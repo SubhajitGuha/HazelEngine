@@ -10,7 +10,8 @@ int main(int *argc,char** argv) {
 	HAZEL_WARN("ERRROR!!!!!!!!!!!");
 	auto app = Hazel::CreateApplication();
 	app->Run();
-
+	
 	delete app;
+	return 0;
 }
 #endif // HZ_PLATFORM_WINDOWS

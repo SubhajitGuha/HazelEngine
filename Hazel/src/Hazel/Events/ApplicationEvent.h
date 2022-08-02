@@ -16,6 +16,7 @@ namespace Hazel {
 			ss << "Window Resize Event " << m_width << " , " << m_height;
 			return ss.str();
 		}
+
 		EVENT_CLASS_TYPE(WindowResize)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	private:

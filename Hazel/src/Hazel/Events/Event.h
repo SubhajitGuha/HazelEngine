@@ -51,10 +51,11 @@ namespace Hazel {
 	public:
 		EventDispatcher(Event& e)
 			:m_Event(e) {}
+
 		template<class t>
 		bool Dispatch(EventFn<t> fn) {
 			if (m_Event.GetEventType() == t::GetStaticType()) {
-				m_Event.m_Handeled = func(*(T*)&m_Event);
+				m_Event.m_Handeled = func(*(t*)&m_Event);
 				return true;
 			}
 			return false;
@@ -63,8 +64,10 @@ namespace Hazel {
 		Event& m_Event;
 	};
 
-	inline std::ostream& operator<<(std::ostream& os, const Event& e)
-	{
+	inline std::ostream& operator<<(std::ostream& os, const Event& e)//there is a "<<" operator of format "stream << value" defined in ostream.h
+																	//which helps to log custom objects in screen. This function just pushes the 																
+	{															   //value of tostring() to the output stream
 		return os << e.ToString();
 	}
+	
 }
