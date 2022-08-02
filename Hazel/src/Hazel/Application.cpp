@@ -9,6 +9,7 @@ namespace Hazel {
 	}
 	void Application::Run()
 	{
+
 		while (true);
 	}
 }
