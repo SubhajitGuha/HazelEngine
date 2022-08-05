@@ -16,6 +16,10 @@ namespace Hazel {
 		WindowResizeEvent re(1920, 1080);
 		HAZEL_WARN(re);
 		
+		if (!glfwInit()) {
+			HAZEL_CORE_TRACE("NOT WORKING");
+			return;
+		}
 		while (true);
 	}
 }
