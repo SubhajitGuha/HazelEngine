@@ -1,6 +1,5 @@
 #pragma once
 #include "Event.h"
-#include "GLFW/glfw3.h"
 
 namespace Hazel {
 	class HAZEL_API WindowResizeEvent: public Event {

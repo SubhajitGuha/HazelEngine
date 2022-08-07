@@ -2,6 +2,8 @@
 #include "hzpch.h"
 #include "Hazel/Core.h"
 #include "Events/Event.h"
+
+
 namespace Hazel{
 	struct WindowProp {
 		std::string Title;

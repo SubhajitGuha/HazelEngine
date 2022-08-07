@@ -1,6 +1,8 @@
 #pragma once
 #include "hzpch.h"
 #include "Core.h"
+#include"Window.h"
+#include "Events/ApplicationEvent.h"
 
 namespace Hazel {
 
@@ -12,6 +14,12 @@ namespace Hazel {
 		
 		void Run();
 
+		void OnEvent(Event& e);
+		std::unique_ptr<Window> m_window;
+
+	private:
+		bool m_Running = true;
+		bool closeWindow(WindowCloseEvent&);
 	};
 	//define in client (not in engine dll)
 	Application* CreateApplication();

@@ -61,7 +61,7 @@ namespace Hazel {
 
 	class HAZEL_API MouseScrollEvent :public Event {
 	public:
-		MouseScrollEvent(int xOffset,int yOffset)
+		MouseScrollEvent(float xOffset,float yOffset)
 			:m_XOffset(xOffset),m_YOffset(yOffset){}
 
 		inline float GetXOffset()const { return m_XOffset; }
@@ -89,7 +89,7 @@ namespace Hazel {
 		
 		std::string ToString()const override {
 			std::stringstream ss;
-			ss << "Mouse Scroll Event" << m_MouseX << " , " << m_MouseY;
+			ss << "Mouse Move Event" << m_MouseX << " , " << m_MouseY;
 			return ss.str();
 		}
 
