@@ -37,7 +37,7 @@ namespace Hazel {
 			return getCategoryFlag() & category; // bitwise and(&) operation to check whether the category belongs to getCategoryflag() 
 												//eg if getcategoryflag() is 0110 and category is 1000 the 0110 & 1000 will result 0000 (false)
 		}
-	protected:
+	//protected:
 		bool m_Handeled = false;
 	};
 

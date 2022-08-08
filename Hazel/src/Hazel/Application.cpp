@@ -24,6 +24,12 @@ namespace Hazel {
 		EventDispatcher dispach(e);
 		dispach.Dispatch<WindowCloseEvent>(HZ_BIND_FN(closeWindow));
 		HAZEL_CORE_TRACE(e);
+		for (auto it = m_layerstack.end(); it != m_layerstack.begin();)
+		{
+			(*--it)->OnEvent(e);	//decrement the iterator here or it will lead to a resticted memory address
+			if (e.m_Handeled)
+				break;
+		}
 	}
 
 	bool Application::closeWindow(WindowCloseEvent& EventClose)
@@ -39,6 +45,11 @@ namespace Hazel {
 	
 		while (m_Running) {
 			m_window->OnUpdate();
+			
+			for (Layer* layer : m_layerstack)
+			{
+				layer->OnUpdate();
+			}
 		}
 	}
 }
