@@ -1,7 +1,7 @@
 #include "hzpch.h"
 #include "Application.h"
 #include "Log.h"
-
+#include "glad/glad.h"
 
 #define HZ_BIND_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
 /*
@@ -15,6 +15,7 @@ namespace Hazel {
 	{
 		m_window = std::unique_ptr<Window>(Window::Create());
 		m_window->SetCallbackEvent(HZ_BIND_FN(OnEvent));
+		
 	}
 	Application::~Application()
 	{

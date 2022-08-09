@@ -23,6 +23,8 @@ namespace Hazel {
 	{
 		if (enable)
 			glfwSwapInterval(1);
+		else
+			glfwSwapInterval(0);
 	}
 	bool WindowsWindow::b_Vsync() const
 	{

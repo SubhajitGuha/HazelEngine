@@ -1,7 +1,8 @@
 workspace "Hazel_Engine"
 
-architecture "x64"
+architecture "x86_64"
 
+startproject "Sandbox"
 configurations
 {
 	"Debug",
@@ -9,14 +10,22 @@ configurations
 	"Dist"
 }
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architectue}"
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+
+IncludeDir = {}
+IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
+IncludeDir["Glad"] = "Hazel/vendor/Glad/include"
+
+include "Hazel/vendor/GLFW"
+include "Hazel/vendor/Glad"
 
 project "Hazel"
 
 	location "Hazel"
 	kind "SharedLib"
 	language "c++"
-	
+	staticruntime "off"
+
 	targetdir ("bin/"..outputdir.."/%{prj.name}")
 	objdir ("bin-int/"..outputdir.."/%{prj.name}")
 
@@ -35,7 +44,14 @@ project "Hazel"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{prj.name}/vendor/GLFW/include"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
+	}
+
+	links{
+		"GLFW",
+		"Glad",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"
@@ -46,31 +62,38 @@ project "Hazel"
 		defines
 		{
 			"HZ_PLATFORM_WINDOWS",
-			"HZ_BUILD_DLL"
+			"HZ_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
 		}
 		postbuildcommands
 		{
 			("{copy} %{cfg.buildtarget.relpath} ../bin/" ..outputdir.. "/Sandbox")
 		}
 
+
 	filter "configurations:Debug"
 		defines "HZ_DEBUG"
+		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "HZ_RELEASE"
+		runtime "Release"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "HZ_DIST"
+		runtime "Release"
 		optimize "On"
+	
 
 project "Sandbox"
 
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "c++"
-	
+
+
 	targetdir ("bin/"..outputdir.."/%{prj.name}")
 	objdir ("bin-int/"..outputdir.."/%{prj.name}")
 
@@ -81,25 +104,22 @@ project "Sandbox"
 	}
 	includedirs
 	{
-		"Hazel/src",
-		"%{prj.name}/vendor/spdlog/include",
-		
+		"Hazel/vendor/spdlog/include",
+		"Hazel/src"		
 	}
 	links "Hazel"
 
 	filter "system:windows"
 		cppdialect "c++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
 		{
-			"HZ_PLATFORM_WINDOWS",
-			
+			"HZ_PLATFORM_WINDOWS"			
 		}
 		
 	filter "configurations:Debug"
-		defines "HZ_DEBUG"
+		defines "HZ_DEBUG"		
 		symbols "On"
 
 	filter "configurations:Release"
