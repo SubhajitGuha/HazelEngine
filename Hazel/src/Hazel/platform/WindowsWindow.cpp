@@ -1,9 +1,10 @@
 #include "hzpch.h"
 #include "WindowsWindow.h"
-#include "Hazel/\Log.h"
+#include "Hazel/Log.h"
 #include"Hazel/Events/KeyEvent.h"
 #include"Hazel/Events/ApplicationEvent.h"
 #include"Hazel/Events/MouseEvent.h"
+
 namespace Hazel {
 	WindowsWindow::WindowsWindow()
 	{
