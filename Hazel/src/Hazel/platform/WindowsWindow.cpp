@@ -4,6 +4,7 @@
 #include"Hazel/Events/KeyEvent.h"
 #include"Hazel/Events/ApplicationEvent.h"
 #include"Hazel/Events/MouseEvent.h"
+#include "glad/glad.h"
 
 namespace Hazel {
 	WindowsWindow::WindowsWindow()
@@ -50,8 +51,13 @@ namespace Hazel {
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, &m_Data);
 		SetVsync(true);
-		//set GLFW callbacks
+		
+		//initilize glad after the window creation or it will throw error
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+			HAZEL_CORE_ERROR("Error in initilizing glad");
+		}
 
+		//set GLFW callbacks
 		glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.width = width;
@@ -115,6 +121,12 @@ namespace Hazel {
 				break;
 			}
 			}
+			});
+
+		glfwSetCharCallback(m_window, [](GLFWwindow* window, unsigned int codepoint) {
+			WindowData& Data = *(WindowData*)glfwGetWindowUserPointer(window);
+			KeyTypedEvent Typed(codepoint);
+			Data.Callbackfunc(Typed);
 			});
 
 		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {

@@ -1,7 +1,7 @@
 #include "hzpch.h"
 #include "Application.h"
 #include "Log.h"
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 #define HZ_BIND_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
 /*
@@ -11,11 +11,12 @@ with out std::bind it is not possible to call OnEvent with an argument while als
 */
 
 namespace Hazel {
+	Application* Application::getApplication;
 	Application::Application()
 	{
+		getApplication = this;
 		m_window = std::unique_ptr<Window>(Window::Create());
 		m_window->SetCallbackEvent(HZ_BIND_FN(OnEvent));
-		
 	}
 	Application::~Application()
 	{
@@ -33,6 +34,18 @@ namespace Hazel {
 		}
 	}
 
+	void Application::PushLayer(Layer* layer)
+	{
+		m_layerstack.PushLayer(layer);
+		layer->OnAttach();
+	}
+
+	void Application::PushOverlay(Layer* Overlay)
+	{
+		m_layerstack.PushOverlay(Overlay);
+		Overlay->OnAttach();
+	}
+
 	bool Application::closeWindow(WindowCloseEvent& EventClose)
 	{
 		m_Running = false;
@@ -45,8 +58,12 @@ namespace Hazel {
 		HAZEL_WARN(re);
 	
 		while (m_Running) {
-			m_window->OnUpdate();
 			
+			m_window->OnUpdate();
+
+			glClearColor(0.6f, 0.5f, 0.9f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+
 			for (Layer* layer : m_layerstack)
 			{
 				layer->OnUpdate();

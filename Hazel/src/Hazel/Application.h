@@ -16,15 +16,20 @@ namespace Hazel {
 		void Run();
 
 		void OnEvent(Event& e);
-		std::unique_ptr<Window> m_window;
 		
-		void PushLayer(Layer* layer) { m_layerstack.PushLayer(layer); }
-		void PushOverlay(Layer* Overlay) { m_layerstack.PushOverlay(Overlay); }
+		void PushLayer(Layer* layer);
+		
+		void PushOverlay(Layer* Overlay);
 
+		inline Window& GetWindow() { return *m_window; }
+
+		static inline Application& Get() { return *getApplication; }
 	private:
+		std::unique_ptr<Window> m_window;
 		bool m_Running = true;
 		bool closeWindow(WindowCloseEvent&);
 		LayerStack m_layerstack;
+		static Application* getApplication;
 	};
 	//define in client (not in engine dll)
 	Application* CreateApplication();

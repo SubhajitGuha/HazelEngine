@@ -7,8 +7,14 @@
     <Filter Include="Hazel\Events">
       <UniqueIdentifier>{5DEF92FE-4952-22A3-F2D7-5A59DE19EE25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Hazel\ImGui">
+      <UniqueIdentifier>{83AD5E9B-EF62-D790-7857-D167E40BCE94}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Hazel\platform">
       <UniqueIdentifier>{2DDE6493-19AC-5899-0240-C9BFEEAC34FE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hazel\platform\Opengl">
+      <UniqueIdentifier>{01376EDB-6DA3-29D6-3697-C133A2C24B3E}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +40,9 @@
     <ClInclude Include="src\Hazel\Events\MouseEvent.h">
       <Filter>Hazel\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\ImGui\ImGuiLayer.h">
+      <Filter>Hazel\ImGui</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Layer.h">
       <Filter>Hazel</Filter>
     </ClInclude>
@@ -46,14 +55,21 @@
     <ClInclude Include="src\Hazel\Window.h">
       <Filter>Hazel</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlRenderer.h">
+      <Filter>Hazel\platform\Opengl</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\platform\WindowsWindow.h">
       <Filter>Hazel\platform</Filter>
     </ClInclude>
     <ClInclude Include="src\hzpch.h" />
+    <ClInclude Include="src\Hazel\Input.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
       <Filter>Hazel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\ImGui\ImGuiLayer.cpp">
+      <Filter>Hazel\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Layer.cpp">
       <Filter>Hazel</Filter>
@@ -66,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="src\Hazel\Window.cpp">
       <Filter>Hazel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlRenderer.cpp">
+      <Filter>Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\WindowsWindow.cpp">
       <Filter>Hazel\platform</Filter>
