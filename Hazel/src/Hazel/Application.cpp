@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Log.h"
 #include <glad/glad.h>
+#include"platform/WindowsInput.h"
 
 #define HZ_BIND_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
 /*
@@ -68,6 +69,9 @@ namespace Hazel {
 			{
 				layer->OnUpdate();
 			}
+
+			HAZEL_CORE_TRACE(Input::IsKeyPressed(GLFW_KEY_W));
+			HAZEL_CORE_TRACE(Input::IsButtonPressed(3));
 		}
 	}
 }

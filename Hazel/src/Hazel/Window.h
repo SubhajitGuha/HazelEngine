@@ -25,6 +25,7 @@ public:
 	virtual void SetCallbackEvent(const EventCallbackFunc&) = 0;
 	virtual void SetVsync(bool enable) = 0;
 	virtual bool b_Vsync()const = 0;
+	virtual void* GetNativeWindow() = 0;//gets the GLFWwindow pointer
 
 	static Window* Create(const WindowProp& prop = WindowProp());
 };

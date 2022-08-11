@@ -20,6 +20,8 @@ namespace Hazel {
 		void SetVsync(bool enable) override;
 		bool b_Vsync()const override;
 
+		inline void* GetNativeWindow() { return m_window; }
+
 		struct WindowData{
 			unsigned int width, height;
 			std::string name;
