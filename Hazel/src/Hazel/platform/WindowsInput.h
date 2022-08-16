@@ -9,5 +9,6 @@ namespace Hazel {
 	public:
 		 bool IsKeyPressedImpl(int keyCode) override;
 		 bool IsMouseButtonPressed(int Button) override;
+		 std::pair<double, double> GetMousePos() override;
 	};
 }

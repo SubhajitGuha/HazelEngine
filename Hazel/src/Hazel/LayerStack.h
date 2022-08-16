@@ -17,7 +17,7 @@ namespace Hazel {
 		inline std::vector<Layer*>::iterator end() { return m_Layers.end(); }
 	private:
 		std::vector<Layer*> m_Layers;
-		std::vector<Layer*>::iterator m_LayerInsert;//iterator for consequtively storing the layers before the ovelay
+		unsigned int m_LayerInsertIndex=0;//iterator for consequtively storing the layers before the ovelay
 	};
 }
 

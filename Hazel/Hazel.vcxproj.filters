@@ -40,8 +40,14 @@
     <ClInclude Include="src\Hazel\Events\MouseEvent.h">
       <Filter>Hazel\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\HazelCodes.h">
+      <Filter>Hazel</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\ImGui\ImGuiLayer.h">
       <Filter>Hazel\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\Input.h">
+      <Filter>Hazel</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Layer.h">
       <Filter>Hazel</Filter>
@@ -55,15 +61,13 @@
     <ClInclude Include="src\Hazel\Window.h">
       <Filter>Hazel</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlRenderer.h">
-      <Filter>Hazel\platform\Opengl</Filter>
+    <ClInclude Include="src\Hazel\platform\WindowsInput.h">
+      <Filter>Hazel\platform</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\WindowsWindow.h">
       <Filter>Hazel\platform</Filter>
     </ClInclude>
     <ClInclude Include="src\hzpch.h" />
-    <ClInclude Include="src\Hazel\Input.h" />
-    <ClInclude Include="src\Hazel\platform\WindowsInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -84,13 +88,13 @@
     <ClCompile Include="src\Hazel\Window.cpp">
       <Filter>Hazel</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlRenderer.cpp">
-      <Filter>Hazel\platform\Opengl</Filter>
+    <ClCompile Include="src\Hazel\platform\WindowsInput.cpp">
+      <Filter>Hazel\platform</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\WindowsWindow.cpp">
       <Filter>Hazel\platform</Filter>
     </ClCompile>
     <ClCompile Include="src\hzpch.cpp" />
-    <ClCompile Include="src\Hazel\platform\WindowsInput.cpp" />
+    <ClCompile Include="src\Hazel\ImGui\ImGuiBuild.cpp" />
   </ItemGroup>
 </Project>

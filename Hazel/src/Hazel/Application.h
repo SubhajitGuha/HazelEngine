@@ -4,6 +4,7 @@
 #include"Window.h"
 #include "Events/ApplicationEvent.h"
 #include "LayerStack.h"
+#include "ImGui/ImGuiLayer.h"
 
 namespace Hazel {
 
@@ -25,6 +26,7 @@ namespace Hazel {
 
 		static inline Application& Get() { return *getApplication; }
 	private:
+		ImGuiLayer* m_ImGuiLayer;
 		std::unique_ptr<Window> m_window;
 		bool m_Running = true;
 		bool closeWindow(WindowCloseEvent&);

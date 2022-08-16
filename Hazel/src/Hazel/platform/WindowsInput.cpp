@@ -19,4 +19,11 @@ namespace Hazel {
 		return status == GLFW_PRESS;
 	}
 
+	std::pair<double, double> WindowsInput::GetMousePos()
+	{
+		std::pair<double, double> coordinate;
+		glfwGetCursorPos((GLFWwindow*) Application::Get().GetWindow().GetNativeWindow(),&coordinate.first,&coordinate.second);
+		return coordinate;
+	}
+
 }

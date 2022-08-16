@@ -18,8 +18,8 @@ class Sandbox :public Hazel::Application
 {
 public:
 	Sandbox(){
-		//PushLayer(new Layerimplement());
-		PushOverlay(new Hazel::ImGuiLayer());
+		PushLayer(new Layerimplement());
+		//PushOverlay(new Hazel::ImGuiLayer());
 	}
 	~Sandbox(){}
 };

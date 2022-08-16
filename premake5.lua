@@ -17,6 +17,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
 IncludeDir["Glad"] = "Hazel/vendor/Glad/include"
 IncludeDir["imgui"] = "Hazel/vendor/imgui"
+IncludeDir["glm"] = "Hazel/vendor/glm"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
@@ -49,7 +50,8 @@ project "Hazel"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.imgui}"
+		"%{IncludeDir.imgui}",
+		"%{IncludeDir.glm}"
 	}
 
 	links{
@@ -109,7 +111,8 @@ project "Sandbox"
 	includedirs
 	{
 		"Hazel/vendor/spdlog/include",
-		"Hazel/vendor/imgui",
+		"%{IncludeDir.imgui}",
+		"%{IncludeDir.glm}",
 		"Hazel/src"		
 	}
 	links "Hazel"

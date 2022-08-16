@@ -3,6 +3,8 @@
 #include "Log.h"
 #include <glad/glad.h>
 #include"platform/WindowsInput.h"
+#include "HazelCodes.h"
+
 
 #define HZ_BIND_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
 /*
@@ -18,6 +20,8 @@ namespace Hazel {
 		getApplication = this;
 		m_window = std::unique_ptr<Window>(Window::Create());
 		m_window->SetCallbackEvent(HZ_BIND_FN(OnEvent));
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
 	}
 	Application::~Application()
 	{
@@ -62,16 +66,18 @@ namespace Hazel {
 			
 			m_window->OnUpdate();
 
-			glClearColor(0.6f, 0.5f, 0.9f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
+			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_layerstack)
 			{
-				layer->OnUpdate();
+				layer->OnImGuiRender();
 			}
+			m_ImGuiLayer->End();
 
-			HAZEL_CORE_TRACE(Input::IsKeyPressed(GLFW_KEY_W));
-			HAZEL_CORE_TRACE(Input::IsButtonPressed(3));
+			if(Input::IsKeyPressed(HZ_KEY_1))
+				HAZEL_CORE_TRACE("KeyPressed is ",HZ_KEY_1);
+			
+			HAZEL_CORE_TRACE(Input::GetCursorPosition().first);
+			HAZEL_CORE_TRACE(Input::GetCursorPosition().second);
 		}
 	}
 }
