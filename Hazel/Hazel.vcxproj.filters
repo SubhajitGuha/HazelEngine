@@ -13,9 +13,6 @@
     <Filter Include="Hazel\platform">
       <UniqueIdentifier>{2DDE6493-19AC-5899-0240-C9BFEEAC34FE}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Hazel\platform\Opengl">
-      <UniqueIdentifier>{01376EDB-6DA3-29D6-3697-C133A2C24B3E}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Hazel.h" />
@@ -73,6 +70,9 @@
     <ClCompile Include="src\Hazel\Application.cpp">
       <Filter>Hazel</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\ImGui\ImGuiBuild.cpp">
+      <Filter>Hazel\ImGui</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\ImGui\ImGuiLayer.cpp">
       <Filter>Hazel\ImGui</Filter>
     </ClCompile>
@@ -95,6 +95,5 @@
       <Filter>Hazel\platform</Filter>
     </ClCompile>
     <ClCompile Include="src\hzpch.cpp" />
-    <ClCompile Include="src\Hazel\ImGui\ImGuiBuild.cpp" />
   </ItemGroup>
 </Project>

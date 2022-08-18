@@ -26,9 +26,10 @@ include "Hazel/vendor/imgui"
 project "Hazel"
 
 	location "Hazel"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "c++"
-	staticruntime "off"
+	staticruntime "on"
+	cppdialect "c++17"
 
 	targetdir ("bin/"..outputdir.."/%{prj.name}")
 	objdir ("bin-int/"..outputdir.."/%{prj.name}")
@@ -62,7 +63,7 @@ project "Hazel"
 	}
 
 	filter "system:windows"
-		cppdialect "c++17"
+		
 		systemversion "latest"
 
 		defines
@@ -70,10 +71,6 @@ project "Hazel"
 			"HZ_PLATFORM_WINDOWS",
 			"HZ_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
-		}
-		postbuildcommands
-		{
-			("{copy} %{cfg.buildtarget.relpath} ../bin/" ..outputdir.. "/Sandbox")
 		}
 
 
@@ -98,7 +95,8 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "c++"
-	staticruntime "off"
+	staticruntime "on"
+	cppdialect "c++17"
 
 	targetdir ("bin/"..outputdir.."/%{prj.name}")
 	objdir ("bin-int/"..outputdir.."/%{prj.name}")
@@ -118,7 +116,7 @@ project "Sandbox"
 	links "Hazel"
 
 	filter "system:windows"
-		cppdialect "c++17"
+		
 		systemversion "latest"
 
 		defines
