@@ -3,6 +3,7 @@
 #include"Hazel/Window.h"
 #include "Hazel/Core.h"
 #include "GLFW/glfw3.h"
+#include "Hazel/platform/Opengl/OpenGlRenderer.h"
 
 namespace Hazel {
 	class WindowsWindow :public Window
@@ -16,7 +17,7 @@ namespace Hazel {
 		unsigned int GetHeight()override {
 			return m_Data.height;
 		}
-		void SetCallbackEvent(const EventCallbackFunc& callback) { m_Data.Callbackfunc = callback; }
+		void SetCallbackEvent(const EventCallbackFunc& callback)override { m_Data.Callbackfunc = callback; }
 		void SetVsync(bool enable) override;
 		bool b_Vsync()const override;
 
@@ -35,5 +36,6 @@ namespace Hazel {
 		void ShutDown();
 		WindowData m_Data;
 		WindowProp prop=WindowProp();
+		GraphicsContext* Context;
 	};
 }

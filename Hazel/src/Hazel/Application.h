@@ -5,6 +5,7 @@
 #include "Events/ApplicationEvent.h"
 #include "LayerStack.h"
 #include "ImGui/ImGuiLayer.h"
+#include "Hazel/platform/Opengl/Shader.h"
 
 namespace Hazel {
 
@@ -32,6 +33,7 @@ namespace Hazel {
 		bool closeWindow(WindowCloseEvent&);
 		LayerStack m_layerstack;
 		static Application* getApplication;
+		Shader* shader;
 	};
 	//define in client (not in engine dll)
 	Application* CreateApplication();

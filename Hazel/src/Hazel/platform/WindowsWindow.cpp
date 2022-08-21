@@ -6,6 +6,7 @@
 #include"Hazel/Events/MouseEvent.h"
 #include "glad/glad.h"
 
+
 namespace Hazel {
 	WindowsWindow::WindowsWindow()
 	{
@@ -18,8 +19,9 @@ namespace Hazel {
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_window);	
-		glClearColor(1.0, 0.6, 0.56, 1.0);
+		Context->SwapBuffers();
+		
+		glClearColor(0.10, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 	void WindowsWindow::SetVsync(bool enable)
@@ -50,15 +52,11 @@ namespace Hazel {
 		}
 
 		m_window = glfwCreateWindow((int)m_Data.width,(int) m_Data.height, m_Data.name.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_window);
+		Context = new OpenGlRenderer(m_window);//context for opengl as this piece of code is abstracted away
+		Context->Init();
 		glfwSetWindowUserPointer(m_window, &m_Data);
 		SetVsync(true);
 		
-		//initilize glad after the window creation or it will throw error
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			HAZEL_CORE_ERROR("Error in initilizing glad");
-		}
-
 		//set GLFW callbacks
 		glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
