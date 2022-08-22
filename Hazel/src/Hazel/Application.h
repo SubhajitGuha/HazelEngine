@@ -5,7 +5,8 @@
 #include "Events/ApplicationEvent.h"
 #include "LayerStack.h"
 #include "ImGui/ImGuiLayer.h"
-#include "Hazel/platform/Opengl/Shader.h"
+#include "Hazel/Renderer/Shader.h"
+#include "Renderer/Buffer.h"
 
 namespace Hazel {
 
@@ -34,6 +35,7 @@ namespace Hazel {
 		LayerStack m_layerstack;
 		static Application* getApplication;
 		Shader* shader;
+		
 	};
 	//define in client (not in engine dll)
 	Application* CreateApplication();

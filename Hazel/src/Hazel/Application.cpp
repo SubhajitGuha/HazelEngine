@@ -60,13 +60,17 @@ namespace Hazel {
 	void Application::Run()
 	{
 		float pos[] = 
-		{0.0,0.5,0.1,
-		0.5,-0.5,-0.5
-		-0.5,-0.50,0.5};
-		unsigned int i;
-		glGenBuffers(1, &i);
-		glBindBuffer(GL_ARRAY_BUFFER, i);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(pos), pos, GL_STATIC_DRAW);
+		{-0.5,0.5,0.0,
+		0.5,-0.5,0.0,
+		-0.5,-0.50,0.0,
+		0.5,0.5,0.0};
+
+		unsigned int index[] =
+		{0,1,2,
+		0,1,3};
+		
+		VertexBuffer* vb = VertexBuffer::Create(pos, sizeof(pos));
+		IndexBuffer* ib = IndexBuffer::Create(index, sizeof(index));
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), 0);
 
@@ -77,7 +81,7 @@ namespace Hazel {
 			void main()
 			{
 				m_pos = pos;
-				gl_Position = vec4(pos,1.0);
+				gl_Position = vec4(pos ,1.0);
 			}
 		)";
 		std::string fragmentshader = R"(
@@ -86,7 +90,7 @@ namespace Hazel {
 			in vec3 m_pos;
 			void main()
 			{
-				color= vec4(m_pos,1.0);
+				color= vec4(m_pos * 0.5 + 0.5,1.0);
 			}
 		)";
 		shader = new Shader(vertexshader, fragmentshader);
@@ -103,7 +107,8 @@ namespace Hazel {
 			}
 			m_ImGuiLayer->End();
 
-			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 			if(Input::IsKeyPressed(HZ_KEY_1))
 				HAZEL_CORE_TRACE("KeyPressed is ",HZ_KEY_1);
 			

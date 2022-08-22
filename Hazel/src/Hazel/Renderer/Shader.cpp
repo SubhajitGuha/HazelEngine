@@ -16,24 +16,28 @@ Hazel::Shader::Shader(std::string& vertexshader, std::string& fragmentshader)
 		{
 			int length;
 			glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &length);
-			char* message = (char*)alloca(length * sizeof(char));
+			char* message = new char[length];
 			glGetShaderInfoLog(vs, length, &length, message);
 			HAZEL_CORE_ERROR(message);
 		}
+
 		}
+
 		unsigned int fs = glCreateShader(GL_FRAGMENT_SHADER);
 		const char* chr1 = fragmentshader.c_str();
 		glShaderSource(fs, 1, &chr1, nullptr);
 		glCompileShader(fs);
 		int id;
 		glGetShaderiv(fs, GL_COMPILE_STATUS, &id);
-		if (id) {
+		if (id) 
+		{
 			int length;
 			glGetShaderiv(fs, GL_INFO_LOG_LENGTH, &length);
 			char* message = new char[length];
 			glGetShaderInfoLog(fs, length, &length, message);
 			HAZEL_CORE_ERROR(message);
 		}
+
 	unsigned int program = glCreateProgram();
 	glAttachShader(program, vs);
 	glAttachShader(program, fs);

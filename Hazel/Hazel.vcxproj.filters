@@ -66,8 +66,11 @@
     </ClInclude>
     <ClInclude Include="src\hzpch.h" />
     <ClInclude Include="src\Hazel\Renderer\GraphicsContext.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlRenderer.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\Shader.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlContext.h" />
+    <ClInclude Include="src\Hazel\Renderer\Shader.h" />
+    <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBuffer.h" />
+    <ClInclude Include="src\Hazel\Renderer\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -98,8 +101,11 @@
       <Filter>Hazel\platform</Filter>
     </ClCompile>
     <ClCompile Include="src\hzpch.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlRenderer.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlContext.cpp" />
     <ClCompile Include="src\Hazel\Renderer\GraphicsContext.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\Shader.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBuffer.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Renderer.cpp" />
   </ItemGroup>
 </Project>

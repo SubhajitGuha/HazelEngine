@@ -4,10 +4,10 @@
 #include "Hazel/Log.h"
 
 namespace Hazel {
-	class OpenGlRenderer :public GraphicsContext
+	class OpenGlContext :public GraphicsContext
 	{
 	public:
-		OpenGlRenderer(GLFWwindow*);
+		OpenGlContext(GLFWwindow*);
 		void Init()override;
 		void SwapBuffers()override;
 	private:

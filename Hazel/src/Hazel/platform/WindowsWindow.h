@@ -3,7 +3,7 @@
 #include"Hazel/Window.h"
 #include "Hazel/Core.h"
 #include "GLFW/glfw3.h"
-#include "Hazel/platform/Opengl/OpenGlRenderer.h"
+#include "Hazel/platform/Opengl/OpenGlContext.h"
 
 namespace Hazel {
 	class WindowsWindow :public Window

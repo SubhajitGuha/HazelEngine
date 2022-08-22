@@ -1,13 +1,13 @@
 #include "hzpch.h"
-#include "OpenGlRenderer.h"
+#include "OpenGlContext.h"
 #include "glad/glad.h"
 
-Hazel::OpenGlRenderer::OpenGlRenderer(GLFWwindow* window)
+Hazel::OpenGlContext::OpenGlContext(GLFWwindow* window)
 	:m_GlfwWindow(window)
 {
 }
 
-void Hazel::OpenGlRenderer::Init()
+void Hazel::OpenGlContext::Init()
 {
 	glfwMakeContextCurrent(m_GlfwWindow);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -15,7 +15,7 @@ void Hazel::OpenGlRenderer::Init()
 	}
 }
 
-void Hazel::OpenGlRenderer::SwapBuffers()
+void Hazel::OpenGlContext::SwapBuffers()
 {
 	glfwSwapBuffers(m_GlfwWindow);
 }
