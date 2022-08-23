@@ -71,6 +71,7 @@
     <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBuffer.h" />
     <ClInclude Include="src\Hazel\Renderer\Renderer.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenglVertexArray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -107,5 +108,6 @@
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBuffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenglVertexArray.cpp" />
   </ItemGroup>
 </Project>

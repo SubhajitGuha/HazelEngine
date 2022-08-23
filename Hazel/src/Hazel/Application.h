@@ -9,7 +9,6 @@
 #include "Renderer/Buffer.h"
 
 namespace Hazel {
-
 	class HAZEL_API Application { //set this class as dll export
 	public:
 		Application();

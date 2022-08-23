@@ -140,6 +140,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenglVertexArray.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBuffer.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlContext.h" />
     <ClInclude Include="src\Hazel.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="src\hzpch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenglVertexArray.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlContext.cpp" />
     <ClCompile Include="src\Hazel\Application.cpp" />
     <ClCompile Include="src\Hazel\ImGui\ImGuiBuild.cpp" />

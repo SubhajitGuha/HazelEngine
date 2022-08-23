@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include"platform/WindowsInput.h"
 #include "HazelCodes.h"
-
+//#include"Hazel/platform/Opengl/OpenglVertexArray.h"
 
 #define HZ_BIND_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
 /*
@@ -60,37 +60,52 @@ namespace Hazel {
 	void Application::Run()
 	{
 		float pos[] = 
-		{-0.5,0.5,0.0,
-		0.5,-0.5,0.0,
-		-0.5,-0.50,0.0,
-		0.5,0.5,0.0};
+		{-0.8,0.8,0.0,  0.8 ,0.0 ,0.6 ,1.0,
+		0.8,-0.8,0.0,   0.1 ,0.6 ,0.9 ,1.0,
+		-0.8,-0.80,0.0, 0.8 ,0.7 ,0.0 ,1.0,
+		0.8,0.8,0.0,    0.2 ,0.9 ,0.8 ,1.0,
+		0.0,0.5,0.0,    0.3 ,0.3 ,0.3 ,1.0,
+		0.5,-0.5,0.0,   0.3 ,0.3 ,0.3 ,1.0,
+		-0.5,-0.5,0.0,   0.3 ,0.3 ,0.3 ,1.0};
 
 		unsigned int index[] =
 		{0,1,2,
-		0,1,3};
+		0,1,3,
+		4,5,6};
 		
-		VertexBuffer* vb = VertexBuffer::Create(pos, sizeof(pos));
+		VertexArray* vao=VertexArray::Create();//vertex array
+		VertexBuffer* vb = VertexBuffer::Create(pos, sizeof(pos));//vertex buffer
+		BufferLayout bl;
+		bl.push("position", DataType::Float3);
+		bl.push("color", DataType::Float4);
+
+		vao->AddBuffer(bl, *vb);
+
 		IndexBuffer* ib = IndexBuffer::Create(index, sizeof(index));
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), 0);
 
 		std::string vertexshader = R"(
 			#version 410 core
 			layout (location = 0) in vec3 pos;
-			out vec3 m_pos;
+			layout (location = 1) in vec4 col;
+
+			out vec4 m_color;
+
 			void main()
 			{
-				m_pos = pos;
+				m_color = col;
 				gl_Position = vec4(pos ,1.0);
+				
 			}
 		)";
 		std::string fragmentshader = R"(
 			#version 410 core
 			layout (location = 0) out vec4 color;
-			in vec3 m_pos;
+
+			in vec4 m_color;
+
 			void main()
 			{
-				color= vec4(m_pos * 0.5 + 0.5,1.0);
+				color= m_color;
 			}
 		)";
 		shader = new Shader(vertexshader, fragmentshader);
@@ -108,8 +123,9 @@ namespace Hazel {
 			m_ImGuiLayer->End();
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-			if(Input::IsKeyPressed(HZ_KEY_1))
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (const void*)(6*sizeof(unsigned int)));
+		
+			if (Input::IsKeyPressed(HZ_KEY_1))
 				HAZEL_CORE_TRACE("KeyPressed is ",HZ_KEY_1);
 			
 			HAZEL_CORE_TRACE(Input::GetCursorPosition().first);
