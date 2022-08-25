@@ -8,7 +8,7 @@ namespace Hazel {
 
 	VertexBuffer* VertexBuffer::Create(float* data, size_t size)
 	{
-		switch (Renderer::GetAPI()) {
+		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::OpenGL:
 			return new OpenGlVertexBuffer(data,size);
 		case GraphicsAPI::None:
@@ -24,9 +24,9 @@ namespace Hazel {
 
 	IndexBuffer* IndexBuffer::Create(unsigned int* data, size_t size)
 	{
-		switch (Renderer::GetAPI()) {
+		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::OpenGL:
-			return new OpenGlIndexBuffer(data,size);
+			return new OpenGlIndexBuffer(data, size);
 		case GraphicsAPI::None:
 			HAZEL_CORE_ERROR("NOT A VALID GRAPHICS API");
 			break;
@@ -35,11 +35,11 @@ namespace Hazel {
 		}
 		return nullptr;
 	}
-	
+
 
 	/// ////////////////////////////////////////////////////////////////////////////
 
-	void BufferLayout ::push(std::string name, DataType type)
+	void BufferLayout::push(std::string name, DataType type)
 	{
 		m_Elements.push_back(new BufferElements(name, type));
 		Stride += GetSize(type);
@@ -48,13 +48,13 @@ namespace Hazel {
 	{
 		switch (type) {
 		case DataType::Float: return sizeof(float);
-		case DataType::Float2: return sizeof(float)*2;
-		case DataType::Float3: return sizeof(float)*3;
-		case DataType::Float4: return sizeof(float)*4;
+		case DataType::Float2: return sizeof(float) * 2;
+		case DataType::Float3: return sizeof(float) * 3;
+		case DataType::Float4: return sizeof(float) * 4;
 		case DataType::Int: return sizeof(int);
-		case DataType::Int2: return sizeof(int)*2;
-		case DataType::Int3: return sizeof(int)*3;
-		case DataType::Int4: return sizeof(int)*4;
+		case DataType::Int2: return sizeof(int) * 2;
+		case DataType::Int3: return sizeof(int) * 3;
+		case DataType::Int4: return sizeof(int) * 4;
 		default:
 			HAZEL_CORE_ERROR("Unidentfied Type");
 		}
@@ -62,7 +62,7 @@ namespace Hazel {
 	}
 	VertexArray* VertexArray::Create()
 	{
-		switch (Renderer::GetAPI()) {
+		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::OpenGL:
 			return new OpenGlVertexArray();
 		case GraphicsAPI::None:

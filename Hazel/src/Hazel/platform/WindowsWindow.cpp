@@ -21,8 +21,6 @@ namespace Hazel {
 		glfwPollEvents();
 		Context->SwapBuffers();
 		
-		glClearColor(0.10, 0.1, 0.1, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
 	}
 	void WindowsWindow::SetVsync(bool enable)
 	{

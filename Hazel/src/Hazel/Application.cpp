@@ -4,7 +4,8 @@
 #include <glad/glad.h>
 #include"platform/WindowsInput.h"
 #include "HazelCodes.h"
-//#include"Hazel/platform/Opengl/OpenglVertexArray.h"
+#include "Renderer/Renderer.h"
+
 
 #define HZ_BIND_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
 /*
@@ -114,6 +115,8 @@ namespace Hazel {
 			
 			m_window->OnUpdate();
 			
+			RenderCommand::ClearColor(glm::vec4(0.8,0.8,0.8,0.8));
+			RenderCommand::Clear();
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_layerstack)
@@ -122,8 +125,7 @@ namespace Hazel {
 			}
 			m_ImGuiLayer->End();
 
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (const void*)(6*sizeof(unsigned int)));
+			RenderCommand::DrawIndex(9, 0);
 		
 			if (Input::IsKeyPressed(HZ_KEY_1))
 				HAZEL_CORE_TRACE("KeyPressed is ",HZ_KEY_1);

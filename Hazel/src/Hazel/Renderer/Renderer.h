@@ -1,15 +1,11 @@
 #pragma once
+#include "RenderCommand.h"
 namespace Hazel {
-	enum class GraphicsAPI
-	{
-		None=0,
-		OpenGL=1
-	};
 	class Renderer {
 	public:
-		static GraphicsAPI GetAPI() { return m_API; }
-	private:
-		
-		static GraphicsAPI m_API;
+		static void Begin(){}
+		static void Submit(){}
+		static void End(){}
+
 	};
 }
