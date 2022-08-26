@@ -17,8 +17,8 @@ namespace Hazel {
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
-	void OpenGlRendererAPI::DrawIndex(unsigned int NumberOfIndex,unsigned int Offset)
+	void OpenGlRendererAPI::DrawIndex(VertexArray& vertexarray)
 	{
-		glDrawElements(GL_TRIANGLES, NumberOfIndex, GL_UNSIGNED_INT, (const void *)Offset);
+		glDrawElements(GL_TRIANGLES, vertexarray.GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (const void *)0);
 	}
 }

@@ -3,9 +3,9 @@
 namespace Hazel {
 	class Renderer {
 	public:
-		static void Begin(){}
-		static void Submit(){}
-		static void End(){}
+		static void BeginScene(){}
+		static void Submit(VertexArray& vertexarray) { RenderCommand::DrawIndex(vertexarray); }
+		static void EndScene(){}
 
 	};
 }

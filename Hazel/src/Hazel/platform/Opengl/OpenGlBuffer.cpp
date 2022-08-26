@@ -37,6 +37,7 @@ namespace Hazel {
 
 	OpenGlIndexBuffer::OpenGlIndexBuffer(unsigned int* data, size_t size)
 	{
+		m_Elements = size/sizeof(unsigned int);
 		glGenBuffers(1, &m_Renderer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Renderer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
@@ -52,5 +53,9 @@ namespace Hazel {
 	void OpenGlIndexBuffer::UnBind() const
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+	size_t OpenGlIndexBuffer::GetCount()
+	{
+		return m_Elements;
 	}
 }

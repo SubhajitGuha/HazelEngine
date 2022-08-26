@@ -60,6 +60,9 @@ namespace Hazel {
 		}
 
 	}
+
+	/////////////////////////////////////////////////////////////////////////
+	
 	VertexArray* VertexArray::Create()
 	{
 		switch (RendererAPI::GetAPI()) {

@@ -48,6 +48,7 @@ namespace Hazel {
 	public:
 		virtual void Bind()const = 0;
 		virtual void UnBind()const = 0;
+		virtual size_t GetCount() = 0;
 		static IndexBuffer* Create(unsigned int* data, size_t size);
 	};
 
@@ -57,6 +58,10 @@ namespace Hazel {
 		virtual void Bind()const = 0;
 		virtual void UnBind()const = 0;
 		virtual void AddBuffer(BufferLayout&, VertexBuffer&){}
+		virtual void SetIndexBuffer(std::shared_ptr<IndexBuffer>) = 0;
+
+		//virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() {return nullptr};
+		virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const = 0;
 		static VertexArray* Create();
 	};
 

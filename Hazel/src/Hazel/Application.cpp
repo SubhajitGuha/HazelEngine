@@ -80,9 +80,10 @@ namespace Hazel {
 		bl.push("position", DataType::Float3);
 		bl.push("color", DataType::Float4);
 
-		vao->AddBuffer(bl, *vb);
-
 		IndexBuffer* ib = IndexBuffer::Create(index, sizeof(index));
+
+		vao->AddBuffer(bl, *vb);
+		vao->SetIndexBuffer((std::shared_ptr<IndexBuffer>)ib);
 
 		std::string vertexshader = R"(
 			#version 410 core
@@ -118,6 +119,10 @@ namespace Hazel {
 			RenderCommand::ClearColor(glm::vec4(0.8,0.8,0.8,0.8));
 			RenderCommand::Clear();
 
+			Renderer::BeginScene();
+			Renderer::Submit(*vao);
+			Renderer::EndScene();
+
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_layerstack)
 			{
@@ -125,8 +130,6 @@ namespace Hazel {
 			}
 			m_ImGuiLayer->End();
 
-			RenderCommand::DrawIndex(9, 0);
-		
 			if (Input::IsKeyPressed(HZ_KEY_1))
 				HAZEL_CORE_TRACE("KeyPressed is ",HZ_KEY_1);
 			

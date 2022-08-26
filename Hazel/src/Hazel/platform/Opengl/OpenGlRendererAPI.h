@@ -8,6 +8,6 @@ namespace Hazel {
 		~OpenGlRendererAPI();
 		void ClearColor(glm::vec4&)override;
 		void Clear()override;
-		void DrawIndex(unsigned int NumberOfIndex, unsigned int Offset)override;
+		void DrawIndex(VertexArray& vertexarray)override;
 	};
 }

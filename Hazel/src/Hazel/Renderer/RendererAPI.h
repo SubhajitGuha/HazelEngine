@@ -1,6 +1,8 @@
 #pragma once
 #include "Hazel/Log.h"
 #include "glm/glm.hpp"
+#include "Hazel/Renderer/Buffer.h"
+
 namespace Hazel {
 	enum class GraphicsAPI
 	{
@@ -11,7 +13,7 @@ namespace Hazel {
 	public:
 		virtual void ClearColor(glm::vec4&) = 0;
 		virtual void Clear() =0;
-		virtual void DrawIndex(unsigned int NumberOfIndex, unsigned int Offset) =0;
+		virtual void DrawIndex(VertexArray& vertexarray) =0;
 		inline static GraphicsAPI GetAPI() { return m_API; }
 	private:
 		static GraphicsAPI m_API;

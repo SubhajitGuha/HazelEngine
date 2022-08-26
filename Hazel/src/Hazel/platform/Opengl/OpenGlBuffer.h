@@ -19,7 +19,9 @@ namespace Hazel {
 		~OpenGlIndexBuffer();
 		void Bind() const override;
 		void UnBind() const override;
+		size_t GetCount()override;
 	private:
+		size_t m_Elements;
 		unsigned int m_Renderer;
 	};
 }

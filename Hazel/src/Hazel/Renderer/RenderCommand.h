@@ -10,8 +10,8 @@ namespace Hazel {
 		inline static void Clear() {
 			m_RendererAPI->Clear();
 		}
-		inline static void DrawIndex(const unsigned int& NumberOfIndex,const unsigned int& StartIndex) {
-			m_RendererAPI->DrawIndex(NumberOfIndex, StartIndex);
+		inline static void DrawIndex(VertexArray& vertexarray) {
+			m_RendererAPI->DrawIndex(vertexarray);
 		}
 	private:
 		static RendererAPI* m_RendererAPI;

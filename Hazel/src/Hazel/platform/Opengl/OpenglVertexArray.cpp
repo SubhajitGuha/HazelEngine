@@ -63,5 +63,13 @@ namespace Hazel {
 			glVertexAttribPointer(i, GetSize(element[i]->Type), GetType(element[i]->Type), element[i]->Normalized, layout.GetStride(),(const void*) offset);
 			offset += GetSize(element[i]->Type)*sizeof(GetType(element[i]->Type));
 		}
+
+		m_VertexBuffer.push_back((std::shared_ptr<VertexBuffer>) & vbo);
 	}
+	void OpenGlVertexArray::SetIndexBuffer(std::shared_ptr<IndexBuffer> IndexBuffer)
+	{
+		Bind();
+		IndexBuffer->Bind();
+		m_IndexBuffer = IndexBuffer;
+	}	
 }
