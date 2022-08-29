@@ -1,11 +1,10 @@
 #include "hzpch.h"
 #include "Application.h"
 #include "Log.h"
-#include <glad/glad.h>
 #include"platform/WindowsInput.h"
 #include "HazelCodes.h"
 #include "Renderer/Renderer.h"
-
+#include"Layer.h"
 
 #define HZ_BIND_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
 /*
@@ -15,8 +14,10 @@ with out std::bind it is not possible to call OnEvent with an argument while als
 */
 
 namespace Hazel {
+	
 	Application* Application::getApplication;
 	Application::Application()
+		:m_camera(-5.8,5.8,-5.8,5.8)
 	{
 		getApplication = this;
 		m_window = std::unique_ptr<Window>(Window::Create());
@@ -31,6 +32,7 @@ namespace Hazel {
 	{
 		EventDispatcher dispach(e);
 		dispach.Dispatch<WindowCloseEvent>(HZ_BIND_FN(closeWindow));
+		dispach.Dispatch<KeyPressedEvent>(HZ_BIND_FN(MoveForward));
 		HAZEL_CORE_TRACE(e);
 		for (auto it = m_layerstack.end(); it != m_layerstack.begin();)
 		{
@@ -67,7 +69,7 @@ namespace Hazel {
 		0.8,0.8,0.0,    0.2 ,0.9 ,0.8 ,1.0,
 		0.0,0.5,0.0,    0.3 ,0.3 ,0.3 ,1.0,
 		0.5,-0.5,0.0,   0.3 ,0.3 ,0.3 ,1.0,
-		-0.5,-0.5,0.0,   0.3 ,0.3 ,0.3 ,1.0};
+		-0.5,-0.5,0.0,  0.3 ,0.3 ,0.3 ,1.0};
 
 		unsigned int index[] =
 		{0,1,2,
@@ -91,11 +93,11 @@ namespace Hazel {
 			layout (location = 1) in vec4 col;
 
 			out vec4 m_color;
-
+			uniform mat4 mvp;
 			void main()
 			{
 				m_color = col;
-				gl_Position = vec4(pos ,1.0);
+				gl_Position = mvp * vec4(pos ,1.0);
 				
 			}
 		)";
@@ -111,6 +113,9 @@ namespace Hazel {
 			}
 		)";
 		shader = new Shader(vertexshader, fragmentshader);
+		
+		m_camera.SetPosition({ 0.0, 0, 0 });//set the location of the model
+		m_camera.SetRotation(30);// set the rotation of the model (in z axis (hard codded))
 
 		while (m_Running) {
 			
@@ -118,8 +123,9 @@ namespace Hazel {
 			
 			RenderCommand::ClearColor(glm::vec4(0.8,0.8,0.8,0.8));
 			RenderCommand::Clear();
-
-			Renderer::BeginScene();
+			m_camera.SetPosition({ v, 0, 0 });
+			Renderer::BeginScene(m_camera);
+			shader->UploadUniformMat4("mvp",Renderer::m_data->m_ProjectionViewMatrix);		
 			Renderer::Submit(*vao);
 			Renderer::EndScene();
 
@@ -137,4 +143,6 @@ namespace Hazel {
 			HAZEL_CORE_TRACE(Input::GetCursorPosition().second);
 		}
 	}
+
+	
 }

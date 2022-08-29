@@ -111,7 +111,7 @@ project "Sandbox"
 		"Hazel/vendor/spdlog/include",
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
-		"Hazel/src"		
+		"Hazel/src"
 	}
 	links "Hazel"
 
@@ -121,11 +121,11 @@ project "Sandbox"
 
 		defines
 		{
-			"HZ_PLATFORM_WINDOWS"			
+			"HZ_PLATFORM_WINDOWS"
 		}
 		
 	filter "configurations:Debug"
-		defines "HZ_DEBUG"		
+		defines "HZ_DEBUG"
 		runtime "Debug"
 		symbols "On"
 

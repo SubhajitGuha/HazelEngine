@@ -60,7 +60,7 @@ namespace Hazel {
 		virtual void AddBuffer(BufferLayout&, VertexBuffer&){}
 		virtual void SetIndexBuffer(std::shared_ptr<IndexBuffer>) = 0;
 
-		//virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() {return nullptr};
+		virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() = 0;
 		virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const = 0;
 		static VertexArray* Create();
 	};

@@ -14,6 +14,7 @@ namespace Hazel {
 		void SetIndexBuffer(std::shared_ptr<IndexBuffer> IndexBuffer)override;
 
 		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const override { return m_IndexBuffer; }
+		const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() override { return m_VertexBuffer; }
 	private:
 		std::vector<std::shared_ptr<VertexBuffer>> m_VertexBuffer;
 		std::shared_ptr<IndexBuffer> m_IndexBuffer;
