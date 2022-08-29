@@ -102,19 +102,19 @@ namespace Hazel {
 			switch (action) {
 			case GLFW_PRESS:
 			{
-				KeyPressedEvent EventKeyPressed(scancode, 0);
+				KeyPressedEvent EventKeyPressed(key, 0);
 				data.Callbackfunc(EventKeyPressed);
 				break;
 			}
 			case GLFW_RELEASE:
 			{
-				KeyReleasedEvent EventKeyReleased(scancode);
+				KeyReleasedEvent EventKeyReleased(key);
 				data.Callbackfunc(EventKeyReleased);
 				break;
 			}
 			case GLFW_REPEAT:
 			{
-				KeyPressedEvent EventKeyRepeat(scancode, 1);
+				KeyPressedEvent EventKeyRepeat(key, 1);
 				data.Callbackfunc(EventKeyRepeat);
 				break;
 			}

@@ -8,7 +8,7 @@ namespace Hazel{
 	struct WindowProp {
 		std::string Title;
 		unsigned int width, height;
-		WindowProp(std::string s="Hazel Engine",unsigned int h=1280,unsigned int w=1280)
+		WindowProp(std::string s="Hazel Engine",unsigned int h=1080,unsigned int w=1080)
 			:Title(s),width(w),height(h)
 		{}
 	};

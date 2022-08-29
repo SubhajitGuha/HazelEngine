@@ -29,15 +29,15 @@ namespace Hazel {
 
 		static inline Application& Get() { return *getApplication; }
 
-		bool MoveForward(KeyPressedEvent& key) {
-			if (key.GetKeyCode() == 17) {
-				v += 0.05;
-			}
-			return true;
-		}
+		bool MoveForward(KeyPressedEvent& key);
+
+		bool MoveBackward(KeyPressedEvent& key);
+
+
 	public:
 		glm::vec3 v3;
 		float v=0;
+		float r = 0;
 	private:
 		ImGuiLayer* m_ImGuiLayer;
 		std::unique_ptr<Window> m_window;

@@ -26,7 +26,7 @@ namespace Hazel {
 		glm::mat4 m_Projection;
 		glm::mat4 m_ProjectionView;
 
-		glm::vec3 m_Position;
+		glm::vec3 m_Position = {0,0,0};
 		float m_Rotation;
 	};
 }

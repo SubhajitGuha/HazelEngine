@@ -17,7 +17,7 @@ namespace Hazel {
 	
 	Application* Application::getApplication;
 	Application::Application()
-		:m_camera(-5.8,5.8,-5.8,5.8)
+		:m_camera(-3,3,-3,3)
 	{
 		getApplication = this;
 		m_window = std::unique_ptr<Window>(Window::Create());
@@ -33,6 +33,22 @@ namespace Hazel {
 		EventDispatcher dispach(e);
 		dispach.Dispatch<WindowCloseEvent>(HZ_BIND_FN(closeWindow));
 		dispach.Dispatch<KeyPressedEvent>(HZ_BIND_FN(MoveForward));
+		dispach.Dispatch<KeyPressedEvent>(HZ_BIND_FN(MoveBackward));
+		dispach.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& key) {
+				if (key.GetKeyCode() == HZ_KEY_E)
+				{
+					r += 2;
+				}
+				return false; 
+			});
+		dispach.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& key) {
+			if (key.GetKeyCode() == HZ_KEY_Q)
+			{
+				r -= 2;
+			}
+			return false; 
+			});
+		
 		HAZEL_CORE_TRACE(e);
 		for (auto it = m_layerstack.end(); it != m_layerstack.begin();)
 		{
@@ -53,7 +69,20 @@ namespace Hazel {
 		m_layerstack.PushOverlay(Overlay);
 		Overlay->OnAttach();
 	}
+	bool Application::MoveForward(KeyPressedEvent& key) {
+		if (key.GetKeyCode() == HZ_KEY_W) {
+			v += 0.05;
+		}
+		return false;
+	}
 
+	bool Application::MoveBackward(KeyPressedEvent& key)
+	{
+		if (key.GetKeyCode() == HZ_KEY_S) {
+			v -= 0.05;
+		}
+		return false;
+	}
 	bool Application::closeWindow(WindowCloseEvent& EventClose)
 	{
 		m_Running = false;
@@ -123,9 +152,11 @@ namespace Hazel {
 			
 			RenderCommand::ClearColor(glm::vec4(0.8,0.8,0.8,0.8));
 			RenderCommand::Clear();
-			m_camera.SetPosition({ v, 0, 0 });
+			m_camera.SetPosition({ 0, v, 0 });
+			m_camera.SetRotation(r);
+
 			Renderer::BeginScene(m_camera);
-			shader->UploadUniformMat4("mvp",Renderer::m_data->m_ProjectionViewMatrix);		
+			shader->UploadUniformMat4("mvp",Renderer::m_data->m_ProjectionViewMatrix);
 			Renderer::Submit(*vao);
 			Renderer::EndScene();
 
