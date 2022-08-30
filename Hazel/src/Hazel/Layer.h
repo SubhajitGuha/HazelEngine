@@ -10,7 +10,7 @@ namespace Hazel {
 			virtual ~Layer();
 			virtual void OnAttach(){}
 			virtual void OnDetach(){}
-			virtual void OnUpdate() {}
+			virtual void OnUpdate(float deltatime) {}
 			virtual void OnImGuiRender() {}
 			virtual void OnEvent(Event& e){}
 

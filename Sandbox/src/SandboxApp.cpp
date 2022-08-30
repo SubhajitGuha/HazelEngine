@@ -1,8 +1,10 @@
 #include <Hazel.h>
 using namespace Hazel;
-class Layerimplement :public Hazel::Layer {
+
+//This is our game layer
+class GameLayer :public Hazel::Layer {
 public:
-	Layerimplement()
+	GameLayer()
 		:Layer("Hazel_Layer"), m_camera(-4,4,4,-4)
 	{
 		float pos[] =
@@ -61,20 +63,20 @@ public:
 		m_camera.SetRotation(30);// set the rotation of the model (in z axis (hard codded))
 
 	}
-	virtual void OnUpdate() {
+	virtual void OnUpdate(float deltatime) {
 		
 		if (Input::IsKeyPressed(HZ_KEY_W))
-			v3.y += m_movespeed;
+			v3.y += m_movespeed*deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_S))
-			v3.y -= m_movespeed;
+			v3.y -= m_movespeed*deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_A))
-			v3.x += m_movespeed;
+			v3.x += m_movespeed*deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_D))
-			v3.x -= m_movespeed;
+			v3.x -= m_movespeed*deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_E))
-			r += 2;
+			r += 2 * deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_Q))
-			r -= 2;
+			r -= 2 * deltatime;
 
 		RenderCommand::ClearColor(glm::vec4(0.8, 0.8, 0.8, 0.8));
 		RenderCommand::Clear();
@@ -111,7 +113,7 @@ class Sandbox :public Hazel::Application
 {
 public:
 	Sandbox(){
-		PushLayer(new Layerimplement());
+		PushLayer(new GameLayer());
 		//PushOverlay(new Hazel::ImGuiLayer());
 	}
 	~Sandbox(){}

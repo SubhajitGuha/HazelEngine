@@ -9,6 +9,7 @@
 #include "Renderer/Buffer.h"
 #include "Hazel/Renderer/OrthographicCamera.h"
 #include "HazelCodes.h"
+#include "Hazel/Core/TimeSteps.h"
 
 namespace Hazel {
 	class HAZEL_API Application { //set this class as dll export
@@ -41,7 +42,7 @@ namespace Hazel {
 		LayerStack m_layerstack;
 		static Application* getApplication;
 		Shader* shader;
-		
+		float m_LastFrameTime;
 	};
 	//define in client (not in engine dll)
 	Application* CreateApplication();
