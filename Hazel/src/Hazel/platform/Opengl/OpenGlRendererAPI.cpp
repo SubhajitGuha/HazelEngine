@@ -9,7 +9,7 @@ namespace Hazel {
 	OpenGlRendererAPI::~OpenGlRendererAPI()
 	{
 	}
-	void OpenGlRendererAPI::ClearColor(glm::vec4& color)
+	void OpenGlRendererAPI::ClearColor(const glm::vec4& color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
 	}

@@ -4,7 +4,7 @@
 namespace Hazel {
 	class RenderCommand {
 	public:
-		inline static void ClearColor(glm::vec4& color) {
+		inline static void ClearColor(const glm::vec4& color) {
 			m_RendererAPI->ClearColor(color);
 		}
 		inline static void Clear() {

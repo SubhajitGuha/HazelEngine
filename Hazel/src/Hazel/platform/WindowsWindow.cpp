@@ -31,7 +31,7 @@ namespace Hazel {
 	}
 	bool WindowsWindow::b_Vsync() const
 	{
-		return false;
+		return true;
 	}
 	void WindowsWindow::Init(WindowProp& prop)
 	{

@@ -11,7 +11,7 @@ namespace Hazel {
 	};
 	class RendererAPI {
 	public:
-		virtual void ClearColor(glm::vec4&) = 0;
+		virtual void ClearColor(const glm::vec4&) = 0;
 		virtual void Clear() =0;
 		virtual void DrawIndex(VertexArray& vertexarray) =0;
 		inline static GraphicsAPI GetAPI() { return m_API; }

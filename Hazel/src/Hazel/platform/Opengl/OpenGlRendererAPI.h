@@ -6,7 +6,7 @@ namespace Hazel {
 	public:
 		OpenGlRendererAPI();
 		~OpenGlRendererAPI();
-		void ClearColor(glm::vec4&)override;
+		void ClearColor(const glm::vec4&)override;
 		void Clear()override;
 		void DrawIndex(VertexArray& vertexarray)override;
 	};

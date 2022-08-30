@@ -41,7 +41,6 @@ namespace Hazel {
 		LayerStack m_layerstack;
 		static Application* getApplication;
 		Shader* shader;
-		OrthographicCamera m_camera;
 		
 	};
 	//define in client (not in engine dll)
