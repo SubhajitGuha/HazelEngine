@@ -29,11 +29,6 @@ namespace Hazel {
 
 		static inline Application& Get() { return *getApplication; }
 
-		bool MoveForward(KeyPressedEvent& key);
-
-		bool MoveBackward(KeyPressedEvent& key);
-
-
 	public:
 		glm::vec3 v3;
 		float v=0;

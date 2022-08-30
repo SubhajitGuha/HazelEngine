@@ -32,21 +32,22 @@ namespace Hazel {
 	{
 		EventDispatcher dispach(e);
 		dispach.Dispatch<WindowCloseEvent>(HZ_BIND_FN(closeWindow));
-		dispach.Dispatch<KeyPressedEvent>(HZ_BIND_FN(MoveForward));
-		dispach.Dispatch<KeyPressedEvent>(HZ_BIND_FN(MoveBackward));
 		dispach.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& key) {
-				if (key.GetKeyCode() == HZ_KEY_E)
-				{
-					r += 2;
+			switch (key.GetKeyCode()) {
+			case HZ_KEY_W:
+				v += 0.5;
+				break;
+			case HZ_KEY_S:
+				v -= 0.5;
+				break;
+			case HZ_KEY_E:
+				r += 2;
+				break;
+			case HZ_KEY_Q:
+				r -= 2;
+				break;
 				}
 				return false; 
-			});
-		dispach.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& key) {
-			if (key.GetKeyCode() == HZ_KEY_Q)
-			{
-				r -= 2;
-			}
-			return false; 
 			});
 		
 		HAZEL_CORE_TRACE(e);
@@ -69,20 +70,7 @@ namespace Hazel {
 		m_layerstack.PushOverlay(Overlay);
 		Overlay->OnAttach();
 	}
-	bool Application::MoveForward(KeyPressedEvent& key) {
-		if (key.GetKeyCode() == HZ_KEY_W) {
-			v += 0.05;
-		}
-		return false;
-	}
 
-	bool Application::MoveBackward(KeyPressedEvent& key)
-	{
-		if (key.GetKeyCode() == HZ_KEY_S) {
-			v -= 0.05;
-		}
-		return false;
-	}
 	bool Application::closeWindow(WindowCloseEvent& EventClose)
 	{
 		m_Running = false;
