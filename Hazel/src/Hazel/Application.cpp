@@ -64,7 +64,8 @@ namespace Hazel {
 
 	void Application::Run()
 	{
-		while (m_Running) {
+		while (m_Running) //render loop
+		{
 			
 			m_window->OnUpdate();
 
@@ -80,17 +81,9 @@ namespace Hazel {
 
 			//for ImguiLayers
 			m_ImGuiLayer->Begin();
-
 			for (Layer* layer : m_layerstack)
 				layer->OnImGuiRender();
-	
 			m_ImGuiLayer->End();
-
-			if (Input::IsKeyPressed(HZ_KEY_1))
-				HAZEL_CORE_TRACE("KeyPressed is ",HZ_KEY_1);
-			
-			HAZEL_CORE_TRACE(Input::GetCursorPosition().first);
-			HAZEL_CORE_TRACE(Input::GetCursorPosition().second);
 		}
 	}
 

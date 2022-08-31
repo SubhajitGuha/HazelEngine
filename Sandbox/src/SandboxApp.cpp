@@ -5,7 +5,7 @@ using namespace Hazel;
 class GameLayer :public Hazel::Layer {
 public:
 	GameLayer()
-		:Layer("Hazel_Layer"), m_camera(-4,4,4,-4)
+		:Layer("Hazel_Layer"), m_camera(-4,4,-4,4)//left right bottom top
 	{
 		float pos[] =
 		{ -0.8,0.8,0.0,  0.8 ,0.0 ,0.6 ,1.0,
@@ -38,11 +38,12 @@ public:
 			layout (location = 1) in vec4 col;
 
 			out vec4 m_color;
-			uniform mat4 mvp;
+			uniform mat4 m_ProjectionView;
+			uniform mat4 m_ModelTransform;
 			void main()
 			{
 				m_color = col;
-				gl_Position = mvp * vec4(pos ,1.0);
+				gl_Position = m_ProjectionView * m_ModelTransform * vec4(pos ,1.0);
 				
 			}
 		)";
@@ -59,9 +60,6 @@ public:
 		)";
 		shader = new Shader(vertexshader, fragmentshader);
 
-		m_camera.SetPosition({ 0.0, 0, 0 });//set the location of the model
-		m_camera.SetRotation(30);// set the rotation of the model (in z axis (hard codded))
-
 	}
 	virtual void OnUpdate(float deltatime) {
 		
@@ -70,13 +68,21 @@ public:
 		if (Input::IsKeyPressed(HZ_KEY_S))
 			v3.y -= m_movespeed*deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_A))
-			v3.x += m_movespeed*deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_D))
 			v3.x -= m_movespeed*deltatime;
+		if (Input::IsKeyPressed(HZ_KEY_D))
+			v3.x += m_movespeed*deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_E))
-			r += 2 * deltatime;
+			r += 60 * deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_Q))
-			r -= 2 * deltatime;
+			r -= 60 * deltatime;
+		if (Input::IsKeyPressed(HZ_KEY_UP))
+			position.y += ObjSpeed * deltatime;
+		if (Input::IsKeyPressed(HZ_KEY_DOWN))
+			position.y -= ObjSpeed * deltatime;
+		if (Input::IsKeyPressed(HZ_KEY_LEFT))
+			position.x -= ObjSpeed * deltatime;
+		if (Input::IsKeyPressed(HZ_KEY_RIGHT))
+			position.x += ObjSpeed * deltatime;
 
 		RenderCommand::ClearColor(glm::vec4(0.8, 0.8, 0.8, 0.8));
 		RenderCommand::Clear();
@@ -84,9 +90,10 @@ public:
 		m_camera.SetPosition(v3);
 		m_camera.SetRotation(r);
 
+		glm::mat4 ModelTransform = glm::translate(glm::mat4(1), position); // Set the model transform for now there is no scale or rotation
+																			//just multiply the scale and rotation matrix with position to get the full transform
 		Renderer::BeginScene(m_camera);
-		shader->UploadUniformMat4("mvp", Renderer::m_data->m_ProjectionViewMatrix);
-		Renderer::Submit(*vao);
+		Renderer::Submit(*shader,*vao, ModelTransform);
 		Renderer::EndScene();
 	}
 
@@ -98,7 +105,7 @@ public:
 
 public:
 	glm::vec3 v3={0,0,0};
-	float m_movespeed = 0.2;
+	float m_movespeed = 20;
 	float r = 0;
 private:
 	bool m_Running = true;
@@ -107,6 +114,8 @@ private:
 	VertexArray* vao;
 	VertexBuffer* vb;
 	IndexBuffer* ib;
+	glm::vec3 position = {0,0,0};
+	float ObjSpeed = 20;
 };
 
 class Sandbox :public Hazel::Application
