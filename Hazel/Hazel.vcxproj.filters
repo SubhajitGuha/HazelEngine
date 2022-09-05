@@ -105,6 +105,7 @@
     </ClInclude>
     <ClInclude Include="src\hzpch.h" />
     <ClInclude Include="src\Hazel\Core\TimeSteps.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlShader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -166,5 +167,6 @@
     </ClCompile>
     <ClCompile Include="src\hzpch.cpp" />
     <ClCompile Include="src\Hazel\Renderer\OrthographicCamera.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlShader.cpp" />
   </ItemGroup>
 </Project>
