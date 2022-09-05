@@ -10,7 +10,7 @@ namespace Hazel {
 		~OpenGlVertexArray();
 		void Bind()const override;
 		void UnBind()const override;
-		void AddBuffer(BufferLayout& layout, VertexBuffer& vbo) override;
+		void AddBuffer(std::shared_ptr<BufferLayout>& layout, std::shared_ptr<VertexBuffer>& vbo) override;
 		void SetIndexBuffer(std::shared_ptr<IndexBuffer> IndexBuffer)override;
 
 		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const override { return m_IndexBuffer; }

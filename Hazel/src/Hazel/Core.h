@@ -1,3 +1,4 @@
+#include <memory>
 #pragma once
 #ifdef HZ_PLATFORM_WINDOWS
 #ifdef HZ_DYNAMIC_LINK
@@ -15,3 +16,13 @@
 #endif // HZ_PLATFORM_WINDOWS
 
 #define BIT(x) (1<<x)
+
+namespace Hazel {
+
+	template<typename T>
+	using ref = std::shared_ptr<T>;
+
+template<typename X>
+using scope = std::unique_ptr<X>;
+
+}

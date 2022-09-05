@@ -57,7 +57,7 @@ namespace Hazel {
 	public:
 		virtual void Bind()const = 0;
 		virtual void UnBind()const = 0;
-		virtual void AddBuffer(BufferLayout&, VertexBuffer&){}
+		virtual void AddBuffer(std::shared_ptr<BufferLayout>& layout, std::shared_ptr<VertexBuffer>& vbo){}
 		virtual void SetIndexBuffer(std::shared_ptr<IndexBuffer>) = 0;
 
 		virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() = 0;

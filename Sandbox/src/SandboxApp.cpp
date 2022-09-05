@@ -15,14 +15,15 @@ public:
 		unsigned int index[] =
 		{0,1,2};
 
-		vao = VertexArray::Create();//vertex array
-		VertexBuffer* vb = VertexBuffer::Create(pos, sizeof(pos));//vertex buffer
-		BufferLayout bl;
-		bl.push("position", DataType::Float3);
-		bl.push("color", DataType::Float4);
-		IndexBuffer* ib = IndexBuffer::Create(index, sizeof(index));
-		vao->AddBuffer(bl, *vb);
-		vao->SetIndexBuffer((std::shared_ptr<IndexBuffer>)ib);
+		
+		vao.reset(VertexArray::Create());//vertex array
+		ref<VertexBuffer> vb(VertexBuffer::Create(pos, sizeof(pos) ));//vertex buffer
+		ref<BufferLayout> bl(new BufferLayout()); //buffer layout
+		bl->push("position", DataType::Float3);
+		bl->push("color", DataType::Float4);
+		ref<IndexBuffer> ib(IndexBuffer::Create(index, sizeof(index)));
+		vao->AddBuffer(bl, vb);
+		vao->SetIndexBuffer(ib);
 
 		std::string vertexshader = R"(
 			#version 410 core
@@ -62,14 +63,14 @@ public:
 		{ 0,1,2,
 		0,1,3};
 
-		SquareVA = VertexArray::Create();
-		VertexBuffer* SquareBuffer = VertexBuffer::Create(pos2, sizeof(pos2));
-		BufferLayout bl2;
-		bl2.push("position", DataType::Float3);
-		bl2.push("color", DataType::Float4);
+		SquareVA .reset(VertexArray::Create());
+		ref<VertexBuffer> SquareBuffer (VertexBuffer::Create(pos2, sizeof(pos2)));
+		ref<BufferLayout> bl2(new BufferLayout);
+		bl2->push("position", DataType::Float3);
+		bl2->push("color", DataType::Float4);
 		IndexBuffer* SquareIndex = IndexBuffer::Create(index2, sizeof(index2));
-		SquareVA->AddBuffer(bl2, *SquareBuffer);
-		SquareVA->SetIndexBuffer((std::shared_ptr<IndexBuffer>)SquareIndex);
+		SquareVA->AddBuffer(bl2, SquareBuffer);
+		SquareVA->SetIndexBuffer((ref<IndexBuffer>)SquareIndex);
 		
 		std::string SolidColorVertShader = R"(
 		#version 410 core
@@ -170,8 +171,8 @@ private:
 
 	OrthographicCamera m_camera;
 
-	VertexArray* vao;
-	VertexArray* SquareVA;
+	ref<VertexArray> vao;
+	ref<VertexArray> SquareVA;
 
 	glm::vec3 position = {0,0,0};
 	glm::vec4 Color1;

@@ -50,21 +50,21 @@ namespace Hazel {
 	{
 		glBindVertexArray(0);
 	}
-	void OpenGlVertexArray::AddBuffer(BufferLayout& layout, VertexBuffer& vbo)
+	void OpenGlVertexArray::AddBuffer(std::shared_ptr<BufferLayout>& layout, std::shared_ptr<VertexBuffer>& vbo)
 	{
-		vbo.Bind();
+		vbo->Bind();
 		Bind();
-		auto element = layout.GetElements();
-		int size = layout.GetElements().size();
+		auto element = layout->GetElements();
+		int size = layout->GetElements().size();
 		int offset = 0;
 		for (unsigned int i = 0; i < size; i++)
 		{
 			glEnableVertexAttribArray(i);
-			glVertexAttribPointer(i, GetSize(element[i]->Type), GetType(element[i]->Type), element[i]->Normalized, layout.GetStride(),(const void*) offset);
+			glVertexAttribPointer(i, GetSize(element[i]->Type), GetType(element[i]->Type), element[i]->Normalized, layout->GetStride(),(const void*) offset);
 			offset += GetSize(element[i]->Type)*sizeof(GetType(element[i]->Type));
 		}
 
-		m_VertexBuffer.push_back((std::shared_ptr<VertexBuffer>) & vbo);
+		m_VertexBuffer.push_back(vbo);
 	}
 	void OpenGlVertexArray::SetIndexBuffer(std::shared_ptr<IndexBuffer> IndexBuffer)
 	{
