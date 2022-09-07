@@ -15,6 +15,7 @@ namespace Hazel {
 		virtual void Clear() =0;
 		virtual void DrawIndex(VertexArray& vertexarray) =0;
 		inline static GraphicsAPI GetAPI() { return m_API; }
+		virtual void Init() = 0;
 	private:
 		static GraphicsAPI m_API;
 	};

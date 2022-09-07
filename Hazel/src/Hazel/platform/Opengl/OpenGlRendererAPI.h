@@ -9,5 +9,6 @@ namespace Hazel {
 		void ClearColor(const glm::vec4&)override;
 		void Clear()override;
 		void DrawIndex(VertexArray& vertexarray)override;
+		void Init() override;
 	};
 }

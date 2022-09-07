@@ -8,7 +8,7 @@ namespace Hazel {
 		virtual void Bind() = 0;
 		virtual void UnBind() = 0;
 		virtual void UploadUniformMat4(const std::string& str,glm::mat4& UniformMat4){}
-		virtual void UploadUniformInt(const std::string& str, int& UniformInt) {}
+		virtual void UploadUniformInt(const std::string& str, const int& UniformInt) {}
 		virtual void UpladUniformFloat(const std::string& str,float& UniformFloat){}
 		virtual void UpladUniformFloat4(const std::string& str, const glm::vec4& UniformFloat4){}
 

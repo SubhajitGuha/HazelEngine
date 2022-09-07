@@ -70,8 +70,10 @@ void Hazel::OpenGlShader::UploadUniformMat4(const std::string& str, glm::mat4& U
 
 }
 
-void Hazel::OpenGlShader::UploadUniformInt(const std::string& str, int& UniformInt)
+void Hazel::OpenGlShader::UploadUniformInt(const std::string& str,const int& UniformInt)
 {
+	unsigned int location = glGetUniformLocation(program, str.c_str());
+	glUniform1i(location, UniformInt);
 }
 
 void Hazel::OpenGlShader::UpladUniformFloat(const std::string& str, float& UniformFloat)

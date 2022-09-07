@@ -7,6 +7,7 @@
 namespace Hazel {
 	class Renderer {
 	public:
+		static void Init();
 		static void BeginScene(OrthographicCamera& camera) 
 		{ 
 			m_data->m_ProjectionViewMatrix = camera.GetProjectionViewMatix(); 
