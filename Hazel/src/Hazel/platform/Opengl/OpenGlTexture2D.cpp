@@ -45,8 +45,7 @@ namespace Hazel {
 	}
 	void OpenGlTexture2D::Bind(int slot) const
 	{
-		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, m_Renderid);
+		glBindTextureUnit(slot, m_Renderid);
 	}
 	void OpenGlTexture2D::UnBind() const
 	{
