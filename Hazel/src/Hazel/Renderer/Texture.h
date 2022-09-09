@@ -13,7 +13,7 @@ namespace Hazel {
 	public:
 
 		virtual void UnBind()const = 0;
-		static ref<Texture> Create(const std::string& path);
+		static ref<Texture2D> Create(const std::string& path);
 	};
 }
 

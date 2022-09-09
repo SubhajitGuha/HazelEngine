@@ -12,6 +12,7 @@ namespace Hazel {
 		virtual void UpladUniformFloat(const std::string& str,float& UniformFloat){}
 		virtual void UpladUniformFloat4(const std::string& str, const glm::vec4& UniformFloat4){}
 
+		static Shader* Create(const std::string& path);
 		static Shader* Create(std::string&,std::string&);
 	private:
 		unsigned int program;

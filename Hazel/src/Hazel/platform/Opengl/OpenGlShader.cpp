@@ -3,85 +3,154 @@
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
 
-Hazel::OpenGlShader::OpenGlShader(std::string& vertexshader, std::string& fragmentshader)
-{
+namespace Hazel {
 
-	unsigned int vs = glCreateShader(GL_VERTEX_SHADER);
-	const char* chr = vertexshader.c_str();
-	glShaderSource(vs, 1, &chr, nullptr);
-	glCompileShader(vs);
+	OpenGlShader::OpenGlShader(std::string& vertexshader, std::string& fragmentshader)
 	{
+
+		unsigned int vs = glCreateShader(GL_VERTEX_SHADER);
+		const char* chr = vertexshader.c_str();
+		glShaderSource(vs, 1, &chr, nullptr);
+		glCompileShader(vs);
+		{
+			int id;
+			glGetShaderiv(vs, GL_COMPILE_STATUS, &id);
+			if (id == GL_FALSE)//if the shader code is not successfully compiled
+			{
+				int length;
+				glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &length);
+				char* message = new char[length];
+				glGetShaderInfoLog(vs, length, &length, message);
+				HAZEL_CORE_ERROR(message);
+			}
+
+		}
+
+		unsigned int fs = glCreateShader(GL_FRAGMENT_SHADER);
+		const char* chr1 = fragmentshader.c_str();
+		glShaderSource(fs, 1, &chr1, nullptr);
+		glCompileShader(fs);
 		int id;
-		glGetShaderiv(vs, GL_COMPILE_STATUS, &id);
-		if (id == GL_FALSE)//if the shader code is not successfully compiled
+		glGetShaderiv(fs, GL_COMPILE_STATUS, &id);
+		if (id)
 		{
 			int length;
-			glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &length);
+			glGetShaderiv(fs, GL_INFO_LOG_LENGTH, &length);
 			char* message = new char[length];
-			glGetShaderInfoLog(vs, length, &length, message);
+			glGetShaderInfoLog(fs, length, &length, message);
 			HAZEL_CORE_ERROR(message);
 		}
 
+		program = glCreateProgram();
+		glAttachShader(program, vs);
+		glAttachShader(program, fs);
+		glLinkProgram(program);
+		glValidateProgram(program);
+
+		glUseProgram(program);
 	}
 
-	unsigned int fs = glCreateShader(GL_FRAGMENT_SHADER);
-	const char* chr1 = fragmentshader.c_str();
-	glShaderSource(fs, 1, &chr1, nullptr);
-	glCompileShader(fs);
-	int id;
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &id);
-	if (id)
+	OpenGlShader::OpenGlShader(const std::string& path)
 	{
-		int length;
-		glGetShaderiv(fs, GL_INFO_LOG_LENGTH, &length);
-		char* message = new char[length];
-		glGetShaderInfoLog(fs, length, &length, message);
-		HAZEL_CORE_ERROR(message);
+		m_shaders = ParseFile(path);
+		unsigned int vs = CompileShader(m_shaders.VertexShader,GL_VERTEX_SHADER);
+		unsigned int fs = CompileShader(m_shaders.Fragmentshader,GL_FRAGMENT_SHADER);
+
+		program = glCreateProgram();
+		glAttachShader(program, vs);
+		glAttachShader(program, fs);
+		glLinkProgram(program);
+		glValidateProgram(program);
+
+		glUseProgram(program);
 	}
 
-	program = glCreateProgram();
-	glAttachShader(program, vs);
-	glAttachShader(program, fs);
-	glLinkProgram(program);
-	glValidateProgram(program);
+	OpenGlShader::~OpenGlShader()
+	{
+		glDeleteProgram(program);
+	}
 
-	glUseProgram(program);
-}
+	unsigned int OpenGlShader::CompileShader(std::string& Shader,unsigned int type)
+	{
+		unsigned int s = glCreateShader(type);
+		const char* chr = Shader.c_str();
+		glShaderSource(s, 1, &chr, nullptr);
+		glCompileShader(s);
 
-Hazel::OpenGlShader::~OpenGlShader()
-{
-	glDeleteProgram(program);
-}
+		int id;
+		glGetShaderiv(s, GL_COMPILE_STATUS, &id);
+		if (id == GL_FALSE)//if the shader code is not successfully compiled
+		{
+			int length;
+			glGetShaderiv(s, GL_INFO_LOG_LENGTH, &length);
+			char* message = new char[length];
+			glGetShaderInfoLog(s, length, &length, message);
+			HAZEL_CORE_ERROR(message);
+		}
 
-void Hazel::OpenGlShader::Bind()
-{
-	glUseProgram(program);
-}
+		return s;
+	}
 
-void Hazel::OpenGlShader::UnBind()
-{
-	glUseProgram(0);
-}
+	Shaders OpenGlShader::ParseFile(const std::string& path)
+	{
+		enum type {
+			VERTEX_SHADER=0, FRAGMENT_SHADER=1
+		};
 
-void Hazel::OpenGlShader::UploadUniformMat4(const std::string& str, glm::mat4& UniformMat4)
-{
-	unsigned int location = glGetUniformLocation(program, str.c_str());
-	glUniformMatrix4fv(location, 1, false, glm::value_ptr(UniformMat4));
+		std::ifstream stream(path);
+		if (&stream == nullptr)
+			HAZEL_CORE_ERROR("Shader File Not Found!!");
+		std::string ShaderCode;
+		std::string Shader[2];
+		int index;
+		while (std::getline(stream, ShaderCode))
+		{
+			if (ShaderCode.find("#shader vertex") != std::string::npos)
+			{
+				index = VERTEX_SHADER;
+				continue;
+			}
+			if (ShaderCode.find("#shader fragment") != std::string::npos)
+			{
+				index = FRAGMENT_SHADER;
+				continue;
+			}
 
-}
+			Shader[index].append(ShaderCode + "\n");
+		}
+		return { Shader[0],Shader[1] };
+	}
 
-void Hazel::OpenGlShader::UploadUniformInt(const std::string& str,const int& UniformInt)
-{
-	unsigned int location = glGetUniformLocation(program, str.c_str());
-	glUniform1i(location, UniformInt);
-}
+	void OpenGlShader::Bind()
+	{
+		glUseProgram(program);
+	}
 
-void Hazel::OpenGlShader::UpladUniformFloat(const std::string& str, float& UniformFloat)
-{
-}
+	void OpenGlShader::UnBind()
+	{
+		glUseProgram(0);
+	}
 
-void Hazel::OpenGlShader::UpladUniformFloat4(const std::string& str, const glm::vec4& UniformFloat4)
-{
-	unsigned int location = glGetUniformLocation(program, &str[0]);
-	glUniform4f(location, UniformFloat4.r, UniformFloat4.g, UniformFloat4.b, UniformFloat4.a);
+	void OpenGlShader::UploadUniformMat4(const std::string& str, glm::mat4& UniformMat4)
+	{
+		unsigned int location = glGetUniformLocation(program, str.c_str());
+		glUniformMatrix4fv(location, 1, false, glm::value_ptr(UniformMat4));
+
+	}
+
+	void OpenGlShader::UploadUniformInt(const std::string& str, const int& UniformInt)
+	{
+		unsigned int location = glGetUniformLocation(program, str.c_str());
+		glUniform1i(location, UniformInt);
+	}
+
+	void OpenGlShader::UpladUniformFloat(const std::string& str, float& UniformFloat)
+	{
+	}
+
+	void OpenGlShader::UpladUniformFloat4(const std::string& str, const glm::vec4& UniformFloat4)
+	{
+		unsigned int location = glGetUniformLocation(program, &str[0]);
+		glUniform4f(location, UniformFloat4.r, UniformFloat4.g, UniformFloat4.b, UniformFloat4.a);
+	}
 }

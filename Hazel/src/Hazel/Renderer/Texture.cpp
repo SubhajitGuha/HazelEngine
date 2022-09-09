@@ -3,7 +3,7 @@
 #include "RendererAPI.h"
 #include "Hazel/platform/Opengl/OpenGlTexture2D.h"
 namespace Hazel {
-	ref<Texture> Texture2D::Create(const std::string& path)
+	ref<Texture2D> Texture2D::Create(const std::string& path)
 	{
 		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::None:

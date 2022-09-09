@@ -28,39 +28,12 @@ public:
 		vao->AddBuffer(bl, vb);
 		vao->SetIndexBuffer(ib);
 
-		std::string vertexshader = R"(
-			#version 410 core
-			layout (location = 0) in vec3 pos;
-			layout (location = 1) in vec2 cord;
+		shader.reset(Shader::Create("Assets/Shaders/TextureShader.glsl"));
 
-			out vec2 tcord;
-			uniform mat4 m_ProjectionView;
-			uniform mat4 m_ModelTransform;
-			void main()
-			{
-				tcord = cord;
-				gl_Position = m_ProjectionView * m_ModelTransform * vec4(pos ,1.0);
-				
-			}
-		)";
-		std::string fragmentshader = R"(
-			#version 410 core
-			layout (location = 0) out vec4 color;
-
-			in vec2 tcord;
-			uniform sampler2D u_Texture;
-			void main()
-			{
-				color= texture(u_Texture,tcord);
-			}
-		)";
-		shader = Shader::Create(vertexshader, fragmentshader);
-		
+		tex2 = Texture2D::Create("Assets/Textures/rickshaw.png");
 		texture = Texture2D::Create("Assets/Textures/Test.png");
-		texture->Bind(0);//define the slot
-		//tex2 = Texture2D::Create("Assets/Textures/rickshaw.png");
-		//tex2->Bind(1);
-		shader->UploadUniformInt("u_Texture", 1);
+		
+		shader->UploadUniformInt("u_Texture", 0);
 
 		float pos2[] = 
 		{ -0.8,0.8,0.0, 0.8 ,0.0 ,0.6 ,1.0,
@@ -72,6 +45,7 @@ public:
 		{ 0,1,2,
 		0,1,3};
 
+		//For tiled Squares
 		SquareVA .reset(VertexArray::Create());
 		ref<VertexBuffer> SquareBuffer (VertexBuffer::Create(pos2, sizeof(pos2)));
 		ref<BufferLayout> bl2(new BufferLayout);
@@ -81,31 +55,7 @@ public:
 		SquareVA->AddBuffer(bl2, SquareBuffer);
 		SquareVA->SetIndexBuffer((ref<IndexBuffer>)SquareIndex);
 		
-		std::string SolidColorVertShader = R"(
-		#version 410 core
-		layout (location = 0) in vec3 pos;
-		layout (location = 1) in vec4 col;
-
-			out vec4 m_color;
-			uniform mat4 m_ProjectionView;
-			uniform mat4 m_ModelTransform;
-			void main()
-			{
-				m_color = col;
-				gl_Position = m_ProjectionView * m_ModelTransform * vec4(pos ,1.0);
-				
-			})";
-
-		std::string SolidColorFragmentshader = R"(
-		#version 410 core
-		layout (location = 0)out vec4 col;
-		uniform vec4 m_color;
-		void main(){
-			col= m_color;
-		}
-)";
-
-		SolidColorShader = Shader::Create(SolidColorVertShader, SolidColorFragmentshader);
+		SolidColorShader = Shader::Create("Assets/Shaders/SolidColorShader.glsl");
 
 	}
 	virtual void OnUpdate(float deltatime) {
@@ -156,10 +106,13 @@ public:
 			}
 		}
 		glm::mat4 ModelTransform2 = glm::scale(glm::mat4(1), glm::vec3(3));
-		
-		Renderer::Submit(*shader, *vao,ModelTransform2);
+		tex2->Bind(0);
+		Renderer::Submit(*shader, *vao, ModelTransform2);
+		texture->Bind(0);
 		Renderer::Submit(*shader, *vao);
 		Renderer::EndScene();
+		
+
 	}
 
 	void OnImGuiRender() {
@@ -179,7 +132,7 @@ public:
 private:
 	bool m_Running = true;
 
-	Shader* shader;
+	std::shared_ptr<Shader> shader,*shader2;
 	Shader* SolidColorShader;
 
 	OrthographicCamera m_camera;
@@ -192,8 +145,8 @@ private:
 	glm::vec4 Color2 = {1,1,1,1};
 
 	float ObjSpeed = 20;
-	ref<Texture> tex2;
-	ref <Texture> texture;
+	ref <Texture2D> texture,tex2;
+	
 };
 
 class Sandbox :public Hazel::Application

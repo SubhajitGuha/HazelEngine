@@ -29,11 +29,15 @@ namespace Hazel {
 		else
 			HAZEL_CORE_ERROR("Invalid Texture format");
 		
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
-		
+		glGenTextures(1, &m_Renderid);
+		//glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
+
+		//glTexStorage2D(GL_TEXTURE_2D, 0, InternalFormat, m_Width, m_Height);
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, Format, GL_UNSIGNED_BYTE, pixel_data);
 		glTexImage2D(GL_TEXTURE_2D, 0,InternalFormat, m_Width, m_Height, 0, Format, GL_UNSIGNED_BYTE, pixel_data);
 
 		if(pixel_data)
@@ -43,7 +47,7 @@ namespace Hazel {
 	{
 		glDeleteTextures(1, &m_Renderid);
 	}
-	void OpenGlTexture2D::Bind(int slot) const
+	void OpenGlTexture2D::Bind(int slot = 0) const
 	{
 		glBindTextureUnit(slot, m_Renderid);
 	}
