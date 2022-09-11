@@ -19,7 +19,7 @@ public:
 		0,2,3};
 
 		
-		vao.reset(VertexArray::Create());//vertex array
+		vao=(VertexArray::Create());//vertex array
 		ref<VertexBuffer> vb(VertexBuffer::Create(pos, sizeof(pos) ));//vertex buffer
 		ref<BufferLayout> bl=std::make_shared<BufferLayout>(); //buffer layout
 		bl->push("position", DataType::Float3);
@@ -137,7 +137,7 @@ private:
 
 	OrthographicCamera m_camera;
 
-	ref<VertexArray> vao;
+	VertexArray* vao;
 	ref<VertexArray> SquareVA;
 
 	glm::vec3 position = {0,0,0};
