@@ -26,4 +26,8 @@ namespace Hazel {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
+	void OpenGlRendererAPI::SetViewPort(unsigned int Width, unsigned int Height)
+	{
+		glViewport(0, 0, Width, Height);
+	}
 }

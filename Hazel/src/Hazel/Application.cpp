@@ -37,6 +37,9 @@ namespace Hazel {
 	{
 		EventDispatcher dispach(e);
 		dispach.Dispatch<WindowCloseEvent>(HZ_BIND_FN(closeWindow));
+		dispach.Dispatch<WindowResizeEvent>([](WindowResizeEvent e) {
+			Renderer::WindowResize(e.GetWidth(), e.GetHeight());
+			return false; });
 
 		HAZEL_CORE_TRACE(e);
 		for (auto it = m_layerstack.end(); it != m_layerstack.begin();)

@@ -8,19 +8,9 @@ namespace Hazel {
 	class Renderer {
 	public:
 		static void Init();
-		static void BeginScene(OrthographicCamera& camera) 
-		{ 
-			m_data->m_ProjectionViewMatrix = camera.GetProjectionViewMatix(); 
-		}
-		static void Submit(Shader& shader , VertexArray& vertexarray , glm::mat4 ModelTransform = glm::mat4(1))
-		{
-			shader.Bind();
-			shader.UploadUniformMat4("m_ProjectionView", Renderer::m_data->m_ProjectionViewMatrix);
-			shader.UploadUniformMat4("m_ModelTransform", ModelTransform);
-
-			vertexarray.Bind();
-			RenderCommand::DrawIndex(vertexarray);
-		}
+		static void WindowResize(unsigned int Width, unsigned int Height); 
+		static void BeginScene(OrthographicCamera& camera);
+		static void Submit(Shader& shader, VertexArray& vertexarray, glm::mat4 ModelTransform = glm::mat4(1));
 		static void EndScene(){}
 
 		struct data {
