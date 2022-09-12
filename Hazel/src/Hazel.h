@@ -22,6 +22,7 @@
 #include "Hazel/Renderer/Buffer.h"
 #include "Hazel/Renderer/Shader.h"
 #include "Hazel/Renderer/OrthographicCamera.h"
+#include "Hazel/OrthographicCameraController.h"
 #include "Hazel/Renderer/Texture.h"
 // -----------------------------------
 

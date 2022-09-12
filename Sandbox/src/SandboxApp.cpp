@@ -5,7 +5,7 @@ using namespace Hazel;
 class GameLayer :public Hazel::Layer {
 public:
 	GameLayer()
-		:Layer("Hazel_Layer"), m_camera(-3,3,-3,3)//left right bottom top
+		:Layer("Hazel_Layer"), m_camera(1920.0/1080.0)//left right bottom top
 	{
 		//Single Square 
 		float pos[] =
@@ -59,19 +59,12 @@ public:
 
 	}
 	virtual void OnUpdate(float deltatime) {
+
+		RenderCommand::ClearColor(glm::vec4(0.4, 0.8, 0.8, 0.8));
+		RenderCommand::Clear();
 		
-		if (Input::IsKeyPressed(HZ_KEY_W))
-			v3.y += m_movespeed*deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_S))
-			v3.y -= m_movespeed*deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_A))
-			v3.x -= m_movespeed*deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_D))
-			v3.x += m_movespeed*deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_E))
-			r += 60 * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_Q))
-			r -= 60 * deltatime;
+		m_camera.OnUpdate(deltatime);
+
 		if (Input::IsKeyPressed(HZ_KEY_UP))
 			position.y += ObjSpeed * deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_DOWN))
@@ -80,16 +73,15 @@ public:
 			position.x -= ObjSpeed * deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_RIGHT))
 			position.x += ObjSpeed * deltatime;
-
-		RenderCommand::ClearColor(glm::vec4(0.4, 0.8, 0.8, 0.8));
-		RenderCommand::Clear();
-
-		m_camera.SetPosition(v3);
-		m_camera.SetRotation(r);
+		if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_4))
+			scale += 0.3;
+		if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
+			scale -= 0.3;
 		
 		//glm::mat4 ModelTransform2 = glm::translate(glm::mat4(1), position); // Set the model transform for now there is no scale or rotation
 																			//just multiply the scale and rotation matrix with position to get the full transform
-		Renderer::BeginScene(m_camera);
+		Renderer::BeginScene(m_camera.GetCamera());
+
 		for (int i = 0; i < 5; i++)
 		{
 			for (int j = 0; j < 5; j++)
@@ -105,7 +97,7 @@ public:
 				Renderer::Submit(*SolidColorShader, *SquareVA , ModelTransform);
 			}
 		}
-		glm::mat4 ModelTransform2 = glm::scale(glm::mat4(1), glm::vec3(3));
+		glm::mat4 ModelTransform2 = glm::scale(glm::mat4(1), glm::vec3(scale));
 		tex2->Bind(0);
 		Renderer::Submit(*shader, *vao, ModelTransform2);
 		texture->Bind(0);
@@ -123,30 +115,28 @@ public:
 	}
 
 	virtual void OnEvent(Hazel::Event& e) {
+		m_camera.OnEvent(e);
 	}
 
-public:
-	glm::vec3 v3={0,0,0};
-	float m_movespeed = 20;
-	float r = 0;
 private:
 	bool m_Running = true;
 
 	std::shared_ptr<Shader> shader,*shader2;
 	Shader* SolidColorShader;
 
-	OrthographicCamera m_camera;
+	OrthographicCameraController m_camera;
 
 	VertexArray* vao;
 	ref<VertexArray> SquareVA;
 
-	glm::vec3 position = {0,0,0};
 	glm::vec4 Color1 = {1,1,1,1};
 	glm::vec4 Color2 = {1,1,1,1};
 
-	float ObjSpeed = 20;
 	ref <Texture2D> texture,tex2;
 	
+	glm::vec3 position = { 0,0,0 };
+	float ObjSpeed = 20;
+	float scale = 1;
 };
 
 class Sandbox :public Hazel::Application

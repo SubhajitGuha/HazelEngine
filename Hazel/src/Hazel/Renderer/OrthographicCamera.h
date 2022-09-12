@@ -16,6 +16,12 @@ namespace Hazel {
 		ReCalculateViewMatrix();
 		}
 
+		void SetScale(float scale) { 
+			m_Scale = scale;
+			ReCalculateViewMatrix();
+		}
+
+		void SetOrthographicProjection(float left, float right, float bottom, float top);
 		inline glm::vec3& GetPosition() { return m_Position; }
 		inline float& GetRotation() { return m_Rotation; }
 		inline glm::mat4 GetProjectionViewMatix() { return m_ProjectionView; }
@@ -28,5 +34,6 @@ namespace Hazel {
 
 		glm::vec3 m_Position = {0,0,0};
 		float m_Rotation;
+		float m_Scale = 1.0;
 	};
 }
