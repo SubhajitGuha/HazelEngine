@@ -29,19 +29,17 @@ namespace Hazel {
 		else
 			HAZEL_CORE_ERROR("Invalid Texture format");
 		
-		glGenTextures(1, &m_Renderid);
-		//glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
+		glTextureStorage2D(m_Renderid, 1, InternalFormat, m_Width, m_Height);
 
-		//glTexStorage2D(GL_TEXTURE_2D, 0, InternalFormat, m_Width, m_Height);
+		glTextureParameteri(m_Renderid, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_Renderid, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, Format, GL_UNSIGNED_BYTE, pixel_data);
-		glTexImage2D(GL_TEXTURE_2D, 0,InternalFormat, m_Width, m_Height, 0, Format, GL_UNSIGNED_BYTE, pixel_data);
+		glTextureSubImage2D(m_Renderid, 0, 0, 0, m_Width, m_Height, Format, GL_UNSIGNED_BYTE, pixel_data);
 
 		if(pixel_data)
 			stbi_image_free(pixel_data);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	OpenGlTexture2D::~OpenGlTexture2D()
 	{
@@ -50,6 +48,8 @@ namespace Hazel {
 	void OpenGlTexture2D::Bind(int slot = 0) const
 	{
 		glBindTextureUnit(slot, m_Renderid);
+		//glActiveTexture(GL_TEXTURE0 + slot);
+		//glBindTexture(GL_TEXTURE_2D, m_Renderid);
 	}
 	void OpenGlTexture2D::UnBind() const
 	{

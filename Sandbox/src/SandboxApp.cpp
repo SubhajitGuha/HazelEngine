@@ -1,4 +1,7 @@
 #include <Hazel.h>
+
+#include <Hazel/EntryPoint.h>
+#include "Sandbox2dApp.h"
 using namespace Hazel;
 
 //This is our game layer
@@ -82,13 +85,13 @@ public:
 																			//just multiply the scale and rotation matrix with position to get the full transform
 		Renderer::BeginScene(m_camera.GetCamera());
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 50; i++)
 		{
-			for (int j = 0; j < 5; j++)
+			for (int j = 0; j < 50; j++)
 			{
-				glm::vec3 tmp = { i, j, 0 };
+				glm::vec3 tmp = { i*0.18, j*0.18, 0 };
 
-				glm::mat4 ModelTransform = glm::translate(glm::mat4(1), position+tmp) * glm::scale(glm::mat4(1), glm::vec3(0.3));
+				glm::mat4 ModelTransform = glm::translate(glm::mat4(1), position+tmp) * glm::scale(glm::mat4(1), glm::vec3(0.1));
 				if(j%2==0)
 				 SolidColorShader->UpladUniformFloat4("m_color", Color2);
 				else
@@ -143,8 +146,9 @@ class Sandbox :public Hazel::Application
 {
 public:
 	Sandbox(){
-		PushLayer(new GameLayer());
+		//PushLayer(new GameLayer());
 		//PushOverlay(new Hazel::ImGuiLayer());
+		PushLayer(new SandBox2dApp());
 	}
 	~Sandbox(){}
 };
