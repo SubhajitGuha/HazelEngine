@@ -40,7 +40,24 @@ namespace Hazel {
 		if(pixel_data)
 			stbi_image_free(pixel_data);
 		glBindTexture(GL_TEXTURE_2D, 0);
+		//glDeleteTextures(1, &m_Renderid);
 	}
+	OpenGlTexture2D::OpenGlTexture2D(const unsigned int Width=1,const  unsigned int Height=1, unsigned int data= 0xffffffff)//for making a custom texture(white,black,red..)
+		:m_Height(Height), m_Width(Width)//default texture is white of height and width = 1
+	{
+		GLenum InternalFormat = GL_RGBA8, Format = GL_RGBA;
+
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
+		glTextureStorage2D(m_Renderid, 1, InternalFormat, m_Width, m_Height);
+
+		glTextureParameteri(m_Renderid, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_Renderid, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glTextureSubImage2D(m_Renderid, 0, 0, 0, m_Width, m_Height, Format, GL_UNSIGNED_BYTE, &data);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	OpenGlTexture2D::~OpenGlTexture2D()
 	{
 		glDeleteTextures(1, &m_Renderid);
@@ -48,8 +65,6 @@ namespace Hazel {
 	void OpenGlTexture2D::Bind(int slot = 0) const
 	{
 		glBindTextureUnit(slot, m_Renderid);
-		//glActiveTexture(GL_TEXTURE0 + slot);
-		//glBindTexture(GL_TEXTURE_2D, m_Renderid);
 	}
 	void OpenGlTexture2D::UnBind() const
 	{

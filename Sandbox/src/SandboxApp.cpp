@@ -31,12 +31,12 @@ public:
 		vao->AddBuffer(bl, vb);
 		vao->SetIndexBuffer(ib);
 
-		shader.reset(Shader::Create("Assets/Shaders/TextureShader.glsl"));
+		shader=(Shader::Create("Assets/Shaders/TextureShader.glsl"));
 
 		tex2 = Texture2D::Create("Assets/Textures/rickshaw.png");
 		texture = Texture2D::Create("Assets/Textures/Test.png");
 		
-		shader->UploadUniformInt("u_Texture", 0);
+		shader->SetInt("u_Texture", 0);
 
 		float pos2[] = 
 		{ -0.8,0.8,0.0, 0.8 ,0.0 ,0.6 ,1.0,
@@ -49,12 +49,12 @@ public:
 		0,1,3};
 
 		//For tiled Squares
-		SquareVA .reset(VertexArray::Create());
+		SquareVA =(VertexArray::Create());
 		ref<VertexBuffer> SquareBuffer (VertexBuffer::Create(pos2, sizeof(pos2)));
 		ref<BufferLayout> bl2(new BufferLayout);
 		bl2->push("position", DataType::Float3);
 		bl2->push("color", DataType::Float4);
-		IndexBuffer* SquareIndex = IndexBuffer::Create(index2, sizeof(index2));
+		ref<IndexBuffer> SquareIndex = IndexBuffer::Create(index2, sizeof(index2));
 		SquareVA->AddBuffer(bl2, SquareBuffer);
 		SquareVA->SetIndexBuffer((ref<IndexBuffer>)SquareIndex);
 		
@@ -93,9 +93,9 @@ public:
 
 				glm::mat4 ModelTransform = glm::translate(glm::mat4(1), position+tmp) * glm::scale(glm::mat4(1), glm::vec3(0.1));
 				if(j%2==0)
-				 SolidColorShader->UpladUniformFloat4("m_color", Color2);
+				 SolidColorShader->SetFloat4("m_color", Color2);
 				else
-				 SolidColorShader->UpladUniformFloat4("m_color", Color1);
+				 SolidColorShader->SetFloat4("m_color", Color1);
 
 				Renderer::Submit(*SolidColorShader, *SquareVA , ModelTransform);
 			}
@@ -124,13 +124,13 @@ public:
 private:
 	bool m_Running = true;
 
-	std::shared_ptr<Shader> shader,*shader2;
-	Shader* SolidColorShader;
+	std::shared_ptr<Shader> shader,*shader2,SolidColorShader;
+	
 
 	OrthographicCameraController m_camera;
 
-	VertexArray* vao;
-	ref<VertexArray> SquareVA;
+	
+	ref<VertexArray> vao,SquareVA;
 
 	glm::vec4 Color1 = {1,1,1,1};
 	glm::vec4 Color2 = {1,1,1,1};

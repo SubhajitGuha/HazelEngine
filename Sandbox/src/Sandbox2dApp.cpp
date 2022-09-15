@@ -1,38 +1,16 @@
 #include "Sandbox2dApp.h"
 
 SandBox2dApp::SandBox2dApp()
-	:m_camera(1920.0/1080.0)
+	:Layer("Renderer2D layer"), m_camera(1920.0 / 1080.0)
 {
+	tex2 = Texture2D::Create("Assets/Textures/Test.png");
+	texture = Texture2D::Create("Assets/Textures/rickshaw.png");
+	Renderer2D::Init();
 }
 
 void SandBox2dApp::OnAttach()
 {
-	float pos[] =
-	{ 0.5,0.5,0.0,   1.0,1.0,
-	0.5,-0.5,0.0,   1.0,0.0,
-	-0.5,-0.5,0.0,  0.0,0.0,
-	-0.5,0.5,0.0,   0.0,1.0 };
 
-	unsigned int index[] =
-	{ 0,1,2,
-	0,2,3 };
-
-
-	vao .reset(VertexArray::Create());//vertex array
-	ref<VertexBuffer> vb(VertexBuffer::Create(pos, sizeof(pos)));//vertex buffer
-	ref<BufferLayout> bl = std::make_shared<BufferLayout>(); //buffer layout
-	bl->push("position", DataType::Float3);
-	bl->push("color", DataType::Float2);
-	ref<IndexBuffer> ib(IndexBuffer::Create(index, sizeof(index)));
-	vao->AddBuffer(bl, vb);
-	vao->SetIndexBuffer(ib);
-
-	shader.reset(Shader::Create("Assets/Shaders/TextureShader.glsl"));
-
-	tex2 = Texture2D::Create("Assets/Textures/rickshaw.png");
-	texture = Texture2D::Create("Assets/Textures/Test.png");
-
-	shader->UploadUniformInt("u_Texture", 0);
 }
 
 void SandBox2dApp::OnDetach()
@@ -64,12 +42,11 @@ void SandBox2dApp::OnUpdate(float deltatime)
 	Set the model transform for now there is no scale or rotation
 	just multiply the scale and rotation matrix with position to get the full transform
 	*/
-	Renderer::BeginScene(m_camera.GetCamera());	
-	texture->Bind(0);
-	Renderer::Submit(*shader, *vao, ModelTransform2);
-	tex2->Bind(0);
-	Renderer::Submit(*shader, *vao);
-	Renderer::EndScene();
+	Renderer2D::BeginScene(m_camera.GetCamera());
+	Renderer2D::DrawQuad({ 0.5,0.8,-0.1 }, { 1,1,0 }, Color1);
+	Renderer2D::DrawQuad(position, glm::vec3(scale), tex2);
+	Renderer2D::DrawQuad({ 0.5,-0.1,0.10 }, { 1,1,0 }, texture);
+	Renderer2D::EndScene();
 }
 
 void SandBox2dApp::OnImGuiRender()

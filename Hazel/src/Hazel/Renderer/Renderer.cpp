@@ -18,8 +18,8 @@ namespace Hazel {
 	void Renderer::Submit(Shader& shader, VertexArray& vertexarray, glm::mat4 ModelTransform)
 	{
 		shader.Bind();
-		shader.UploadUniformMat4("m_ProjectionView", Renderer::m_data->m_ProjectionViewMatrix);
-		shader.UploadUniformMat4("m_ModelTransform", ModelTransform);
+		shader.SetMat4("m_ProjectionView", Renderer::m_data->m_ProjectionViewMatrix);
+		shader.SetMat4("m_ModelTransform", ModelTransform);
 
 		vertexarray.Bind();
 		RenderCommand::DrawIndex(vertexarray);

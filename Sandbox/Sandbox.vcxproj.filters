@@ -26,7 +26,7 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\TextureShader.glsl" />
+    <None Include="Assets\Shaders\2_In_1Shader.glsl" />
     <None Include="Assets\Shaders\SolidColorShader.glsl" />
   </ItemGroup>
   <ItemGroup>

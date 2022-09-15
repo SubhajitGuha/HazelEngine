@@ -14,4 +14,15 @@ namespace Hazel {
 			return nullptr;
 		}
 	}
+	ref<Texture2D> Texture2D::Create(const unsigned int Width,const unsigned int Height,const unsigned int data)
+	{
+		switch (RendererAPI::GetAPI()) {
+		case GraphicsAPI::None:
+			return nullptr;
+		case GraphicsAPI::OpenGL:
+			return std::make_shared<OpenGlTexture2D>(Width,Height,data);
+		default:
+			return nullptr;
+		}
+	}
 }

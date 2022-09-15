@@ -131,6 +131,27 @@ namespace Hazel {
 		glUseProgram(0);
 	}
 
+	void OpenGlShader::SetMat4(const std::string& str, glm::mat4& UniformMat4)
+	{
+		UploadUniformMat4(str, UniformMat4);
+	}
+
+	void OpenGlShader::SetInt(const std::string& str, const int& UniformInt)
+	{
+		UploadUniformInt(str, UniformInt);
+	}
+
+	void OpenGlShader::SetFloat(const std::string& str, float& UniformFloat)
+	{
+		UpladUniformFloat(str, UniformFloat);
+	}
+
+	void OpenGlShader::SetFloat4(const std::string& str, const glm::vec4& UniformFloat4)
+	{
+		UpladUniformFloat4(str, UniformFloat4);
+	}
+
+	//opengl specific upload uniform
 	void OpenGlShader::UploadUniformMat4(const std::string& str, glm::mat4& UniformMat4)
 	{
 		unsigned int location = glGetUniformLocation(program, str.c_str());
@@ -146,6 +167,8 @@ namespace Hazel {
 
 	void OpenGlShader::UpladUniformFloat(const std::string& str, float& UniformFloat)
 	{
+		unsigned int location = glGetUniformLocation(program, str.c_str());
+		glUniform1f(location, UniformFloat);
 	}
 
 	void OpenGlShader::UpladUniformFloat4(const std::string& str, const glm::vec4& UniformFloat4)

@@ -6,6 +6,7 @@ namespace Hazel {
 	{
 	public:
 		OpenGlTexture2D(const std::string& path);
+		OpenGlTexture2D(const unsigned int Width, const unsigned int Height, unsigned int);
 		virtual ~OpenGlTexture2D();
 		unsigned int GetWidth() override { return m_Width; }
 		unsigned int GetHeight() override { return m_Height; }

@@ -145,7 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SolidColorShader.glsl" />
-    <None Include="Assets\Shaders\TextureShader.glsl" />
+    <None Include="Assets\Shaders\2_In_1Shader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sandbox2dApp.h" />

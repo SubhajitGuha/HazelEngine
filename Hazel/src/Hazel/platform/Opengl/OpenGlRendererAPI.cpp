@@ -15,7 +15,7 @@ namespace Hazel {
 	}
 	void OpenGlRendererAPI::Clear()
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	void OpenGlRendererAPI::DrawIndex(VertexArray& vertexarray)
 	{
@@ -25,6 +25,7 @@ namespace Hazel {
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_DEPTH_TEST);
 	}
 	void OpenGlRendererAPI::SetViewPort(unsigned int Width, unsigned int Height)
 	{

@@ -1,5 +1,6 @@
 #pragma once
 #include "Hazel/Log.h"
+#include "Hazel/Core.h"
 
 //This Buffer file contains Both index and vertex Buffer oi
 namespace Hazel {
@@ -40,7 +41,7 @@ namespace Hazel {
 		virtual void Bind()const = 0;
 		virtual void UnBind()const = 0;
 
-		static VertexBuffer* Create(float* data, size_t size);
+		static ref<VertexBuffer> Create(float* data, size_t size);
 	};
 
 
@@ -49,7 +50,7 @@ namespace Hazel {
 		virtual void Bind()const = 0;
 		virtual void UnBind()const = 0;
 		virtual size_t GetCount() = 0;
-		static IndexBuffer* Create(unsigned int* data, size_t size);
+		static ref<IndexBuffer> Create(unsigned int* data, size_t size);
 	};
 
 
@@ -62,7 +63,7 @@ namespace Hazel {
 
 		virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() = 0;
 		virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const = 0;
-		static VertexArray* Create();
+		static ref<VertexArray> Create();
 	};
 
 }

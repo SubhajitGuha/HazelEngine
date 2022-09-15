@@ -1,5 +1,6 @@
 #pragma once
 #include "RendererAPI.h"
+#include "Hazel/Core.h"
 
 namespace Hazel {
 	class RenderCommand {
@@ -17,7 +18,9 @@ namespace Hazel {
 		inline static void DrawIndex(VertexArray& vertexarray) {
 			m_RendererAPI->DrawIndex(vertexarray);
 		}
+
 	private:
-		static RendererAPI* m_RendererAPI;
+		static ref<RendererAPI> GetRendererAPI();
+		static ref<RendererAPI> m_RendererAPI;
 	};
 }

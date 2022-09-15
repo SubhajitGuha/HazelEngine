@@ -6,11 +6,11 @@
 namespace Hazel {
 	
 
-	VertexBuffer* VertexBuffer::Create(float* data, size_t size)
+	ref<VertexBuffer> VertexBuffer::Create(float* data, size_t size)
 	{
 		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::OpenGL:
-			return new OpenGlVertexBuffer(data,size);
+			return std::make_shared<OpenGlVertexBuffer>(data,size);
 		case GraphicsAPI::None:
 			HAZEL_CORE_ERROR("NOT A VALID GRAPHICS API");
 			break;
@@ -22,11 +22,11 @@ namespace Hazel {
 
 	/// //////////////////////////////////////////////////////////////////////////
 
-	IndexBuffer* IndexBuffer::Create(unsigned int* data, size_t size)
+	ref<IndexBuffer> IndexBuffer::Create(unsigned int* data, size_t size)
 	{
 		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::OpenGL:
-			return new OpenGlIndexBuffer(data, size);
+			return std::make_shared<OpenGlIndexBuffer>(data, size);
 		case GraphicsAPI::None:
 			HAZEL_CORE_ERROR("NOT A VALID GRAPHICS API");
 			break;
@@ -63,11 +63,11 @@ namespace Hazel {
 
 	/////////////////////////////////////////////////////////////////////////
 	
-	VertexArray* VertexArray::Create()
+	ref<VertexArray> VertexArray::Create()
 	{
 		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::OpenGL:
-			return new OpenGlVertexArray();
+			return std::make_shared<OpenGlVertexArray>();
 		case GraphicsAPI::None:
 			HAZEL_CORE_ERROR("NOT A VALID GRAPHICS API");
 			break;

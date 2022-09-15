@@ -14,6 +14,7 @@ namespace Hazel {
 
 		virtual void UnBind()const = 0;
 		static ref<Texture2D> Create(const std::string& path);
+		static ref<Texture2D> Create(const unsigned int Width,const unsigned int Height, unsigned int);
 	};
 }
 

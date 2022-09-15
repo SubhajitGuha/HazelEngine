@@ -7,6 +7,7 @@
 namespace Hazel {
 	class Renderer {
 	public:
+		~Renderer() { delete m_data; }
 		static void Init();
 		static void WindowResize(unsigned int Width, unsigned int Height); 
 		static void BeginScene(OrthographicCamera& camera);

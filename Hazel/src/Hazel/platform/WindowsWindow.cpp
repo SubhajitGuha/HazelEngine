@@ -14,6 +14,8 @@ namespace Hazel {
 	}
 	WindowsWindow::~WindowsWindow()
 	{
+		//delete m_window;
+		//delete Context;
 		ShutDown();
 	}
 	void WindowsWindow::OnUpdate()
@@ -50,7 +52,7 @@ namespace Hazel {
 		}
 
 		m_window = glfwCreateWindow((int)m_Data.width,(int) m_Data.height, m_Data.name.c_str(), nullptr, nullptr);
-		Context = new OpenGlContext(m_window);//context for opengl as this piece of code is abstracted away
+		Context = new OpenGlContext((ref<GLFWwindow>)m_window);//context for opengl as this piece of code is abstracted away
 		Context->Init();
 		glfwSetWindowUserPointer(m_window, &m_Data);
 		SetVsync(true);
