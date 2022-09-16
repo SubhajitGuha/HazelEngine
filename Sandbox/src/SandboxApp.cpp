@@ -10,6 +10,8 @@ public:
 	GameLayer()
 		:Layer("Hazel_Layer"), m_camera(1920.0/1080.0)//left right bottom top
 	{
+		HZ_PROFILE_SCOPE("GameLayer :public Hazel::Layer");//capture the profile time in the json file
+		
 		//Single Square 
 		float pos[] =
 		{0.5,0.5,0.0,   1.0,1.0,
@@ -21,7 +23,6 @@ public:
 		{0,1,2,
 		0,2,3};
 
-		
 		vao=(VertexArray::Create());//vertex array
 		ref<VertexBuffer> vb(VertexBuffer::Create(pos, sizeof(pos) ));//vertex buffer
 		ref<BufferLayout> bl=std::make_shared<BufferLayout>(); //buffer layout
@@ -62,6 +63,8 @@ public:
 
 	}
 	virtual void OnUpdate(float deltatime) {
+
+		HZ_PROFILE_SCOPE("virtual void OnUpdate(float deltatime)");
 
 		RenderCommand::ClearColor(glm::vec4(0.4, 0.8, 0.8, 0.8));
 		RenderCommand::Clear();

@@ -9,6 +9,9 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <chrono>
+
+#include "Hazel/Debug/Instrumentation.h"
 #ifdef HZ_PLATFORM_WINDOWS
 #include <windows.h>
 #endif // HZ_PLATFORM_WINDOWS

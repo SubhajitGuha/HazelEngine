@@ -22,4 +22,5 @@ private:
 	glm::vec3 position = { 0,0,0 };
 	float ObjSpeed = 20;
 	float scale = 1;
+
 };
