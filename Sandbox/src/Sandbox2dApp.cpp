@@ -50,10 +50,12 @@ void SandBox2dApp::OnUpdate(float deltatime )
 		HZ_PROFILE_SCOPE("RENDER");
 		{
 			Renderer2D::BeginScene(m_camera.GetCamera());
-			//for(int i=0;i<=1000;i++)
-			Renderer2D::DrawQuad({ 0.0,0.0,0.0 }, { 1.0,1.0,0.0 }, Color1);
-			Renderer2D::DrawQuad({ 1.0,0.0,0.0 }, { 1.0,1.0,0.0 }, Color1);
-			Renderer2D::DrawQuad({ 3.0,0.0,0.0 }, { 1.0,1.0,0.0 }, Color1);
+			//Renderer2D::DrawQuad({ 0,0.0,0.0 }, { 1.0,1.0,0.0 }, Color1);
+			for (int i = 0; i < 100; i += 2)
+				for (int j = 0; j < 100; j += 2)
+					Renderer2D::DrawQuad({ i,j,0.0 }, { 1.0,1.0,0.0 }, Color1);
+			
+			//Renderer2D::DrawQuad({ 7,0.0,0.0 }, { 1.0,1.0,0.0 }, Color1);
 			//Renderer2D::DrawQuad(position, glm::vec3(scale), tex2);
 			//Renderer2D::DrawQuad({ 0.5,-0.1,0.10 }, { 1,1,0 }, texture);
 			Renderer2D::EndScene();
