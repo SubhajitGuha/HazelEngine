@@ -12,6 +12,14 @@ namespace Hazel {
 		glm::vec3 Position;
 		glm::vec2 TextureCoordinate;
 		glm::vec4 Color;
+		unsigned int TextureSlotindex = 0;//serves as an index to the array of texture slot which is passed as an uniform in init()
+		VertexAttributes(glm::vec3 Position, glm::vec2 TextureCoordinate, glm::vec4 Color = {1,1,1,1}, unsigned int TextureSlotindex = 0)
+		{
+			this->Position = Position;
+			this->TextureCoordinate = TextureCoordinate;
+			this->Color = Color;
+			this->TextureSlotindex = TextureSlotindex;
+		}
 		//may more ..uv coord , tangents , normals..
 	};
 
@@ -19,15 +27,16 @@ namespace Hazel {
 		int maxQuads = 10000;
 		int NumIndices = maxQuads * 6;
 		int NumVertices = maxQuads * 4;
-
+		
 		ref<VertexArray> vao;
 		ref<Shader> shader;
 		ref<Texture2D> WhiteTex;
 		ref<VertexBuffer> vb;
+		//ref<Texture2D> texture, texture2;
 
 		std::vector< VertexAttributes> Quad;
 		std::vector<unsigned int> index;
-		unsigned int m_VertexCounter = 0;
+		int m_VertexCounter = 0;
 	};
 
 		static Renderer2DStorage* m_data;
@@ -35,7 +44,7 @@ namespace Hazel {
 	void Renderer2D::Init()
 	{
 		m_data = new Renderer2DStorage;
-
+		
 		//initilize the vertex buffer data and index buffer data
 		m_data->Quad.resize(m_data->NumVertices, { glm::vec3(0.0),glm::vec2(0.0),glm::vec4(0.0) });
 		m_data->index.resize(m_data->NumIndices);
@@ -56,58 +65,69 @@ namespace Hazel {
 		//ref<VertexBuffer> vb = VertexBuffer::Create(pos, sizeof(pos));//vertex buffer
 		m_data->vb = VertexBuffer::Create((sizeof(VertexAttributes)*4)*m_data->maxQuads);//(sizeof(VertexAttributes)*4) gives one quad multiply it with howmany quads you want
 		ref<BufferLayout> bl = std::make_shared<BufferLayout>(); //buffer layout
+
 		bl->push("position", DataType::Float3);
 		bl->push("TexCoord", DataType::Float2);
 		bl->push("Color", DataType::Float4);
+		bl->push("TextureSlot", DataType::Int);
+
 		ref<IndexBuffer> ib(IndexBuffer::Create(&m_data->index[0], m_data->NumIndices));
 		m_data->vao->AddBuffer(bl, m_data->vb);
 		m_data->vao->SetIndexBuffer(ib);
 
 		m_data->WhiteTex = Texture2D::Create(1,1,0xffffffff);//create a default white texture
 		m_data->shader = (Shader::Create("Assets/Shaders/2_In_1Shader.glsl"));//texture shader
-
 		
+		unsigned int TextureIDindex[] = { 0,1,2,3,4,5,6,7 };
+
+		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
+																						//which will be used to render textures in batch renderer
 
 	}
 	void Renderer2D::BeginScene(OrthographicCamera& camera)
 	{
 		m_data->shader->Bind();//bind the textureShader
-		m_data->shader->SetInt("u_Texture", 0);//bind the texture to slot 0
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionViewMatix());
 	}
 
 	void Renderer2D::EndScene()
 	{
 		m_data->vb->SetData(sizeof(VertexAttributes)*4* m_data->m_VertexCounter, &m_data->Quad[0].Position);
-		RenderCommand::DrawIndex(*m_data->vao);
+		RenderCommand::DrawIndex(*m_data->vao);//draw call done only once (batch rendering is implemented)
 		m_data->m_VertexCounter = 0;
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col)
 	{
-		m_data->Quad[m_data->m_VertexCounter+0] = { pos,{0.0,0.0},col };
-		m_data->Quad[m_data->m_VertexCounter+1] = { {pos.x ,pos.y + scale.y,pos.z},{0.0,1.0},col };
-		m_data->Quad[m_data->m_VertexCounter+2] = { {pos.x + scale.x,pos.y+scale.y,pos.z},{1.0,1.0},col };
-		m_data->Quad[m_data->m_VertexCounter+3] = { {pos.x+scale.x,pos.y,pos.z},{1.0,0.0},col };
+		m_data->Quad[m_data->m_VertexCounter+0] = VertexAttributes(pos,{0.0,0.0},col );
+		m_data->Quad[m_data->m_VertexCounter+1] = VertexAttributes({pos.x ,pos.y + scale.y,pos.z},{0.0,1.0},col);
+		m_data->Quad[m_data->m_VertexCounter+2] = VertexAttributes({pos.x + scale.x,pos.y+scale.y,pos.z},{1.0,1.0},col );
+		m_data->Quad[m_data->m_VertexCounter+3] = VertexAttributes({pos.x+scale.x,pos.y,pos.z},{1.0,0.0},col );
 
 		//glm::mat4 transform = glm::translate(glm::mat4(1.0), pos) * glm::scale(glm::mat4(1), scale);
 		glm::mat4 transform = glm::mat4(1.0);
 		m_data->shader->SetMat4("u_ModelTransform", transform);
 
 		m_data->WhiteTex->Bind(0);//bind the white texture so that solid color is selected in fragment shader
-		m_data->shader->SetFloat4("u_color", col);
+		//m_data->shader->SetFloat4("u_color", col);
 
 		m_data->m_VertexCounter+=4;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex)
+	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex , unsigned int index)
 	{
-		glm::mat4 transform = glm::translate(glm::mat4(1.0), pos) * glm::scale(glm::mat4(1), scale);
+		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(pos, { 0.0,0.0 }, {1,1,1,1} , index);
+		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes({ pos.x ,pos.y + scale.y,pos.z }, { 0.0,1.0 }, {1,1,1,1} , index);
+		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes({ pos.x + scale.x,pos.y + scale.y,pos.z }, { 1.0,1.0 }, {1,1,1,1} , index);
+		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes({ pos.x + scale.x,pos.y,pos.z }, { 1.0,0.0 }, {1,1,1,1} , index);
+
+		glm::mat4 transform = glm::mat4(1.0);
 		m_data->shader->SetMat4("u_ModelTransform", transform);
 		
-		m_data->shader->SetFloat4("u_color", glm::vec4(1));//set the multiplying color to white so that the texture is selected in fragment shader
+		tex->Bind(index);
+		//m_data->shader->SetFloat4("u_color", glm::vec4(1));//set the multiplying color to white so that the texture is selected in fragment shader
 
-		tex->Bind(0);
-		RenderCommand::DrawIndex(*m_data->vao);
+		m_data->m_VertexCounter += 4;
+
 	}
 }

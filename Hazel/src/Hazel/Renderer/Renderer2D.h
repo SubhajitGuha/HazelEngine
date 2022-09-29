@@ -13,6 +13,6 @@ namespace Hazel {
 		static void EndScene();
 	public:
 		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col);
-		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> col);
+		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> col , unsigned int);
 	};
 }

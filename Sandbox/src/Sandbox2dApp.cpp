@@ -50,14 +50,15 @@ void SandBox2dApp::OnUpdate(float deltatime )
 		HZ_PROFILE_SCOPE("RENDER");
 		{
 			Renderer2D::BeginScene(m_camera.GetCamera());
-			//Renderer2D::DrawQuad({ 0,0.0,0.0 }, { 1.0,1.0,0.0 }, Color1);
-			for (int i = 0; i < 100; i += 2)
-				for (int j = 0; j < 100; j += 2)
-					Renderer2D::DrawQuad({ i,j,0.0 }, { 1.0,1.0,0.0 }, Color1);
-			
-			//Renderer2D::DrawQuad({ 7,0.0,0.0 }, { 1.0,1.0,0.0 }, Color1);
-			//Renderer2D::DrawQuad(position, glm::vec3(scale), tex2);
-			//Renderer2D::DrawQuad({ 0.5,-0.1,0.10 }, { 1,1,0 }, texture);
+			int slot = 0;
+			for (int i = 0; i < 90; i += 2) {
+				for (int j = 0; j < 90; j += 2)
+				{
+					Renderer2D::DrawQuad({ i,j,0.0 }, { 1.0,1.0,0.0 }, (slot % 2 == 0) ? tex2 : texture, (slot) % 2+1);//assign slots other than 0 as 0 is the default white texture
+				}
+				slot++;
+			}
+			Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
 			Renderer2D::EndScene();
 		}
 	
