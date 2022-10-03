@@ -1,6 +1,6 @@
 #shader vertex
 #version 410 core
-layout (location = 0) in vec3 pos;
+layout (location = 0) in vec4 pos;
 layout (location = 1) in vec2 cord;
 layout (location = 2) in vec4 color;
 layout (location = 3) in float slotindex;
@@ -17,7 +17,7 @@ void main()
 	m_color = color;
 	m_slotindex = slotindex;
 	tcord = cord;
-	gl_Position = u_ProjectionView * u_ModelTransform * vec4(pos ,1.0);
+	gl_Position = u_ProjectionView * pos;
 	
 }
 #shader fragment

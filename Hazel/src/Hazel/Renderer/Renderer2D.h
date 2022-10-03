@@ -12,7 +12,7 @@ namespace Hazel {
 		static void BeginScene(OrthographicCamera& camera);
 		static void EndScene();
 	public:
-		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col);
-		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> col , unsigned int);
+		static void DrawQuad(const glm::vec3& pos,const float angle, const glm::vec3& scale, const glm::vec4& col);
+		static void DrawQuad(const glm::vec3& pos, const float angle, const glm::vec3& scale, ref<Texture2D> col , unsigned int);
 	};
 }

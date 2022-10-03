@@ -21,6 +21,7 @@ void SandBox2dApp::OnDetach()
 
 void SandBox2dApp::OnUpdate(float deltatime )
 {
+
 	HZ_PROFILE_SCOPE("SandBox2dApp::OnUpdate");
 	{
 		RenderCommand::ClearColor(glm::vec4(0.4, 0.4, 0.4, 1.0));
@@ -47,6 +48,7 @@ void SandBox2dApp::OnUpdate(float deltatime )
 		Set the model transform. for now there is no scale or rotation
 		just multiply the scale and rotation matrix with position to get the full transform
 		*/
+		
 		HZ_PROFILE_SCOPE("RENDER");
 		{
 			Renderer2D::BeginScene(m_camera.GetCamera());
@@ -54,15 +56,13 @@ void SandBox2dApp::OnUpdate(float deltatime )
 			for (int i = 0; i < 90; i += 2) {
 				for (int j = 0; j < 90; j += 2)
 				{
-					Renderer2D::DrawQuad({ i,j,0.0 }, { 1.0,1.0,0.0 }, (slot % 2 == 0) ? tex2 : texture, (slot) % 2+1);//assign slots other than 0 as 0 is the default white texture
+					Renderer2D::DrawQuad({ i,j,0.0 },0.0, { 1.0,1.0,0.0 }, (slot % 2 == 0) ? tex2 : texture, (slot) % 2+1);//assign slots other than 0 as 0 is the default white texture
 				}
 				slot++;
 			}
-			Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
+			Renderer2D::DrawQuad(position,19.f, glm::vec3(scale), Color1);
 			Renderer2D::EndScene();
 		}
-	
-	
 }
 
 void SandBox2dApp::OnImGuiRender()

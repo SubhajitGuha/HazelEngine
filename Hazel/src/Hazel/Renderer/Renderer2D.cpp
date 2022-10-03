@@ -6,14 +6,17 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glad/glad.h"
 
+#define M_TRANSFORM(pos,angle) glm::rotate(glm::mat4(1),glm::radians(angle),{0,0,1})\
+ * glm::scale(glm::mat4(1),{1,1,1}) * pos
 namespace Hazel {
 
 	struct VertexAttributes {
-		glm::vec3 Position;
+		//glm::vec3 Position;
+		glm::vec4 Position;
 		glm::vec2 TextureCoordinate;
 		glm::vec4 Color;
 		unsigned int TextureSlotindex = 0;//serves as an index to the array of texture slot which is passed as an uniform in init()
-		VertexAttributes(glm::vec3 Position, glm::vec2 TextureCoordinate, glm::vec4 Color = {1,1,1,1}, unsigned int TextureSlotindex = 0)
+		VertexAttributes(glm::vec4 Position, glm::vec2 TextureCoordinate, glm::vec4 Color = {1,1,1,1}, unsigned int TextureSlotindex = 0)
 		{
 			this->Position = Position;
 			this->TextureCoordinate = TextureCoordinate;
@@ -46,7 +49,7 @@ namespace Hazel {
 		m_data = new Renderer2DStorage;
 		
 		//initilize the vertex buffer data and index buffer data
-		m_data->Quad.resize(m_data->NumVertices, { glm::vec3(0.0),glm::vec2(0.0),glm::vec4(0.0) });
+		m_data->Quad.resize(m_data->NumVertices, { glm::vec4(0.0),glm::vec2(0.0),glm::vec4(0.0) });
 		m_data->index.resize(m_data->NumIndices);
 
 		int offset = 0;
@@ -66,7 +69,7 @@ namespace Hazel {
 		m_data->vb = VertexBuffer::Create((sizeof(VertexAttributes)*4)*m_data->maxQuads);//(sizeof(VertexAttributes)*4) gives one quad multiply it with howmany quads you want
 		ref<BufferLayout> bl = std::make_shared<BufferLayout>(); //buffer layout
 
-		bl->push("position", DataType::Float3);
+		bl->push("position", DataType::Float4);
 		bl->push("TexCoord", DataType::Float2);
 		bl->push("Color", DataType::Float4);
 		bl->push("TextureSlot", DataType::Int);
@@ -97,12 +100,12 @@ namespace Hazel {
 		m_data->m_VertexCounter = 0;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col)
+	void Renderer2D::DrawQuad(const glm::vec3& pos,const float angle, const glm::vec3& scale, const glm::vec4& col)
 	{
-		m_data->Quad[m_data->m_VertexCounter+0] = VertexAttributes(pos,{0.0,0.0},col );
-		m_data->Quad[m_data->m_VertexCounter+1] = VertexAttributes({pos.x ,pos.y + scale.y,pos.z},{0.0,1.0},col);
-		m_data->Quad[m_data->m_VertexCounter+2] = VertexAttributes({pos.x + scale.x,pos.y+scale.y,pos.z},{1.0,1.0},col );
-		m_data->Quad[m_data->m_VertexCounter+3] = VertexAttributes({pos.x+scale.x,pos.y,pos.z},{1.0,0.0},col );
+		m_data->Quad[m_data->m_VertexCounter+0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos,1),angle),{0.0,0.0},col );
+		m_data->Quad[m_data->m_VertexCounter+1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x ,pos.y + scale.y,pos.z,1.f), angle),{0.0,1.0},col);
+		m_data->Quad[m_data->m_VertexCounter+2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y+scale.y,pos.z,1.f), angle),{1.0,1.0},col );
+		m_data->Quad[m_data->m_VertexCounter+3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x+scale.x,pos.y,pos.z,1.f), angle),{1.0,0.0},col );
 
 		//glm::mat4 transform = glm::translate(glm::mat4(1.0), pos) * glm::scale(glm::mat4(1), scale);
 		glm::mat4 transform = glm::mat4(1.0);
@@ -114,12 +117,12 @@ namespace Hazel {
 		m_data->m_VertexCounter+=4;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex , unsigned int index)
+	void Renderer2D::DrawQuad(const glm::vec3& pos, const float angle , const glm::vec3& scale, ref<Texture2D> tex , unsigned int index)
 	{
-		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(pos, { 0.0,0.0 }, {1,1,1,1} , index);
-		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes({ pos.x ,pos.y + scale.y,pos.z }, { 0.0,1.0 }, {1,1,1,1} , index);
-		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes({ pos.x + scale.x,pos.y + scale.y,pos.z }, { 1.0,1.0 }, {1,1,1,1} , index);
-		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes({ pos.x + scale.x,pos.y,pos.z }, { 1.0,0.0 }, {1,1,1,1} , index);
+		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos,1), angle), { 0.0,0.0 }, { 1,1,1,1 }, index);
+		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x ,pos.y + scale.y,pos.z ,1.f), angle), { 0.0,1.0 }, {1,1,1,1},index);
+		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y + scale.y,pos.z, 1.f), angle), { 1.0,1.0 }, {1,1,1,1},index);
+		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y,pos.z, 1.f), angle), { 1.0,0.0 }, {1,1,1,1},index);
 
 		glm::mat4 transform = glm::mat4(1.0);
 		m_data->shader->SetMat4("u_ModelTransform", transform);
