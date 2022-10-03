@@ -24,6 +24,7 @@
     <Image Include="Assets\Textures\rickshaw.png">
       <Filter>Assets\Textures</Filter>
     </Image>
+    <Image Include="Assets\Textures\RPGpack_sheet_2X.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\2_In_1Shader.glsl" />

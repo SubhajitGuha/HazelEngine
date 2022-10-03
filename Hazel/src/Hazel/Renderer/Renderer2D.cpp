@@ -100,7 +100,7 @@ namespace Hazel {
 		m_data->m_VertexCounter = 0;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& pos,const float angle, const glm::vec3& scale, const glm::vec4& col)
+	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col, const float angle)
 	{
 		m_data->Quad[m_data->m_VertexCounter+0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos,1),angle),{0.0,0.0},col );
 		m_data->Quad[m_data->m_VertexCounter+1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x ,pos.y + scale.y,pos.z,1.f), angle),{0.0,1.0},col);
@@ -117,12 +117,14 @@ namespace Hazel {
 		m_data->m_VertexCounter+=4;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& pos, const float angle , const glm::vec3& scale, ref<Texture2D> tex , unsigned int index)
+	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex , glm::vec2 TexCoord, unsigned int index, const float angle)
 	{
-		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos,1), angle), { 0.0,0.0 }, { 1,1,1,1 }, index);
-		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x ,pos.y + scale.y,pos.z ,1.f), angle), { 0.0,1.0 }, {1,1,1,1},index);
-		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y + scale.y,pos.z, 1.f), angle), { 1.0,1.0 }, {1,1,1,1},index);
-		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y,pos.z, 1.f), angle), { 1.0,0.0 }, {1,1,1,1},index);
+		float width = 2560.f, height = 1664.f;
+		float ImageWidth = 128.f, ImageHeight = 128.f;
+		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos,1), angle), { ImageWidth*TexCoord.x /width,ImageHeight*TexCoord.y/height }, { 1,1,1,1 }, index);
+		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x ,pos.y + scale.y,pos.z ,1.f), angle), { ImageWidth * TexCoord.x /width,ImageHeight * (TexCoord.y+1)/height }, {1,1,1,1},index);
+		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y + scale.y,pos.z, 1.f), angle), { ImageWidth *(TexCoord.x+1) /width,ImageHeight * (TexCoord.y + 1)/height }, {1,1,1,1},index);
+		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y,pos.z, 1.f), angle), { ImageWidth * (TexCoord.x + 1) /width,ImageHeight * TexCoord.y/height }, {1,1,1,1},index);
 
 		glm::mat4 transform = glm::mat4(1.0);
 		m_data->shader->SetMat4("u_ModelTransform", transform);

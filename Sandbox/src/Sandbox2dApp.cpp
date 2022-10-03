@@ -6,7 +6,7 @@ SandBox2dApp::SandBox2dApp()
 {
 	//HZ_PROFILE_SCOPE("SandBox2dApp::SandBox2dApp()");
 	tex2 = Texture2D::Create("Assets/Textures/Test.png");
-	texture = Texture2D::Create("Assets/Textures/rickshaw.png");
+	texture = Texture2D::Create("Assets/Textures/RPGpack_sheet_2X.png");
 	Renderer2D::Init();
 }
 
@@ -24,7 +24,7 @@ void SandBox2dApp::OnUpdate(float deltatime )
 
 	HZ_PROFILE_SCOPE("SandBox2dApp::OnUpdate");
 	{
-		RenderCommand::ClearColor(glm::vec4(0.4, 0.4, 0.4, 1.0));
+		RenderCommand::ClearColor(glm::vec4(0.2));
 		RenderCommand::Clear();
 
 		m_camera.OnUpdate(deltatime);
@@ -51,18 +51,25 @@ void SandBox2dApp::OnUpdate(float deltatime )
 		
 		HZ_PROFILE_SCOPE("RENDER");
 		{
-			Renderer2D::BeginScene(m_camera.GetCamera());
+			/*Renderer2D::BeginScene(m_camera.GetCamera());
 			int slot = 0;
 			for (int i = 0; i < 90; i += 2) {
 				for (int j = 0; j < 90; j += 2)
 				{
-					Renderer2D::DrawQuad({ i,j,0.0 },0.0, { 1.0,1.0,0.0 }, (slot % 2 == 0) ? tex2 : texture, (slot) % 2+1);//assign slots other than 0 as 0 is the default white texture
+					Renderer2D::DrawQuad({ i,j,0.0 },{ 1.0,1.0,0.0 }, (slot % 2 == 0) ? tex2 : texture, (slot) % 2+1);//assign slots other than 0 as 0 is the default white texture
 				}
 				slot++;
 			}
-			Renderer2D::DrawQuad(position,19.f, glm::vec3(scale), Color1);
-			Renderer2D::EndScene();
+			Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
+			Renderer2D::EndScene();*/
 		}
+		Renderer2D::BeginScene(m_camera.GetCamera());
+		Renderer2D::DrawQuad({0,0,0}, glm::vec3(1), texture, { 0,1 }, 1);
+		Renderer2D::DrawQuad({0,1,0}, glm::vec3(1), texture, { 0,2 }, 1);
+		Renderer2D::DrawQuad({ 3,0,0 }, glm::vec3(1), texture, { 2,1 }, 1);
+		Renderer2D::DrawQuad({ 3,1,0 }, glm::vec3(1), texture, { 2,2 }, 1);
+		Renderer2D::DrawQuad({ 4,5,0 }, glm::vec3(3), texture, { 7,5 }, 1);
+		Renderer2D::EndScene();
 }
 
 void SandBox2dApp::OnImGuiRender()
@@ -72,19 +79,6 @@ void SandBox2dApp::OnImGuiRender()
 	ImGui::Begin("Color Picker");
 	ImGui::ColorPicker4("Color3", glm::value_ptr(Color1));
 	ImGui::End();
-
-	//ImGui::Begin("Benchmark");
-	//	
-	//for (auto item : TimerVar)
-	//{
-	//	char name[50]="";
-	//	strcpy(name, item.name);
-	//	strcat(name, " %.3fms");
-	//ImGui::Text(name,item.Time);
-	//}
-	//TimerVar.clear();
-	//ImGui::End();
-
 }
 
 void SandBox2dApp::OnEvent(Event& e)

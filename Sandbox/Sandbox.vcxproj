@@ -135,6 +135,7 @@
     <ClCompile Include="src\SandboxApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Textures\RPGpack_sheet_2X.png" />
     <Image Include="Assets\Textures\Test.png" />
     <Image Include="Assets\Textures\rickshaw.png" />
   </ItemGroup>

@@ -12,7 +12,8 @@ namespace Hazel {
 		static void BeginScene(OrthographicCamera& camera);
 		static void EndScene();
 	public:
-		static void DrawQuad(const glm::vec3& pos,const float angle, const glm::vec3& scale, const glm::vec4& col);
-		static void DrawQuad(const glm::vec3& pos, const float angle, const glm::vec3& scale, ref<Texture2D> col , unsigned int);
+		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col, const float angle = 0.f);
+		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex , glm::vec2 TexCoord , unsigned int index=1, const float angle=0.f);
+		//note texture coord defines the uv coordinate of the texture (in sprite sheet we need these texture coordinates to get individual asset images)
 	};
 }
