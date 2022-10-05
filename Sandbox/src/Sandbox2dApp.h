@@ -1,5 +1,6 @@
 #pragma once
 #include "Hazel.h"
+#include <unordered_map>
 
 using namespace Hazel;
 
@@ -19,6 +20,9 @@ private:
 	ref<VertexArray> vao;
 	glm::vec4 Color1 = { 1,1,1,1 };
 	ref <Texture2D> texture, tex2;
+	ref<SubTexture2D> tree,land,mud,water;
+	std::unordered_map<char, ref<SubTexture2D>> asset_map;
+	std::string level_map,tree_map;
 	glm::vec3 position = { 0,0,0 };
 	float ObjSpeed = 20;
 	float scale = 1;

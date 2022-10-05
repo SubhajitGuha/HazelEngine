@@ -27,7 +27,7 @@ namespace Hazel {
 	};
 
 	struct Renderer2DStorage {
-		int maxQuads = 10000;
+		int maxQuads = 100000;
 		int NumIndices = maxQuads * 6;
 		int NumVertices = maxQuads * 4;
 		
@@ -107,32 +107,34 @@ namespace Hazel {
 		m_data->Quad[m_data->m_VertexCounter+2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y+scale.y,pos.z,1.f), angle),{1.0,1.0},col );
 		m_data->Quad[m_data->m_VertexCounter+3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x+scale.x,pos.y,pos.z,1.f), angle),{1.0,0.0},col );
 
-		//glm::mat4 transform = glm::translate(glm::mat4(1.0), pos) * glm::scale(glm::mat4(1), scale);
-		glm::mat4 transform = glm::mat4(1.0);
-		m_data->shader->SetMat4("u_ModelTransform", transform);
-
 		m_data->WhiteTex->Bind(0);//bind the white texture so that solid color is selected in fragment shader
 		//m_data->shader->SetFloat4("u_color", col);
 
 		m_data->m_VertexCounter+=4;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex , glm::vec2 TexCoord, unsigned int index, const float angle)
+	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex , unsigned int index, const float angle)
 	{
-		float width = 2560.f, height = 1664.f;
-		float ImageWidth = 128.f, ImageHeight = 128.f;
-		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos,1), angle), { ImageWidth*TexCoord.x /width,ImageHeight*TexCoord.y/height }, { 1,1,1,1 }, index);
-		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x ,pos.y + scale.y,pos.z ,1.f), angle), { ImageWidth * TexCoord.x /width,ImageHeight * (TexCoord.y+1)/height }, {1,1,1,1},index);
-		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y + scale.y,pos.z, 1.f), angle), { ImageWidth *(TexCoord.x+1) /width,ImageHeight * (TexCoord.y + 1)/height }, {1,1,1,1},index);
-		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y,pos.z, 1.f), angle), { ImageWidth * (TexCoord.x + 1) /width,ImageHeight * TexCoord.y/height }, {1,1,1,1},index);
+			m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos, 1), angle), { 0,0 }, { 1,1,1,1 }, index);
+			m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x, pos.y + scale.y, pos.z, 1.f), angle), { 0,1 }, { 1,1,1,1 }, index);
+			m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y + scale.y, pos.z, 1.f), angle), { 1,1 }, { 1,1,1,1 }, index);
+			m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y, pos.z, 1.f), angle), { 1,0 }, { 1,1,1,1 }, index);
 
-		glm::mat4 transform = glm::mat4(1.0);
-		m_data->shader->SetMat4("u_ModelTransform", transform);
 		
 		tex->Bind(index);
 		//m_data->shader->SetFloat4("u_color", glm::vec4(1));//set the multiplying color to white so that the texture is selected in fragment shader
-
+		
 		m_data->m_VertexCounter += 4;
 
+	}
+	void Renderer2D::DrawSubTexturedQuad(const glm::vec3& pos, const glm::vec3& scale, ref<SubTexture2D> tex, unsigned int index, const float angle)
+	{
+		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos, 1), angle), tex->m_TextureCoordinate[0], { 1,1,1,1 }, index);
+		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x, pos.y + scale.y, pos.z, 1.f), angle), tex->m_TextureCoordinate[1], { 1,1,1,1 }, index);
+		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y + scale.y, pos.z, 1.f), angle), tex->m_TextureCoordinate[2], { 1,1,1,1 }, index);
+		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y, pos.z, 1.f), angle), tex->m_TextureCoordinate[3], { 1,1,1,1 }, index);
+
+		tex->Texture->Bind(index);
+		m_data->m_VertexCounter += 4;
 	}
 }

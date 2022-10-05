@@ -5,8 +5,44 @@ SandBox2dApp::SandBox2dApp()
 	:Layer("Renderer2D layer"), m_camera(1920.0 / 1080.0)
 {
 	//HZ_PROFILE_SCOPE("SandBox2dApp::SandBox2dApp()");
-	tex2 = Texture2D::Create("Assets/Textures/Test.png");
+
+	level_map =
+		"llllllllllllllllllllllllllllll"
+		"lllmlllllllwwwwwllllllllllllll"
+		"lllmmllllwwwwwwwwwwlllllllllll"
+		"llllllwwwwwwwwwwwwwwwwwlllllll"
+		"llllwwwwwwwwwwwwwwwwwwmwwlllll"
+		"lllwwwwwwwwmmmmwwwwwwwwmwwwlll"
+		"llllllwmwwwwwwwwwwwwwwwlllllll"
+		"llllwwwwwwwwwwwwwwwwllllllllll"
+		"lllllllllwwwwwwwwwwwllllllllll"
+		"llllllllmmmwwwwwllllllllllllll"
+		"llllllllllllllllllllllllllllll";
+
+	tree_map = 
+		"ttttt  ttttt  tttt  ttttt  ttt"
+		"ttt t     t     tttttttttttttt"
+		"ttt  tttt          ttttttttttt"
+		"tt  tt                 ttt   t"
+		"tttt                     ttttt"
+		"ttt                        ttt"
+		"tttttt                 ttt  tt"
+		"tttt                tttt    tt"
+		"     tttt           tt    tttt"
+		"tttttttt        tttt   tttt tt"
+		"tttt     ttt   ttt          tt";
+
 	texture = Texture2D::Create("Assets/Textures/RPGpack_sheet_2X.png");
+	tree = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 4,1 }, { 128.f,128.f }, {1,2});
+	mud = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 6,11 }, { 128.f,128.f });
+	land = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 3,10 }, { 128.f,128.f });
+	water = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 11,11 }, { 128.f,128.f });
+
+	asset_map['l'] = land;
+	asset_map['w'] = water;
+	asset_map['t'] = tree;
+	asset_map['m'] = mud;
+
 	Renderer2D::Init();
 }
 
@@ -48,27 +84,25 @@ void SandBox2dApp::OnUpdate(float deltatime )
 		Set the model transform. for now there is no scale or rotation
 		just multiply the scale and rotation matrix with position to get the full transform
 		*/
-		
-		HZ_PROFILE_SCOPE("RENDER");
-		{
-			/*Renderer2D::BeginScene(m_camera.GetCamera());
-			int slot = 0;
-			for (int i = 0; i < 90; i += 2) {
-				for (int j = 0; j < 90; j += 2)
-				{
-					Renderer2D::DrawQuad({ i,j,0.0 },{ 1.0,1.0,0.0 }, (slot % 2 == 0) ? tex2 : texture, (slot) % 2+1);//assign slots other than 0 as 0 is the default white texture
-				}
-				slot++;
-			}
-			Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
-			Renderer2D::EndScene();*/
-		}
+	
 		Renderer2D::BeginScene(m_camera.GetCamera());
-		Renderer2D::DrawQuad({0,0,0}, glm::vec3(1), texture, { 0,1 }, 1);
-		Renderer2D::DrawQuad({0,1,0}, glm::vec3(1), texture, { 0,2 }, 1);
-		Renderer2D::DrawQuad({ 3,0,0 }, glm::vec3(1), texture, { 2,1 }, 1);
-		Renderer2D::DrawQuad({ 3,1,0 }, glm::vec3(1), texture, { 2,2 }, 1);
-		Renderer2D::DrawQuad({ 4,5,0 }, glm::vec3(3), texture, { 7,5 }, 1);
+		for (int i = 0; i < level_map.size(); i++) {
+		
+			ref<SubTexture2D> subTexture;
+			subTexture = asset_map[level_map[i]];
+			if (subTexture)
+				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30,0 }, { 1,1,1 }, subTexture);
+		}
+		Renderer2D::EndScene();
+
+		Renderer2D::BeginScene(m_camera.GetCamera());
+		for (int i = 0; i < tree_map.size(); i++) {
+
+			ref<SubTexture2D> subTexture;
+			subTexture = asset_map[tree_map[i]];
+			if (subTexture)
+				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
+		}
 		Renderer2D::EndScene();
 }
 
