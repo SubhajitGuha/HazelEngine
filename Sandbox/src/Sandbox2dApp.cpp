@@ -43,6 +43,8 @@ SandBox2dApp::SandBox2dApp()
 	asset_map['t'] = tree;
 	asset_map['m'] = mud;
 
+	m_FrameBuffer = FrameBuffer::Create({1920,1080});//create a frame buffer object
+
 	Renderer2D::Init();
 }
 
@@ -60,6 +62,8 @@ void SandBox2dApp::OnUpdate(float deltatime )
 
 	HZ_PROFILE_SCOPE("SandBox2dApp::OnUpdate");
 	{
+		m_FrameBuffer->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
+
 		RenderCommand::ClearColor(glm::vec4(0.2));
 		RenderCommand::Clear();
 
@@ -78,7 +82,6 @@ void SandBox2dApp::OnUpdate(float deltatime )
 		if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
 			scale -= 0.3;
 
-		glm::mat4 ModelTransform2 = glm::translate(glm::mat4(1), position) * glm::scale(glm::mat4(1), glm::vec3(scale));
 	}
 		/*
 		Set the model transform. for now there is no scale or rotation
@@ -104,14 +107,20 @@ void SandBox2dApp::OnUpdate(float deltatime )
 				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
 		}
 		Renderer2D::EndScene();
+		m_FrameBuffer->UnBind();
 }
 
 void SandBox2dApp::OnImGuiRender()
 {
 	HZ_PROFILE_SCOPE("ImGUI RENDER");
 
-	ImGui::Begin("Color Picker");
+	ImGui::DockSpaceOverViewport();//always keep DockSpaceOverViewport() above all other ImGui windows to make the other windows docable
+	ImGui::Begin("Color");
 	ImGui::ColorPicker4("Color3", glm::value_ptr(Color1));
+	ImGui::End();
+	ImGui::Begin("Multi");
+
+	ImGui::Image((void *)m_FrameBuffer->GetSceneTextureID(), { 1920,1080 });
 	ImGui::End();
 }
 

@@ -26,6 +26,7 @@
 #include "Hazel/OrthographicCameraController.h"
 #include "Hazel/Renderer/Texture.h"
 #include "Hazel/Renderer/SubTexture.h"
+#include "Hazel/Renderer/FrameBuffer.h"
 // -----------------------------------
 
 //.....EntryPoint................................

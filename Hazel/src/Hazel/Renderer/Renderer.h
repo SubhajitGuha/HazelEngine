@@ -17,8 +17,6 @@ namespace Hazel {
 		struct data {
 			glm::mat4 m_ProjectionViewMatrix;
 		};
-		static data* m_data;
-
-	
+		static data* m_data;	
 	};
 }

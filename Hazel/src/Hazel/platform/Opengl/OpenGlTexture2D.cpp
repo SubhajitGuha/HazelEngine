@@ -30,7 +30,7 @@ namespace Hazel {
 			HAZEL_CORE_ERROR("Invalid Texture format");
 		
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
-		glTextureStorage2D(m_Renderid, 1, InternalFormat, m_Width, m_Height);
+		glTextureStorage2D(m_Renderid, 1, InternalFormat, m_Width, m_Height);//immutable texture storage
 
 		glTextureParameteri(m_Renderid, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

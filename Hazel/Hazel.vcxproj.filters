@@ -139,6 +139,10 @@
     <ClInclude Include="src\Hazel\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Hazel\Debug\Instrumentation.h" />
     <ClInclude Include="src\Hazel\Renderer\SubTexture.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.h" />
+    <ClInclude Include="src\Hazel\Renderer\FrameBuffer.h">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -219,5 +223,9 @@
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
