@@ -63,6 +63,13 @@ namespace Hazel {
 		ImGui::ShowDemoWindow(&demo_window);
 	}
 
+	void ImGuiLayer::OnEvent(Event& e)
+	{
+		//ImGuiIO& io = ImGui::GetIO();
+		//e.m_Handeled |= e.IsInCategory(EventCategory::EventCategoryMouse) & io.WantCaptureMouse;
+		//e.m_Handeled |= e.IsInCategory(EventCategory::EventCategoryKeyboard) & io.WantCaptureKeyboard;		
+	}
+
 	void ImGuiLayer::Begin()
 	{
 		ImGui_ImplGlfw_NewFrame();

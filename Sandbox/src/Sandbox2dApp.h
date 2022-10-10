@@ -18,9 +18,11 @@ private:
 	glm::vec4 Color1 = { 1,1,1,1 };
 	std::unordered_map<char, ref<SubTexture2D>> asset_map;
 	std::string level_map,tree_map;
-	glm::vec3 position = { 0,0,0 };
+	glm::vec3 position = { 0,0,0.2 };
 	float ObjSpeed = 20;
 	float scale = 1;
+	glm::vec2 m_ViewportSize = { 1920,1080 };
+	bool isWindowFocused = false;
 
 	ref<Shader> shader;
 	ref<VertexArray> vao;

@@ -18,11 +18,11 @@ namespace Hazel {
 		 void OnAttach()override;
 		 void OnDetach()override;
 		 void OnImGuiRender() override;
-	
+		 virtual void OnEvent(Event& e) override;
 
 		 void Begin();
 		 void End();
-		 
-		
+	public:
+		bool b_DispatchEvents = false;
 	};
 }

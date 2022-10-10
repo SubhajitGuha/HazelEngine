@@ -64,24 +64,27 @@ void SandBox2dApp::OnUpdate(float deltatime )
 	{
 		m_FrameBuffer->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 
-		RenderCommand::ClearColor(glm::vec4(0.2));
+		RenderCommand::ClearColor({ 0.5,0.3,0.8,1 });
 		RenderCommand::Clear();
 
-		m_camera.OnUpdate(deltatime);
+		if (isWindowFocused)//Take inputs only when the window is focused
+		{
+			m_camera.OnUpdate(deltatime);
 
-		if (Input::IsKeyPressed(HZ_KEY_UP))
-			position.y += ObjSpeed * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_DOWN))
-			position.y -= ObjSpeed * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_LEFT))
-			position.x -= ObjSpeed * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_RIGHT))
-			position.x += ObjSpeed * deltatime;
-		if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_4))
-			scale += 0.3;
-		if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
-			scale -= 0.3;
+			if (Input::IsKeyPressed(HZ_KEY_UP))
+				position.y += ObjSpeed * deltatime;
+			if (Input::IsKeyPressed(HZ_KEY_DOWN))
+				position.y -= ObjSpeed * deltatime;
+			if (Input::IsKeyPressed(HZ_KEY_LEFT))
+				position.x -= ObjSpeed * deltatime;
+			if (Input::IsKeyPressed(HZ_KEY_RIGHT))
+				position.x += ObjSpeed * deltatime;
+			if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_4))
+				scale += 0.3;
+			if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
+				scale -= 0.3;
 
+		}
 	}
 		/*
 		Set the model transform. for now there is no scale or rotation
@@ -107,6 +110,9 @@ void SandBox2dApp::OnUpdate(float deltatime )
 				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
 		}
 		Renderer2D::EndScene();
+		Renderer2D::BeginScene(m_camera.GetCamera());
+		Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
+		Renderer2D::EndScene();
 		m_FrameBuffer->UnBind();
 }
 
@@ -118,13 +124,21 @@ void SandBox2dApp::OnImGuiRender()
 	ImGui::Begin("Color");
 	ImGui::ColorPicker4("Color3", glm::value_ptr(Color1));
 	ImGui::End();
-	ImGui::Begin("Multi");
 
-	ImGui::Image((void *)m_FrameBuffer->GetSceneTextureID(), { 1920,1080 });
+	ImGui::Begin("Viewport");
+	isWindowFocused = ImGui::IsWindowFocused();
+	ImVec2 Size = ImGui::GetContentRegionAvail();
+	if (m_ViewportSize != *(glm::vec2*)&Size)
+	{
+		m_ViewportSize = { Size.x,Size.y };
+		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+	}
+	ImGui::Image((void*)m_FrameBuffer->GetSceneTextureID(), *(ImVec2*)&m_ViewportSize);
 	ImGui::End();
 }
 
 void SandBox2dApp::OnEvent(Event& e)
 {
-	m_camera.OnEvent(e);
+	if (isWindowFocused)
+		m_camera.OnEvent(e);
 }

@@ -30,6 +30,7 @@ namespace Hazel {
 
 		static inline Application& Get() { return *getApplication; }
 
+		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 	public:
 		glm::vec3 v3;
 		float v=0;
