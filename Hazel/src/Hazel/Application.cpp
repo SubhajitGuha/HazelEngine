@@ -80,16 +80,16 @@ namespace Hazel {
 			m_LastFrameTime = time;
 
 			HAZEL_CORE_TRACE("Time is -> {0}",ts.GetTime());
-			//for ImguiLayers
-			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_layerstack)
-				layer->OnImGuiRender();
-			m_ImGuiLayer->End();
 
 			//layers render layer and game layers
 			for (Layer* layer : m_layerstack)
 				layer->OnUpdate(ts);
 
+			//for ImguiLayers
+			m_ImGuiLayer->Begin();
+			for (Layer* layer : m_layerstack)
+				layer->OnImGuiRender();
+			m_ImGuiLayer->End();
 		}
 	}
 

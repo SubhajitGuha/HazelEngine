@@ -1,10 +1,10 @@
-#include "Sandbox2dApp.h"
+#include "HazelEditor.h"
 //#include "Hazel/Profiling.h"
 
-SandBox2dApp::SandBox2dApp()
+ HazelEditor:: HazelEditor()
 	:Layer("Renderer2D layer"), m_camera(1920.0 / 1080.0)
 {
-	//HZ_PROFILE_SCOPE("SandBox2dApp::SandBox2dApp()");
+	//HZ_PROFILE_SCOPE(" HazelEditor:: HazelEditor()");
 
 	level_map =
 		"llllllllllllllllllllllllllllll"
@@ -43,41 +43,48 @@ SandBox2dApp::SandBox2dApp()
 	asset_map['t'] = tree;
 	asset_map['m'] = mud;
 
+	m_FrameBuffer = FrameBuffer::Create({1920,1080});//create a frame buffer object
+
 	Renderer2D::Init();
 }
 
-void SandBox2dApp::OnAttach()
+void  HazelEditor::OnAttach()
 {
 
 }
 
-void SandBox2dApp::OnDetach()
+void  HazelEditor::OnDetach()
 {
 }
 
-void SandBox2dApp::OnUpdate(float deltatime )
+void  HazelEditor::OnUpdate(float deltatime )
 {
 
-	HZ_PROFILE_SCOPE("SandBox2dApp::OnUpdate");
+	HZ_PROFILE_SCOPE(" HazelEditor::OnUpdate");
 	{
+		m_FrameBuffer->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 
 		RenderCommand::ClearColor({ 0.5,0.3,0.8,1 });
 		RenderCommand::Clear();
-		m_camera.OnUpdate(deltatime);
 
-		if (Input::IsKeyPressed(HZ_KEY_UP))
-			position.y += ObjSpeed * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_DOWN))
-			position.y -= ObjSpeed * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_LEFT))
-			position.x -= ObjSpeed * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_RIGHT))
-			position.x += ObjSpeed * deltatime;
-		if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_4))
-			scale += 0.3;
-		if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
-			scale -= 0.3;
+		if (isWindowFocused)//Take inputs only when the window is focused
+		{
+			m_camera.OnUpdate(deltatime);
 
+			if (Input::IsKeyPressed(HZ_KEY_UP))
+				position.y += ObjSpeed * deltatime;
+			if (Input::IsKeyPressed(HZ_KEY_DOWN))
+				position.y -= ObjSpeed * deltatime;
+			if (Input::IsKeyPressed(HZ_KEY_LEFT))
+				position.x -= ObjSpeed * deltatime;
+			if (Input::IsKeyPressed(HZ_KEY_RIGHT))
+				position.x += ObjSpeed * deltatime;
+			if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_4))
+				scale += 0.3;
+			if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
+				scale -= 0.3;
+
+		}
 	}
 		/*
 		Set the model transform. for now there is no scale or rotation
@@ -106,18 +113,32 @@ void SandBox2dApp::OnUpdate(float deltatime )
 		Renderer2D::BeginScene(m_camera.GetCamera());
 		Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
 		Renderer2D::EndScene();
+		m_FrameBuffer->UnBind();
 }
 
-void SandBox2dApp::OnImGuiRender()
+void  HazelEditor::OnImGuiRender()
 {
-	//HZ_PROFILE_SCOPE("ImGUI RENDER");
-	
+	HZ_PROFILE_SCOPE("ImGUI RENDER");
+
+	ImGui::DockSpaceOverViewport();//always keep DockSpaceOverViewport() above all other ImGui windows to make the other windows docable
 	ImGui::Begin("Color");
 	ImGui::ColorPicker4("Color3", glm::value_ptr(Color1));
 	ImGui::End();
+
+	ImGui::Begin("Viewport");
+	isWindowFocused = ImGui::IsWindowFocused();
+	ImVec2 Size = ImGui::GetContentRegionAvail();
+	if (m_ViewportSize != *(glm::vec2*)&Size)
+	{
+		m_ViewportSize = { Size.x,Size.y };
+		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+	}
+	ImGui::Image((void*)m_FrameBuffer->GetSceneTextureID(), *(ImVec2*)&m_ViewportSize);
+	ImGui::End();
 }
 
-void SandBox2dApp::OnEvent(Event& e)
+void  HazelEditor::OnEvent(Event& e)
 {
+	if (isWindowFocused)
 		m_camera.OnEvent(e);
 }

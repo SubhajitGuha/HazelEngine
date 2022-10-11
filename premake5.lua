@@ -2,7 +2,7 @@ workspace "Hazel_Engine"
 
 architecture "x86_64"
 
-startproject "Sandbox"
+startproject "Hazel_Editor"
 
 configurations
 {
@@ -97,6 +97,57 @@ project "Hazel"
 project "Sandbox"
 
 	location "Sandbox"
+	kind "ConsoleApp"
+	language "c++"
+	staticruntime "on"
+	cppdialect "c++17"
+
+	targetdir ("bin/"..outputdir.."/%{prj.name}")
+	objdir ("bin-int/"..outputdir.."/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/Assets/**.png"
+	}
+	includedirs
+	{
+		"Hazel/vendor/spdlog/include",
+		"%{IncludeDir.imgui}",
+		"%{IncludeDir.glm}",
+		"Hazel/src"
+	}
+	links "Hazel"
+
+	filter "system:windows"
+		
+		systemversion "latest"
+
+		defines
+		{
+			"HZ_PLATFORM_WINDOWS"
+		}
+		
+	filter "configurations:Debug"
+		defines "HZ_DEBUG"
+		runtime "Debug"
+		symbols "On"
+
+	filter "configurations:Release"
+		defines "HZ_RELEASE"
+		runtime "Release"
+		optimize "On"
+
+	filter "configurations:Dist"
+		defines "HZ_DIST"
+		runtime "Release"
+		optimize "On"
+
+
+project "Hazel_Editor"
+
+	location "Hazel_Editor"
 	kind "ConsoleApp"
 	language "c++"
 	staticruntime "on"

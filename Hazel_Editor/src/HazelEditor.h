@@ -4,9 +4,9 @@
 
 using namespace Hazel;
 
-class SandBox2dApp :public Layer {
+class  HazelEditor :public Layer {
 public:
-	SandBox2dApp();
+	 HazelEditor();
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
 	virtual void OnUpdate(float deltatime) override;
@@ -22,9 +22,11 @@ private:
 	float ObjSpeed = 20;
 	float scale = 1;
 	glm::vec2 m_ViewportSize = { 1920,1080 };
+	bool isWindowFocused = false;
 
 	ref<Shader> shader;
 	ref<VertexArray> vao;
 	ref <Texture2D> texture, tex2;
 	ref<SubTexture2D> tree,land,mud,water;
+	ref<FrameBuffer> m_FrameBuffer;
 };

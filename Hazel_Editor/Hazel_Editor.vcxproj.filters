@@ -12,12 +12,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Sandbox2dApp.h">
+    <ClInclude Include="src\HazelEditor.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Sandbox2dApp.cpp">
+    <ClCompile Include="src\HazelEditor.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\SandboxApp.cpp">

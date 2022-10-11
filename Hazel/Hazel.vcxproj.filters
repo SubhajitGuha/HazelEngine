@@ -10,6 +10,9 @@
     <Filter Include="src\Hazel\Core">
       <UniqueIdentifier>{48D253A8-34A0-47AE-1D34-B8D409A12313}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Hazel\Debug">
+      <UniqueIdentifier>{6676DAB2-D201-4877-DB12-CB6B471DA477}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Hazel\Events">
       <UniqueIdentifier>{D495B311-C08E-D263-E9C0-B7E8D518B26F}</UniqueIdentifier>
     </Filter>
@@ -45,6 +48,9 @@
     <ClInclude Include="src\Hazel\Core\TimeSteps.h">
       <Filter>src\Hazel\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Debug\Instrumentation.h">
+      <Filter>src\Hazel\Debug</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\EntryPoint.h">
       <Filter>src\Hazel</Filter>
     </ClInclude>
@@ -78,7 +84,13 @@
     <ClInclude Include="src\Hazel\Log.h">
       <Filter>src\Hazel</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\OrthographicCameraController.h">
+      <Filter>src\Hazel</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\Buffer.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\FrameBuffer.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\GraphicsContext.h">
@@ -93,10 +105,16 @@
     <ClInclude Include="src\Hazel\Renderer\Renderer.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\Renderer2D.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\RendererAPI.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\Shader.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\SubTexture.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\Texture.h">
@@ -109,6 +127,9 @@
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlContext.h">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.h">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlRendererAPI.h">
@@ -135,14 +156,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
-    <ClInclude Include="src\Hazel\Renderer\Renderer2D.h" />
-    <ClInclude Include="src\Hazel\Debug\Instrumentation.h" />
-    <ClInclude Include="src\Hazel\Renderer\SubTexture.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.h" />
-    <ClInclude Include="src\Hazel\Renderer\FrameBuffer.h">
-      <Filter>src\Hazel\platform\Opengl</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -163,7 +176,13 @@
     <ClCompile Include="src\Hazel\Log.cpp">
       <Filter>src\Hazel</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\OrthographicCameraController.cpp">
+      <Filter>src\Hazel</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\GraphicsContext.cpp">
@@ -178,10 +197,16 @@
     <ClCompile Include="src\Hazel\Renderer\Renderer.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\Renderer2D.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\RendererAPI.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Shader.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp">
@@ -194,6 +219,9 @@
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlContext.cpp">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.cpp">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlRendererAPI.cpp">
@@ -219,13 +247,6 @@
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\Renderer2D.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp">
-      <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -140,13 +140,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.h" />
-    <ClInclude Include="src\Hazel\Renderer\FrameBuffer.h" />
-    <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
     <ClInclude Include="src\Hazel.h" />
     <ClInclude Include="src\Hazel\Application.h" />
     <ClInclude Include="src\Hazel\Core.h" />
     <ClInclude Include="src\Hazel\Core\TimeSteps.h" />
+    <ClInclude Include="src\Hazel\Debug\Instrumentation.h" />
     <ClInclude Include="src\Hazel\EntryPoint.h" />
     <ClInclude Include="src\Hazel\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Hazel\Events\Event.h" />
@@ -158,8 +156,9 @@
     <ClInclude Include="src\Hazel\Layer.h" />
     <ClInclude Include="src\Hazel\LayerStack.h" />
     <ClInclude Include="src\Hazel\Log.h" />
-    <ClInclude Include="src\Hazel\Debug\Instrumentation.h" />
+    <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
     <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
+    <ClInclude Include="src\Hazel\Renderer\FrameBuffer.h" />
     <ClInclude Include="src\Hazel\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Hazel\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Hazel\Renderer\RenderCommand.h" />
@@ -167,10 +166,12 @@
     <ClInclude Include="src\Hazel\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Hazel\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Hazel\Renderer\Shader.h" />
+    <ClInclude Include="src\Hazel\Renderer\SubTexture.h" />
     <ClInclude Include="src\Hazel\Renderer\Texture.h" />
     <ClInclude Include="src\Hazel\Window.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBuffer.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlContext.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlRendererAPI.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlShader.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlTexture2D.h" />
@@ -178,20 +179,18 @@
     <ClInclude Include="src\Hazel\platform\WindowsInput.h" />
     <ClInclude Include="src\Hazel\platform\WindowsWindow.h" />
     <ClInclude Include="src\hzpch.h" />
-    <ClInclude Include="src\Hazel\Renderer\SubTexture.h" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp" />
-    <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Application.cpp" />
     <ClCompile Include="src\Hazel\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Hazel\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Hazel\Layer.cpp" />
     <ClCompile Include="src\Hazel\LayerStack.cpp" />
     <ClCompile Include="src\Hazel\Log.cpp" />
+    <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\GraphicsContext.cpp" />
     <ClCompile Include="src\Hazel\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Hazel\Renderer\RenderCommand.cpp" />
@@ -199,10 +198,12 @@
     <ClCompile Include="src\Hazel\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Hazel\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp" />
     <ClCompile Include="src\Hazel\Window.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBuffer.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlContext.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlRendererAPI.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlShader.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlTexture2D.cpp" />
@@ -212,7 +213,6 @@
     <ClCompile Include="src\hzpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
