@@ -22,7 +22,9 @@ private:
 	float ObjSpeed = 20;
 	float scale = 1;
 	glm::vec2 m_ViewportSize = { 1920,1080 };
+	entt::entity entity;
 
+	ref<Scene> m_Scene;
 	ref<Shader> shader;
 	ref<VertexArray> vao;
 	ref <Texture2D> texture, tex2;

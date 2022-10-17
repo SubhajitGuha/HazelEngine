@@ -48,7 +48,10 @@ SandBox2dApp::SandBox2dApp()
 
 void SandBox2dApp::OnAttach()
 {
-
+	m_Scene = Scene::Create();
+	entity = m_Scene->CreateEntity();
+	auto trans = glm::translate(glm::mat4(1.0f), { 3.f,3.f,0.1f }) * glm::scale(glm::mat4(1.0f), glm::vec3(5.f));
+	m_Scene->m_registry.emplace<TransformComponent>(entity, trans);
 }
 
 void SandBox2dApp::OnDetach()
@@ -103,8 +106,9 @@ void SandBox2dApp::OnUpdate(float deltatime )
 				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
 		}
 		Renderer2D::EndScene();
-		Renderer2D::BeginScene(m_camera.GetCamera());
-		Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
+
+		Renderer2D::BeginScene(m_camera.GetCamera());//Camera gives the projection and the camera transform which is then multiplied in vertex shader with model transform (MVP)
+		Renderer2D::DrawQuad(m_Scene->m_registry.get<TransformComponent>(entity), Color1);
 		Renderer2D::EndScene();
 }
 

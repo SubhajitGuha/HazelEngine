@@ -19,6 +19,7 @@ IncludeDir["Glad"] = "Hazel/vendor/Glad/include"
 IncludeDir["imgui"] = "Hazel/vendor/imgui"
 IncludeDir["glm"] = "Hazel/vendor/glm"
 IncludeDir["stb_image"] = "Hazel/vendor/stb_image"
+IncludeDir["entt"] = "Hazel/vendor/entt"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
@@ -45,7 +46,8 @@ project "Hazel"
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
 		"%{IncludeDir.stb_image}/**.h",
-		"%{IncludeDir.stb_image}/**.cpp"
+		"%{IncludeDir.stb_image}/**.cpp",
+		"%{IncludeDir.entt}/**.hpp"
 	}
 
 	includedirs
@@ -56,7 +58,8 @@ project "Hazel"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	links{
@@ -116,6 +119,7 @@ project "Sandbox"
 		"Hazel/vendor/spdlog/include",
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}",
 		"Hazel/src"
 	}
 	links "Hazel"
@@ -167,6 +171,7 @@ project "Hazel_Editor"
 		"Hazel/vendor/spdlog/include",
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}",
 		"Hazel/src"
 	}
 	links "Hazel"
