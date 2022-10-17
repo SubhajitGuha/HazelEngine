@@ -127,6 +127,16 @@ namespace Hazel {
 		m_data->m_VertexCounter += 4;
 
 	}
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	{
+		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(transform*glm::vec4(0,0,0,1), { 0,0 }, color);
+		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(transform*glm::vec4(0,1,0,1), { 0,1 }, color);
+		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(transform*glm::vec4(1,1,0,1), { 1,1 }, color);
+		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(transform*glm::vec4(1,0,0,1), { 1,0 }, color);
+
+		m_data->WhiteTex->Bind(0);//There is no need to bind the texture every frame .In this case the texture can be bound once and used all the time
+		m_data->m_VertexCounter += 4;
+	}
 	void Renderer2D::DrawSubTexturedQuad(const glm::vec3& pos, const glm::vec3& scale, ref<SubTexture2D> tex, unsigned int index, const float angle)
 	{
 		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos, 1), angle), tex->m_TextureCoordinate[0], { 1,1,1,1 }, index);

@@ -10,11 +10,14 @@
 #include "Hazel/Input.h"
 #include "Hazel/HazelCodes.h"
 #include "Hazel/ImGui/ImGuiLayer.h"
+#include "Hazel/Scene/Scene.h"
+#include "Hazel/Scene/Component.h"
 
 //-------Non Hazel api----------------
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "entt.hpp"
 
 // ---Renderer------------------------
 #include "Hazel/Renderer/Renderer.h"
