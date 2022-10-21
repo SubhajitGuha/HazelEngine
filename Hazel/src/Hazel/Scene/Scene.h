@@ -8,13 +8,12 @@ namespace Hazel {
 	public:
 		Scene();
 		~Scene();
+		entt::registry& getRegistry() { return m_registry; }
 		entt::entity CreateEntity();
-		//entt::registry GetRegistry() { return m_registry; }
-		//template<typename T>
-		//void AddComponent(const entt::entity entity){m_registry.emplace<T>() }
+		//const entt::registry& GetRegistry() { return m_registry; }
 
 		static ref<Scene> Create();
-	public:
+	private:
 		entt::registry m_registry;
 	};
 }
