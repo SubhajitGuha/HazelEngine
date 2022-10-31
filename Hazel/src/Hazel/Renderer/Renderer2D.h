@@ -5,12 +5,15 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "SubTexture.h"
+#include "Hazel/Renderer/Camareas/Camera.h"
+
 namespace Hazel {
 
 	class Renderer2D {
 	public:
 		static void Init();
 		static void BeginScene(OrthographicCamera& camera);
+		static void BeginScene(Camera& camera);
 		static void EndScene();
 	public:
 		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col, const float angle = 0.f);

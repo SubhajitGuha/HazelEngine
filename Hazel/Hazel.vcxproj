@@ -158,6 +158,8 @@
     <ClInclude Include="src\Hazel\Log.h" />
     <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
     <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
+    <ClInclude Include="src\Hazel\Renderer\Camareas\Camera.h" />
+    <ClInclude Include="src\Hazel\Renderer\Camareas\SceneCamera.h" />
     <ClInclude Include="src\Hazel\Renderer\FrameBuffer.h" />
     <ClInclude Include="src\Hazel\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Hazel\Renderer\OrthographicCamera.h" />
@@ -194,6 +196,8 @@
     <ClCompile Include="src\Hazel\Log.cpp" />
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Camareas\Camera.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Camareas\SceneCamera.cpp" />
     <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\GraphicsContext.cpp" />
     <ClCompile Include="src\Hazel\Renderer\OrthographicCamera.cpp" />

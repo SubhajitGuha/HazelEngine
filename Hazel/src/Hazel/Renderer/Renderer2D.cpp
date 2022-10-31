@@ -93,6 +93,12 @@ namespace Hazel {
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionViewMatix());
 	}
 
+	void Renderer2D::BeginScene(Camera& camera)
+	{
+		m_data->shader->Bind();//bind the textureShader
+		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjection());
+	}
+
 	void Renderer2D::EndScene()
 	{
 		m_data->vb->SetData(sizeof(VertexAttributes)*4* m_data->m_VertexCounter, &m_data->Quad[0].Position);

@@ -1,6 +1,5 @@
 #pragma once
 #include "Hazel.h"
-#include "Hazel/Scene/Entity.h"
 #include <unordered_map>
 
 using namespace Hazel;
@@ -24,6 +23,7 @@ private:
 	float scale = 1;
 	glm::vec2 m_ViewportSize = { 1920,1080 };
 	Entity* SquareEntt;
+	Entity* CameraEntt;
 
 	ref<Scene> m_Scene;
 	ref<Shader> shader;

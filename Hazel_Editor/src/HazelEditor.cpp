@@ -50,7 +50,21 @@
 
 void  HazelEditor::OnAttach()
 {
+	m_scene = Scene::Create();
 
+	Square_entity = m_scene->CreateEntity("Square");
+	auto transform = glm::translate(glm::mat4(1.f), { 1,0,0 }) * glm::rotate(glm::mat4(1.f), glm::radians(19.f), { 0,0,1 }) * glm::scale(glm::mat4(1.f), glm::vec3(3));
+	Square_entity->AddComponent<TransformComponent>(transform);
+	Square_entity->AddComponent<CameraComponent>();
+
+	camera_entity = m_scene->CreateEntity("Camera");//create the camera entity
+	auto transform1 = glm::translate(glm::mat4(1.f), { 0,2,0 }) * glm::rotate(glm::mat4(1.f), glm::radians(0.f), { 0,0,1 }) * glm::scale(glm::mat4(1.f), glm::vec3(3));
+	camera_entity->AddComponent<TransformComponent>(transform1);
+	camera_entity->AddComponent<CameraComponent>(120 , 80);
+
+	camera_entity->GetComponent<CameraComponent>().camera.bIsMainCamera = false;
+
+	m_scene->print();
 }
 
 void  HazelEditor::OnDetach()
@@ -91,28 +105,35 @@ void  HazelEditor::OnUpdate(float deltatime )
 		just multiply the scale and rotation matrix with position to get the full transform
 		*/
 	
-		Renderer2D::BeginScene(m_camera.GetCamera());
-		for (int i = 0; i < level_map.size(); i++) {
-		
-			ref<SubTexture2D> subTexture;
-			subTexture = asset_map[level_map[i]];
-			if (subTexture)
-				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30,0 }, { 1,1,1 }, subTexture);
-		}
-		Renderer2D::EndScene();
+		//Renderer2D::BeginScene(m_camera.GetCamera());
+		//for (int i = 0; i < level_map.size(); i++) {
+		//
+		//	ref<SubTexture2D> subTexture;
+		//	subTexture = asset_map[level_map[i]];
+		//	if (subTexture)
+		//		Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30,0 }, { 1,1,1 }, subTexture);
+		//}
+		//Renderer2D::EndScene();
+		//
+		//Renderer2D::BeginScene(m_camera.GetCamera());
+		//for (int i = 0; i < tree_map.size(); i++) {
+		//
+		//	ref<SubTexture2D> subTexture;
+		//	subTexture = asset_map[tree_map[i]];
+		//	if (subTexture)
+		//		Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
+		//}
+		//Renderer2D::EndScene();
+		//Renderer2D::BeginScene(m_camera.GetCamera());
+		//Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
+		//Renderer2D::EndScene();
 
-		Renderer2D::BeginScene(m_camera.GetCamera());
-		for (int i = 0; i < tree_map.size(); i++) {
-
-			ref<SubTexture2D> subTexture;
-			subTexture = asset_map[tree_map[i]];
-			if (subTexture)
-				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
-		}
-		Renderer2D::EndScene();
-		Renderer2D::BeginScene(m_camera.GetCamera());
-		Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
-		Renderer2D::EndScene();
+		////using Entt (entity component system)
+		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
+		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
+		//Renderer2D::EndScene();
+		m_scene->OnUpdate(deltatime);
+		m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
 		m_FrameBuffer->UnBind();
 }
 
@@ -134,6 +155,17 @@ void  HazelEditor::OnImGuiRender()
 		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 	}
 	ImGui::Image((void*)m_FrameBuffer->GetSceneTextureID(), *(ImVec2*)&m_ViewportSize);
+	ImGui::End();
+
+	ImGui::Begin("Camera Selection");
+	ImGui::Checkbox("Camera1 : is Main Camera", &IsMainCamera);
+	auto cam1 = m_scene->GetEntitybyName("Camera");
+	cam1->GetComponent<CameraComponent>().camera.bIsMainCamera = IsMainCamera;
+
+	bool val2 = true;
+	ImGui::Checkbox("Camera2 : is Main Camera", &IsMainCamera2);
+	auto cam2 = m_scene->GetEntitybyName("Square");
+	cam2->GetComponent<CameraComponent>().camera.bIsMainCamera = IsMainCamera2;
 	ImGui::End();
 }
 

@@ -172,6 +172,8 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Scene\Entity.h" />
+    <ClInclude Include="src\Hazel\Renderer\Camareas\Camera.h" />
+    <ClInclude Include="src\Hazel\Renderer\Camareas\SceneCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -268,5 +270,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Scene\Entity.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Camareas\Camera.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Camareas\SceneCamera.cpp" />
   </ItemGroup>
 </Project>

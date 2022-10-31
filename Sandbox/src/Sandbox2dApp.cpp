@@ -50,11 +50,17 @@ SandBox2dApp::SandBox2dApp()
 void SandBox2dApp::OnAttach()
 {
 	m_Scene = Scene::Create();//create scene obj
-	auto entity = m_Scene->CreateEntity();//Create an entiy (here a quad)
+	//Create an entiy (here a quad)
+	
+	SquareEntt = m_Scene->CreateEntity("Square");
+	CameraEntt = m_Scene->CreateEntity("Camera");
 
-	SquareEntt = new Entity( *m_Scene,entity );
 	auto trans = glm::translate(glm::mat4(1.0f), { 3.f,3.f,0.1f }) * glm::scale(glm::mat4(1.0f), glm::vec3(5.f));
 	SquareEntt->AddComponent<TransformComponent>(trans);
+	SquareEntt->AddComponent<CameraComponent>(1920,1080);
+
+	CameraEntt->AddComponent<TransformComponent>(trans);
+	CameraEntt->AddComponent<CameraComponent>(1 , 9);
 }
 
 void SandBox2dApp::OnDetach()
@@ -90,29 +96,30 @@ void SandBox2dApp::OnUpdate(float deltatime )
 		just multiply the scale and rotation matrix with position to get the full transform
 		*/
 	
-		Renderer2D::BeginScene(m_camera.GetCamera());
-		for (int i = 0; i < level_map.size(); i++) {
+		//Renderer2D::BeginScene(m_camera.GetCamera());
+		//for (int i = 0; i < level_map.size(); i++) {
+		//
+		//	ref<SubTexture2D> subTexture;
+		//	subTexture = asset_map[level_map[i]];
+		//	if (subTexture)
+		//		Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30,0 }, { 1,1,1 }, subTexture);
+		//}
+		//Renderer2D::EndScene();
+		//
+		//Renderer2D::BeginScene(m_camera.GetCamera());
+		//for (int i = 0; i < tree_map.size(); i++) {
+		//
+		//	ref<SubTexture2D> subTexture;
+		//	subTexture = asset_map[tree_map[i]];
+		//	if (subTexture)
+		//		Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
+		//}
+		//Renderer2D::EndScene();
+		//Renderer2D::BeginScene(m_camera.GetCamera());
 		
-			ref<SubTexture2D> subTexture;
-			subTexture = asset_map[level_map[i]];
-			if (subTexture)
-				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30,0 }, { 1,1,1 }, subTexture);
-		}
-		Renderer2D::EndScene();
-
-		Renderer2D::BeginScene(m_camera.GetCamera());
-		for (int i = 0; i < tree_map.size(); i++) {
-
-			ref<SubTexture2D> subTexture;
-			subTexture = asset_map[tree_map[i]];
-			if (subTexture)
-				Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
-		}
-		Renderer2D::EndScene();
-
-		Renderer2D::BeginScene(m_camera.GetCamera());//Camera gives the projection and the camera transform which is then multiplied in vertex shader with model transform (MVP)
-		Renderer2D::DrawQuad(SquareEntt->GetComponent<TransformComponent>(), Color1);
-		Renderer2D::EndScene();
+		//resizing is not done;
+	m_Scene->OnUpdate(deltatime);
+	
 }
 
 void SandBox2dApp::OnImGuiRender()

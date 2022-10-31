@@ -1,7 +1,6 @@
 #pragma once
 #include "Hazel.h"
 #include <unordered_map>
-
 using namespace Hazel;
 
 class  HazelEditor :public Layer {
@@ -23,7 +22,11 @@ private:
 	float scale = 1;
 	glm::vec2 m_ViewportSize = { 1920,1080 };
 	bool isWindowFocused = false;
+	Entity* Square_entity;
+	Entity* camera_entity;
+	bool IsMainCamera = false, IsMainCamera2 = true;//Main camera selector in ImGui
 
+	ref<Scene> m_scene;
 	ref<Shader> shader;
 	ref<VertexArray> vao;
 	ref <Texture2D> texture, tex2;

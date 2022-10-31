@@ -11,6 +11,7 @@
 #include "Hazel/HazelCodes.h"
 #include "Hazel/ImGui/ImGuiLayer.h"
 #include "Hazel/Scene/Scene.h"
+#include "Hazel/Scene/Entity.h"
 #include "Hazel/Scene/Component.h"
 
 //-------Non Hazel api----------------
