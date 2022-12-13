@@ -2,6 +2,7 @@
 
 //only used by hazel applications
 
+#include "Hazel/Core.h"
 #include "Hazel/Application.h"
 #include "Hazel/Layer.h"
 #include "Hazel/Log.h"
@@ -13,6 +14,7 @@
 #include "Hazel/Scene/Scene.h"
 #include "Hazel/Scene/Entity.h"
 #include "Hazel/Scene/Component.h"
+#include "Hazel/Scene/ScriptableEntity.h"
 
 //-------Non Hazel api----------------
 #include "glm/glm.hpp"
@@ -31,6 +33,7 @@
 #include "Hazel/Renderer/Texture.h"
 #include "Hazel/Renderer/SubTexture.h"
 #include "Hazel/Renderer/FrameBuffer.h"
+#include "Hazel/Renderer/Camareas/SceneCamera.h"
 // -----------------------------------
 
 //.....EntryPoint................................

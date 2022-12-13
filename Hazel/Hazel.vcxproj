@@ -173,6 +173,7 @@
     <ClInclude Include="src\Hazel\Scene\Component.h" />
     <ClInclude Include="src\Hazel\Scene\Entity.h" />
     <ClInclude Include="src\Hazel\Scene\Scene.h" />
+    <ClInclude Include="src\Hazel\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Hazel\Window.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBuffer.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlContext.h" />

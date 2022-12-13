@@ -16,6 +16,7 @@ namespace Hazel {
 		Entity* CreateEntity(const std::string& name);
 		//const entt::registry& GetRegistry() { return m_registry; }
 		void OnUpdate(TimeStep ts);
+		void OnCreate();
 		void Resize(float Width, float Height);
 
 		Entity* GetEntitybyName(const char* Name)
@@ -26,12 +27,6 @@ namespace Hazel {
 				return Entity_Map[Name];
 		}
 
-		void print() {
-			for (auto x : Entity_Map) {
-				HAZEL_CORE_TRACE("Map is {0}",x.first);
-			}
-		}
-
 		static ref<Scene> Create();
 	public:
 		std::string EntityName;
@@ -39,6 +34,7 @@ namespace Hazel {
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
 		std::unordered_map<std::string, Entity*> Entity_Map;
+		Entity* m_Entity;
 	};
 }
 

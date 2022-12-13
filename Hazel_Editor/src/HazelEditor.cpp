@@ -12,7 +12,7 @@
 		"lllmmllllwwwwwwwwwwlllllllllll"
 		"llllllwwwwwwwwwwwwwwwwwlllllll"
 		"llllwwwwwwwwwwwwwwwwwwmwwlllll"
-		"lllwwwwwwwwmmmmwwwwwwwwmwwwlll"
+		"lllwwwwwwwwmmmmwwwwwwwwmwwllll"
 		"llllllwmwwwwwwwwwwwwwwwlllllll"
 		"llllwwwwwwwwwwwwwwwwllllllllll"
 		"lllllllllwwwwwwwwwwwllllllllll"
@@ -21,15 +21,15 @@
 
 	tree_map = 
 		"ttttt  ttttt  tttt  ttttt  ttt"
-		"ttt t     t     tttttttttttttt"
+		"ttt t     t     ttttttt tt ttt"
 		"ttt  tttt          ttttttttttt"
 		"tt  tt                 ttt   t"
 		"tttt                     ttttt"
 		"ttt                        ttt"
 		"tttttt                 ttt  tt"
-		"tttt                tttt    tt"
+		"tttt                t tt    tt"
 		"     tttt           tt    tttt"
-		"tttttttt        tttt   tttt tt"
+		"tttt ttt        tttt   tttt tt"
 		"tttt     ttt   ttt          tt";
 
 	texture = Texture2D::Create("Assets/Textures/RPGpack_sheet_2X.png");
@@ -48,24 +48,63 @@
 	Renderer2D::Init();
 }
 
-void  HazelEditor::OnAttach()
-{
-	m_scene = Scene::Create();
+ void  HazelEditor::OnAttach()
+ {
+	 m_scene = Scene::Create();
 
-	Square_entity = m_scene->CreateEntity("Square");
-	auto transform = glm::translate(glm::mat4(1.f), { 1,0,0 }) * glm::rotate(glm::mat4(1.f), glm::radians(19.f), { 0,0,1 }) * glm::scale(glm::mat4(1.f), glm::vec3(3));
-	Square_entity->AddComponent<TransformComponent>(transform);
-	Square_entity->AddComponent<CameraComponent>();
+	 Square_entity = m_scene->CreateEntity("Square");
+	 auto transform = glm::translate(glm::mat4(1.f), { 1,0,0 }) * glm::rotate(glm::mat4(1.f), glm::radians(19.f), { 0,0,1 }) * glm::scale(glm::mat4(1.f), glm::vec3(3));
+	 Square_entity->AddComponent<TransformComponent>(transform);
+	 Square_entity->AddComponent<CameraComponent>();
 
-	camera_entity = m_scene->CreateEntity("Camera");//create the camera entity
-	auto transform1 = glm::translate(glm::mat4(1.f), { 0,2,0 }) * glm::rotate(glm::mat4(1.f), glm::radians(0.f), { 0,0,1 }) * glm::scale(glm::mat4(1.f), glm::vec3(3));
-	camera_entity->AddComponent<TransformComponent>(transform1);
-	camera_entity->AddComponent<CameraComponent>(120 , 80);
+	 camera_entity = m_scene->CreateEntity("Camera");//create the camera entity
+	 auto transform1 = glm::translate(glm::mat4(1.f), { 0,2,0 }) * glm::rotate(glm::mat4(1.f), glm::radians(0.f), { 0,0,1 }) * glm::scale(glm::mat4(1.f), glm::vec3(3));
+	 camera_entity->AddComponent<TransformComponent>(transform1);
+	 camera_entity->AddComponent<CameraComponent>();
 
-	camera_entity->GetComponent<CameraComponent>().camera.bIsMainCamera = false;
+	 camera_entity->GetComponent<CameraComponent>().camera.bIsMainCamera = false;
+	 camera_entity->GetComponent<CameraComponent>().camera.SetOrthographic(50);
+//....................script......................................................................
 
-	m_scene->print();
-}
+	 class CustomScript :public ScriptableEntity {
+	 public:
+		 glm::vec3 position = { 0,0,0 };
+		 float rotate = 0.0;
+		 float ObjSpeed = 10;
+		 float scale = 1;
+
+		 virtual void OnUpdate(TimeStep ts) override 
+		 { 
+			 if (!m_Entity)
+				 return;
+
+			 m_Entity->m_DefaultColor = glm::vec4(1.0, 0.8, 0.3, 1.0);
+
+			 if (Input::IsKeyPressed(HZ_KEY_E))
+				 rotate += 1;
+			 if (Input::IsKeyPressed(HZ_KEY_Q))
+				 rotate -= 1;
+			 if (Input::IsKeyPressed(HZ_KEY_UP))
+				 position.y += ObjSpeed * ts;
+			 if (Input::IsKeyPressed(HZ_KEY_DOWN))
+				 position.y -= ObjSpeed * ts;
+			 if (Input::IsKeyPressed(HZ_KEY_LEFT))
+				 position.x -= ObjSpeed * ts;
+			 if (Input::IsKeyPressed(HZ_KEY_RIGHT))
+				 position.x += ObjSpeed * ts;
+			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_4))
+				 scale += 0.01;
+			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
+				 scale -= 0.01;
+			 auto transform = glm::translate(glm::mat4(1.f), position) * glm::rotate(glm::mat4(1.0f),glm::radians(rotate),glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(scale));
+			 m_Entity->ReplaceComponent<TransformComponent>(transform);
+		 }
+		 virtual void OnCreate() override{}
+		 virtual void OnDestroy() override{}
+	 };
+	 //.........................script.........................................................
+	 Square_entity->AddComponent<ScriptComponent>().Bind<CustomScript>();
+ }
 
 void  HazelEditor::OnDetach()
 {
@@ -142,6 +181,7 @@ void  HazelEditor::OnImGuiRender()
 	HZ_PROFILE_SCOPE("ImGUI RENDER");
 
 	ImGui::DockSpaceOverViewport();//always keep DockSpaceOverViewport() above all other ImGui windows to make the other windows docable
+	
 	ImGui::Begin("Color");
 	ImGui::ColorPicker4("Color3", glm::value_ptr(Color1));
 	ImGui::End();
