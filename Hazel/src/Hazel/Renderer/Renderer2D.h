@@ -15,11 +15,15 @@ namespace Hazel {
 		static void BeginScene(OrthographicCamera& camera);
 		static void BeginScene(Camera& camera);
 		static void EndScene();
+		static void LineBeginScene();
+		static void LineEndScene();
+
 	public:
 		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col, const float angle = 0.f);
 		static void DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex, unsigned int index = 1, const float angle = 0.f);
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
 		static void DrawSubTexturedQuad(const glm::vec3& pos, const glm::vec3& scale, ref<SubTexture2D> tex, unsigned int index = 2, const float angle = 0.f);
+		static void DrawLine(const glm::vec3& p1,const glm::vec3& p2,const glm::vec4 color);
 		//note texture coord defines the uv coordinate of the texture (in sprite sheet we need these texture coordinates to get individual asset images)
 	};
 }

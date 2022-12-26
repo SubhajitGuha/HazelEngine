@@ -72,14 +72,14 @@
 		 float rotate = 0.0;
 		 float ObjSpeed = 10;
 		 float scale = 1;
-
+		 float size = 1.0f;
 		 virtual void OnUpdate(TimeStep ts) override 
 		 { 
 			 if (!m_Entity)
 				 return;
 
 			 m_Entity->m_DefaultColor = glm::vec4(1.0, 0.8, 0.3, 1.0);
-
+			 
 			 if (Input::IsKeyPressed(HZ_KEY_E))
 				 rotate += 1;
 			 if (Input::IsKeyPressed(HZ_KEY_Q))
@@ -96,8 +96,13 @@
 				 scale += 0.01;
 			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
 				 scale -= 0.01;
+			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_1))
+				 size += 0.1;
+			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_2))
+				 size -= 0.1;
 			 auto transform = glm::translate(glm::mat4(1.f), position) * glm::rotate(glm::mat4(1.0f),glm::radians(rotate),glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(scale));
-			 m_Entity->ReplaceComponent<TransformComponent>(transform);
+			 m_Entity->ReplaceComponent<TransformComponent>(transform);//controlling transform
+			 m_Entity->GetComponent<CameraComponent>().camera.SetOrthographic(size);//controlling camera
 		 }
 		 virtual void OnCreate() override{}
 		 virtual void OnDestroy() override{}
@@ -171,7 +176,12 @@ void  HazelEditor::OnUpdate(float deltatime )
 		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
 		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
 		//Renderer2D::EndScene();
-		m_scene->OnUpdate(deltatime);
+	Renderer2D::LineBeginScene();
+	Renderer2D::DrawLine({ 0,0,0 }, { 1,-2,0 }, {0.2,0.5,1,1});
+	Renderer2D::DrawLine({ 1,-2,0 }, {2,3,0}, { 0.2,0.5,1,1 });
+	Renderer2D::DrawLine({2,3,0 }, { 0,0,0 }, { 0.2,0.5,1,1 });
+	Renderer2D::LineEndScene();
+	m_scene->OnUpdate(deltatime);
 		m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
 		m_FrameBuffer->UnBind();
 }

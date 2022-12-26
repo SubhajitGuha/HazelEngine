@@ -25,7 +25,7 @@ namespace Hazel {
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) {
 			
 			if(nsc.m_Script==nullptr)
-				nsc.CreateInstance();// this needs to be done once not every frame.
+				nsc.CreateInstance();// this needs to be done once ,not every frame.
 			
 			for (auto item : Entity_Map)
 			{
@@ -65,7 +65,6 @@ namespace Hazel {
 
 			Renderer2D::BeginScene(*MainCamera);//pass only the main camera for rendering
 
-		//auto view = m_registry.view<TransformComponent>();
 		for (auto item : Entity_Map) //iterate through all the Entity in the map Entity_map
 		{
 			auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)

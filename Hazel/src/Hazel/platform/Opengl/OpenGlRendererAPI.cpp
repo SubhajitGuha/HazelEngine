@@ -19,7 +19,14 @@ namespace Hazel {
 	}
 	void OpenGlRendererAPI::DrawIndex(VertexArray& vertexarray)
 	{
+		vertexarray.Bind();
 		glDrawElements(GL_TRIANGLES, vertexarray.GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (const void *)0);
+	}
+	void OpenGlRendererAPI::DrawLine(VertexArray& vertexarray,uint32_t count)
+	{
+		
+		vertexarray.Bind();
+		glDrawArrays(GL_LINES,0,count);
 	}
 	void OpenGlRendererAPI::Init()
 	{

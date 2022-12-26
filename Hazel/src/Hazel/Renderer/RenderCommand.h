@@ -18,6 +18,9 @@ namespace Hazel {
 		inline static void DrawIndex(VertexArray& vertexarray) {
 			m_RendererAPI->DrawIndex(vertexarray);
 		}
+		inline static void DrawLine(VertexArray& vertexarray,uint32_t& count) {
+			m_RendererAPI->DrawLine(vertexarray,count);
+		}
 
 	private:
 		static ref<RendererAPI> GetRendererAPI();
