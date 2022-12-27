@@ -26,14 +26,14 @@ namespace Hazel {
 		//may more ..uv coord , tangents , normals..
 	};
 
-	struct LineAttributes {//attributes for drawing a line
-		//glm::vec3 Position;
-		glm::vec4 Position1;
+	struct LineAttributes {
+		//attributes for drawing a line
+		glm::vec4 Position;
 		glm::vec4 Color;
 		LineAttributes() = default;
-		LineAttributes(glm::vec4 p1, glm::vec4 c)
+		LineAttributes(const glm::vec4& p1, const glm::vec4& c)
 		{
-			Position1 = p1;
+			Position = p1;
 			Color = c;
 		}
 	};
@@ -45,8 +45,7 @@ namespace Hazel {
 		
 		ref<VertexArray> vao;
 		ref<VertexArray> Linevao;
-		ref<Shader> shader;
-		ref<Shader> Lineshader;
+		ref<Shader> shader,Lineshader;
 		ref<Texture2D> WhiteTex;
 		ref<VertexBuffer> vb;
 		ref<VertexBuffer> Linevb;
@@ -58,7 +57,6 @@ namespace Hazel {
 		uint32_t m_VertexCounter = 0;
 		uint32_t m_LineVertCounter = 0;
 	};
-
 		static Renderer2DStorage* m_data;
 
 	void Renderer2D::Init()
@@ -66,8 +64,8 @@ namespace Hazel {
 		m_data = new Renderer2DStorage;
 		
 		//initilize the vertex buffer data and index buffer data
-		m_data->Quad.resize(m_data->NumVertices, { glm::vec4(0.0),glm::vec2(0.0),glm::vec4(0.0) });
-		m_data->Line.resize(m_data->maxQuads);//allocate space for the vertices that will draw the line
+		m_data->Quad.resize(m_data->NumVertices*4, { glm::vec4(0.0),glm::vec2(0.0),glm::vec4(0.0) });
+		m_data->Line.resize(m_data->maxQuads*2);//allocate space for the vertices that will draw the line
 		m_data->index.resize(m_data->NumIndices);
 
 		int offset = 0;
@@ -84,30 +82,31 @@ namespace Hazel {
 
 		m_data->Linevao = (VertexArray::Create());
 		m_data->vao=(VertexArray::Create());//vertex array
-		//ref<VertexBuffer> vb = VertexBuffer::Create(pos, sizeof(pos));//vertex buffer
+		
+		m_data->Linevb = VertexBuffer::Create((sizeof(LineAttributes)*2)* m_data->maxQuads);
 		m_data->vb = VertexBuffer::Create((sizeof(VertexAttributes)*4)*m_data->maxQuads);//(sizeof(VertexAttributes)*4) gives one quad multiply it with howmany quads you want
-		m_data->Linevb = VertexBuffer::Create(sizeof(LineAttributes)*2* m_data->maxQuads);
 
 		ref<BufferLayout> Linebl = std::make_shared<BufferLayout>(); //buffer layout
 		ref<BufferLayout> bl = std::make_shared<BufferLayout>(); //buffer layout
+
+		Linebl->push("position", DataType::Float4);
+		Linebl->push("Color", DataType::Float4);
 
 		bl->push("position", DataType::Float4);
 		bl->push("TexCoord", DataType::Float2);
 		bl->push("Color", DataType::Float4);
 		bl->push("TextureSlot", DataType::Int);
 
-		Linebl->push("position", DataType::Float4);
-		Linebl->push("color", DataType::Float4);
-
+		m_data->Linevao->AddBuffer(Linebl, m_data->Linevb);
+		
 		ref<IndexBuffer> ib(IndexBuffer::Create(&m_data->index[0], m_data->NumIndices));
 		m_data->vao->AddBuffer(bl, m_data->vb);
 		m_data->vao->SetIndexBuffer(ib);
 
-		m_data->Linevao->AddBuffer(Linebl, m_data->Linevb);
 
 		m_data->WhiteTex = Texture2D::Create(1,1,0xffffffff);//create a default white texture
-		m_data->shader = (Shader::Create("Assets/Shaders/2_In_1Shader.glsl"));//texture shader
 		m_data->Lineshader = (Shader::Create("Assets/Shaders/LineShader.glsl"));
+		m_data->shader = (Shader::Create("Assets/Shaders/2_In_1Shader.glsl"));//texture shader
 
 		unsigned int TextureIDindex[] = { 0,1,2,3,4,5,6,7 };
 
@@ -134,15 +133,16 @@ namespace Hazel {
 		m_data->m_VertexCounter = 0;
 	}
 
-	void Renderer2D::LineBeginScene()
+	void Renderer2D::LineBeginScene(OrthographicCamera& camera)
 	{
 		m_data->Lineshader->Bind();
+		m_data->Lineshader->SetMat4("u_ProjectionView", camera.GetProjectionViewMatix());
 	}
 
 	void Renderer2D::LineEndScene()
 	{
-		m_data->Linevb->SetData(sizeof(LineAttributes) * 2 * m_data->m_LineVertCounter, &m_data->Line[0].Position1);
-		uint32_t x = 2 * m_data->m_LineVertCounter;
+		m_data->Linevb->SetData(sizeof(LineAttributes) * 2 * m_data->m_LineVertCounter, &m_data->Line[0].Position);
+		uint32_t x = (2 * m_data->m_LineVertCounter) -1;
 		RenderCommand::DrawLine(*m_data->Linevao, x);
 		m_data->m_LineVertCounter = 0;
 	}
@@ -194,7 +194,7 @@ namespace Hazel {
 		tex->Texture->Bind(index);//There is no need to bind the texture every frame .In this case the texture can be bound once and used all the time
 		m_data->m_VertexCounter += 4;
 	}
-	void Renderer2D::DrawLine(const glm::vec3& p1,const glm::vec3& p2 , const glm::vec4 color)
+	void Renderer2D::DrawLine(const glm::vec3& p1,const glm::vec3& p2 , const glm::vec4& color)
 	{
 		m_data->Line[m_data->m_LineVertCounter + 0] = LineAttributes(glm::vec4(p1, 1), color);
 		m_data->Line[m_data->m_LineVertCounter + 1] = LineAttributes(glm::vec4(p2, 1), color);

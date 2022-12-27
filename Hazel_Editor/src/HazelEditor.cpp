@@ -78,7 +78,7 @@
 			 if (!m_Entity)
 				 return;
 
-			 m_Entity->m_DefaultColor = glm::vec4(1.0, 0.8, 0.3, 1.0);
+			 m_Entity->m_DefaultColor = glm::vec4(0.8, 0.8, 0.1, 1.0);
 			 
 			 if (Input::IsKeyPressed(HZ_KEY_E))
 				 rotate += 1;
@@ -176,12 +176,13 @@ void  HazelEditor::OnUpdate(float deltatime )
 		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
 		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
 		//Renderer2D::EndScene();
-	Renderer2D::LineBeginScene();
-	Renderer2D::DrawLine({ 0,0,0 }, { 1,-2,0 }, {0.2,0.5,1,1});
-	Renderer2D::DrawLine({ 1,-2,0 }, {2,3,0}, { 0.2,0.5,1,1 });
-	Renderer2D::DrawLine({2,3,0 }, { 0,0,0 }, { 0.2,0.5,1,1 });
-	Renderer2D::LineEndScene();
 	m_scene->OnUpdate(deltatime);
+	Renderer2D::LineBeginScene(m_camera.GetCamera());//render lines
+	Renderer2D::DrawLine({ 0,0,0 }, {5,8,0}, {0.8,0.5,1,1});
+	Renderer2D::DrawLine({ 5,8,0 }, { -5,3,0 }, { 0.1,0.6,0.2,1 });
+	Renderer2D::DrawLine({ -5,3,0 }, { 0,0,0 }, { 0.8,0.3,0.6,1 });
+	Renderer2D::DrawLine({ 5,7,0 }, { 1,0,0 }, { 0.8,0.3,0.6,1 });
+	Renderer2D::LineEndScene();
 		m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
 		m_FrameBuffer->UnBind();
 }

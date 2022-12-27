@@ -38,6 +38,5 @@
   <ItemGroup>
     <None Include="Assets\Shaders\2_In_1Shader.glsl" />
     <None Include="Assets\Shaders\SolidColorShader.glsl" />
-    <None Include="Assets\Shaders\LineShader.glsl" />
   </ItemGroup>
 </Project>
