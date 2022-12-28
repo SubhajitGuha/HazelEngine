@@ -122,7 +122,7 @@ void  HazelEditor::OnUpdate(float deltatime )
 	{
 		m_FrameBuffer->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 
-		RenderCommand::ClearColor({ 0.5,0.3,0.8,1 });
+		RenderCommand::ClearColor({0.8,0.8,0.8,1.0});
 		RenderCommand::Clear();
 
 		if (isWindowFocused)//Take inputs only when the window is focused
@@ -176,13 +176,8 @@ void  HazelEditor::OnUpdate(float deltatime )
 		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
 		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
 		//Renderer2D::EndScene();
-	m_scene->OnUpdate(deltatime);
-	Renderer2D::LineBeginScene(m_camera.GetCamera());//render lines
-	Renderer2D::DrawLine({ 0,0,0 }, {5,8,0}, {0.8,0.5,1,1});
-	Renderer2D::DrawLine({ 5,8,0 }, { -5,3,0 }, { 0.1,0.6,0.2,1 });
-	Renderer2D::DrawLine({ -5,3,0 }, { 0,0,0 }, { 0.8,0.3,0.6,1 });
-	Renderer2D::DrawLine({ 5,7,0 }, { 1,0,0 }, { 0.8,0.3,0.6,1 });
-	Renderer2D::LineEndScene();
+	//m_scene->OnUpdate(deltatime);
+	Bezier_Curve(P0, P1, P2, P3);
 		m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
 		m_FrameBuffer->UnBind();
 }
@@ -218,6 +213,13 @@ void  HazelEditor::OnImGuiRender()
 	auto cam2 = m_scene->GetEntitybyName("Square");
 	cam2->GetComponent<CameraComponent>().camera.bIsMainCamera = IsMainCamera2;
 	ImGui::End();
+
+	ImGui::Begin("Curve Controller");
+	ImGui::DragFloat2("point0", (float*)&P0,1.0,-100.0,100.0);
+	ImGui::DragFloat2("point1", (float*)&P1, 1.0, -100.0, 100.0);
+	ImGui::DragFloat2("point2", (float*)&P2, 1.0, -100.0, 100.0);
+	ImGui::DragFloat2("point3", (float*)&P3, 1.0, -100.0, 100.0);
+	ImGui::End();
 }
 
 void  HazelEditor::OnEvent(Event& e)
@@ -225,3 +227,26 @@ void  HazelEditor::OnEvent(Event& e)
 	if (isWindowFocused)
 		m_camera.OnEvent(e);
 }
+
+void HazelEditor::Bezier_Curve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3)
+{
+	glm::vec2 p;
+	glm::vec3 tmp = glm::vec3(p0, 0);
+
+	Renderer2D::LineBeginScene(m_camera.GetCamera());
+	for (int i = 0; i < 100; i++)//iterating the value of t
+	{
+		float t = i / 100.0;
+		p.x = p0.x +
+			t * (-3 * p0.x + 3 * p1.x) +
+			t * t * (3 * p0.x - 6 * p1.x + 3 * p2.x) +
+			t * t * t * (-p0.x + 3 * p1.x - 3 * p2.x + p3.x);
+		p.y = p0.y +
+			t * (-3 * p0.y + 3 * p1.y) +
+			t * t * (3 * p0.y - 6 * p1.y + 3 * p2.y) +
+			t * t * t * (-p0.y + 3 * p1.y - 3 * p2.y + p3.y);
+		Renderer2D::DrawLine(tmp, glm::vec3(p, 0), { 0.8,0.4,0.2,1 });
+		tmp = glm::vec3(p, 0);
+	}
+	Renderer2D::LineEndScene();
+	}
