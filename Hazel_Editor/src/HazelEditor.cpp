@@ -178,19 +178,6 @@ void  HazelEditor::OnUpdate(float deltatime )
 		//Renderer2D::EndScene();
 	//m_scene->OnUpdate(deltatime);
 
-	auto C_1 = [&](glm::vec2 p2, glm::vec2 p3) {
-		glm::vec2 p;
-		p.x = 2 * p3.x - p2.x;
-		p.y = 2 * p3.y - p2.y;
-		return p;
-	};
-	auto C_2 = [&](glm::vec2 p1, glm::vec2 p2,glm::vec2 p3) {
-		glm::vec2 p;
-		p.x = p1.x + 4 * (p3.x - p2.x);
-		p.y = p1.y + 4 * (p3.y - p2.y);
-		return p;
-	};
-
 	auto velocity = [&](const glm::vec2& point1, const glm::vec2& point2,float& s) {
 		glm::vec2 vel;
 		vel = point2 - point1;
@@ -199,20 +186,22 @@ void  HazelEditor::OnUpdate(float deltatime )
 		return vel;
 	};
 	
-	std::vector<glm::vec2> arr_pts = { { 5,-5 },{8,-8},{10,0} ,{12,3},{15,-8},{16,8},{18,-10},{18.2,0.2},{19,0.9},{19.8,-5},{20.5,2} };//array of points for testing
+	std::vector<glm::vec2> arr_pts = { { 5,-5 },{8,-8},{10,0} ,{12,3},{15,2},{16,3},{18,2.1},{18.2,3.5},{19,3.9},{19.8,-5},{20.5,2} };//array of points for testing
 	glm::vec2 tmp_point = P1 , tmp_vel = velocity(P0,arr_pts[0],factor);
 
-	Hermite_Curve(P0, P1, velocity({-3,-3},P1,factor),velocity(P0,P2,factor));//drawing the first point with assumed velocities
-
+	Renderer2D::LineBeginScene(m_camera.GetCamera());
 	for (int i=0;i<arr_pts.size()-1;i++)
 	{	
 		auto x = velocity(tmp_point, arr_pts[i + 1], factor);
-		Hermite_Curve(tmp_point, arr_pts[i], tmp_vel, x);
+		Renderer2D::DrawCurve(tmp_point, arr_pts[i], tmp_vel, x);//drawing a hermitian curve
 		tmp_point = arr_pts[i];
 		tmp_vel = x;
+		Renderer2D::Draw_Bezier_Curve(P0, c1, c2, P1);
 	}
+	Renderer2D::LineEndScene();
+	
 	m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
-		m_FrameBuffer->UnBind();
+	m_FrameBuffer->UnBind();
 }
 
 void  HazelEditor::OnImGuiRender()
@@ -260,50 +249,4 @@ void  HazelEditor::OnEvent(Event& e)
 {
 	if (isWindowFocused)
 		m_camera.OnEvent(e);
-}
-
-void HazelEditor::Bezier_Curve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3)
-{
-	glm::vec2 p;
-	glm::vec3 tmp = glm::vec3(p0, 0);
-
-	Renderer2D::LineBeginScene(m_camera.GetCamera());
-	for (int i = 0; i < 100; i++)//iterating the value of t
-	{
-		float t = (float)i / 100.0;
-		p.x = p0.x +
-			t * (-3 * p0.x + 3 * p1.x) +
-			t * t * (3 * p0.x - 6 * p1.x + 3 * p2.x) +
-			t * t * t * (-p0.x + 3 * p1.x - 3 * p2.x + p3.x);
-		p.y = p0.y +
-			t * (-3 * p0.y + 3 * p1.y) +
-			t * t * (3 * p0.y - 6 * p1.y + 3 * p2.y) +
-			t * t * t * (-p0.y + 3 * p1.y - 3 * p2.y + p3.y);
-		Renderer2D::DrawLine(tmp, glm::vec3(p, 0), { 0.9,0.4,0.6,1 });
-		tmp = glm::vec3(p, 0);
-	}
-	Renderer2D::LineEndScene();
-	}
-
-void HazelEditor::Hermite_Curve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& v0, const glm::vec2& v1)
-{
-	glm::vec2 p;
-	glm::vec3 tmp = glm::vec3(p0, 0);
-
-	Renderer2D::LineBeginScene(m_camera.GetCamera());
-	for (int i = 0; i < 60; i++)//iterating the value of t
-	{
-		float t = (float)i / 60.0;
-		p.x = p0.x +
-			t * v0.x +
-			t * t * (-3 * p0.x - 2 * v0.x + 3 * p1.x - v1.x) +
-			t * t * t * (2 * p0.x + v0.x - 2 * p1.x + v1.x);
-		p.y = p0.y +
-			t * v0.y +
-			t * t * (-3 * p0.y - 2 * v0.y + 3 * p1.y - v1.y) +
-			t * t * t * (2 * p0.y + v0.y - 2 * p1.y + v1.y);
-		Renderer2D::DrawLine(tmp, glm::vec3(p, 0), { 0.9,0.4,0.6,1 });
-		tmp = glm::vec3(p, 0);
-	}
-	Renderer2D::LineEndScene();
 }

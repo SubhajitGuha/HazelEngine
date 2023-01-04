@@ -11,8 +11,7 @@ public:
 	virtual void OnUpdate(float deltatime) override;
 	virtual void OnImGuiRender() override;
 	virtual void OnEvent(Event& e) override;
-	void Bezier_Curve(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3, const glm::vec2& p4);//this needs to be an entity so change later
-	void Hermite_Curve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& v0, const glm::vec2& v1);
+
 private:
 	OrthographicCameraController m_camera;
 	glm::vec4 Color1 = { 1,1,1,1 };

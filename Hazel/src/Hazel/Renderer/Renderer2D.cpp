@@ -39,7 +39,7 @@ namespace Hazel {
 	};
 
 	struct Renderer2DStorage {
-		int maxQuads = 100000;
+		int maxQuads = 1000000;
 		int NumIndices = maxQuads * 6;
 		int NumVertices = maxQuads * 4;
 		
@@ -196,10 +196,59 @@ namespace Hazel {
 	}
 	void Renderer2D::DrawLine(const glm::vec3& p1,const glm::vec3& p2 , const glm::vec4& color)
 	{
+		//if (m_data->m_LineVertCounter >= m_data->Line.size())
+		//{
+		//	LineEndScene();//if ran out of cache then partiatilly render the cache
+		//	Init();
+		//	return;
+		//}
 		m_data->Line[m_data->m_LineVertCounter + 0] = LineAttributes(glm::vec4(p1, 1), color);
 		m_data->Line[m_data->m_LineVertCounter + 1] = LineAttributes(glm::vec4(p2, 1), color);
 		m_data->m_LineVertCounter += 2;
-		glLineWidth(4.0f);
+		glLineWidth(4.f);
 		//glColor4f(0, 1, 0, 1);
+	}
+	void Renderer2D::DrawCurve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& v0, const glm::vec2& v1)
+	{
+		//hermite curve implementation best for joining points in a smooth manner
+		glm::vec2 p;
+		glm::vec3 tmp = glm::vec3(p0, 0.0f);
+
+		for (int i = 1; i <= 10; i++)//iterating the value of t
+		{
+			float t = (float)i / 10;
+			p.x = p0.x +
+				t * v0.x +
+				t * t * (-3 * p0.x - 2 * v0.x + 3 * p1.x - v1.x) +
+				t * t * t * (2 * p0.x + v0.x - 2 * p1.x + v1.x);
+			p.y = p0.y +
+				t * v0.y +
+				t * t * (-3 * p0.y - 2 * v0.y + 3 * p1.y - v1.y) +
+				t * t * t * (2 * p0.y + v0.y - 2 * p1.y + v1.y);
+			Renderer2D::DrawLine(tmp, glm::vec3(p, 0.0f), { 0.9,0.4,0.6,1 });
+			tmp = glm::vec3(p, 0);
+		}
+		
+	}
+	void Renderer2D::Draw_Bezier_Curve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3)
+	{
+
+		glm::vec2 p;
+		glm::vec3 tmp = glm::vec3(p0, 0);
+
+		for (int i = 1; i <= 10; i++)//iterating the value of t
+		{
+			float t = (float)i / 10.0;
+			p.x = p0.x +
+				t * (-3 * p0.x + 3 * p1.x) +
+				t * t * (3 * p0.x - 6 * p1.x + 3 * p2.x) +
+				t * t * t * (-p0.x + 3 * p1.x - 3 * p2.x + p3.x);
+			p.y = p0.y +
+				t * (-3 * p0.y + 3 * p1.y) +
+				t * t * (3 * p0.y - 6 * p1.y + 3 * p2.y) +
+				t * t * t * (-p0.y + 3 * p1.y - 3 * p2.y + p3.y);
+			Renderer2D::DrawLine(tmp, glm::vec3(p, 0), { 0.9,0.4,0.6,1 });
+			tmp = glm::vec3(p, 0);
+		}
 	}
 }
