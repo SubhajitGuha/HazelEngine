@@ -190,19 +190,26 @@ void  HazelEditor::OnUpdate(float deltatime )
 		p.y = p1.y + 4 * (p3.y - p2.y);
 		return p;
 	};
+
+	auto velocity = [&](const glm::vec2& point1, const glm::vec2& point2,float& s) {
+		glm::vec2 vel;
+		vel = point2 - point1;
+		vel.x *= s;
+		vel.y *= s;
+		return vel;
+	};
 	
-	std::vector<glm::vec2> arr_pts = { { 5,-5 },{8,-8},{10,0} ,{12,3},{15,-8},{16,8} };//array of points for testing
-	glm::vec2 point1 = c1, point2 = c2, point3 = P1;
-	//making the curve c1 and c2 continous (making velocity and accelaration continious)
-	Bezier_Curve(P0, c1,c2, P1);
-	for (auto pts : arr_pts)
-	{
-		auto x = C_1(point2, point3);//making c1 continous
-		auto y = C_2(point1, point2, point3);//making c2 continous
-		Bezier_Curve(point3, x, y, pts);
-		point1 = x;
-		point2 = y;
-		point3 = pts;
+	std::vector<glm::vec2> arr_pts = { { 5,-5 },{8,-8},{10,0} ,{12,3},{15,-8},{16,8},{18,-10},{18.2,0.2},{19,0.9},{19.8,-5},{20.5,2} };//array of points for testing
+	glm::vec2 tmp_point = P1 , tmp_vel = velocity(P0,arr_pts[0],factor);
+
+	Hermite_Curve(P0, P1, velocity({-3,-3},P1,factor),velocity(P0,P2,factor));//drawing the first point with assumed velocities
+
+	for (int i=0;i<arr_pts.size()-1;i++)
+	{	
+		auto x = velocity(tmp_point, arr_pts[i + 1], factor);
+		Hermite_Curve(tmp_point, arr_pts[i], tmp_vel, x);
+		tmp_point = arr_pts[i];
+		tmp_vel = x;
 	}
 	m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
 		m_FrameBuffer->UnBind();
@@ -284,9 +291,9 @@ void HazelEditor::Hermite_Curve(const glm::vec2& p0, const glm::vec2& p1, const 
 	glm::vec3 tmp = glm::vec3(p0, 0);
 
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
-	for (int i = 0; i < 100; i++)//iterating the value of t
+	for (int i = 0; i < 60; i++)//iterating the value of t
 	{
-		float t = (float)i / 100.0;
+		float t = (float)i / 60.0;
 		p.x = p0.x +
 			t * v0.x +
 			t * t * (-3 * p0.x - 2 * v0.x + 3 * p1.x - v1.x) +
@@ -295,7 +302,7 @@ void HazelEditor::Hermite_Curve(const glm::vec2& p0, const glm::vec2& p1, const 
 			t * v0.y +
 			t * t * (-3 * p0.y - 2 * v0.y + 3 * p1.y - v1.y) +
 			t * t * t * (2 * p0.y + v0.y - 2 * p1.y + v1.y);
-		
+		Renderer2D::DrawLine(tmp, glm::vec3(p, 0), { 0.9,0.4,0.6,1 });
 		tmp = glm::vec3(p, 0);
 	}
 	Renderer2D::LineEndScene();
