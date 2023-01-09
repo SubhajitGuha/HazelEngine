@@ -28,7 +28,7 @@ in vec4 m_color;
 in float m_slotindex;
 in vec2 tcord;
 
-uniform sampler2D u_Texture[8];
+uniform sampler2D u_Texture[32];
 uniform vec4 u_color;
 
 void main()

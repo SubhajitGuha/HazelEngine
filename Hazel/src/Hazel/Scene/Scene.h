@@ -34,7 +34,7 @@ namespace Hazel {
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
 		std::unordered_map<std::string, Entity*> Entity_Map;
-		Entity* m_Entity;
+		Entity* m_Entity = nullptr;
 	};
 }
 

@@ -16,7 +16,7 @@ namespace Hazel {
 		bool ZoomEvent(MouseScrollEvent& e);
 		bool WindowResize(WindowResizeEvent& e);
 	private:
-		float m_ZoomLevel = 2.0f;
+		float m_ZoomLevel = 1.0f;
 		float m_AspectRatio;
 		OrthographicCamera m_Camera;
 

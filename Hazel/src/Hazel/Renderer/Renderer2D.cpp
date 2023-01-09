@@ -108,7 +108,7 @@ namespace Hazel {
 		m_data->Lineshader = (Shader::Create("Assets/Shaders/LineShader.glsl"));
 		m_data->shader = (Shader::Create("Assets/Shaders/2_In_1Shader.glsl"));//texture shader
 
-		unsigned int TextureIDindex[] = { 0,1,2,3,4,5,6,7 };
+		unsigned int TextureIDindex[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31};
 
 		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
 																						//which will be used to render textures in batch renderer
@@ -167,7 +167,7 @@ namespace Hazel {
 			m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y + scale.y, pos.z, 1.f), angle), { 1,1 }, { 1,1,1,1 }, index);
 			m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y, pos.z, 1.f), angle), { 1,0 }, { 1,1,1,1 }, index);
 
-		
+		if(tex)
 		tex->Bind(index);
 		//m_data->shader->SetFloat4("u_color", glm::vec4(1));//set the multiplying color to white so that the texture is selected in fragment shader
 		
@@ -208,7 +208,7 @@ namespace Hazel {
 		glLineWidth(4.f);
 		//glColor4f(0, 1, 0, 1);
 	}
-	void Renderer2D::DrawCurve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& v0, const glm::vec2& v1)
+	void Renderer2D::DrawCurve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& v0, const glm::vec2& v1 , const glm::vec4& color)
 	{
 		//hermite curve implementation best for joining points in a smooth manner
 		glm::vec2 p;
@@ -216,7 +216,7 @@ namespace Hazel {
 
 		for (int i = 1; i <= 10; i++)//iterating the value of t
 		{
-			float t = (float)i / 10;
+			double t = ( double)i / 10.0;
 			p.x = p0.x +
 				t * v0.x +
 				t * t * (-3 * p0.x - 2 * v0.x + 3 * p1.x - v1.x) +
@@ -225,7 +225,7 @@ namespace Hazel {
 				t * v0.y +
 				t * t * (-3 * p0.y - 2 * v0.y + 3 * p1.y - v1.y) +
 				t * t * t * (2 * p0.y + v0.y - 2 * p1.y + v1.y);
-			Renderer2D::DrawLine(tmp, glm::vec3(p, 0.0f), { 0.9,0.4,0.6,1 });
+			Renderer2D::DrawLine(tmp, glm::vec3(p, 0.0f), color);
 			tmp = glm::vec3(p, 0);
 		}
 		

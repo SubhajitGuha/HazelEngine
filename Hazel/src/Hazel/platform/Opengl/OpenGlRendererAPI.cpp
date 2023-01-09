@@ -24,7 +24,6 @@ namespace Hazel {
 	}
 	void OpenGlRendererAPI::DrawLine(VertexArray& vertexarray,uint32_t count)
 	{
-		
 		vertexarray.Bind();
 		glDrawArrays(GL_LINES,0,count);
 	}

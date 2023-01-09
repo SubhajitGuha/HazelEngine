@@ -22,9 +22,9 @@ namespace Hazel {
 	void Scene::OnUpdate(TimeStep ts)
 	{
 		//run scripts
-		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) {
-			
-			if(nsc.m_Script==nullptr)
+		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
+		{
+				if(nsc.m_Script==nullptr)
 				nsc.CreateInstance();// this needs to be done once ,not every frame.
 			
 			for (auto item : Entity_Map)
@@ -72,8 +72,8 @@ namespace Hazel {
 			auto& transform = item.second->GetComponent<TransformComponent>();
 			auto& camera = item.second->GetComponent<CameraComponent>();
 			glm::vec4 color;
-
-			if (entt == m_Entity->GetEntity())//if the current entity has a script
+			
+			if (m_Entity && entt == m_Entity->GetEntity())//if the current entity has a script
 				color = m_Entity->m_DefaultColor;
 			else
 				color = glm::vec4(1.0f);
