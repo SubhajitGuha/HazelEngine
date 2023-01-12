@@ -21,7 +21,10 @@ namespace Hazel {
 		inline static void DrawLine(VertexArray& vertexarray,uint32_t& count) {
 			m_RendererAPI->DrawLine(vertexarray,count);
 		}
-
+		inline static glm::vec2 GetViewportSize()
+		{
+			return m_RendererAPI->GetViewportSize();
+		}
 	private:
 		static ref<RendererAPI> GetRendererAPI();
 		static ref<RendererAPI> m_RendererAPI;

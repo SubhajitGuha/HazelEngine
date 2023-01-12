@@ -12,5 +12,6 @@ namespace Hazel {
 		void DrawLine(VertexArray& vertexarray,uint32_t count)override;
 		void Init() override;
 		void SetViewPort(unsigned int, unsigned int) override;
+		virtual glm::vec2 GetViewportSize() override;
 	};
 }

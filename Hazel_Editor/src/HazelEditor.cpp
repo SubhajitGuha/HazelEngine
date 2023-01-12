@@ -221,6 +221,7 @@ void  HazelEditor::OnImGuiRender()
 	{
 		m_ViewportSize = { Size.x,Size.y };
 		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		m_camera.onResize(Size.x, Size.y);
 	}
 	ImGui::Image((void*)m_FrameBuffer->GetSceneTextureID(), *(ImVec2*)&m_ViewportSize);
 	ImGui::End();

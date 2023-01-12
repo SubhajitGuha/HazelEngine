@@ -18,6 +18,7 @@ namespace Hazel {
 		inline static GraphicsAPI GetAPI() { return m_API; }
 		virtual void Init() = 0;
 		virtual void SetViewPort(unsigned int, unsigned int) = 0;
+		virtual glm::vec2 GetViewportSize() = 0;
 	private:
 		static GraphicsAPI m_API;
 	};

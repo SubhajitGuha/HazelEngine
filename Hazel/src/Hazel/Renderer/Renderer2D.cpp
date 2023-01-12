@@ -194,7 +194,7 @@ namespace Hazel {
 		tex->Texture->Bind(index);//There is no need to bind the texture every frame .In this case the texture can be bound once and used all the time
 		m_data->m_VertexCounter += 4;
 	}
-	void Renderer2D::DrawLine(const glm::vec3& p1,const glm::vec3& p2 , const glm::vec4& color)
+	void Renderer2D::DrawLine(const glm::vec3& p1,const glm::vec3& p2 , const glm::vec4& color, const float& width)
 	{
 		//if (m_data->m_LineVertCounter >= m_data->Line.size())
 		//{
@@ -205,7 +205,7 @@ namespace Hazel {
 		m_data->Line[m_data->m_LineVertCounter + 0] = LineAttributes(glm::vec4(p1, 1), color);
 		m_data->Line[m_data->m_LineVertCounter + 1] = LineAttributes(glm::vec4(p2, 1), color);
 		m_data->m_LineVertCounter += 2;
-		glLineWidth(4.f);
+		glLineWidth(width);
 		//glColor4f(0, 1, 0, 1);
 	}
 	void Renderer2D::DrawCurve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& v0, const glm::vec2& v1 , const glm::vec4& color)

@@ -12,11 +12,13 @@ namespace Hazel {
 		void OnUpdate(TimeStep ts);
 		void OnEvent(Event& e);
 		inline OrthographicCamera GetCamera() { return m_Camera; }
+		void onResize(float width, float height);
+		glm::vec3 GetPosition() { return v3; }
 	private:
 		bool ZoomEvent(MouseScrollEvent& e);
 		bool WindowResize(WindowResizeEvent& e);
 	private:
-		float m_ZoomLevel = 1.0f;
+		float m_ZoomLevel = 3.0f;
 		float m_AspectRatio;
 		OrthographicCamera m_Camera;
 

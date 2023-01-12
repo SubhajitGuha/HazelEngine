@@ -35,6 +35,11 @@ namespace Hazel {
 		dispatcher.Dispatch<MouseScrollEvent>(HZ_BIND_FN(ZoomEvent));
 		dispatcher.Dispatch<WindowResizeEvent>(HZ_BIND_FN(WindowResize));
 	}
+	void OrthographicCameraController::onResize(float width, float height)
+	{
+		m_AspectRatio = width/ height;
+		m_Camera.SetOrthographicProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+	}
 	bool OrthographicCameraController::ZoomEvent(MouseScrollEvent& e)
 	{
 		m_ZoomLevel += e.GetYOffset();

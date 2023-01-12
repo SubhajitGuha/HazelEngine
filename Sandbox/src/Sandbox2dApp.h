@@ -21,13 +21,16 @@ private:
 	glm::vec3 position = { 0,0,0.2 };
 	float ObjSpeed = 20;
 	float scale = 1;
-	glm::vec2 m_ViewportSize = { 1920,1080 };
+	glm::vec2 m_ViewportSize = { 0,0 };
 	Entity* SquareEntt;
 	Entity* CameraEntt;
-	glm::vec2 P0 = { 0,0 }, P1 = { 3,3 }, P2 = { 5,-5 }, P3 = { 8,-8 }, c2 = { 2,3 }, c1 = { 0.3,-2.2 };
+	glm::vec2 P0 = { 0,0 }, P1 = { 1,0 }, c2 = { 2,3 }, c1 = { 0.3,-2.2 };
 	//these coordinates are scaled to 100 (i.e) coord {3,3} is actually {300,300}
-	float factor = 0.1;
+	float factor = 0.3;
+	int coordinate_scale = 1;
 	std::vector<glm::vec2> m_Points;
+	glm::vec2 window_pos = {0,0};
+	glm::vec2 tmp_MousePos = { -1000,-1000 };
 
 	ref<Scene> m_Scene;
 	ref<Shader> shader;

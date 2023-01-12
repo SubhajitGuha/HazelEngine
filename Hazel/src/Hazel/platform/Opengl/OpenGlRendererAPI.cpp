@@ -39,4 +39,10 @@ namespace Hazel {
 	{
 		glViewport(0, 0, Width, Height);
 	}
+	glm::vec2 OpenGlRendererAPI::GetViewportSize()
+	{
+		float arr[4];
+		glGetFloatv(GL_VIEWPORT, arr);
+		return {arr[2],arr[3]};//the index 2 and 3 gives the width and height of the viewport
+	}
 }
