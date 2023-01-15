@@ -2,7 +2,7 @@ workspace "Hazel_Engine"
 
 architecture "x86_64"
 
-startproject "Hazel_Editor"
+startproject "Sandbox"
 
 configurations
 {
@@ -20,11 +20,12 @@ IncludeDir["imgui"] = "Hazel/vendor/imgui"
 IncludeDir["glm"] = "Hazel/vendor/glm"
 IncludeDir["stb_image"] = "Hazel/vendor/stb_image"
 IncludeDir["entt"] = "Hazel/vendor/entt"
+IncludeDir["curl"] = "Hazel/vendor/Curl/include"
+IncludeDir["json"]="Hazel/vendor/jsoncpp"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
 include "Hazel/vendor/imgui"
-
 
 project "Hazel"
 
@@ -48,6 +49,12 @@ project "Hazel"
 		"%{prj.name}/src/**.cpp",
 		"%{IncludeDir.stb_image}/**.h",
 		"%{IncludeDir.stb_image}/**.cpp",
+		"%{IncludeDir.curl}/**.h",
+		"%{IncludeDir.curl}/**.c",
+		"%{IncludeDir.curl}/**.cpp",
+		"%{IncludeDir.json}/**.h",
+		"%{IncludeDir.json}/**.cpp",
+		"%{IncludeDir.json}/**.c",
 		"%{IncludeDir.entt}/**.hpp"
 	}
 
@@ -60,6 +67,8 @@ project "Hazel"
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.curl}",
+		"%{IncludeDir.json}",
 		"%{IncludeDir.entt}"
 	}
 
@@ -67,7 +76,13 @@ project "Hazel"
 		"GLFW",
 		"Glad",
 		"imgui",
-		"opengl32.lib"
+		"opengl32.lib",
+		"Normaliz.lib",
+		"Ws2_32.lib",
+		"Wldap32.lib",
+		"Crypt32.lib",
+		"advapi32.lib",
+		"Hazel/vendor/Curl/lib/libcurl_a_debug.lib"
 	}
 
 	filter "system:windows"
@@ -121,6 +136,8 @@ project "Sandbox"
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.curl}",
+		"%{IncludeDir.json}",
 		"Hazel/src"
 	}
 	links "Hazel"
@@ -173,6 +190,8 @@ project "Hazel_Editor"
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.curl}",
+		"%{IncludeDir.json}",
 		"Hazel/src"
 	}
 	links "Hazel"

@@ -1,4 +1,9 @@
+#define CURL_STATICLIB
 #include "Sandbox2dApp.h"
+#include "curl/curl.h"
+#include "json/json.h"
+#include <iostream>
+
 //#include "Hazel/Profiling.h"
 
 SandBox2dApp::SandBox2dApp()
@@ -10,11 +15,48 @@ SandBox2dApp::SandBox2dApp()
 	Renderer2D::Init();
 }
 
+static size_t my_write(void* buffer, size_t size, size_t nmemb, void* param)
+{
+	std::string& text = *static_cast<std::string*>(param);
+	size_t totalsize = size * nmemb;
+	text.append(static_cast<char*>(buffer), totalsize);
+	return totalsize;
+};
+
 void SandBox2dApp::OnAttach()
 {
 	m_Points = { { 5,5 },{8,8},{10,0} ,{12,3},{15,2},{16,3},{18,2.1},{18.2,3.5},{19,3.9},{19.8,-5},{20.5,2},{22,3},{25,-10},{26,-8},{29,3},{33,7} ,{34,2} };//array of points for testing
 	for (int i = 0; i < m_Points.size(); i++)
 		m_Points[i].y *= -1;//invert the y axis as open gl inverts the y axis
+
+	//get data from a server using an api key
+	//curl is used to connect to the server
+	std::string result;
+	CURL* curl;
+	CURLcode res;
+	
+	curl = curl_easy_init();
+	if (curl) {
+		curl_easy_setopt(curl, CURLOPT_URL, "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=TSLA&apikey=4NT07D3RF1DRQBSL");
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, my_write);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
+		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+		res = curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
+		if (CURLE_OK != res) {
+			std::cerr << "CURL error: " << res << '\n';
+		}
+	}
+	curl_global_cleanup();
+	std::cout << result << "\n\n";
+	Json::Value jsonData;//json file parser
+	Json::Reader jsonReader;
+	if (jsonReader.parse(result, jsonData)) {
+		std::cout << "Open: " << jsonData["chart"]["result"][0]["indicators"]["quote"][0]["open"][0] << std::endl;
+		std::cout << "Close: " << jsonData["chart"]["result"][0]["indicators"]["quote"][0]["close"][0] << std::endl;
+		std::cout << "High: " << jsonData["chart"]["result"][0]["indicators"]["quote"][0]["high"][0] << std::endl;
+		std::cout << "Low: " << jsonData["chart"]["result"][0]["indicators"]["quote"][0]["low"][0] << std::endl;
+	}
 }
 
 void SandBox2dApp::OnDetach()

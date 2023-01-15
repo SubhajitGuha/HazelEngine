@@ -1,7 +1,7 @@
 #pragma once
-#include <memory>
 #include <functional>
 #include <string>
+#include <memory>
 #include <sstream>
 #include <vector>
 #include <unordered_map>
@@ -13,5 +13,5 @@
 
 #include "Hazel/Debug/Instrumentation.h"
 #ifdef HZ_PLATFORM_WINDOWS
-#include <windows.h>
+//#include <windows.h>
 #endif // HZ_PLATFORM_WINDOWS

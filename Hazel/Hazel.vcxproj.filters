@@ -37,8 +37,23 @@
     <Filter Include="vendor">
       <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vendor\Curl">
+      <UniqueIdentifier>{78F965C1-E4AE-DEB6-6DA3-D88DD957D5BA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\Curl\include">
+      <UniqueIdentifier>{EB1831F5-577A-0E03-E0E7-54B54C4845C2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\Curl\include\curl">
+      <UniqueIdentifier>{D02D57FF-BC52-A67F-E59D-8B0FD121A59D}</UniqueIdentifier>
+    </Filter>
     <Filter Include="vendor\entt">
       <UniqueIdentifier>{DD8078C1-4936-F1B6-D22A-EB8D3EDFE7BA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\jsoncpp">
+      <UniqueIdentifier>{DF9952C1-CB67-46C7-B4FB-B6EDA068222C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\jsoncpp\json">
+      <UniqueIdentifier>{08359755-7496-7463-FD03-BB156964AB22}</UniqueIdentifier>
     </Filter>
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
@@ -180,8 +195,50 @@
     <ClInclude Include="src\hzpch.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\curl.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\curlver.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\easy.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\header.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\mprintf.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\multi.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\options.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\stdcheaders.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\system.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\typecheck-gcc.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\urlapi.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\Curl\include\curl\websockets.h">
+      <Filter>vendor\Curl\include\curl</Filter>
+    </ClInclude>
     <ClInclude Include="vendor\entt\entt.hpp">
       <Filter>vendor\entt</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\jsoncpp\json\json-forwards.h">
+      <Filter>vendor\jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\jsoncpp\json\json.h">
+      <Filter>vendor\jsoncpp\json</Filter>
     </ClInclude>
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
@@ -286,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="src\hzpch.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\jsoncpp\jsoncpp.cpp">
+      <Filter>vendor\jsoncpp</Filter>
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
