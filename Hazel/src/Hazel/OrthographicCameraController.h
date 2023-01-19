@@ -14,6 +14,7 @@ namespace Hazel {
 		inline OrthographicCamera GetCamera() { return m_Camera; }
 		void onResize(float width, float height);
 		glm::vec3 GetPosition() { return v3; }
+		void SetCameraPosition(const glm::vec3& pos) { v3 = pos; }
 	private:
 		bool ZoomEvent(MouseScrollEvent& e);
 		bool WindowResize(WindowResizeEvent& e);
@@ -24,7 +25,7 @@ namespace Hazel {
 
 		glm::vec3 v3 = { 0,0,0 };
 
-		float m_movespeed = 20;
+		float m_movespeed = 100;
 		float r = 0;
 	};
 }

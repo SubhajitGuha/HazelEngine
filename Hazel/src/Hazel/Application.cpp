@@ -79,8 +79,6 @@ namespace Hazel {
 			TimeStep ts = time - m_LastFrameTime;//this is the delta time (time btn last and present frame or time required to render a frame)
 			m_LastFrameTime = time;
 
-			HAZEL_CORE_TRACE("Time is -> {0}",ts.GetTime());
-
 			//layers render layer and game layers
 			for (Layer* layer : m_layerstack)
 				layer->OnUpdate(ts);

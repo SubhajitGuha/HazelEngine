@@ -21,10 +21,10 @@ namespace Hazel {
 		if (Input::IsKeyPressed(HZ_KEY_D))
 			v3.x += m_movespeed * deltatime;
 
-		if (Input::IsKeyPressed(HZ_KEY_E))
-			r += 60 * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_Q))
-			r -= 60 * deltatime;
+		//if (Input::IsKeyPressed(HZ_KEY_E))
+			//r += 60 * deltatime;
+		//if (Input::IsKeyPressed(HZ_KEY_Q))
+			//r -= 60 * deltatime;
 
 		m_Camera.SetPosition(v3);
 		m_Camera.SetRotation(r);
