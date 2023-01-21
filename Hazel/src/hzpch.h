@@ -8,8 +8,10 @@
 #include <unordered_set>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <chrono>
+#include <thread>
 
 #include "Hazel/Debug/Instrumentation.h"
 #ifdef HZ_PLATFORM_WINDOWS

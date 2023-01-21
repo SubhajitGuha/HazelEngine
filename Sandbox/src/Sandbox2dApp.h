@@ -30,15 +30,18 @@ private:
 	std::vector<glm::vec2> m_Points;
 	glm::vec2 window_pos = {0,0};
 	glm::vec2 tmp_MousePos = { -1000,-1000 };
+	glm::vec4 color = { 1,0.462,0,1 };
 
-	std::string DataInterval = "TIME_SERIES_MONTHLY",interval=MONTHLY;
+	std::string DataInterval = "TIME_SERIES_WEEKLY",interval=WEEKLY;
 
-	std::string CompanyName="IBM";
+	std::string CompanyName="IBM";//default
 	float factor = 0.2;
 	float max_val = INT_MIN, min_val = INT_MAX;
 	int coordinate_scale = 1;
 	int UpscaledValue = 100; // this variable is used for scaling the normalized-finance data values
 	int NumPoints = 1000;
+	bool isFetchingData = false;
+	bool isWindowFocused = false;
 
 	ref<Scene> m_Scene;
 	ref<Shader> shader;

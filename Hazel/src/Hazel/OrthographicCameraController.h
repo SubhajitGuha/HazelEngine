@@ -15,6 +15,11 @@ namespace Hazel {
 		void onResize(float width, float height);
 		glm::vec3 GetPosition() { return v3; }
 		void SetCameraPosition(const glm::vec3& pos) { v3 = pos; }
+		bool bCanBeRotated(bool val) {
+			bCanRotate = val;
+			return val;
+		}
+		inline void SetCameraSpeed(const float& val) { m_movespeed = val; }
 	private:
 		bool ZoomEvent(MouseScrollEvent& e);
 		bool WindowResize(WindowResizeEvent& e);
@@ -27,5 +32,6 @@ namespace Hazel {
 
 		float m_movespeed = 100;
 		float r = 0;
+		bool bCanRotate = true;
 	};
 }

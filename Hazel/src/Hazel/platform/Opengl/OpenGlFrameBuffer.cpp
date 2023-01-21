@@ -29,6 +29,12 @@ namespace Hazel {
         invalidate(Specification);
         glViewport(0, 0, width, height);
     }
+    void OpenGlFrameBuffer::ClearFrameBuffer()//this does nothing
+    {
+        float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        glClearBufferfv(GL_COLOR, 0, clearColor);
+        glFlush();
+    }
     void OpenGlFrameBuffer::invalidate(const FrameBufferSpecification& spec)
     {
         if (m_RenderID)

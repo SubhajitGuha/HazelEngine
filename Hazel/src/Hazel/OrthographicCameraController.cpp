@@ -13,18 +13,21 @@ namespace Hazel {
 	void OrthographicCameraController::OnUpdate(TimeStep deltatime)
 	{
 		if (Input::IsKeyPressed(HZ_KEY_W))
-			v3.y += m_movespeed * deltatime;
-		if (Input::IsKeyPressed(HZ_KEY_S))
 			v3.y -= m_movespeed * deltatime;
+		if (Input::IsKeyPressed(HZ_KEY_S))
+			v3.y += m_movespeed * deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_A))
 			v3.x -= m_movespeed * deltatime;
 		if (Input::IsKeyPressed(HZ_KEY_D))
 			v3.x += m_movespeed * deltatime;
 
-		//if (Input::IsKeyPressed(HZ_KEY_E))
-			//r += 60 * deltatime;
-		//if (Input::IsKeyPressed(HZ_KEY_Q))
-			//r -= 60 * deltatime;
+		if (bCanRotate)
+		{
+			if (Input::IsKeyPressed(HZ_KEY_E))
+				r += 60 * deltatime;
+			if (Input::IsKeyPressed(HZ_KEY_Q))
+				r -= 60 * deltatime;
+		}
 
 		m_Camera.SetPosition(v3);
 		m_Camera.SetRotation(r);

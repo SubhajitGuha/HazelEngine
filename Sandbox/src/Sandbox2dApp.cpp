@@ -1,9 +1,8 @@
 #define CURL_STATICLIB
+#include "hzpch.h"
 #include "Sandbox2dApp.h"
 #include "curl/curl.h"
 #include "json/json.h"
-#include <algorithm>
-#include <iostream>
 
 //#include "Hazel/Profiling.h"
 
@@ -11,9 +10,10 @@ SandBox2dApp::SandBox2dApp()
 	:Layer("Renderer2D layer"), m_camera(1366 / 768)
 {
 	//HZ_PROFILE_SCOPE("SandBox2dApp::SandBox2dApp()");
+	m_camera.bCanBeRotated(false);
 
 	m_Framebuffer = FrameBuffer::Create({ 1366,768 });
-	Renderer2D::Init();
+	//Renderer2D::Init();
 }
 
 
@@ -28,7 +28,8 @@ static size_t my_write(void* buffer, size_t size, size_t nmemb, void* param)
 void SandBox2dApp::FetchData()//fetch data from the server and push that data to the m_Points array
 {
 	m_Points.clear();
-	m_Framebuffer->UnBind();
+	Renderer2D::Init();
+
 	//get data from a server using an api key
 	//curl is used to connect to the server
 	std::string result="";
@@ -144,12 +145,12 @@ void SandBox2dApp::OnDetach()
 
 void SandBox2dApp::OnUpdate(float deltatime)
 {
-
 	m_Framebuffer->Bind();
-	RenderCommand::ClearColor({ 0.1,0.1,0.1,1 });
+	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
 
-	m_camera.OnUpdate(deltatime);
+	if (isWindowFocused)
+		m_camera.OnUpdate(deltatime);
 
 	//draw lines at cursor tip
 	//use y= mx+c 
@@ -228,9 +229,8 @@ void SandBox2dApp::OnImGuiRender()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));//to remove the borders
 
 	ImGui::Begin("Viewport",NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-
+		isWindowFocused = ImGui::IsWindowFocused();
 		window_pos = *(glm::vec2*)&ImGui::GetWindowPos();
-
 	ImVec2 Size = ImGui::GetContentRegionAvail();
 	if (m_ViewportSize != *(glm::vec2*)&Size)
 	{
@@ -295,35 +295,48 @@ void SandBox2dApp::OnImGuiRender()
 	{
 		ChangeInterval(APIInterval::_WEEKLY);
 		FetchData();
+		HAZEL_CORE_ERROR(m_Points.size());
 	}
 	if (ImGui::Button("MONTHLY", { 150,20 }))
 	{
 		ChangeInterval(APIInterval::_MONTHLY);
 		FetchData();
-		//HAZEL_CORE_ERROR(m_Points[m_Points.size() - 1].x);
+		HAZEL_CORE_ERROR(m_Points.size());
 	}
 	if (ImGui::Button("DAILY", { 150,20 }))
 	{
 		ChangeInterval(APIInterval::_DAILY);
 		FetchData();
+		HAZEL_CORE_ERROR(m_Points.size());
+
 	}
 	ImGui::InputText("Company", &CompanyName[0], 200);
 	if (ImGui::Button("APPLY", { 150,20 }))
 	{
+		//std::thread t(std::mem_fn(&SandBox2dApp::FetchData), this);
+		//t.join();
 		FetchData();
 	}
+	ImGui::End();
+
+	ImGui::Begin("Graph color");
+	ImGui::ColorPicker4("PickColor", (float*)&color);
 	ImGui::End();
 
 }
 
 void SandBox2dApp::OnEvent(Event& e)
 {
+	if (isWindowFocused)
+	{
 		m_camera.OnEvent(e);
 		EventDispatcher dispatch(e);
-		dispatch.Dispatch<MouseScrollEvent>([&](MouseScrollEvent e) {
+		dispatch.Dispatch<MouseButtonPressed>([&](MouseButtonPressed e) {
+			if(e.GetMouseButton() == HZ_MOUSE_BUTTON_2)
 			MoveCameraToNearestPoint();
 			return true;
 			});
+	}
 }
 
 glm::vec2 SandBox2dApp::normalize_data(const glm::vec2& arr_ele, const int& index)//this function gives the normalized finance data (using min-max normalization)
@@ -347,7 +360,7 @@ void SandBox2dApp::drawCurve()
 		return vel;
 	};
 
-	glm::vec2 tmp_point = { -1,0 }, tmp_vel = velocity({-2,0}, normalize_data(m_Points[0], 0), factor);
+	glm::vec2 tmp_point = { -1.0f,0.0f }, tmp_vel = velocity({-2.0f,0.0f}, normalize_data(m_Points[0], 0.0f), factor);
 	//draw the curves from the coordinates of the array m_Points
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
 	{
@@ -355,12 +368,12 @@ void SandBox2dApp::drawCurve()
 		{
 			auto x = velocity(tmp_point, normalize_data(m_Points[i + 1],i+1), factor);
 			if(tmp_point.x>0)
-			Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i],i), tmp_vel, x, { 1,0.8,0,1 });//drawing a hermitian curve
+			Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i],i), tmp_vel, x, color);//drawing a hermitian curve
 			tmp_point = normalize_data(m_Points[i],i);
 			tmp_vel = x;
-			//Renderer2D::DrawLine(glm::vec3(normalize_data(m_Points[i], i), 0), glm::vec3(normalize_data(m_Points[i+1], i + 1), 0), { 1,0.8,0,1 });
+			//Renderer2D::DrawLine(glm::vec3(normalize_data(m_Points[i], i), 0), glm::vec3(normalize_data(m_Points[i+1], i + 1), 0), color);
 		}
-		Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel, { 1,0.8,0,1 });
+		Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
 	Renderer2D::LineEndScene();
 	}
 

@@ -39,7 +39,7 @@ namespace Hazel {
 	};
 
 	struct Renderer2DStorage {
-		int maxQuads = 1000000;
+		int maxQuads = 21000;
 		int NumIndices = maxQuads * 6;
 		int NumVertices = maxQuads * 4;
 		
@@ -62,7 +62,8 @@ namespace Hazel {
 	void Renderer2D::Init()
 	{
 		m_data = new Renderer2DStorage;
-		
+
+
 		//initilize the vertex buffer data and index buffer data
 		m_data->Quad.resize(m_data->NumVertices*4, { glm::vec4(0.0),glm::vec2(0.0),glm::vec4(0.0) });
 		m_data->Line.resize(m_data->maxQuads*2);//allocate space for the vertices that will draw the line
@@ -208,7 +209,7 @@ namespace Hazel {
 		glLineWidth(width);
 		//glColor4f(0, 1, 0, 1);
 	}
-	void Renderer2D::DrawCurve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& v0, const glm::vec2& v1 , const glm::vec4& color)
+	void Renderer2D::DrawCurve(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& v0, const glm::vec2& v1 , const glm::vec4& color,float width)
 	{
 		//hermite curve implementation best for joining points in a smooth manner
 		glm::vec2 p;
@@ -216,7 +217,7 @@ namespace Hazel {
 
 		for (int i = 1; i <= 10; i++)//iterating the value of t
 		{
-			double t = ( double)i / 10.0;
+			float t = ( float)i / 10.0;
 			p.x = p0.x +
 				t * v0.x +
 				t * t * (-3 * p0.x - 2 * v0.x + 3 * p1.x - v1.x) +
@@ -225,7 +226,7 @@ namespace Hazel {
 				t * v0.y +
 				t * t * (-3 * p0.y - 2 * v0.y + 3 * p1.y - v1.y) +
 				t * t * t * (2 * p0.y + v0.y - 2 * p1.y + v1.y);
-			Renderer2D::DrawLine(tmp, glm::vec3(p, 0.0f), color);
+			Renderer2D::DrawLine(tmp, glm::vec3(p, 0.0f), color, width);
 			tmp = glm::vec3(p, 0);
 		}
 		
