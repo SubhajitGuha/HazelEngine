@@ -5,12 +5,19 @@
 #define WEEKLY "Weekly Time Series"
 #define MONTHLY "Monthly Time Series"
 #define DAILY "Time Series (Daily)"
+//#define INTRADAY "Time Series (60min)"
 using namespace Hazel;
 
 enum APIInterval {
 	_WEEKLY,
 	_MONTHLY,
-	_DAILY
+	_DAILY,
+	_INTRADAY
+};
+
+struct TradingVal {
+	 std::string xLabel;
+	 std::string open , close, high, low, volume;
 };
 
 //Trading software build client side
@@ -28,18 +35,26 @@ private:
 	glm::vec2 m_ViewportSize = { 0,0 };
 	
 	std::vector<glm::vec2> m_Points;
+	std::vector<TradingVal> val;
 	glm::vec2 window_pos = {0,0};
+	glm::vec2 Window_Size = { -1,-1 };
 	glm::vec2 tmp_MousePos = { -1000,-1000 };
+	std::pair<std::string, std::string> MousePos_Label;
 	glm::vec4 color = { 1,0.462,0,1 };
 
 	std::string DataInterval = "TIME_SERIES_WEEKLY",interval=WEEKLY;
 
-	std::string CompanyName="IBM";//default
+	std::string CompanyName="AMD";//default
+	std::string tmp_string = "";//used in Draw_X_axis_Label function
+
+	APIInterval ApiInterval = APIInterval::_WEEKLY;//used in x-axis labeling
 	float factor = 0.2;
 	float max_val = INT_MIN, min_val = INT_MAX;
 	int coordinate_scale = 1;
 	int UpscaledValue = 100; // this variable is used for scaling the normalized-finance data values
 	int NumPoints = 1000;
+	int SkipCoordinate = 0;//used to skip coordinate label 
+	int interval_in_min = 15;
 	bool isFetchingData = false;
 	bool isWindowFocused = false;
 
@@ -52,8 +67,10 @@ private:
 
 private:
 	glm::vec2 normalize_data(const glm::vec2& arr_ele, const int& index);
+	glm::vec2 ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm::vec2& ViewportSize);
 	void drawCurve();
 	void FetchData();
 	void MoveCameraToNearestPoint();
 	void ChangeInterval(APIInterval apiinterval);
+	void Draw_X_axis_Label(ImDrawList* draw_list);
 };

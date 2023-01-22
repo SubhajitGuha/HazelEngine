@@ -45,7 +45,8 @@ namespace Hazel {
 	}
 	bool OrthographicCameraController::ZoomEvent(MouseScrollEvent& e)
 	{
-		m_ZoomLevel += e.GetYOffset();
+		m_ZoomLevel = std::clamp(m_ZoomLevel - e.GetYOffset(), 1.0f, 30.0f);
+		
 		m_Camera.SetOrthographicProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 		return false;
 	}

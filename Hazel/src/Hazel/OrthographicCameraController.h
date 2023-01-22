@@ -20,6 +20,7 @@ namespace Hazel {
 			return val;
 		}
 		inline void SetCameraSpeed(const float& val) { m_movespeed = val; }
+		inline float GetZoomLevel() { return m_ZoomLevel; }
 	private:
 		bool ZoomEvent(MouseScrollEvent& e);
 		bool WindowResize(WindowResizeEvent& e);

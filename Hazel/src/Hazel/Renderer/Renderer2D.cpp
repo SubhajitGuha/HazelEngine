@@ -63,7 +63,6 @@ namespace Hazel {
 	{
 		m_data = new Renderer2DStorage;
 
-
 		//initilize the vertex buffer data and index buffer data
 		m_data->Quad.resize(m_data->NumVertices*4, { glm::vec4(0.0),glm::vec2(0.0),glm::vec4(0.0) });
 		m_data->Line.resize(m_data->maxQuads*2);//allocate space for the vertices that will draw the line

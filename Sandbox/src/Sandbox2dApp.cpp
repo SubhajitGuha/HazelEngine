@@ -28,6 +28,7 @@ static size_t my_write(void* buffer, size_t size, size_t nmemb, void* param)
 void SandBox2dApp::FetchData()//fetch data from the server and push that data to the m_Points array
 {
 	m_Points.clear();
+	val.clear();
 	Renderer2D::Init();
 
 	//get data from a server using an api key
@@ -35,7 +36,7 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 	std::string result="";
 	CURL* curl;
 	CURLcode res;
-	std::string api = "https://www.alphavantage.co/query?function=" + DataInterval + "&symbol=" + CompanyName + "&apikey=4NT07D3RF1DRQBSL";
+	std::string api = "https://www.alphavantage.co/query?function=" + DataInterval + "&symbol=" + CompanyName + "&outputsize=full&interval="+std::to_string(interval_in_min)+"min&apikey=4NT07D3RF1DRQBSL";
 	curl = curl_easy_init();
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, api.c_str());
@@ -56,23 +57,27 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 	if (jsonReader.parse(result, jsonData)) 
 	{
 		uint32_t JsonSize = jsonData[interval].size();
-		//the "Weekly Time Series" needs to be a variable that needs to be changed according to the value of "function" in the api call
+
 		for (auto it = jsonData[interval].begin(); it != jsonData[interval].end(); it++)
 		{
 
 			std::string Xstring = it.name();
-			std::remove(Xstring.begin(), Xstring.end(), '-');
-			float x = std::stof(Xstring.substr(0, Xstring.size() - 2));
-			float y = std::stof(jsonData[interval][it.name()]["2. high"].asString());
+			float x =0;
+			float y = std::stof(jsonData[interval][it.name()]["4. close"].asString());
 			if (y > max_val)
 				max_val = y;
 			if (y < min_val)
 				min_val = y;
 			m_Points.push_back({ x,-y });//pushing the data onto the array
+			TradingVal value = {Xstring,jsonData[interval][it.name()]["1. open"].asString(), jsonData[interval][it.name()]["4. close"].asString(),
+			jsonData[interval][it.name()]["2. high"].asString(),jsonData[interval][it.name()]["3. low"].asString(),
+			jsonData[interval][it.name()]["5. volume"].asString() };
+			val.push_back(value);
 		}
 		if (JsonSize > NumPoints)
 		{
 			m_Points.erase(m_Points.begin(), m_Points.end() - NumPoints);
+			val.erase(val.begin(), val.end() - NumPoints);
 		}
 	}
 	m_camera.SetCameraPosition({ normalize_data(m_Points[m_Points.size() - 1],m_Points.size() - 1),0 });
@@ -115,6 +120,7 @@ void SandBox2dApp::MoveCameraToNearestPoint()
 
 void SandBox2dApp::ChangeInterval(APIInterval apiinterval)
 {
+	ApiInterval = apiinterval;
 	switch (apiinterval)
 	{
 	case APIInterval::_WEEKLY:
@@ -129,9 +135,93 @@ void SandBox2dApp::ChangeInterval(APIInterval apiinterval)
 		DataInterval = "TIME_SERIES_DAILY_ADJUSTED";
 		interval = DAILY;
 		return;
+	case APIInterval::_INTRADAY:
+		DataInterval = "TIME_SERIES_INTRADAY";
+		interval = "Time Series (" + std::to_string(interval_in_min) + "min)";
+		return;
 	}
 }
 
+
+void SandBox2dApp::Draw_X_axis_Label(ImDrawList* draw_list)
+{
+	auto GetMonthNames = [=](std::string date) {
+		int monthNum = stoi(date.substr(5, 7));
+		switch (monthNum) {
+		case 1:
+			return "Jan" + date.substr(7);
+		case 2:
+			return "Feb" + date.substr(7);
+		case 3:
+			return "Mar" + date.substr(7);
+		case 4:
+			return "Apr" + date.substr(7);
+		case 5:
+			return "May" + date.substr(7);
+		case 6:
+			return "Jun" + date.substr(7);
+		case 7:
+			return "Jul" + date.substr(7);
+		case 8:
+			return "Aug" + date.substr(7);
+		case 9:
+			return "Sep" + date.substr(7);
+		case 10:
+			return "Oct" + date.substr(7);
+		case 11:
+			return "Nov" + date.substr(7);
+		case 12:
+			return "Dec" + date.substr(7);
+		}
+	};
+
+	for (int i = 0; i < m_Points.size(); i+=SkipCoordinate+ coordinate_scale) {
+		glm::vec4 worldPos = { i - m_camera.GetPosition().x ,0,0,0 };//it is the openGl coordinate
+		auto Screen_coord = ConvertToScreenCoordinate(worldPos, Window_Size);//convert opengl coordinate to screen coordinate(i.e 1366,720)
+
+		auto label = val[i].xLabel;
+		switch (ApiInterval)
+		{
+		case APIInterval::_WEEKLY :
+		case APIInterval::_MONTHLY :
+		case APIInterval::_DAILY:
+			if (label.substr(0, 4) != tmp_string.substr(0, 4))
+			{
+				auto sublabel = label.substr(0, 4);
+				draw_list->AddText({ Screen_coord.x,Screen_coord.y + 300 }, IM_COL32(0, 225, 255, 230), &sublabel[0]);
+				tmp_string = label;
+			}
+			else
+			{
+				auto sublabel = GetMonthNames(label);
+				draw_list->AddText({ Screen_coord.x,Screen_coord.y + 300 }, IM_COL32(0, 255, 0, 230), &sublabel[0]);
+			}
+			break;
+		case APIInterval::_INTRADAY:
+			if (label.substr(0, 10) != tmp_string.substr(0, 10))
+			{
+				auto sublabel = label.substr(0, 4);
+				draw_list->AddText({ Screen_coord.x,Screen_coord.y + 320 }, IM_COL32(0, 225, 255, 230), &label[0]);
+				tmp_string = label;
+			}
+			else
+			{
+				auto sublabel = label.substr(10);
+				draw_list->AddText({ Screen_coord.x,Screen_coord.y + 300 }, IM_COL32(0, 255, 0, 230), &sublabel[0]);
+			}
+			break;
+		}
+	}
+	
+}
+
+glm::vec2 SandBox2dApp::ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm::vec2& ViewportSize) //this function converts opengl coordinate to screen coordinate
+{
+	OGlCoordinate = OGlCoordinate * m_camera.GetCamera().GetProjectionViewMatix();
+	float x = (OGlCoordinate.x + 1) * ViewportSize.x * 0.5 + window_pos.x;//transforming into window coordinate
+	float y = (OGlCoordinate.y + 1) * ViewportSize.y * 0.5 + window_pos.y;
+	return glm::vec2(x, y);
+};
 
 void SandBox2dApp::OnAttach()
 {
@@ -141,6 +231,7 @@ void SandBox2dApp::OnAttach()
 void SandBox2dApp::OnDetach()
 {
 	delete[] & m_Points[0];
+	delete[] & val[0];
 }
 
 void SandBox2dApp::OnUpdate(float deltatime)
@@ -169,9 +260,10 @@ void SandBox2dApp::OnUpdate(float deltatime)
 		for (int i=0;i<m_Points.size();i++)
 		{
 			auto actualcoord = m_camera.GetCamera().GetProjectionViewMatix() * glm::vec4(m_Points[i], 1.0, 1.0);
-			if (CheckPointInRadius(normalize_data(m_Points[i],i), worldPos, 2)) {
+			if (CheckPointInRadius(normalize_data(m_Points[i],i), worldPos, 1)) {
 				Renderer2D::DrawLine({ -100000 ,normalize_data(m_Points[i],i).y,0 }, { 100000,normalize_data(m_Points[i],i).y,0 }, { 1,1,1,0.9 }, 1.5);//kind a works
-				tmp_MousePos = m_Points[i];
+				tmp_MousePos = { i,m_Points[i].y };
+				MousePos_Label = { val[i].xLabel,val[i].close };//for drawing the mouse coordinates
 				break;
 			}
 			else
@@ -211,18 +303,9 @@ void SandBox2dApp::OnUpdate(float deltatime)
 
 void SandBox2dApp::OnImGuiRender()
 {
-	auto ConvertToScreenCoordinate = [&](glm::vec4& OGlCoordinate,glm::vec2& ViewportSize) //this function converts opengl coordinate to screen coordinate
-	{
-		OGlCoordinate = OGlCoordinate * m_camera.GetCamera().GetProjectionViewMatix();
-		float x = (OGlCoordinate.x + 1) * ViewportSize.x * 0.5 + window_pos.x;//transforming into window coordinate
-		float y = (OGlCoordinate.y + 1) * ViewportSize.y * 0.5 + window_pos.y;
-		return glm::vec2(x, y);
-	};
-
-
 	//HZ_PROFILE_SCOPE("ImGUI RENDER");
 	ImGui::DockSpaceOverViewport();
-
+	
 	ImGuiIO& io = ImGui::GetIO();
 	ImVec2 displaySize = io.DisplaySize;
 	
@@ -231,6 +314,7 @@ void SandBox2dApp::OnImGuiRender()
 	ImGui::Begin("Viewport",NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 		isWindowFocused = ImGui::IsWindowFocused();
 		window_pos = *(glm::vec2*)&ImGui::GetWindowPos();
+
 	ImVec2 Size = ImGui::GetContentRegionAvail();
 	if (m_ViewportSize != *(glm::vec2*)&Size)
 	{
@@ -245,21 +329,15 @@ void SandBox2dApp::OnImGuiRender()
 	// get the ImDrawList for the current window
 	ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-	auto Window_Size = RenderCommand::GetViewportSize();
+	Window_Size = RenderCommand::GetViewportSize();
 
 	//the labeling must be modified so that it can show all intervals like(1min,1hr,1mo,1yr)
 	//x-axis coordinate label
-	for (int i = 0; i < m_Points.size()+50; i+=coordinate_scale)
-	{
-		glm::vec4 worldPos = { i - m_camera.GetPosition().x ,0,0,0 };//it is the openGl coordinate
-		auto Screen_coord = ConvertToScreenCoordinate(worldPos, Window_Size);//convert opengl coordinate to screen coordinate(i.e 1366,720)
-		auto label = std::to_string(i);
-		draw_list->AddText({ Screen_coord.x,Screen_coord.y+300 }, IM_COL32(0,255,0,230), &label[0]);
-	}
+	Draw_X_axis_Label(draw_list);
 
 	//y-axis coordinate label
 	//FINAL ADJUSTMENT...
-	for (int i = 0; i < UpscaledValue * coordinate_scale; i += coordinate_scale)
+	for (int i = 0; i < UpscaledValue * coordinate_scale; i += coordinate_scale+SkipCoordinate)
 	{
 		auto deNormalize = [=](const int& n) //de Normalize the finance data
 		{
@@ -276,13 +354,10 @@ void SandBox2dApp::OnImGuiRender()
 		if (tmp_MousePos.x > -1000)
 		{
 			auto Pos_Mouse = io.MousePos;
-			std::string label_x = std::to_string((int)tmp_MousePos.x);//eg 20011225 --> 2001/12/25
-			label_x.insert(label_x.begin() + 4, '/');
-			label_x.insert(label_x.begin() + 7, '/');
-			draw_list->AddText({ Pos_Mouse.x + 15,Pos_Mouse.y + 15 }, IM_COL32(255, 255, 255, 255), &label_x[0]);//slight offset is given
-			std::string label_y = " , " + std::to_string(-tmp_MousePos.y);
-
-			draw_list->AddText({ Pos_Mouse.x + 90,Pos_Mouse.y + 15 }, IM_COL32(255, 255, 255, 255), &label_y[0]);
+			std::string label_x = MousePos_Label.first;
+			draw_list->AddText({ Pos_Mouse.x + 15,Pos_Mouse.y + 50 }, IM_COL32(255, 255, 255, 255), &label_x[0]);//slight offset is given
+			std::string label_y = " , "+ MousePos_Label.second;
+			draw_list->AddText({ Pos_Mouse.x + label_x.size() * 10 ,Pos_Mouse.y +50 }, IM_COL32(255, 255, 255, 255), &label_y[0]);
 		}
 
 	ImGui::End();
@@ -310,6 +385,24 @@ void SandBox2dApp::OnImGuiRender()
 		HAZEL_CORE_ERROR(m_Points.size());
 
 	}
+	if (ImGui::Button("5min Interval", { 150,20 }))
+	{
+		interval_in_min = 5;
+		ChangeInterval(APIInterval::_INTRADAY);
+		FetchData();
+	}
+	if (ImGui::Button("15min Interval", { 150,20 }))
+	{
+		interval_in_min = 15;
+		ChangeInterval(APIInterval::_INTRADAY);
+		FetchData();
+	}
+	if (ImGui::Button("1hr Interval", { 150,20 }))
+	{
+		interval_in_min = 60;
+		ChangeInterval(APIInterval::_INTRADAY);
+		FetchData();
+	}
 	ImGui::InputText("Company", &CompanyName[0], 200);
 	if (ImGui::Button("APPLY", { 150,20 }))
 	{
@@ -317,12 +410,36 @@ void SandBox2dApp::OnImGuiRender()
 		//t.join();
 		FetchData();
 	}
+
 	ImGui::End();
 
 	ImGui::Begin("Graph color");
 	ImGui::ColorPicker4("PickColor", (float*)&color);
 	ImGui::End();
 
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.7f);
+
+	//ImGui::SetNextWindowPos({ 1000,20});
+	ImGui::Begin("Values");
+	ImGui::TextColored(*(ImVec4*)&color, CompanyName.c_str());
+	if (tmp_MousePos.x > -1000)
+	{
+		int i = tmp_MousePos.x;
+		std::string date = "Date : " + val[i].xLabel;
+		ImGui::TextColored(*(ImVec4*)&color,date.c_str());
+		std::string open = "Open : " + val[i].open;
+		ImGui::TextColored(*(ImVec4*)&color, open.c_str());
+		std::string high = "High : " + val[i].high;
+		ImGui::TextColored(*(ImVec4*)&color, high.c_str());
+		std::string low = "Low : " + val[i].low;
+		ImGui::TextColored(*(ImVec4*)&color, low.c_str());
+		std::string close = "Close : " + val[i].close;
+		ImGui::TextColored(*(ImVec4*)&color, close.c_str());
+		std::string volume = "volume : " + val[i].volume;
+		ImGui::TextColored(*(ImVec4*)&color, volume.c_str());
+	}
+	ImGui::End();
 }
 
 void SandBox2dApp::OnEvent(Event& e)
@@ -336,6 +453,20 @@ void SandBox2dApp::OnEvent(Event& e)
 			MoveCameraToNearestPoint();
 			return true;
 			});
+		dispatch.Dispatch<MouseScrollEvent>([&](MouseScrollEvent e) {
+			auto zoom = m_camera.GetZoomLevel();
+			if (coordinate_scale > 1)
+			{
+				SkipCoordinate = 0;
+				return true;
+			}
+			if (zoom > 6 && zoom <= 20)
+				SkipCoordinate = 2;
+			else if (zoom > 20)
+				SkipCoordinate = 4;
+			else
+				SkipCoordinate = 0;
+			return true; });
 	}
 }
 
@@ -366,14 +497,18 @@ void SandBox2dApp::drawCurve()
 	{
 		for (int i = 0; i < m_Points.size() - 1; i++)
 		{
-			auto x = velocity(tmp_point, normalize_data(m_Points[i + 1],i+1), factor);
-			if(tmp_point.x>0)
-			Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i],i), tmp_vel, x, color);//drawing a hermitian curve
-			tmp_point = normalize_data(m_Points[i],i);
-			tmp_vel = x;
-			//Renderer2D::DrawLine(glm::vec3(normalize_data(m_Points[i], i), 0), glm::vec3(normalize_data(m_Points[i+1], i + 1), 0), color);
+			if (factor == 0)
+				Renderer2D::DrawLine(glm::vec3(normalize_data(m_Points[i], i), 0), glm::vec3(normalize_data(m_Points[i + 1], i + 1), 0), color);
+			else {
+				auto x = velocity(tmp_point, normalize_data(m_Points[i + 1],i+1), factor);
+				if(tmp_point.x>0)
+				Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i],i), tmp_vel, x, color);//drawing a hermitian curve
+				tmp_point = normalize_data(m_Points[i],i);
+				tmp_vel = x;
+			}
 		}
-		Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
+		if(factor>0)
+			Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
 	Renderer2D::LineEndScene();
 	}
 
