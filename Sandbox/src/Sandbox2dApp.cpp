@@ -96,26 +96,7 @@ auto CheckPointInRadius = [&](const glm::vec2& p1, const glm::vec2& p2, float ra
 
 void SandBox2dApp::MoveCameraToNearestPoint()
 {
-	auto CalculateDistance = [&](const glm::vec2& p1 , const glm::vec2& p2) {
-		float tmp;
-		tmp = sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
-		return tmp;
-	};
-
-	float dist;
-	glm::vec3 CamPos = m_camera.GetPosition();
-	glm::vec2 MoveToPos=normalize_data(m_Points[m_Points.size()-1],m_Points.size()-1);
-	for (int i = m_Points.size() - 1; i >= 0; i--)
-	{
-		glm::vec2 point = normalize_data(m_Points[i], i);
-		if (CheckPointInRadius({ CamPos.x,CamPos.y }, point, 50))
-		{
-			MoveToPos = point;
-			break;
-		}
-
-	}
-	m_camera.SetCameraPosition(glm::vec3(m_camera.GetPosition().x,MoveToPos.y, 0));
+	m_camera.SetCameraPosition(glm::vec3(PointOnTheGraph.x, PointOnTheGraph.y, 0));//move the camera to the pont on the curve
 }
 
 void SandBox2dApp::ChangeInterval(APIInterval apiinterval)
@@ -256,7 +237,8 @@ void SandBox2dApp::OnUpdate(float deltatime)
 		glm::vec4 screenPos = glm::vec4((MousePos.first - window_pos.x) / (Window_Size.x * 0.5) - 1.0, MousePos.second / (Window_Size.y * 0.5) - 1.0, 1.0f, 1.0f);
 		glm::vec4 worldPos = invVP * screenPos;//converted mouse pos to opengl position
 
-		auto getNearestPointToCursor = [&]() {
+		auto getNearestPointToCursor = [&]() //this lamda returns a point on the graph that is nearest to the mouse position(in opengl coordinate)
+		{
 			float minDist = INT_MAX;
 			glm::vec2 minpoint = { -1,-1 };
 			for (int i = 0; i < m_Points.size(); i++)
@@ -273,9 +255,9 @@ void SandBox2dApp::OnUpdate(float deltatime)
 			return normalize_data(minpoint, minpoint.x);
 		};
 
-		glm::vec2 Coord_points = getNearestPointToCursor();
-		Renderer2D::DrawLine({ Coord_points.x,-1000,0 }, { Coord_points.x,1000,0 }, { 1,1,1,0.9 }, 1.5);
-		Renderer2D::DrawLine({ -10000 ,Coord_points.y,0 }, { 10000,Coord_points.y,0 }, { 1,1,1,0.9 }, 1.5);
+		PointOnTheGraph = getNearestPointToCursor();
+		Renderer2D::DrawLine({ PointOnTheGraph.x,-1000,0 }, { PointOnTheGraph.x,1000,0 }, { 1,1,1,0.9 }, 1.5);
+		Renderer2D::DrawLine({ -10000 ,PointOnTheGraph.y,0 }, { 10000,PointOnTheGraph.y,0 }, { 1,1,1,0.9 }, 1.5);
 
 	}
 	Renderer2D::LineEndScene();
@@ -285,7 +267,7 @@ void SandBox2dApp::OnUpdate(float deltatime)
 	//draw the x-axises
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
 	{
-		for (int i = 0; i < m_Points.size() ; i += coordinate_scale)
+		for (int i = 0; i < m_Points.size() + 50 ; i += coordinate_scale)
 			Renderer2D::DrawLine({ i,-1000.0f+m_camera.GetPosition().y,0 }, { i,1000.0f+ m_camera.GetPosition().y,0 }, { 1,1,1,0.2 }, 1);
 	}
 	Renderer2D::LineEndScene();
@@ -353,7 +335,7 @@ void SandBox2dApp::OnImGuiRender()
 		glm::vec4 worldPos = { 0 ,-i - m_camera.GetPosition().y,0,0 };//it is the openGl coordinate
 		auto Screen_coord = ConvertToScreenCoordinate(worldPos, Window_Size);//convert opengl coordinate to screen coordinate(i.e 1366,720)
 		auto label = std::to_string(deNormalize(i));//invert the y-axis
-		draw_list->AddText({ Screen_coord.x-500,Screen_coord.y }, IM_COL32(255, 0, 0, 230), &label[0]);
+		draw_list->AddText({ Screen_coord.x-500,Screen_coord.y }, IM_COL32(239, 0, 255, 230), &label[0]);
 	}
 
 	//rendering the coordinates of the mouse cursor (m_Points[tmp_MousePos.x])
@@ -505,20 +487,21 @@ void SandBox2dApp::drawCurve()
 	//draw the curves from the coordinates of the array m_Points
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
 	{
-		for (int i = 0; i < m_Points.size() - 1; i++)
-		{
-			//if (factor == 0)
+		if (factor == 0)//if factor is ==0 no need to draw curved lines 
+			for (int i = 0; i < m_Points.size() - 1; i++)
 				Renderer2D::DrawLine(glm::vec3(normalize_data(m_Points[i], i), 0), glm::vec3(normalize_data(m_Points[i + 1], i + 1), 0), color);
-			//else {
-			//	auto x = velocity(tmp_point, normalize_data(m_Points[i + 1],i+1), factor);
-			//	if(tmp_point.x>0)
-			//	Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i],i), tmp_vel, x, color);//drawing a hermitian curve
-			//	tmp_point = normalize_data(m_Points[i],i);
-			//	tmp_vel = x;
-			//}
+		
+		else {
+			for (int i = 0; i < m_Points.size() - 1; i++) 
+			{
+				auto x = velocity(tmp_point, normalize_data(m_Points[i + 1], i + 1), factor);
+				if (tmp_point.x > 0)
+				Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i], i), tmp_vel, x, color);//drawing a hermitian curve
+				tmp_point = normalize_data(m_Points[i], i);
+				tmp_vel = x;
+			}
+			Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
 		}
-		//if(factor>0)
-			//Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
 	Renderer2D::LineEndScene();
 	}
 

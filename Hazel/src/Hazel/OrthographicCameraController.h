@@ -31,7 +31,7 @@ namespace Hazel {
 
 		glm::vec3 v3 = { 0,0,0 };
 
-		float m_movespeed = 100;
+		float m_movespeed = 80;
 		float r = 0;
 		bool bCanRotate = true;
 	};

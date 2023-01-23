@@ -39,6 +39,7 @@ private:
 	glm::vec2 window_pos = {0,0};
 	glm::vec2 Window_Size = { -1,-1 };
 	glm::vec2 tmp_MousePos = { -1000,-1000 };
+	glm::vec2 PointOnTheGraph;//stores the values of the point on the graph
 	std::pair<std::string, std::string> MousePos_Label;
 	glm::vec4 color = { 1,0.462,0,1 };
 
@@ -53,7 +54,7 @@ private:
 	int coordinate_scale = 1;
 	int UpscaledValue = 100; // this variable is used for scaling the normalized-finance data values
 	int NumPoints = 1000;
-	int SkipCoordinate = 0;//used to skip coordinate label 
+	int SkipCoordinate = 0;//used to skip coordinate label
 	int interval_in_min = 15;
 	bool isFetchingData = false;
 	bool isWindowFocused = false;
