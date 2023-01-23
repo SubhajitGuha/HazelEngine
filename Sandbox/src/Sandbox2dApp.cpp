@@ -145,7 +145,7 @@ void SandBox2dApp::ChangeInterval(APIInterval apiinterval)
 
 void SandBox2dApp::Draw_X_axis_Label(ImDrawList* draw_list)
 {
-	auto GetMonthNames = [=](std::string date) {
+	auto GetMonthNames = [=](const std::string& date) {
 		int monthNum = stoi(date.substr(5, 7));
 		switch (monthNum) {
 		case 1:
@@ -250,27 +250,33 @@ void SandBox2dApp::OnUpdate(float deltatime)
 	{
 		auto MousePos = Input::GetCursorPosition();//get the mouse position
 		auto Window_Size = RenderCommand::GetViewportSize();//get the view port dimensions
-		glm::mat4 invVP = glm::inverse(m_camera.GetCamera().GetProjectionViewMatix());
+
+		glm::mat4 invVP = glm::inverse(m_camera.GetCamera().GetProjectionViewMatix());//inverse the view projection matrix
 		//window_pos gives the imGui viewport position
 		glm::vec4 screenPos = glm::vec4((MousePos.first - window_pos.x) / (Window_Size.x * 0.5) - 1.0, MousePos.second / (Window_Size.y * 0.5) - 1.0, 1.0f, 1.0f);
-		glm::vec4 worldPos = invVP * screenPos;
+		glm::vec4 worldPos = invVP * screenPos;//converted mouse pos to opengl position
 
-		Renderer2D::DrawLine({ worldPos.x,-1000,0 }, { worldPos.x,1000,0 }, { 1,1,1,0.9 }, 1.5);//kind a works
-
-		for (int i=0;i<m_Points.size();i++)
-		{
-			auto actualcoord = m_camera.GetCamera().GetProjectionViewMatix() * glm::vec4(m_Points[i], 1.0, 1.0);
-			if (CheckPointInRadius(normalize_data(m_Points[i],i), worldPos, 1)) {
-				Renderer2D::DrawLine({ -100000 ,normalize_data(m_Points[i],i).y,0 }, { 100000,normalize_data(m_Points[i],i).y,0 }, { 1,1,1,0.9 }, 1.5);//kind a works
-				tmp_MousePos = { i,m_Points[i].y };
-				MousePos_Label = { val[i].xLabel,val[i].close };//for drawing the mouse coordinates
-				break;
+		auto getNearestPointToCursor = [&]() {
+			float minDist = INT_MAX;
+			glm::vec2 minpoint = { -1,-1 };
+			for (int i = 0; i < m_Points.size(); i++)
+			{
+				float dist = sqrt(pow(i - worldPos.x, 2) + pow(normalize_data(m_Points[i], i).y - worldPos.y, 2));
+				if (dist < minDist)
+				{
+					minDist = dist;
+					minpoint = { i,m_Points[i].y };
+				}
 			}
-			else
-				tmp_MousePos = { -1000,-1000 };
-			//else if(i-1>0)
-				//Renderer2D::DrawLine({ -1000 ,m_Points[i-1].y,0 }, { 1000,m_Points[i-1].y,0 }, { 0.3,0.5,0.9,1 }, 1.5);
-		}
+			tmp_MousePos = { minpoint.x,m_Points[minpoint.x].y };
+			MousePos_Label = { val[minpoint.x].xLabel,val[minpoint.x].close };//for drawing the mouse coordinates
+			return normalize_data(minpoint, minpoint.x);
+		};
+
+		glm::vec2 Coord_points = getNearestPointToCursor();
+		Renderer2D::DrawLine({ Coord_points.x,-1000,0 }, { Coord_points.x,1000,0 }, { 1,1,1,0.9 }, 1.5);
+		Renderer2D::DrawLine({ -10000 ,Coord_points.y,0 }, { 10000,Coord_points.y,0 }, { 1,1,1,0.9 }, 1.5);
+
 	}
 	Renderer2D::LineEndScene();
 
@@ -279,7 +285,7 @@ void SandBox2dApp::OnUpdate(float deltatime)
 	//draw the x-axises
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
 	{
-		for (int i = 0; i < m_Points.size()+100 ; i += coordinate_scale)
+		for (int i = 0; i < m_Points.size() ; i += coordinate_scale)
 			Renderer2D::DrawLine({ i,-1000.0f+m_camera.GetPosition().y,0 }, { i,1000.0f+ m_camera.GetPosition().y,0 }, { 1,1,1,0.2 }, 1);
 	}
 	Renderer2D::LineEndScene();
@@ -422,7 +428,7 @@ void SandBox2dApp::OnImGuiRender()
 
 	//ImGui::SetNextWindowPos({ 1000,20});
 	ImGui::Begin("Values");
-	ImGui::TextColored(*(ImVec4*)&color, CompanyName.c_str());
+	ImGui::TextColored(*(ImVec4*)&color, (CompanyName + "  ("+interval+")").c_str());
 	if (tmp_MousePos.x > -1000)
 	{
 		int i = tmp_MousePos.x;
@@ -467,6 +473,10 @@ void SandBox2dApp::OnEvent(Event& e)
 			else
 				SkipCoordinate = 0;
 			return true; });
+		dispatch.Dispatch<KeyPressedEvent>([&](KeyPressedEvent e) {
+			if (e.GetKeyCode() == HZ_KEY_R)
+				m_camera.SetCameraPosition(glm::vec3(m_Points.size(),normalize_data(m_Points[m_Points.size()-1],m_Points.size() - 1).y,0));
+			return true; });
 	}
 }
 
@@ -497,18 +507,18 @@ void SandBox2dApp::drawCurve()
 	{
 		for (int i = 0; i < m_Points.size() - 1; i++)
 		{
-			if (factor == 0)
+			//if (factor == 0)
 				Renderer2D::DrawLine(glm::vec3(normalize_data(m_Points[i], i), 0), glm::vec3(normalize_data(m_Points[i + 1], i + 1), 0), color);
-			else {
-				auto x = velocity(tmp_point, normalize_data(m_Points[i + 1],i+1), factor);
-				if(tmp_point.x>0)
-				Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i],i), tmp_vel, x, color);//drawing a hermitian curve
-				tmp_point = normalize_data(m_Points[i],i);
-				tmp_vel = x;
-			}
+			//else {
+			//	auto x = velocity(tmp_point, normalize_data(m_Points[i + 1],i+1), factor);
+			//	if(tmp_point.x>0)
+			//	Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i],i), tmp_vel, x, color);//drawing a hermitian curve
+			//	tmp_point = normalize_data(m_Points[i],i);
+			//	tmp_vel = x;
+			//}
 		}
-		if(factor>0)
-			Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
+		//if(factor>0)
+			//Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
 	Renderer2D::LineEndScene();
 	}
 
