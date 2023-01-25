@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\ImGuiInputText.h" />
     <ClInclude Include="src\Sandbox2dApp.h" />
   </ItemGroup>
   <ItemGroup>

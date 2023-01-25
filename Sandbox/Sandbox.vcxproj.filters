@@ -15,6 +15,7 @@
     <ClInclude Include="src\Sandbox2dApp.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\ImGuiInputText.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sandbox2dApp.cpp">

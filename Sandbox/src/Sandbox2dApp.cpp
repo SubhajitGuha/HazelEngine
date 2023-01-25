@@ -1,11 +1,11 @@
 #define CURL_STATICLIB
 #include "hzpch.h"
 #include "Sandbox2dApp.h"
+#include"ImGuiInputText.h"
 #include "curl/curl.h"
 #include "json/json.h"
 
 //#include "Hazel/Profiling.h"
-
 SandBox2dApp::SandBox2dApp()
 	:Layer("Renderer2D layer"), m_camera(1366 / 768)
 {
@@ -15,7 +15,6 @@ SandBox2dApp::SandBox2dApp()
 	m_Framebuffer = FrameBuffer::Create({ 1366,768 });
 	//Renderer2D::Init();
 }
-
 
 static size_t my_write(void* buffer, size_t size, size_t nmemb, void* param)
 {
@@ -50,7 +49,7 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 		}
 	}
 	curl_global_cleanup();
-	std::cout << result << "\n\n";
+	//std::cout << result << "\n\n";
 	Json::Value jsonData;//json file parser
 	Json::Reader jsonReader;
 
@@ -80,8 +79,66 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 			val.erase(val.begin(), val.end() - NumPoints);
 		}
 	}
+	HAZEL_CORE_ERROR(val.size());
 	m_camera.SetCameraPosition({ normalize_data(m_Points[m_Points.size() - 1],m_Points.size() - 1),0 });
 }
+
+
+size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
+	size_t written = fwrite(ptr, size, nmemb, stream);
+	return written;
+}
+
+//this func is used in multi threading environment
+void SandBox2dApp::AutoFill(const std::string& str)//this function is used for the auto compleate searchbox logic, it connects to the server and saves the data to a json file
+{
+	std::lock_guard<std::mutex> lock(m);//mutex which helps in synchronization of the processes when 2 or more thread tries to access the shared code
+	suggestions.clear();
+	CompanyDescription.clear();
+
+	HAZEL_CORE_WARN(str);
+	CURL* curl;
+	CURLcode res;
+	FILE* fp;
+	std::string api = "https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=" + str + "&apikey=4NT07D3RF1DRQBSL&datatype=json";
+	char outfilename[FILENAME_MAX] = "data.json";
+	curl = curl_easy_init();
+	if (curl) {
+		fp = fopen(outfilename, "wb");
+		curl_easy_setopt(curl, CURLOPT_URL, api.c_str());
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+		res = curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
+		if (CURLE_OK != res) {
+			std::cerr << "CURL error: " << res << '\n';
+		}
+		fclose(fp);
+	}
+	curl_global_cleanup();
+	std::ifstream file("data.json");
+	Json::Value jsondata;
+	Json::Reader jsonreader;
+	if (jsonreader.parse(file, jsondata))
+	{
+		if (jsondata["bestMatches"].begin() == jsondata["bestMatches"].end())
+		{
+			suggestions.push_back("No Matches Found");
+			return;
+		}
+		for (auto it = jsondata["bestMatches"].begin(); it != jsondata["bestMatches"].end(); it++) {
+			suggestions.push_back(it->begin()->asString());
+			std::string tmp = "";
+			for (auto i = it->begin(); i != it->end(); i++)
+				tmp += i.name()+" : " + i->asString() + "\n";
+			CompanyDescription.push_back(tmp);
+		}
+		
+		
+		HAZEL_CORE_INFO(jsondata["bestMatches"]);
+	}
+};
 
 auto CheckPointInRadius = [&](const glm::vec2& p1, const glm::vec2& p2, float radius)
 {
@@ -258,7 +315,6 @@ void SandBox2dApp::OnUpdate(float deltatime)
 		PointOnTheGraph = getNearestPointToCursor();
 		Renderer2D::DrawLine({ PointOnTheGraph.x,-1000,0 }, { PointOnTheGraph.x,1000,0 }, { 1,1,1,0.9 }, 1.5);
 		Renderer2D::DrawLine({ -10000 ,PointOnTheGraph.y,0 }, { 10000,PointOnTheGraph.y,0 }, { 1,1,1,0.9 }, 1.5);
-
 	}
 	Renderer2D::LineEndScene();
 
@@ -345,7 +401,7 @@ void SandBox2dApp::OnImGuiRender()
 			std::string label_x = MousePos_Label.first;
 			draw_list->AddText({ Pos_Mouse.x + 15,Pos_Mouse.y + 50 }, IM_COL32(255, 255, 255, 255), &label_x[0]);//slight offset is given
 			std::string label_y = " , "+ MousePos_Label.second;
-			draw_list->AddText({ Pos_Mouse.x + label_x.size() * 10 ,Pos_Mouse.y +50 }, IM_COL32(255, 255, 255, 255), &label_y[0]);
+			draw_list->AddText({ Pos_Mouse.x + label_x.size() * 8 ,Pos_Mouse.y +50 }, IM_COL32(255, 255, 255, 255), &label_y[0]);
 		}
 
 	ImGui::End();
@@ -391,7 +447,42 @@ void SandBox2dApp::OnImGuiRender()
 		ChangeInterval(APIInterval::_INTRADAY);
 		FetchData();
 	}
-	ImGui::InputText("Company", &CompanyName[0], 200);
+	ImGuiInputTextCallback callback ;
+	if (ImGui::InputText("Company",&CompanyName))
+	{
+		//std::this_thread::sleep_for(std::chrono::seconds(2));
+		search_thread = std::thread([=]() {AutoFill(CompanyName); });
+		search_thread.detach();
+	}
+
+
+	if (suggestions.size() > 0)//draw suggestion list if suggestions vector has some values
+	{
+		const char* list[100];
+		if (suggestions.size() < 100)//just a protection
+			for (int i = 0; i < suggestions.size(); i++)
+				list[i] = suggestions[i].c_str();
+		else
+			for (int i = 0; i < 100; i++)
+				list[i] = suggestions[i].c_str();
+
+		if (ImGui::ListBox(" ", &selected_suggestion, list, suggestions.size()))
+		{
+			CompanyName = suggestions[selected_suggestion];
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGuiStyle& style = ImGui::GetStyle();
+			style.Colors[ImGuiCol_WindowBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.8f);
+			ImGui::SetNextWindowPos({ io.MousePos.x + 20,io.MousePos.y });
+			ImGui::SetNextWindowSize({ 300,200 });
+			ImGui::Begin(" ");
+			if (selected_suggestion < CompanyDescription.size())
+				ImGui::Text(CompanyDescription[selected_suggestion].c_str());
+			ImGui::End();
+		}
+	}
+
 	if (ImGui::Button("APPLY", { 150,20 }))
 	{
 		//std::thread t(std::mem_fn(&SandBox2dApp::FetchData), this);
@@ -411,7 +502,7 @@ void SandBox2dApp::OnImGuiRender()
 	//ImGui::SetNextWindowPos({ 1000,20});
 	ImGui::Begin("Values");
 	ImGui::TextColored(*(ImVec4*)&color, (CompanyName + "  ("+interval+")").c_str());
-	if (tmp_MousePos.x > -1000)
+	if (tmp_MousePos.x > -1000 && tmp_MousePos.x<val.size())//when the interval is changed the tmp_MousePos is not updated so we put a check here to resolve any unwanted errors
 	{
 		int i = tmp_MousePos.x;
 		std::string date = "Date : " + val[i].xLabel;

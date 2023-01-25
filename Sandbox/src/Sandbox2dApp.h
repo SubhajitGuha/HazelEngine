@@ -36,6 +36,10 @@ private:
 	
 	std::vector<glm::vec2> m_Points;
 	std::vector<TradingVal> val;
+	std::vector<std::string> CompanyDescription;
+	std::vector<std::string> suggestions;//array of strings that stores the auto compleate suggestions that we receive from the server
+	int selected_suggestion = 0;//stores the suggestion index that is selected in the listbox, used in Imgui::ListBox()
+
 	glm::vec2 window_pos = {0,0};
 	glm::vec2 Window_Size = { -1,-1 };
 	glm::vec2 tmp_MousePos = { -1000,-1000 };
@@ -47,6 +51,7 @@ private:
 
 	std::string CompanyName="AMD";//default
 	std::string tmp_string = "";//used in Draw_X_axis_Label function
+	std::string SearchResult = "";//contain the search result of auto search
 
 	APIInterval ApiInterval = APIInterval::_WEEKLY;//used in x-axis labeling
 	float factor = 0.2;
@@ -58,6 +63,9 @@ private:
 	int interval_in_min = 15;
 	bool isFetchingData = false;
 	bool isWindowFocused = false;
+	bool isDatafetched = false;
+	std::thread search_thread;
+	std::mutex m;
 
 	ref<Scene> m_Scene;
 	ref<Shader> shader;
@@ -71,6 +79,7 @@ private:
 	glm::vec2 ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm::vec2& ViewportSize);
 	void drawCurve();
 	void FetchData();
+	void AutoFill(const std::string& str);
 	void MoveCameraToNearestPoint();
 	void ChangeInterval(APIInterval apiinterval);
 	void Draw_X_axis_Label(ImDrawList* draw_list);
