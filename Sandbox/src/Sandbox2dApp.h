@@ -15,6 +15,11 @@ enum APIInterval {
 	_INTRADAY
 };
 
+enum GraphType {
+	_LINE,
+	_CANDLESTICK,
+	_NONE
+};
 struct TradingVal {
 	 std::string xLabel;
 	 std::string open , close, high, low, volume;
@@ -49,13 +54,20 @@ private:
 
 	std::string DataInterval = "TIME_SERIES_WEEKLY",interval=WEEKLY;
 
-	std::string CompanyName="AMD";//default
+	std::string CompanyName="IBM";//default
 	std::string tmp_string = "";//used in Draw_X_axis_Label function
 	std::string SearchResult = "";//contain the search result of auto search
 
 	APIInterval ApiInterval = APIInterval::_WEEKLY;//used in x-axis labeling
+	GraphType graphtype = GraphType::_CANDLESTICK;
+
+	std::unordered_map<std::string, GraphType> GraphType_Map;
+	int IndexOfGraph = 0;
+
 	float factor = 0.2;
 	float max_val = INT_MIN, min_val = INT_MAX;
+	float max_volume = INT_MIN,min_volume = INT_MAX;
+	float volume_scale=100;
 	int coordinate_scale = 1;
 	int UpscaledValue = 100; // this variable is used for scaling the normalized-finance data values
 	int NumPoints = 1000;
@@ -65,7 +77,7 @@ private:
 	bool isWindowFocused = false;
 	bool isDatafetched = false;
 	std::thread search_thread;
-	std::mutex m;
+	std::mutex m;//LOCK VARIABLE
 
 	ref<Scene> m_Scene;
 	ref<Shader> shader;
@@ -78,6 +90,8 @@ private:
 	glm::vec2 normalize_data(const glm::vec2& arr_ele, const int& index);
 	glm::vec2 ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm::vec2& ViewportSize);
 	void drawCurve();
+	void drawCandleStick();
+	void drawVolumeBarGraph(ImDrawList* draw_list);
 	void FetchData();
 	void AutoFill(const std::string& str);
 	void MoveCameraToNearestPoint();

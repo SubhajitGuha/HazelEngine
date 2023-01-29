@@ -1,9 +1,9 @@
 {
     "bestMatches": [
         {
-            "1. symbol": "MAN",
-            "2. name": "ManpowerGroup",
-            "3. type": "Equity",
+            "1. symbol": "TSL",
+            "2. name": "GraniteShares 1.25x Long Tesla Daily ETF",
+            "3. type": "ETF",
             "4. region": "United States",
             "5. marketOpen": "09:30",
             "6. marketClose": "16:00",
@@ -12,8 +12,8 @@
             "9. matchScore": "1.0000"
         },
         {
-            "1. symbol": "MANA",
-            "2. name": "Grayscale Investments LLC",
+            "1. symbol": "TSLA",
+            "2. name": "Tesla Inc",
             "3. type": "Equity",
             "4. region": "United States",
             "5. marketOpen": "09:30",
@@ -23,92 +23,92 @@
             "9. matchScore": "0.8571"
         },
         {
-            "1. symbol": "MAN.PAR",
-            "2. name": "Manutan International S.A.",
+            "1. symbol": "TSLH",
+            "2. name": "Innovator Hedged TSLA Strategy ETF",
+            "3. type": "ETF",
+            "4. region": "United States",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "16:00",
+            "7. timezone": "UTC-04",
+            "8. currency": "USD",
+            "9. matchScore": "0.8571"
+        },
+        {
+            "1. symbol": "TSLI",
+            "2. name": "GraniteShares 1x Short TSLA Daily ETF",
+            "3. type": "ETF",
+            "4. region": "United States",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "16:00",
+            "7. timezone": "UTC-04",
+            "8. currency": "USD",
+            "9. matchScore": "0.8571"
+        },
+        {
+            "1. symbol": "TSLAX",
+            "2. name": "TRANSAMERICA SMALL CAP VALUE A",
+            "3. type": "Mutual Fund",
+            "4. region": "United States",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "16:00",
+            "7. timezone": "UTC-04",
+            "8. currency": "USD",
+            "9. matchScore": "0.7500"
+        },
+        {
+            "1. symbol": "TSLCX",
+            "2. name": "TRANSAMERICA SMALL CAP VALUE C",
+            "3. type": "Mutual Fund",
+            "4. region": "United States",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "16:00",
+            "7. timezone": "UTC-04",
+            "8. currency": "USD",
+            "9. matchScore": "0.7500"
+        },
+        {
+            "1. symbol": "TSLFX",
+            "2. name": "TRANSAMERICA SMALL CAP VALUE R4",
+            "3. type": "Mutual Fund",
+            "4. region": "United States",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "16:00",
+            "7. timezone": "UTC-04",
+            "8. currency": "USD",
+            "9. matchScore": "0.7500"
+        },
+        {
+            "1. symbol": "TSLIX",
+            "2. name": "TRANSAMERICA SMALL CAP VALUE I",
+            "3. type": "Mutual Fund",
+            "4. region": "United States",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "16:00",
+            "7. timezone": "UTC-04",
+            "8. currency": "USD",
+            "9. matchScore": "0.7500"
+        },
+        {
+            "1. symbol": "TSL.TRT",
+            "2. name": "Tree Island Steel Ltd.",
             "3. type": "Equity",
-            "4. region": "Paris",
-            "5. marketOpen": "09:00",
-            "6. marketClose": "17:30",
-            "7. timezone": "UTC+02",
-            "8. currency": "EUR",
+            "4. region": "Toronto",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "16:00",
+            "7. timezone": "UTC-05",
+            "8. currency": "CAD",
             "9. matchScore": "0.6667"
         },
         {
-            "1. symbol": "MANA.PAR",
-            "2. name": "21S MANA",
-            "3. type": "ETF",
-            "4. region": "Paris",
-            "5. marketOpen": "09:00",
-            "6. marketClose": "17:30",
-            "7. timezone": "UTC+02",
-            "8. currency": "EUR",
-            "9. matchScore": "0.6000"
-        },
-        {
-            "1. symbol": "MANA11.SAO",
-            "2. name": "MANATÍ CAPITAL HEDGE FUND FDO INV IMOB",
-            "3. type": "Mutual Fund",
+            "1. symbol": "TSLA34.SAO",
+            "2. name": "Tesla Inc",
+            "3. type": "Equity",
             "4. region": "Brazil/Sao Paolo",
             "5. marketOpen": "10:00",
             "6. marketClose": "17:30",
             "7. timezone": "UTC-03",
             "8. currency": "BRL",
             "9. matchScore": "0.5000"
-        },
-        {
-            "1. symbol": "MAN50ETF.BSE",
-            "2. name": "MIRAE ASSET NIFTY 50 ETF (MAN50ETF)",
-            "3. type": "ETF",
-            "4. region": "India/Bombay",
-            "5. marketOpen": "09:15",
-            "6. marketClose": "15:30",
-            "7. timezone": "UTC+5.5",
-            "8. currency": "INR",
-            "9. matchScore": "0.4286"
-        },
-        {
-            "1. symbol": "MANAKSIA.BSE",
-            "2. name": "MANAKSIA LTD.",
-            "3. type": "Equity",
-            "4. region": "India/Bombay",
-            "5. marketOpen": "09:15",
-            "6. marketClose": "15:30",
-            "7. timezone": "UTC+5.5",
-            "8. currency": "INR",
-            "9. matchScore": "0.4286"
-        },
-        {
-            "1. symbol": "MANALIPETC.BSE",
-            "2. name": "MANALI PETROCHEMICAL LTD.",
-            "3. type": "Equity",
-            "4. region": "India/Bombay",
-            "5. marketOpen": "09:15",
-            "6. marketClose": "15:30",
-            "7. timezone": "UTC+5.5",
-            "8. currency": "INR",
-            "9. matchScore": "0.3750"
-        },
-        {
-            "1. symbol": "MANAPPURAM.BSE",
-            "2. name": "MANAPPURAM FINANCE LTD.",
-            "3. type": "Equity",
-            "4. region": "India/Bombay",
-            "5. marketOpen": "09:15",
-            "6. marketClose": "15:30",
-            "7. timezone": "UTC+5.5",
-            "8. currency": "INR",
-            "9. matchScore": "0.3750"
-        },
-        {
-            "1. symbol": "MANAKSTELTD.BSE",
-            "2. name": "Manaksia Steels Ltd",
-            "3. type": "Equity",
-            "4. region": "India/Bombay",
-            "5. marketOpen": "09:15",
-            "6. marketClose": "15:30",
-            "7. timezone": "UTC+5.5",
-            "8. currency": "INR",
-            "9. matchScore": "0.3529"
         }
     ]
 }

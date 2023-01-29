@@ -10,10 +10,11 @@ SandBox2dApp::SandBox2dApp()
 	:Layer("Renderer2D layer"), m_camera(1366 / 768)
 {
 	//HZ_PROFILE_SCOPE("SandBox2dApp::SandBox2dApp()");
-	m_camera.bCanBeRotated(false);
+	GraphType_Map["CandleStick"] = GraphType::_CANDLESTICK;
+	GraphType_Map["Line"] = GraphType::_LINE; //add more if u want to support more types of graphs
 
+	m_camera.bCanBeRotated(false);
 	m_Framebuffer = FrameBuffer::Create({ 1366,768 });
-	//Renderer2D::Init();
 }
 
 static size_t my_write(void* buffer, size_t size, size_t nmemb, void* param)
@@ -63,23 +64,32 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 			std::string Xstring = it.name();
 			float x =0;
 			float y = std::stof(jsonData[interval][it.name()]["4. close"].asString());
+			float vol = std::stof(jsonData[interval][it.name()]["5. volume"].asString());
+
 			if (y > max_val)
 				max_val = y;
 			if (y < min_val)
 				min_val = y;
+			if (vol > max_volume)
+				max_volume = vol;
+			if (vol < min_volume)
+				min_volume = vol;
 			m_Points.push_back({ x,-y });//pushing the data onto the array
 			TradingVal value = {Xstring,jsonData[interval][it.name()]["1. open"].asString(), jsonData[interval][it.name()]["4. close"].asString(),
 			jsonData[interval][it.name()]["2. high"].asString(),jsonData[interval][it.name()]["3. low"].asString(),
 			jsonData[interval][it.name()]["5. volume"].asString() };
 			val.push_back(value);
 		}
+		HAZEL_CORE_WARN(max_volume);
+		HAZEL_CORE_INFO(min_volume);
+
 		if (JsonSize > NumPoints)
 		{
 			m_Points.erase(m_Points.begin(), m_Points.end() - NumPoints);
 			val.erase(val.begin(), val.end() - NumPoints);
 		}
 	}
-	HAZEL_CORE_ERROR(val.size());
+	HAZEL_CORE_ERROR(result);
 	m_camera.SetCameraPosition({ normalize_data(m_Points[m_Points.size() - 1],m_Points.size() - 1),0 });
 }
 
@@ -134,8 +144,7 @@ void SandBox2dApp::AutoFill(const std::string& str)//this function is used for t
 				tmp += i.name()+" : " + i->asString() + "\n";
 			CompanyDescription.push_back(tmp);
 		}
-		
-		
+
 		HAZEL_CORE_INFO(jsondata["bestMatches"]);
 	}
 };
@@ -250,7 +259,7 @@ void SandBox2dApp::Draw_X_axis_Label(ImDrawList* draw_list)
 			break;
 		}
 	}
-	
+	drawVolumeBarGraph(draw_list);
 }
 
 glm::vec2 SandBox2dApp::ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm::vec2& ViewportSize) //this function converts opengl coordinate to screen coordinate
@@ -311,19 +320,28 @@ void SandBox2dApp::OnUpdate(float deltatime)
 			MousePos_Label = { val[minpoint.x].xLabel,val[minpoint.x].close };//for drawing the mouse coordinates
 			return normalize_data(minpoint, minpoint.x);
 		};
-
 		PointOnTheGraph = getNearestPointToCursor();
-		Renderer2D::DrawLine({ PointOnTheGraph.x,-1000,0 }, { PointOnTheGraph.x,1000,0 }, { 1,1,1,0.9 }, 1.5);
-		Renderer2D::DrawLine({ -10000 ,PointOnTheGraph.y,0 }, { 10000,PointOnTheGraph.y,0 }, { 1,1,1,0.9 }, 1.5);
+		Renderer2D::DrawLine({ PointOnTheGraph.x,-1000,0 }, { PointOnTheGraph.x,1000,0 }, { 1,1,1,0.9 }, 1);
+		Renderer2D::DrawLine({ -10000 ,PointOnTheGraph.y,0 }, { 10000,PointOnTheGraph.y,0 }, { 1,1,1,0.9 }, 1);
 	}
 	Renderer2D::LineEndScene();
 
-	drawCurve();//draws the curve using the coordinates
+
+	//choose which type of graph to draw
+	switch (graphtype) {
+	case GraphType::_CANDLESTICK:
+		drawCandleStick();
+		break;
+	case GraphType::_LINE:
+		drawCurve();
+		break;
+	};
+
 
 	//draw the x-axises
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
 	{
-		for (int i = 0; i < m_Points.size() + 50 ; i += coordinate_scale)
+		for (int i = 0; i <= m_Points.size() ; i += coordinate_scale)
 			Renderer2D::DrawLine({ i,-1000.0f+m_camera.GetPosition().y,0 }, { i,1000.0f+ m_camera.GetPosition().y,0 }, { 1,1,1,0.2 }, 1);
 	}
 	Renderer2D::LineEndScene();
@@ -410,6 +428,7 @@ void SandBox2dApp::OnImGuiRender()
 	ImGui::Begin("Properties");
 	ImGui::DragFloat("Curvature Factor", &factor, 0.1, 0, 1);
 	ImGui::DragInt("Coordinate Spacing", &coordinate_scale, 1, 1, 10);
+	ImGui::DragFloat("Volume Scale", &volume_scale, 10, 0, 500000);
 	if (ImGui::Button("WEEKLY", { 150,20 }))
 	{
 		ChangeInterval(APIInterval::_WEEKLY);
@@ -489,7 +508,12 @@ void SandBox2dApp::OnImGuiRender()
 		//t.join();
 		FetchData();
 	}
-
+	{
+		const char*const list[2] = { "CandleStick","Line" };//names must be same as the GraphType_Map(unordered_map) key values
+		if (ImGui::Combo("Graph Types", &IndexOfGraph, list, 2)) 
+			Renderer2D::Init();//to clear the previous drawn buffer
+		graphtype = GraphType_Map[list[IndexOfGraph]];
+	}
 	ImGui::End();
 
 	ImGui::Begin("Graph color");
@@ -501,10 +525,19 @@ void SandBox2dApp::OnImGuiRender()
 
 	//ImGui::SetNextWindowPos({ 1000,20});
 	ImGui::Begin("Values");
-	ImGui::TextColored(*(ImVec4*)&color, (CompanyName + "  ("+interval+")").c_str());
+	ImGui::TextColored({1,1,1,1}, (CompanyName + "  (" + interval + ")").c_str());
+
+	float netchange = -(m_Points[m_Points.size() - 1].y - m_Points[m_Points.size() - 2].y);//the y value is inverted for drawing in opengl
+	float NetChangePercent = ((m_Points[m_Points.size() - 1].y / m_Points[m_Points.size() - 2].y) - 1) * 100;
+	if (netchange > 0)//net cng formula current price - old price
+		ImGui::TextColored({0,1,0.2,1}, ("  +" + std::to_string(netchange).substr(0, 6) + "  (+" + std::to_string(NetChangePercent).substr(0, 6) + " %%)").c_str());
+	else
+		ImGui::TextColored({ 1,0,0.2,1 }, ("  " + std::to_string(netchange).substr(0, 6) + "  (" + std::to_string(NetChangePercent).substr(0,6) + " %%)").c_str());
+
 	if (tmp_MousePos.x > -1000 && tmp_MousePos.x<val.size())//when the interval is changed the tmp_MousePos is not updated so we put a check here to resolve any unwanted errors
 	{
 		int i = tmp_MousePos.x;
+		glm::vec4 color = { 1,1,1,1 };
 		std::string date = "Date : " + val[i].xLabel;
 		ImGui::TextColored(*(ImVec4*)&color,date.c_str());
 		std::string open = "Open : " + val[i].open;
@@ -517,6 +550,16 @@ void SandBox2dApp::OnImGuiRender()
 		ImGui::TextColored(*(ImVec4*)&color, close.c_str());
 		std::string volume = "volume : " + val[i].volume;
 		ImGui::TextColored(*(ImVec4*)&color, volume.c_str());
+
+		if (tmp_MousePos.x > 0) {
+			float netchange = -(m_Points[tmp_MousePos.x].y - m_Points[tmp_MousePos.x - 1].y);//the y value is inverted for drawing in opengl
+			float NetChangePercent = ((m_Points[tmp_MousePos.x].y / m_Points[tmp_MousePos.x - 1].y) - 1) * 100;
+			if (netchange > 0)//net cng formula current price - old price
+				ImGui::TextColored({ 0,1,0.2,1 }, ("Change:  +" + std::to_string(netchange).substr(0, 6) + "  (+" + std::to_string(NetChangePercent).substr(0, 6) + " %%)").c_str());
+			else
+				ImGui::TextColored({ 1,0,0.2,1 }, ("Change:  " + std::to_string(netchange).substr(0, 6) + "  (" + std::to_string(NetChangePercent).substr(0, 6) + " %%)").c_str());
+		}
+
 	}
 	ImGui::End();
 }
@@ -594,6 +637,63 @@ void SandBox2dApp::drawCurve()
 			Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
 		}
 	Renderer2D::LineEndScene();
+	}
+}
+void SandBox2dApp::drawCandleStick()
+{
+	glm::vec4 Lcolor = { 0,1,0,1 };
+	float Low, High, Open, Close;
+	Renderer2D::LineBeginScene(m_camera.GetCamera());
+	for (int i = 0; i < val.size(); i++)
+	{
+		Low = -stof(val[i].low);
+		High = -stof(val[i].high);
+		Close = -stof(val[i].close);
+		Open = -stof(val[i].open);
+		if (-Close < -Open)
+			Lcolor = { 1,0,0,1 };
+		else
+			Lcolor = { 0,1,0,1 };
+		Renderer2D::DrawLine({ i,normalize_data({i,Open},i).y,0 }, { i,normalize_data({i,Close},i).y,0 }, Lcolor,10);
+	}
+	Renderer2D::LineEndScene();
+	Renderer2D::LineBeginScene(m_camera.GetCamera());
+	for (int i = 0; i < val.size(); i++)
+	{
+		Low = -stof(val[i].low);
+		High = -stof(val[i].high);
+		Close = -stof(val[i].close);
+		Open = -stof(val[i].open);
+		Renderer2D::DrawLine({ i,normalize_data({i,Low},i).y,0 }, { i,normalize_data({i,High},i).y,0 }, { 1,1,1,1 },2);
+	}
+	Renderer2D::LineEndScene();
+}
+
+void SandBox2dApp::drawVolumeBarGraph(ImDrawList* draw_list) {
+
+	float volume;
+	auto LColour = IM_COL32(200, 255, 0, 150);
+	float thickness=8;
+	float zoom = m_camera.GetZoomLevel();
+	if (zoom <= 17 && zoom >= 10)
+		thickness = 15;
+	if (zoom < 10 && zoom>=4)
+		thickness = 35;
+	if (zoom < 4 && zoom>=2)
+		thickness = 45;
+	if (zoom < 2)
+		thickness = 65;
+	for (int i = 1; i < val.size(); i++)
+	{
+		volume = (-stof(val[i].volume) - min_volume) / (max_volume - min_volume);
+		volume *= volume_scale;
+		glm::vec4 world_coord = { i - m_camera.GetPosition().x,0,0,0 };
+		auto ScreenCoord = ConvertToScreenCoordinate(world_coord, Window_Size);
+		if (-m_Points[i - 1].y <= -m_Points[i].y)
+			LColour = IM_COL32(120, 255, 0, 120);
+		else
+			LColour = IM_COL32(255, 0, 80, 120);
+		draw_list->AddLine({ ScreenCoord.x,ScreenCoord.y+300 }, { ScreenCoord.x,ScreenCoord.y+volume+300}, LColour, thickness);
 	}
 
 }
