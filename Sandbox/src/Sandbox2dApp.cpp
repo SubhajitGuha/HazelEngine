@@ -64,8 +64,15 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 			std::string Xstring = it.name();
 			float x =0;
 			float y = std::stof(jsonData[interval][it.name()]["4. close"].asString());
-			float vol = std::stof(jsonData[interval][it.name()]["5. volume"].asString());
+			float vol=0;
+			std::string volume_index = "";
 
+			if (ApiInterval == APIInterval::_DAILY)
+				volume_index = "6. volume";
+			else
+				volume_index = "5. volume";
+
+			vol = std::stof(jsonData[interval][it.name()][volume_index.c_str()].asString());
 			if (y > max_val)
 				max_val = y;
 			if (y < min_val)
@@ -77,7 +84,7 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 			m_Points.push_back({ x,-y });//pushing the data onto the array
 			TradingVal value = {Xstring,jsonData[interval][it.name()]["1. open"].asString(), jsonData[interval][it.name()]["4. close"].asString(),
 			jsonData[interval][it.name()]["2. high"].asString(),jsonData[interval][it.name()]["3. low"].asString(),
-			jsonData[interval][it.name()]["5. volume"].asString() };
+			jsonData[interval][it.name()][volume_index.c_str()].asString() };
 			val.push_back(value);
 		}
 		HAZEL_CORE_WARN(max_volume);
@@ -373,7 +380,7 @@ void SandBox2dApp::OnImGuiRender()
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));//to remove the borders
 
-	ImGui::Begin("Viewport",NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("Viewport",NULL, ImGuiWindowFlags_NoCollapse);
 		isWindowFocused = ImGui::IsWindowFocused();
 		window_pos = *(glm::vec2*)&ImGui::GetWindowPos();
 
