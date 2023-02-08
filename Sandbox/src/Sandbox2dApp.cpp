@@ -1,7 +1,8 @@
 #define CURL_STATICLIB
 #include "hzpch.h"
 #include "Sandbox2dApp.h"
-#include"ImGuiInputText.h"
+#include "DisplayNews.h"
+#include "ImGuiInputText.h"
 #include "curl/curl.h"
 #include "json/json.h"
 
@@ -9,6 +10,8 @@
 SandBox2dApp::SandBox2dApp()
 	:Layer("Renderer2D layer"), m_camera(1366 / 768)
 {
+	news = new News();
+
 	//HZ_PROFILE_SCOPE("SandBox2dApp::SandBox2dApp()");
 	GraphType_Map["CandleStick"] = GraphType::_CANDLESTICK;
 	GraphType_Map["Line"] = GraphType::_LINE; //add more if u want to support more types of graphs
@@ -17,12 +20,9 @@ SandBox2dApp::SandBox2dApp()
 	m_Framebuffer = FrameBuffer::Create({ 1366,768 });
 }
 
-static size_t my_write(void* buffer, size_t size, size_t nmemb, void* param)
-{
-	std::string& text = *static_cast<std::string*>(param);
-	size_t totalsize = size * nmemb;
-	text.append(static_cast<char*>(buffer), totalsize);
-	return totalsize;
+size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
+	size_t written = fwrite(ptr, size, nmemb, stream);
+	return written;
 }
 
 void SandBox2dApp::FetchData()//fetch data from the server and push that data to the m_Points array
@@ -34,33 +34,37 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 	//get data from a server using an api key
 	//curl is used to connect to the server
 	std::string result="";
+	FILE* fp;
+
 	CURL* curl;
 	CURLcode res;
 	std::string api = "https://www.alphavantage.co/query?function=" + DataInterval + "&symbol=" + CompanyName + "&outputsize=full&interval="+std::to_string(interval_in_min)+"min&apikey=4NT07D3RF1DRQBSL";
 	curl = curl_easy_init();
 	if (curl) {
+		fp = fopen("trading_data.json", "wb");
 		curl_easy_setopt(curl, CURLOPT_URL, api.c_str());
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, my_write);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 		if (CURLE_OK != res) {
 			std::cerr << "CURL error: " << res << '\n';
 		}
+		fclose(fp);
 	}
 	curl_global_cleanup();
 	//std::cout << result << "\n\n";
+	std::ifstream file("trading_data.json");
 	Json::Value jsonData;//json file parser
 	Json::Reader jsonReader;
 
-	if (jsonReader.parse(result, jsonData)) 
+	if (jsonReader.parse(file, jsonData)) 
 	{
 		uint32_t JsonSize = jsonData[interval].size();
 
 		for (auto it = jsonData[interval].begin(); it != jsonData[interval].end(); it++)
 		{
-
 			std::string Xstring = it.name();
 			float x =0;
 			float y = std::stof(jsonData[interval][it.name()]["4. close"].asString());
@@ -101,11 +105,6 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 }
 
 
-size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
-	size_t written = fwrite(ptr, size, nmemb, stream);
-	return written;
-}
-
 //this func is used in multi threading environment
 void SandBox2dApp::AutoFill(const std::string& str)//this function is used for the auto compleate searchbox logic, it connects to the server and saves the data to a json file
 {
@@ -113,7 +112,6 @@ void SandBox2dApp::AutoFill(const std::string& str)//this function is used for t
 	suggestions.clear();
 	CompanyDescription.clear();
 
-	HAZEL_CORE_WARN(str);
 	CURL* curl;
 	CURLcode res;
 	FILE* fp;
@@ -269,6 +267,7 @@ void SandBox2dApp::Draw_X_axis_Label(ImDrawList* draw_list)
 	drawVolumeBarGraph(draw_list);
 }
 
+
 glm::vec2 SandBox2dApp::ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm::vec2& ViewportSize) //this function converts opengl coordinate to screen coordinate
 {
 	OGlCoordinate = OGlCoordinate * m_camera.GetCamera().GetProjectionViewMatix();
@@ -280,6 +279,7 @@ glm::vec2 SandBox2dApp::ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm:
 void SandBox2dApp::OnAttach()
 {
 	FetchData();
+	news->OnAttach();
 }
 
 void SandBox2dApp::OnDetach()
@@ -297,6 +297,7 @@ void SandBox2dApp::OnUpdate(float deltatime)
 	if (isWindowFocused)
 		m_camera.OnUpdate(deltatime);
 
+	news->OnUpdate();
 	//draw lines at cursor tip
 	//use y= mx+c 
 	//straight line parallel to y axis is x = k; where k= some constant(here mouse x position)
@@ -569,6 +570,8 @@ void SandBox2dApp::OnImGuiRender()
 
 	}
 	ImGui::End();
+
+	news->OnImGuiRender();
 }
 
 void SandBox2dApp::OnEvent(Event& e)

@@ -201,6 +201,7 @@
     <ClInclude Include="vendor\jsoncpp\json\json-forwards.h" />
     <ClInclude Include="vendor\jsoncpp\json\json.h" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />
+    <ClInclude Include="vendor\stb_image\stb_image_resize.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp" />

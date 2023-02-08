@@ -5,7 +5,7 @@
 #define WEEKLY "Weekly Time Series"
 #define MONTHLY "Monthly Time Series"
 #define DAILY "Time Series (Daily)"
-//#define INTRADAY "Time Series (60min)"
+
 using namespace Hazel;
 
 enum APIInterval {
@@ -25,6 +25,7 @@ struct TradingVal {
 	 std::string open , close, high, low, volume;
 };
 
+class News;
 //Trading software build client side
 class SandBox2dApp :public Layer {
 public:
@@ -36,6 +37,7 @@ public:
 	virtual void OnEvent(Event& e) override;
 
 private:
+	News* news;
 	OrthographicCameraController m_camera;
 	glm::vec2 m_ViewportSize = { 0,0 };
 	
@@ -82,7 +84,6 @@ private:
 	ref<Scene> m_Scene;
 	ref<Shader> shader;
 	ref<VertexArray> vao;
-	ref <Texture2D> texture, tex2;
 	ref<SubTexture2D> tree,land,mud,water;
 	ref<FrameBuffer> m_Framebuffer;
 

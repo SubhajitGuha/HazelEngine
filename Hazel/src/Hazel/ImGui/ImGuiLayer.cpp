@@ -10,10 +10,11 @@
 #define BIND_FUNC(x) std::bind(&ImGuiLayer::x,this,std::placeholders::_1)
 
 namespace Hazel {
+	ImFont* ImGuiLayer::Font;
 	ImGuiLayer::ImGuiLayer()
 		:Layer("ImGuiLayer")
 	{
-
+		Font = nullptr;
 	}
 	ImGuiLayer::~ImGuiLayer()
 	{
@@ -31,6 +32,10 @@ namespace Hazel {
 		//io.ConfigViewportsNoAutoMerge = true;
 		//io.ConfigViewportsNoTaskBarIcon = true;
 
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("Assets/Font/OpenSans-Bold.ttf", 18.0f);
+		Font = io.Fonts->AddFontFromFileTTF("Assets/Font/OpenSans-ExtraBold.ttf", 20.0f);
+
+
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
 		//ImGui::StyleColorsClassic();
@@ -42,6 +47,9 @@ namespace Hazel {
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
+		
+		SetDarkThemeColors();
+
 		GLFWwindow* window =(GLFWwindow*) Application::Get().GetWindow().GetNativeWindow();
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -92,6 +100,34 @@ namespace Hazel {
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
+	}
+
+	void ImGuiLayer::SetDarkThemeColors()
+	{
+		auto& colors = ImGui::GetStyle().Colors;
+		colors[ImGuiCol_WindowBg] = { 0.1,0.105,0.1,1.0f };
+
+		colors[ImGuiCol_Header] = { 0.2,0.205,0.21,1.0f };
+		colors[ImGuiCol_HeaderHovered] = { 0.3,0.305,0.3,1.0f };
+		colors[ImGuiCol_HeaderActive] = { 0.1,0.105,0.1,1.0f };
+
+		colors[ImGuiCol_Button] = { 0.2,0.205,0.21,1.0f };
+		colors[ImGuiCol_ButtonHovered] = { 0.4,0.405,0.4,1.0f };
+		colors[ImGuiCol_ButtonActive] = { 0.1,0.105,0.1,1.0f };
+
+		colors[ImGuiCol_FrameBg] = { 0.2,0.205,0.21,1.0f };
+		colors[ImGuiCol_FrameBgHovered] = { 0.3,0.305,0.3,1.0f };
+		colors[ImGuiCol_FrameBgActive] = { 0.1,0.105,0.1,1.0f };
+
+		colors[ImGuiCol_Tab] = { 0.25,0.2505,0.251,1.0f };
+		colors[ImGuiCol_TabHovered] = { 0.78,0.7805,0.78,1.0f };
+		colors[ImGuiCol_TabActive] = { 0.681,0.6805,0.681,1.0f };
+		colors[ImGuiCol_TabUnfocused] = { 0.35,0.3505,0.351,1.0f };
+		colors[ImGuiCol_TabUnfocusedActive] = { 0.5,0.505,0.51,1.0f };
+
+		colors[ImGuiCol_TitleBg] = { 0.15,0.1505,0.15,1.0f };
+		colors[ImGuiCol_TitleBgActive] = { 0.15,0.1505,0.15,1.0f };
+		colors[ImGuiCol_TitleBgCollapsed]= { 0.95,0.1505,0.951,1.0f };
 	}
 
 

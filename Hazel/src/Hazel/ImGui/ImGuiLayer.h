@@ -24,5 +24,8 @@ namespace Hazel {
 		 void End();
 	public:
 		bool b_DispatchEvents = false;
+		static ImFont* Font;
+	private:
+		void SetDarkThemeColors();
 	};
 }

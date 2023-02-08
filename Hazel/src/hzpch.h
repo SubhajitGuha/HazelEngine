@@ -1,4 +1,5 @@
 #pragma once
+#include <limits>
 #include <functional>
 #include <string>
 #include <memory>
@@ -13,7 +14,7 @@
 #include <chrono>
 #include <thread>
 
-#include "Hazel/Debug/Instrumentation.h"
 #ifdef HZ_PLATFORM_WINDOWS
 //#include <windows.h>
 #endif // HZ_PLATFORM_WINDOWS
+#include "Hazel/Debug/Instrumentation.h"

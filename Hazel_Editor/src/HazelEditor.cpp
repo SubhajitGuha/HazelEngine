@@ -32,7 +32,7 @@
 		"tttt ttt        tttt   tttt tt"
 		"tttt     ttt   ttt          tt";
 
-	texture = Texture2D::Create("Assets/Textures/RPGpack_sheet_2X.png");
+	texture = Texture2D::Create(std::string("Assets/Textures/RPGpack_sheet_2X.png"));
 	tree = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 4,1 }, { 128.f,128.f }, {1,2});
 	mud = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 6,11 }, { 128.f,128.f });
 	land = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 3,10 }, { 128.f,128.f });
