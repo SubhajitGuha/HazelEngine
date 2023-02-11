@@ -5,6 +5,13 @@
 #include "ScriptableEntity.h"
 
 namespace Hazel {
+	struct TagComponent {
+		std::string tag;
+		TagComponent() {tag = "";}
+		TagComponent(const std::string& name)
+			:tag(name){}
+		operator std::string() { return tag; }
+	};
 	struct TransformComponent {
 		glm::mat4 Transform;
 		TransformComponent() = default;

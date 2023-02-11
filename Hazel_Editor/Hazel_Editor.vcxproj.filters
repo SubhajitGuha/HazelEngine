@@ -15,6 +15,7 @@
     <ClInclude Include="src\HazelEditor.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Pannels\SceneHierarchy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HazelEditor.cpp">
@@ -23,6 +24,7 @@
     <ClCompile Include="src\SandboxApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Pannels\SceneHierarchy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png">

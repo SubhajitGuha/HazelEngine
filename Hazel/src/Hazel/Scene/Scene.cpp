@@ -13,10 +13,13 @@ namespace Hazel {
 	}
 	Entity* Scene::CreateEntity(const std::string& name)
 	{
-		EntityName = name;
 		m_entity = m_registry.create();
 		auto entity = new Entity( this,m_entity);
-		Entity_Map[EntityName] = entity;
+		if (name == "")//if no name is give to an entity just call it entity (i.e define tag with entity)
+			entity->AddComponent<TagComponent>("Entity");//automatically add a tag component when an entity is created
+		else
+			entity->AddComponent<TagComponent>(name);
+		Entity_Map[entity->GetComponent<TagComponent>()] = entity;
 		return entity;
 	}
 	void Scene::OnUpdate(TimeStep ts)

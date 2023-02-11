@@ -1,3 +1,114 @@
 {
-    "Note": "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency. Thank you!"
+    "bestMatches": [
+        {
+            "1. symbol": "TATACHEM.BSE",
+            "2. name": "TATA CHEMICALS LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.5333"
+        },
+        {
+            "1. symbol": "TATACOMM.BSE",
+            "2. name": "TATA COMMUNICATIONS LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.5333"
+        },
+        {
+            "1. symbol": "TATAELXSI.BSE",
+            "2. name": "TATA ELXSI LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.5000"
+        },
+        {
+            "1. symbol": "TATAPOWER.BSE",
+            "2. name": "TATA POWER CO.LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.5000"
+        },
+        {
+            "1. symbol": "TATACOFFEE.BSE",
+            "2. name": "TATA COFFEE LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.4706"
+        },
+        {
+            "1. symbol": "TATACONSUM.BSE",
+            "2. name": "Tata Consumer Products Ltd",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.4706"
+        },
+        {
+            "1. symbol": "TATAINVEST.BSE",
+            "2. name": "TATA INVESTMENT CORPORATION LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.4706"
+        },
+        {
+            "1. symbol": "TATAMETALI.BSE",
+            "2. name": "TATA METALIKS LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.4706"
+        },
+        {
+            "1. symbol": "TATAMOTORS.BSE",
+            "2. name": "TATA MOTORS LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.4706"
+        },
+        {
+            "1. symbol": "TATAMTRDVR.BSE",
+            "2. name": "Tata Motors  Ltd - DVR",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.4706"
+        }
+    ]
 }

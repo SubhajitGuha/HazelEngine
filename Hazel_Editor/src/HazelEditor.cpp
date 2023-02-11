@@ -64,6 +64,12 @@
 
 	 camera_entity->GetComponent<CameraComponent>().camera.bIsMainCamera = false;
 	 camera_entity->GetComponent<CameraComponent>().camera.SetOrthographic(50);
+
+	 Square2 = m_scene->CreateEntity("2ndSquare");
+	 Square2->AddComponent<TransformComponent>(glm::translate(glm::mat4(1.0), { 0,1.5,0 }));
+	 Square2->AddComponent<CameraComponent>();
+
+	 //Square3 = m_scene->CreateEntity("3rdSquare");
 //....................script......................................................................
 
 	 class CustomScript :public ScriptableEntity {
@@ -92,14 +98,11 @@
 				 position.x -= ObjSpeed * ts;
 			 if (Input::IsKeyPressed(HZ_KEY_RIGHT))
 				 position.x += ObjSpeed * ts;
-			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_4))
+			 if (Input::IsKeyPressed(HZ_KEY_PAGE_UP))
 				 scale += 0.01;
-			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
+			 if (Input::IsKeyPressed(HZ_KEY_PAGE_DOWN))
 				 scale -= 0.01;
-			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_1))
-				 size += 0.1;
-			 if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_2))
-				 size -= 0.1;
+			
 			 auto transform = glm::translate(glm::mat4(1.f), position) * glm::rotate(glm::mat4(1.0f),glm::radians(rotate),glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(scale));
 			 m_Entity->ReplaceComponent<TransformComponent>(transform);//controlling transform
 			 m_Entity->GetComponent<CameraComponent>().camera.SetOrthographic(size);//controlling camera
@@ -109,6 +112,8 @@
 	 };
 	 //.........................script.........................................................
 	 Square_entity->AddComponent<ScriptComponent>().Bind<CustomScript>();
+
+	 m_Pannel.Context(m_scene);
  }
 
 void  HazelEditor::OnDetach()
@@ -168,37 +173,16 @@ void  HazelEditor::OnUpdate(float deltatime )
 		//		Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
 		//}
 		//Renderer2D::EndScene();
-		//Renderer2D::BeginScene(m_camera.GetCamera());
-		//Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
-		//Renderer2D::EndScene();
+		
+		Renderer2D::BeginScene(m_camera.GetCamera());
+		Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
+		Renderer2D::EndScene();
 
-		////using Entt (entity component system)
-		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
-		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
-		//Renderer2D::EndScene();
-	//m_scene->OnUpdate(deltatime);
-
-	auto velocity = [&](const glm::vec2& point1, const glm::vec2& point2,float& s) {
-		glm::vec2 vel;
-		vel = point2 - point1;
-		vel.x *= s;
-		vel.y *= s;
-		return vel;
-	};
-	
-	std::vector<glm::vec2> arr_pts = { { 5,-5 },{8,-8},{10,0} ,{12,3},{15,2},{16,3},{18,2.1},{18.2,3.5},{19,3.9},{19.8,-5},{20.5,2} };//array of points for testing
-	glm::vec2 tmp_point = P1 , tmp_vel = velocity(P0,arr_pts[0],factor);
-
-	Renderer2D::LineBeginScene(m_camera.GetCamera());
-	for (int i=0;i<arr_pts.size()-1;i++)
-	{	
-		auto x = velocity(tmp_point, arr_pts[i + 1], factor);
-		Renderer2D::DrawCurve(tmp_point, arr_pts[i], tmp_vel, x);//drawing a hermitian curve
-		tmp_point = arr_pts[i];
-		tmp_vel = x;
-		Renderer2D::Draw_Bezier_Curve(P0, c1, c2, P1);
-	}
-	Renderer2D::LineEndScene();
+		//using Entt (entity component system)
+		Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
+		Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
+		Renderer2D::EndScene();
+	m_scene->OnUpdate(deltatime);
 	
 	m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
 	m_FrameBuffer->UnBind();
@@ -244,6 +228,8 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::DragFloat2("point3", (float*)&P3, 1.0, -100.0, 100.0);
 	ImGui::DragFloat("Factor", &factor, 0.01, 0.0, 1.0);
 	ImGui::End();
+
+	m_Pannel.OnImGuiRender();
 }
 
 void  HazelEditor::OnEvent(Event& e)

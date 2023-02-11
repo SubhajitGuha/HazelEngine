@@ -188,13 +188,13 @@ void News::SaveImage(const std::string& img_url)
 			std::cerr << "CURL error: " << res << '\n';
 		}
 		else {
-			//do some thing
+			ImageCount++;
 		}
 		if (fp == NULL)
 			HAZEL_CORE_ERROR("No file found");
 		fclose(fp);
 	}
 	curl_global_cleanup();
-			ImageCount++;
+			
 	//free(fp);
 }

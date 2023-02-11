@@ -28,8 +28,6 @@ namespace Hazel {
 		}
 
 		static ref<Scene> Create();
-	public:
-		std::string EntityName;
 	private:
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};

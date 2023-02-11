@@ -1,5 +1,6 @@
 #pragma once
 #include "Hazel.h"
+#include "Pannels/SceneHierarchy.h"
 #include <unordered_map>
 using namespace Hazel;
 
@@ -22,14 +23,14 @@ private:
 	float scale = 1;
 	glm::vec2 m_ViewportSize = { 1920,1080 };
 	bool isWindowFocused = false;
-	Entity* Square_entity;
+	Entity* Square_entity,*Square2,*Square3;
 	Entity* camera_entity;
 	bool IsMainCamera = false, IsMainCamera2 = true;//Main camera selector in ImGui
 	glm::vec2 P0 = { 0,0 }, P1 = { 3,3 }, P2 = { 5,-5 }, P3 = {8,-8},c2 = { 2,3 }, c1 = { 0.3,-2.2 };
 	float factor = 0.1;
 	
 
-
+	SceneHierarchyPannel m_Pannel;
 	ref<Scene> m_scene;
 	ref<Shader> shader;
 	ref<VertexArray> vao;
