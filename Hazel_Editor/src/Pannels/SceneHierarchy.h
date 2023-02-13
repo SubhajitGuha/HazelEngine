@@ -13,10 +13,16 @@ namespace Hazel {
 		void OnImGuiRender();
 	private:
 		ref<Scene> m_Context;
-		ref<Entity> m_selected_entityID;
+		ref<Entity> m_selected_entity;
+
+		//For properties pannel (camera ui)
 		//glm::vec3 translation=glm::vec3(0);
 	private:
 		void DrawHierarchyNode(const Entity* ent);
 		void DrawProperties();
+		void DrawTransformUI();
+		void DrawCameraUI();
+		void DrawTagUI();
+		void DrawSpriteRendererUI();
 	};
 }

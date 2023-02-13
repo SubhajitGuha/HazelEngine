@@ -1,6 +1,7 @@
 #pragma once
 #include "Hazel.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "Hazel/Renderer/Camareas/SceneCamera.h"
 #include "ScriptableEntity.h"
 
@@ -13,11 +14,18 @@ namespace Hazel {
 		operator std::string() { return tag; }
 	};
 	struct TransformComponent {
-		glm::mat4 Transform;
+		glm::vec3 Translation = { 0,0,0 };
+		glm::vec3 Rotation = { 0,0,0 };//in degrees
+		glm::vec3 Scale = { 1,1,1 };
 		TransformComponent() = default;
-		TransformComponent(const glm::mat4& transform)
-			:Transform(transform){}
-		operator glm::mat4& () { return Transform; }
+		TransformComponent(const glm::vec3& translation,const glm::vec3& rotatation=glm::vec3(0),const glm::vec3& scale=glm::vec3(1))
+			:Translation(translation),Rotation(rotatation),Scale(scale){}
+		glm::mat4 GetTransform() {
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0), glm::radians(Rotation.x), { 1,0,0 }) *
+				glm::rotate(glm::mat4(1.0), glm::radians(Rotation.y), { 0,1,0 }) *
+				glm::rotate(glm::mat4(1.0), glm::radians(Rotation.z), { 0,0,1 });
+			return glm::translate(glm::mat4(1.0), Translation) * rotation * glm::scale(glm::mat4(1), Scale);
+		}
 	};
 
 	struct CameraComponent {
@@ -43,5 +51,14 @@ namespace Hazel {
 			CreateInstance = [&]() {m_Script = new t(); };
 			DeleteInstance = [&]() {delete m_Script; };
 		}
+	};
+
+	struct SpriteRenderer
+	{
+		glm::vec4 Color = { 1,1,1,1 };
+		SpriteRenderer() = default;
+		SpriteRenderer(const glm::vec4& color)
+			:Color(color){}
+		operator glm::vec4() { return Color; }
 	};
 }

@@ -19,7 +19,7 @@ namespace Hazel {
 			entity->AddComponent<TagComponent>("Entity");//automatically add a tag component when an entity is created
 		else
 			entity->AddComponent<TagComponent>(name);
-		Entity_Map[entity->GetComponent<TagComponent>()] = entity;
+		//Entity_Map[entity->GetComponent<TagComponent>()] = entity;
 		return entity;
 	}
 	void Scene::OnUpdate(TimeStep ts)
@@ -30,27 +30,14 @@ namespace Hazel {
 				if(nsc.m_Script==nullptr)
 				nsc.CreateInstance();// this needs to be done once ,not every frame.
 			
-			for (auto item : Entity_Map)
-			{
-				if (entity == item.second->GetEntity())
-				{
-					nsc.m_Script->m_Entity = item.second;//the Entity in the script class is made equal to the created scene entity
-					m_Entity = nsc.m_Script->m_Entity;//this allows more script flexibility and discards unnecessary memory allocations
-				}
-			}
-			
-
+				m_registry.each([&](auto m_entity)//iterate through all entities
+					{
+						if (entity == m_entity)
+						{
+							nsc.m_Script->m_Entity = new Entity(this, m_entity);//the Entity in the script class is made equal to the created scene entity
+						}
+					});
 			nsc.m_Script->OnUpdate(ts);//update to get the script values
-
-			for (auto item : Entity_Map)
-			{
-				if (entity == item.second->GetEntity())
-				{
-					item.second->m_DefaultColor = m_Entity->m_DefaultColor;//then update the entity attributes
-					//can be a shader,can be a model , ...... anything that can be changed
-				}
-			}
-
 			});
 
 		Camera* MainCamera=nullptr;//if there is no main camera Then dont render
@@ -66,25 +53,22 @@ namespace Hazel {
 			if (!MainCamera)
 				return;
 
-			Renderer2D::BeginScene(*MainCamera);//pass only the main camera for rendering
+		Renderer2D::BeginScene(*MainCamera);//pass only the main camera for rendering
 
-		for (auto item : Entity_Map) //iterate through all the Entity in the map Entity_map
-		{
-			auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
+		m_registry.each([&](auto m_entity)
+			{
+				//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
+				Entity Entity(this, m_entity);
+				auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
+				glm::vec4 color;
 
-			auto& transform = item.second->GetComponent<TransformComponent>();
-			auto& camera = item.second->GetComponent<CameraComponent>();
-			glm::vec4 color;
-			
-			if (m_Entity && entt == m_Entity->GetEntity())//if the current entity has a script
-				color = m_Entity->m_DefaultColor;
-			else
-				color = glm::vec4(1.0f);
-
-			if (camera.camera.bIsMainCamera) {
-				Renderer2D::DrawQuad(transform, item.second->m_DefaultColor);//running the script
-			}
-		}
+				//if (camera.camera.bIsMainCamera) {
+				if (Entity.HasComponent<SpriteRenderer>())
+					Renderer2D::DrawQuad(transform, Entity.GetComponent<SpriteRenderer>());
+				else
+					Renderer2D::DrawQuad(transform, Entity.m_DefaultColor);//running the script
+				
+			});
 
 			Renderer2D::EndScene();
 	}

@@ -19,20 +19,12 @@ namespace Hazel {
 		void OnCreate();
 		void Resize(float Width, float Height);
 
-		Entity* GetEntitybyName(const char* Name)
-		{
-			if (Entity_Map.find(Name) == Entity_Map.end()) {
-				HAZEL_CORE_ERROR("No Such Entity With Name {0}", Name);
-			}
-				return Entity_Map[Name];
-		}
-
 		static ref<Scene> Create();
+
 	private:
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
-		std::unordered_map<std::string, Entity*> Entity_Map;
-		Entity* m_Entity = nullptr;
+		friend class Entity;
 	};
 }
 

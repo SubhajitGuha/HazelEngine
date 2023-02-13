@@ -1,5 +1,6 @@
 #pragma once
 #include "Hazel.h"
+#include "entt.hpp"
 #include "Component.h"
 #include "Scene.h"
 namespace Hazel {
@@ -21,6 +22,7 @@ namespace Hazel {
 		}
 		template<typename T>
 		T& GetComponent() {
+			HZ_ASSERT(HasComponent<T>(),"Entity dosent contain this component")//if there is no component assertion will be called
 			return scene->getRegistry().get<T>(entity);
 		}
 		template<typename ...Args>
@@ -37,12 +39,12 @@ namespace Hazel {
 		template<typename T>
 		bool HasComponent()
 		{
-			
-			T* component = &GetComponent<T>();
-			if (component == nullptr)
-				return false;
-			else
+			auto x= scene->getRegistry().try_get<T>(entity);
+		
+			if (x )
 				return true;
+			else
+				return false;
 		}
 
 		entt::entity GetEntity() { return entity; }
@@ -53,12 +55,13 @@ namespace Hazel {
 			return (uint32_t)entity == id;
 		}
 		
+		bool operator!= (uint32_t id) {
+			return !(*this == id);
+		}
+
 	//default entity parameters like color of the quad,texture,subtexture,transform,shader
 	public:
 		glm::vec4 m_DefaultColor = glm::vec4(1.0f);
-		//ref<Texture2D> m_DefaultTexture;//default texture
-		//ref<SubTexture2D> m_DefaultSubTrexture;//default subtexture
-		ref<Shader> m_DefaultShader = Shader::Create("Assets/Shaders/2_In_1Shader.glsl");//default shader
 	private:
 		entt::entity entity{entt::null};
 		Scene* scene;

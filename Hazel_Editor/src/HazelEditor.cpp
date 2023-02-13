@@ -52,30 +52,32 @@
  {
 	 m_scene = Scene::Create();
 
-	 Square_entity = m_scene->CreateEntity("Square");
-	 auto transform = glm::translate(glm::mat4(1.f), { 1,0,0 }) * glm::rotate(glm::mat4(1.f), glm::radians(19.f), { 0,0,1 }) * glm::scale(glm::mat4(1.f), glm::vec3(3));
-	 Square_entity->AddComponent<TransformComponent>(transform);
-	 Square_entity->AddComponent<CameraComponent>();
+	Square_entity = m_scene->CreateEntity("Square");
+	
+	Square_entity->AddComponent<TransformComponent>(glm::vec3(1,2,0));
+	Square_entity->AddComponent<CameraComponent>();
+	Square_entity->AddComponent<SpriteRenderer>(glm::vec4(1, 0.2, 0, 1));
 
 	 camera_entity = m_scene->CreateEntity("Camera");//create the camera entity
-	 auto transform1 = glm::translate(glm::mat4(1.f), { 0,2,0 }) * glm::rotate(glm::mat4(1.f), glm::radians(0.f), { 0,0,1 }) * glm::scale(glm::mat4(1.f), glm::vec3(3));
-	 camera_entity->AddComponent<TransformComponent>(transform1);
+	 camera_entity->AddComponent<TransformComponent>(glm::vec3(0,-1,0));
 	 camera_entity->AddComponent<CameraComponent>();
 
 	 camera_entity->GetComponent<CameraComponent>().camera.bIsMainCamera = false;
 	 camera_entity->GetComponent<CameraComponent>().camera.SetOrthographic(50);
 
 	 Square2 = m_scene->CreateEntity("2ndSquare");
-	 Square2->AddComponent<TransformComponent>(glm::translate(glm::mat4(1.0), { 0,1.5,0 }));
+	 Square2->AddComponent<TransformComponent>(glm::vec3(-1,0,0));
 	 Square2->AddComponent<CameraComponent>();
+	 //Square2->GetComponent<CameraComponent>();
 
-	 //Square3 = m_scene->CreateEntity("3rdSquare");
+	 Square3 = m_scene->CreateEntity("3rdSquare");
+	 Square3->AddComponent<TransformComponent>(glm::vec3(-2,0,0));
 //....................script......................................................................
 
 	 class CustomScript :public ScriptableEntity {
 	 public:
-		 glm::vec3 position = { 0,0,0 };
-		 float rotate = 0.0;
+		 glm::vec3 position = { 0,0,0 }, rotate = {0,0,0};
+		// float rotate = 0.0;
 		 float ObjSpeed = 10;
 		 float scale = 1;
 		 float size = 1.0f;
@@ -83,13 +85,11 @@
 		 { 
 			 if (!m_Entity)
 				 return;
-
-			 m_Entity->m_DefaultColor = glm::vec4(0.8, 0.8, 0.1, 1.0);
 			 
 			 if (Input::IsKeyPressed(HZ_KEY_E))
-				 rotate += 1;
+				 rotate.y += 1;
 			 if (Input::IsKeyPressed(HZ_KEY_Q))
-				 rotate -= 1;
+				 rotate.y -= 1;
 			 if (Input::IsKeyPressed(HZ_KEY_UP))
 				 position.y += ObjSpeed * ts;
 			 if (Input::IsKeyPressed(HZ_KEY_DOWN))
@@ -99,20 +99,27 @@
 			 if (Input::IsKeyPressed(HZ_KEY_RIGHT))
 				 position.x += ObjSpeed * ts;
 			 if (Input::IsKeyPressed(HZ_KEY_PAGE_UP))
+				 position.z += ObjSpeed * ts;
+			 if (Input::IsKeyPressed(HZ_KEY_PAGE_DOWN))
+				 position.z -= ObjSpeed * ts;
+			 if (Input::IsKeyPressed(HZ_KEY_PAGE_UP))
 				 scale += 0.01;
 			 if (Input::IsKeyPressed(HZ_KEY_PAGE_DOWN))
 				 scale -= 0.01;
 			
-			 auto transform = glm::translate(glm::mat4(1.f), position) * glm::rotate(glm::mat4(1.0f),glm::radians(rotate),glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(scale));
-			 m_Entity->ReplaceComponent<TransformComponent>(transform);//controlling transform
-			 m_Entity->GetComponent<CameraComponent>().camera.SetOrthographic(size);//controlling camera
+			 if(!m_Entity->HasComponent<SpriteRenderer>())
+				m_Entity->AddComponent<SpriteRenderer>(glm::vec4(0, 0.3, 1, 1));
+			 //auto transform = glm::translate(glm::mat4(1.f), position) * glm::rotate(glm::mat4(1.0f),glm::radians(rotate),glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(scale));
+			 m_Entity->ReplaceComponent<TransformComponent>(position,rotate);//controlling transform
+			 //m_Entity->GetComponent<CameraComponent>().camera.SetOrthographic(size);//controlling camera
 		 }
 		 virtual void OnCreate() override{}
 		 virtual void OnDestroy() override{}
 	 };
 	 //.........................script.........................................................
-	 Square_entity->AddComponent<ScriptComponent>().Bind<CustomScript>();
-
+//	 Square_entity->AddComponent<ScriptComponent>().Bind<CustomScript>();
+	 Square3->AddComponent<ScriptComponent>().Bind<CustomScript>();
+	 Square3->AddComponent<CameraComponent>();
 	 m_Pannel.Context(m_scene);
  }
 
@@ -173,17 +180,16 @@ void  HazelEditor::OnUpdate(float deltatime )
 		//		Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
 		//}
 		//Renderer2D::EndScene();
-		
-		Renderer2D::BeginScene(m_camera.GetCamera());
-		Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
-		Renderer2D::EndScene();
 
+		//Renderer2D::BeginScene(m_camera.GetCamera());
+		//Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
+		//Renderer2D::EndScene();
 		//using Entt (entity component system)
-		Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
-		Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
-		Renderer2D::EndScene();
+		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
+		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
+		//Renderer2D::EndScene();
+
 	m_scene->OnUpdate(deltatime);
-	
 	m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
 	m_FrameBuffer->UnBind();
 }
@@ -210,16 +216,6 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Image((void*)m_FrameBuffer->GetSceneTextureID(), *(ImVec2*)&m_ViewportSize);
 	ImGui::End();
 
-	ImGui::Begin("Camera Selection");
-	ImGui::Checkbox("Camera1 : is Main Camera", &IsMainCamera);
-	auto cam1 = m_scene->GetEntitybyName("Camera");
-	cam1->GetComponent<CameraComponent>().camera.bIsMainCamera = IsMainCamera;
-
-	bool val2 = true;
-	ImGui::Checkbox("Camera2 : is Main Camera", &IsMainCamera2);
-	auto cam2 = m_scene->GetEntitybyName("Square");
-	cam2->GetComponent<CameraComponent>().camera.bIsMainCamera = IsMainCamera2;
-	ImGui::End();
 
 	ImGui::Begin("Curve Controller");
 	ImGui::DragFloat2("control_point0", (float*)&c1,0.10,-100.0,100.0);
