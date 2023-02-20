@@ -230,6 +230,8 @@ void  HazelEditor::OnImGuiRender()
 
 void  HazelEditor::OnEvent(Event& e)
 {
-	if (isWindowFocused)
+	if (isWindowFocused) {
 		m_camera.OnEvent(e);
+		m_scene->OnEvent(e);
+	}
 }

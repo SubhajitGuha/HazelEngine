@@ -3,8 +3,10 @@
 #include "Entity.h"
 #include "Component.h"
 #include "Hazel/Renderer/Renderer2D.h"
+#include "Hazel/Renderer/Camareas/EditorCamera.h"
 
 namespace Hazel {
+	EditorCamera editor_cam;
 	Scene::Scene()
 	{
 	}
@@ -15,12 +17,17 @@ namespace Hazel {
 	{
 		m_entity = m_registry.create();
 		auto entity = new Entity( this,m_entity);
+		entity->AddComponent<TransformComponent>();
 		if (name == "")//if no name is give to an entity just call it entity (i.e define tag with entity)
 			entity->AddComponent<TagComponent>("Entity");//automatically add a tag component when an entity is created
 		else
 			entity->AddComponent<TagComponent>(name);
 		//Entity_Map[entity->GetComponent<TagComponent>()] = entity;
 		return entity;
+	}
+	void Scene::DestroyEntity(const Entity& delete_entity)
+	{
+		m_registry.destroy(delete_entity);
 	}
 	void Scene::OnUpdate(TimeStep ts)
 	{
@@ -50,10 +57,10 @@ namespace Hazel {
 			}
 		}
 
-			if (!MainCamera)
-				return;
-
-		Renderer2D::BeginScene(*MainCamera);//pass only the main camera for rendering
+		if (!MainCamera)
+			Renderer2D::BeginScene(editor_cam);
+		else
+			Renderer2D::BeginScene(*MainCamera);//pass only the main camera for rendering
 
 		m_registry.each([&](auto m_entity)
 			{
@@ -63,14 +70,17 @@ namespace Hazel {
 				glm::vec4 color;
 
 				//if (camera.camera.bIsMainCamera) {
-				if (Entity.HasComponent<SpriteRenderer>())
-					Renderer2D::DrawQuad(transform, Entity.GetComponent<SpriteRenderer>());
+				if (Entity.HasComponent<SpriteRenderer>()) {
+					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+					Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
+				}
 				else
-					Renderer2D::DrawQuad(transform, Entity.m_DefaultColor);//running the script
+					Renderer2D::DrawQuad(transform, Entity.m_DefaultColor,nullptr);//running the script
 				
 			});
 
 			Renderer2D::EndScene();
+			editor_cam.OnUpdate(ts);
 	}
 	void Scene::OnCreate()
 	{
@@ -83,6 +93,11 @@ namespace Hazel {
 			if(camera.IsResiziable && camera.IsResiziable)
 				m_registry.get<CameraComponent>(entity).camera.SetViewportSize(Width,Height);
 		}
+		editor_cam.SetViewportSize(Width, Height);//resize the editor camera
+	}
+	void Scene::OnEvent(Event& e)
+	{
+		editor_cam.OnEvent(e);
 	}
 	ref<Scene> Scene::Create()
 	{

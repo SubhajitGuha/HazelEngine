@@ -126,6 +126,12 @@ namespace Hazel {
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjection());
 	}
 
+	void Renderer2D::BeginScene(EditorCamera& camera)
+	{
+		m_data->shader->Bind();//bind the textureShader
+		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+	}
+
 	void Renderer2D::EndScene()
 	{
 		m_data->vb->SetData(sizeof(VertexAttributes)*4* m_data->m_VertexCounter, &m_data->Quad[0].Position);
@@ -174,15 +180,27 @@ namespace Hazel {
 		m_data->m_VertexCounter += 4;
 
 	}
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
-	{
-		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(transform*glm::vec4(0,0,0,1), { 0,0 }, color);
-		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(transform*glm::vec4(0,1,0,1), { 0,1 }, color);
-		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(transform*glm::vec4(1,1,0,1), { 1,1 }, color);
-		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(transform*glm::vec4(1,0,0,1), { 1,0 }, color);
 
-		m_data->WhiteTex->Bind(0);//There is no need to bind the texture every frame .In this case the texture can be bound once and used all the time
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color,ref<Texture2D> texture)
+	{
+		int k = 0;
+		if (texture.get() == nullptr) {
+			texture = m_data->WhiteTex;//if the texture is null then bind the white texture to slot 0
+		}
+		else
+			k = 1;//if the texture is not null then bind it to slot 1 (though it is not correct as if there are more than 1
+					// Script component then texture will be fetched from the same slot ^_^ :(  :) )
+
+		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(transform*glm::vec4(0,0,0,1), { 0,0 }, color,k);
+		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(transform*glm::vec4(0,1,0,1), { 0,1 }, color,k);
+		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(transform*glm::vec4(1,1,0,1), { 1,1 }, color,k);
+		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(transform*glm::vec4(1,0,0,1), { 1,0 }, color,k);
+
+		texture->Bind(k);//for now bind at slot 0
+		//m_data->WhiteTex->Bind(0);//There is no need to bind the texture every frame .In this case the texture can be bound once and used all the time
 		m_data->m_VertexCounter += 4;
+		k++;
+		k = k % 10;
 	}
 	void Renderer2D::DrawSubTexturedQuad(const glm::vec3& pos, const glm::vec3& scale, ref<SubTexture2D> tex, unsigned int index, const float angle)
 	{

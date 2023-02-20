@@ -61,7 +61,7 @@ namespace Hazel {
 		vbo->Bind();
 		Bind();
 		auto element = layout->GetElements();
-		int size = layout->GetElements().size();
+		int size = element.size();
 		int offset = 0;
 		for (unsigned int i = 0; i < size; i++)
 		{

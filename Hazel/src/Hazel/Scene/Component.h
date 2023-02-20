@@ -53,12 +53,13 @@ namespace Hazel {
 		}
 	};
 
+	class Texture2D;
 	struct SpriteRenderer
 	{
 		glm::vec4 Color = { 1,1,1,1 };
+		ref<Texture2D> texture = nullptr;
 		SpriteRenderer() = default;
-		SpriteRenderer(const glm::vec4& color)
-			:Color(color){}
-		operator glm::vec4() { return Color; }
+		SpriteRenderer(const glm::vec4& color,const ref<Texture2D> tex=nullptr)
+			:Color(color),texture(tex){}
 	};
 }

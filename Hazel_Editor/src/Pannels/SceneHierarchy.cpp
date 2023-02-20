@@ -3,6 +3,7 @@
 #include "imgui_internal.h"
 #include "imgui.h"
 namespace Hazel {
+	std::string texture_path = "Assets/Textures/Test.png";
 	SceneHierarchyPannel::SceneHierarchyPannel() = default;
 	SceneHierarchyPannel::~SceneHierarchyPannel()
 	{}
@@ -71,10 +72,19 @@ namespace Hazel {
 	void SceneHierarchyPannel::OnImGuiRender()
 	{
 		//static int 
+		bool isEntityDestroyed = false;
 		ref<Entity> m_Entity;
 		ImGuiTreeNodeFlags flags = 0;
 		ImGui::Begin("Scene Hierarchy Pannel");
-		{
+		
+			if (ImGui::BeginPopupContextWindow("Actions",1,false))
+			{
+				if (ImGui::Button("Create Entity", { 120,30 }))
+				{
+					m_Context->CreateEntity();
+				}
+				ImGui::EndPopup();
+			}
 			m_Context->getRegistry().each([&](auto entity) {
 
 				m_Entity = std::make_shared<Entity>(m_Context.get(), entity);
@@ -93,14 +103,41 @@ namespace Hazel {
 					ImGui::TreePop();
 				}
 				});
-		}
+
 		if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered())
 			m_selected_entity = nullptr;
+
+		if (m_selected_entity && ImGui::BeginPopupContextItem("Action"))//popup only appears when there is a selected entity
+		{
+			if (ImGui::Button("Delete Entity", { 100,30 })) {
+				isEntityDestroyed = true;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+
 		ImGui::End();
 
 		//properties pannel
 		ImGui::Begin("Properties");
 
+		if (m_selected_entity && ImGui::BeginPopupContextWindow("Actions",1,false))//click on any blank area to add component
+		{
+			if (ImGui::Button("Create Transform Component", { 220,30 }))
+			{
+				m_selected_entity->AddComponent<TransformComponent>();//sets to default values
+			}
+			
+			if (ImGui::Button("Create Sprite Renderer Component", { 220,30 }))
+			{
+				m_selected_entity->AddComponent<SpriteRenderer>();
+			}
+			if (ImGui::Button("Create Camera Component", { 220,30 }))
+			{
+				m_selected_entity->AddComponent<CameraComponent>();
+			}
+			ImGui::EndPopup();
+		}
 		if (m_selected_entity.get() && m_selected_entity->HasComponent<TagComponent>())
 		{
 			DrawTagUI();
@@ -119,9 +156,15 @@ namespace Hazel {
 		if (m_selected_entity.get() && m_selected_entity->HasComponent<SpriteRenderer>())
 		{
 			DrawSpriteRendererUI();
+		
 		}
-
 		ImGui::End();
+
+		if (isEntityDestroyed)//delete entity
+		{
+			m_Context->DestroyEntity(*m_selected_entity);
+			m_selected_entity = nullptr;
+		}
 	}
 	void SceneHierarchyPannel::DrawHierarchyNode(const Entity* ent)
 	{
@@ -132,23 +175,42 @@ namespace Hazel {
 
 	void SceneHierarchyPannel::DrawTransformUI()
 	{
+		if (!m_selected_entity)
+			return;
 		auto& transform = m_selected_entity->GetComponent<TransformComponent>();
-if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen, "Transform Component")) //typeid() operator is a part of runtime type identification in cpp it determines the type of object at runtime
-{
-	DrawVec3Control("Translation", transform.Translation);
-	DrawVec3Control("Rotation", transform.Rotation);
-	DrawVec3Control("Scale", transform.Scale, 1.0);
+		if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen, "Transform Component")) //typeid() operator is a part of runtime type identification in cpp it determines the type of object at runtime
+		{
+			DrawVec3Control("Translation", transform.Translation);
+			DrawVec3Control("Rotation", transform.Rotation);
+			DrawVec3Control("Scale", transform.Scale, 1.0);
 
-	ImGui::TreePop();
-}
+			ImGui::TreePop();
+		}
 	}
 
 	void SceneHierarchyPannel::DrawCameraUI()
 	{
+		if (!m_selected_entity)
+			return;
+		bool open = ImGui::TreeNodeEx(" Camera Component", ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen);
+		bool delete_component = false;
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 2,2 });
+		ImGui::SameLine(ImGui::GetWindowWidth() - 40.f);
+		if (ImGui::Button("+", { 20,20 }))
+		{
+			ImGui::OpenPopup("ComponentSettings1");
+		}
+		ImGui::PopStyleVar();
+		if (ImGui::BeginPopup("ComponentSettings1"))
+		{
+			if (ImGui::MenuItem("Remove Component"))
+				delete_component = true;
+			ImGui::EndPopup();
+		}
 		auto& camera = m_selected_entity->GetComponent<CameraComponent>().camera;
 		const char* Items[] = { "Orthographic","Perspective" };
 		const char* Selected_Item = Items[(int)camera.m_projection_type];
-		if (ImGui::TreeNodeEx(" Camera Component", ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
+		if (open)
 		{
 			bool isPrimary = camera.bIsMainCamera;
 			ImGui::Checkbox("Primary Camera", &isPrimary);
@@ -214,9 +276,13 @@ if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNo
 			}
 			ImGui::TreePop();
 		}
+		if (delete_component)
+			m_selected_entity->RemoveComponent<CameraComponent>();
 	}
 	void SceneHierarchyPannel::DrawTagUI()
 	{
+		if (!m_selected_entity)
+			return;
 		if (ImGui::TreeNodeEx("TAG Component", ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			char buffer[250] = { 0 };
@@ -233,11 +299,42 @@ if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNo
 	}
 	void SceneHierarchyPannel::DrawSpriteRendererUI()
 	{
-		if(ImGui::TreeNodeEx("Sprite Renderer", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow))
+		if (!m_selected_entity)
+			return;
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 2,2 });
+		bool open = ImGui::TreeNodeEx("Sprite Renderer", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow);
+		bool delete_component = false;
+		ImGui::SameLine(ImGui::GetWindowWidth()-40.f);
+		if (ImGui::Button("+", {20,20}))
 		{
-			auto& color = m_selected_entity->GetComponent<SpriteRenderer>().Color;
-			ImGui::ColorEdit4("##Sprite", (float*)(&color));
+			ImGui::OpenPopup("ComponentSettings");
+		}
+		ImGui::PopStyleVar();
+		if (ImGui::BeginPopup("ComponentSettings"))
+		{
+			if (ImGui::MenuItem("Remove Component"))
+				delete_component = true;
+			ImGui::EndPopup();
+		}
+		if(open)
+		{
+			auto& Sprite_Renderer = m_selected_entity->GetComponent<SpriteRenderer>();
+			ImGui::ColorEdit4("##Sprite", (float*)(&Sprite_Renderer.Color));
+
+			char buf[200];
+			strcpy_s(buf,sizeof(buf), texture_path.c_str());
+			if (ImGui::InputText("Texture Path", buf, 200))
+			{
+				texture_path = std::string(buf);
+			}
+
+			if (ImGui::Button("APPLY", {100,30}))
+			{
+				Sprite_Renderer.texture = Texture2D::Create(buf);
+			}
 			ImGui::TreePop();
 		}
+		if (delete_component)
+			m_selected_entity->RemoveComponent<SpriteRenderer>();
 	}
 }

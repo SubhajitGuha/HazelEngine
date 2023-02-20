@@ -13,11 +13,16 @@ namespace Hazel {
 		~Entity() = default;
 		template<typename T,typename ...Args>
 		T& AddComponent(Args&& ...arg) {
+			if (HasComponent<T>())//if the entity already exist then return that entity
+				RemoveComponent<T>();
+
 			scene->getRegistry().emplace<T>(entity, std::forward<Args>(arg)...);//forward all the arguments so use "..."
 			return GetComponent<T>();
 		}
 		template <typename ... Args>
 		void RemoveComponent() {
+				if (HasComponent<Args...>() == false)//check whether all the components are valid or not Args.. passes all the component types one by one
+					return;
 			scene->getRegistry().remove<Args...>(entity);
 		}
 		template<typename T>
@@ -49,8 +54,10 @@ namespace Hazel {
 
 		entt::entity GetEntity() { return entity; }
 
-		operator uint32_t() { return (uint32_t)entity; }
+		operator uint32_t() const{ return (uint32_t)entity; }
 		
+		operator entt::entity()const { return entity; }
+
 		bool operator== (uint32_t id) {
 			return (uint32_t)entity == id;
 		}
