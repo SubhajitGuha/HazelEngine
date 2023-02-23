@@ -19,6 +19,7 @@
 #include "Hazel/Scene/Entity.h"
 #include "Hazel/Scene/Component.h"
 #include "Hazel/Scene/ScriptableEntity.h"
+#include "Hazel/LoadMesh.h"
 
 //-------Non Hazel api----------------
 #include "glm/glm.hpp"
@@ -29,6 +30,7 @@
 // ---Renderer------------------------
 #include "Hazel/Renderer/Renderer.h"
 #include "Hazel/Renderer/Renderer2D.h"
+#include "Hazel/Renderer/Renderer3D.h"
 #include "Hazel/Renderer/RenderCommand.h"
 #include "Hazel/Renderer/Buffer.h"
 #include "Hazel/Renderer/Shader.h"

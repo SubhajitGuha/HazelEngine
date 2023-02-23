@@ -11,6 +11,11 @@
 namespace Hazel {
 	class EditorCamera;
 	class Renderer2D {
+	private:
+		static void StartBatch();
+		static void Flush();
+		static void FlushLine();
+		static void NextBatch();
 	public:
 		static void Init();
 		static void BeginScene(OrthographicCamera& camera);

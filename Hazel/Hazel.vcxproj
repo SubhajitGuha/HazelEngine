@@ -140,6 +140,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Hazel\Renderer\Renderer3D.h" />
+    <ClInclude Include="src\Hazel\LoadMesh.h" />
     <ClInclude Include="src\Hazel.h" />
     <ClInclude Include="src\Hazel\Application.h" />
     <ClInclude Include="src\Hazel\Core.h" />
@@ -205,6 +207,8 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Hazel\Renderer\Renderer3D.cpp" />
+    <ClCompile Include="src\Hazel\LoadMesh.cpp" />
     <ClCompile Include="src\Hazel\Application.cpp" />
     <ClCompile Include="src\Hazel\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Hazel\ImGui\ImGuiLayer.cpp" />

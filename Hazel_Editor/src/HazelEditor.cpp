@@ -1,11 +1,11 @@
 #include "HazelEditor.h"
 //#include "Hazel/Profiling.h"
 
+LoadMesh* mesh;
  HazelEditor:: HazelEditor()
 	:Layer("Renderer2D layer"), m_camera(1920.0 / 1080.0)
 {
 	//HZ_PROFILE_SCOPE(" HazelEditor:: HazelEditor()");
-
 	level_map =
 		"llllllllllllllllllllllllllllll"
 		"lllmlllllllwwwwwllllllllllllll"
@@ -32,6 +32,7 @@
 		"tttt ttt        tttt   tttt tt"
 		"tttt     ttt   ttt          tt";
 
+
 	texture = Texture2D::Create(std::string("Assets/Textures/RPGpack_sheet_2X.png"));
 	tree = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 4,1 }, { 128.f,128.f }, {1,2});
 	mud = SubTexture2D::CreateFromCoordinate(texture, { 2560.f,1664.f }, { 6,11 }, { 128.f,128.f });
@@ -45,6 +46,7 @@
 
 	m_FrameBuffer = FrameBuffer::Create({1920,1080});//create a frame buffer object
 
+	Renderer3D::Init();
 	Renderer2D::Init();
 }
 
@@ -188,9 +190,15 @@ void  HazelEditor::OnUpdate(float deltatime )
 		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
 		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
 		//Renderer2D::EndScene();
+	
 
 	m_scene->OnUpdate(deltatime);
 	m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
+
+
+	//Renderer2D::BeginScene(m_camera.GetCamera());
+	//Renderer2D::DrawQuad({ 1,2,0 }, { 1,1,1 }, { 1,0.1,0.7,1 });
+	//Renderer2D::EndScene();
 	m_FrameBuffer->UnBind();
 }
 

@@ -13,7 +13,7 @@ namespace Hazel {
 	public:
 		virtual void ClearColor(const glm::vec4&) = 0;
 		virtual void Clear() =0;
-		virtual void DrawIndex(VertexArray& vertexarray) =0;
+		virtual void DrawIndex(VertexArray& vertexarray) = 0;
 		virtual void DrawLine(VertexArray& vertexarray, uint32_t count) = 0;
 		inline static GraphicsAPI GetAPI() { return m_API; }
 		virtual void Init() = 0;

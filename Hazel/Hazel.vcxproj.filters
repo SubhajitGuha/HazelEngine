@@ -245,6 +245,8 @@
     </ClInclude>
     <ClInclude Include="vendor\stb_image\stb_image_resize.h" />
     <ClInclude Include="src\Hazel\Renderer\Camareas\EditorCamera.h" />
+    <ClInclude Include="src\Hazel\LoadMesh.h" />
+    <ClInclude Include="src\Hazel\Renderer\Renderer3D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -353,5 +355,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Camareas\EditorCamera.cpp" />
+    <ClCompile Include="src\Hazel\LoadMesh.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Renderer3D.cpp" />
   </ItemGroup>
 </Project>

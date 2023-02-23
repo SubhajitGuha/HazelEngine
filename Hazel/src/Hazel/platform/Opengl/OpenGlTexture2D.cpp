@@ -32,7 +32,7 @@ namespace Hazel {
 			HAZEL_CORE_ERROR("Invalid Texture format");
 		
 
-		Resize_Image(100, 100);//resize the image if width,height > 100 (for the #trading application this is necessary)
+		Resize_Image(1080, 1080);//resize the image if width,height > 100 (for the #trading application this is necessary)
 							//otherwise not needed (i might resize the image if img dimension < 1080p or it will crash)
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);

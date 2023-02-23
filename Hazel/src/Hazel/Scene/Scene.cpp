@@ -3,12 +3,16 @@
 #include "Entity.h"
 #include "Component.h"
 #include "Hazel/Renderer/Renderer2D.h"
+#include "Hazel/Renderer/Renderer3D.h"
 #include "Hazel/Renderer/Camareas/EditorCamera.h"
+#include "Hazel/LoadMesh.h"
 
 namespace Hazel {
+	LoadMesh* m_LoadMesh;
 	EditorCamera editor_cam;
 	Scene::Scene()
 	{
+		m_LoadMesh = new LoadMesh("Assets/Meshes/Cube.obj");
 	}
 	Scene::~Scene()
 	{
@@ -32,6 +36,7 @@ namespace Hazel {
 	void Scene::OnUpdate(TimeStep ts)
 	{
 		//run scripts
+
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
 		{
 				if(nsc.m_Script==nullptr)
@@ -72,14 +77,17 @@ namespace Hazel {
 				//if (camera.camera.bIsMainCamera) {
 				if (Entity.HasComponent<SpriteRenderer>()) {
 					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-					Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
+					//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
 				}
-				else
-					Renderer2D::DrawQuad(transform, Entity.m_DefaultColor,nullptr);//running the script
+				//else
+					//Renderer2D::DrawQuad(transform, Entity.m_DefaultColor,nullptr);//running the script
 				
 			});
-
 			Renderer2D::EndScene();
+
+			Renderer3D::BeginScene(editor_cam);
+			Renderer3D::DrawMesh(*m_LoadMesh);
+
 			editor_cam.OnUpdate(ts);
 	}
 	void Scene::OnCreate()

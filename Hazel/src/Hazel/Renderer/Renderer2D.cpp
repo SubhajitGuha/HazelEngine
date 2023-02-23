@@ -39,7 +39,7 @@ namespace Hazel {
 	};
 
 	struct Renderer2DStorage {
-		int maxQuads = 21000;
+		int maxQuads = 1000;
 		int NumIndices = maxQuads * 6;
 		int NumVertices = maxQuads * 4;
 		
@@ -59,12 +59,38 @@ namespace Hazel {
 	};
 		static Renderer2DStorage* m_data;
 
-	void Renderer2D::Init()
+		void Renderer2D::StartBatch()
+		{
+			m_data->m_VertexCounter = 0;
+		}
+
+		void Renderer2D::Flush()
+		{
+			m_data->vb->SetData(sizeof(VertexAttributes) * m_data->m_VertexCounter, &m_data->Quad[0].Position.x);
+			RenderCommand::DrawIndex(*m_data->vao);//draw call done only once (batch rendering is implemented)
+			m_data->m_VertexCounter = 0;
+		}
+
+		void Renderer2D::FlushLine()
+		{
+			m_data->Linevb->SetData(sizeof(LineAttributes) * m_data->m_LineVertCounter, &m_data->Line[0].Position);
+			uint32_t x = (2 * m_data->m_LineVertCounter) - 1;
+			RenderCommand::DrawLine(*m_data->Linevao, x);
+			m_data->m_LineVertCounter = 0;
+		}
+
+		void Renderer2D::NextBatch()
+		{
+			Flush();
+			StartBatch();
+		}
+
+		void Renderer2D::Init()
 	{
 		m_data = new Renderer2DStorage;
 
 		//initilize the vertex buffer data and index buffer data
-		m_data->Quad.resize(m_data->NumVertices*4, { glm::vec4(0.0),glm::vec2(0.0),glm::vec4(0.0) });
+		m_data->Quad.resize(m_data->NumVertices, { glm::vec4(0.0),glm::vec2(0.0),glm::vec4(0.0) });
 		m_data->Line.resize(m_data->maxQuads*2);//allocate space for the vertices that will draw the line
 		m_data->index.resize(m_data->NumIndices);
 
@@ -99,7 +125,7 @@ namespace Hazel {
 
 		m_data->Linevao->AddBuffer(Linebl, m_data->Linevb);
 		
-		ref<IndexBuffer> ib(IndexBuffer::Create(&m_data->index[0], m_data->NumIndices));
+		ref<IndexBuffer> ib(IndexBuffer::Create(&m_data->index[0], sizeof(unsigned int) * m_data->NumIndices));
 		m_data->vao->AddBuffer(bl, m_data->vb);
 		m_data->vao->SetIndexBuffer(ib);
 
@@ -113,61 +139,70 @@ namespace Hazel {
 		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
 																						//which will be used to render textures in batch renderer
 
+		 m_data->index.clear();
 	}
 	void Renderer2D::BeginScene(OrthographicCamera& camera)
 	{
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionViewMatix());
+
+		StartBatch();
 	}
 
 	void Renderer2D::BeginScene(Camera& camera)
 	{
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjection());
+
+		StartBatch();
 	}
 
 	void Renderer2D::BeginScene(EditorCamera& camera)
 	{
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
-		m_data->vb->SetData(sizeof(VertexAttributes)*4* m_data->m_VertexCounter, &m_data->Quad[0].Position);
-		RenderCommand::DrawIndex(*m_data->vao);//draw call done only once (batch rendering is implemented)
-		m_data->m_VertexCounter = 0;
+		Flush();
 	}
 
 	void Renderer2D::LineBeginScene(OrthographicCamera& camera)
 	{
 		m_data->Lineshader->Bind();
 		m_data->Lineshader->SetMat4("u_ProjectionView", camera.GetProjectionViewMatix());
+
+		StartBatch();
 	}
 
 	void Renderer2D::LineEndScene()
 	{
-		m_data->Linevb->SetData(sizeof(LineAttributes) * 2 * m_data->m_LineVertCounter, &m_data->Line[0].Position);
-		uint32_t x = (2 * m_data->m_LineVertCounter) -1;
-		RenderCommand::DrawLine(*m_data->Linevao, x);
-		m_data->m_LineVertCounter = 0;
+		FlushLine();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, const glm::vec4& col, const float angle)
 	{
-		m_data->Quad[m_data->m_VertexCounter+0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos,1),angle),{0.0,0.0},col );
-		m_data->Quad[m_data->m_VertexCounter+1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x ,pos.y + scale.y,pos.z,1.f), angle),{0.0,1.0},col);
-		m_data->Quad[m_data->m_VertexCounter+2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x,pos.y+scale.y,pos.z,1.f), angle),{1.0,1.0},col );
-		m_data->Quad[m_data->m_VertexCounter+3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x+scale.x,pos.y,pos.z,1.f), angle),{1.0,0.0},col );
+		if (m_data->m_VertexCounter >= m_data->NumVertices)
+			NextBatch();
+		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos, 1), angle), { 0.0,0.0 }, col);
+		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x, pos.y + scale.y, pos.z, 1.f), angle), { 0.0,1.0 }, col);
+		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y + scale.y, pos.z, 1.f), angle), { 1.0,1.0 }, col);
+		m_data->Quad[m_data->m_VertexCounter + 3] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y, pos.z, 1.f), angle), { 1.0,0.0 }, col);
 
 		m_data->WhiteTex->Bind(0);//bind the white texture so that solid color is selected in fragment shader
 		//m_data->shader->SetFloat4("u_color", col);
 
-		m_data->m_VertexCounter+=4;
+		m_data->m_VertexCounter += 4;
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& pos, const glm::vec3& scale, ref<Texture2D> tex , unsigned int index, const float angle)
 	{
+		if (m_data->m_VertexCounter >= m_data->NumVertices)
+			NextBatch();
+
 			m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos, 1), angle), { 0,0 }, { 1,1,1,1 }, index);
 			m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x, pos.y + scale.y, pos.z, 1.f), angle), { 0,1 }, { 1,1,1,1 }, index);
 			m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y + scale.y, pos.z, 1.f), angle), { 1,1 }, { 1,1,1,1 }, index);
@@ -183,6 +218,9 @@ namespace Hazel {
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color,ref<Texture2D> texture)
 	{
+		if (m_data->m_VertexCounter >= m_data->NumVertices)
+			NextBatch();
+
 		int k = 0;
 		if (texture.get() == nullptr) {
 			texture = m_data->WhiteTex;//if the texture is null then bind the white texture to slot 0
@@ -199,11 +237,16 @@ namespace Hazel {
 		texture->Bind(k);//for now bind at slot 0
 		//m_data->WhiteTex->Bind(0);//There is no need to bind the texture every frame .In this case the texture can be bound once and used all the time
 		m_data->m_VertexCounter += 4;
+		std::cout << m_data->m_VertexCounter << std::endl;
 		k++;
 		k = k % 10;
 	}
+
 	void Renderer2D::DrawSubTexturedQuad(const glm::vec3& pos, const glm::vec3& scale, ref<SubTexture2D> tex, unsigned int index, const float angle)
 	{
+		if (m_data->m_VertexCounter >= m_data->NumVertices)
+			NextBatch();
+
 		m_data->Quad[m_data->m_VertexCounter + 0] = VertexAttributes(M_TRANSFORM(glm::vec4(pos, 1), angle), tex->m_TextureCoordinate[0], { 1,1,1,1 }, index);
 		m_data->Quad[m_data->m_VertexCounter + 1] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x, pos.y + scale.y, pos.z, 1.f), angle), tex->m_TextureCoordinate[1], { 1,1,1,1 }, index);
 		m_data->Quad[m_data->m_VertexCounter + 2] = VertexAttributes(M_TRANSFORM(glm::vec4(pos.x + scale.x, pos.y + scale.y, pos.z, 1.f), angle), tex->m_TextureCoordinate[2], { 1,1,1,1 }, index);
@@ -214,12 +257,12 @@ namespace Hazel {
 	}
 	void Renderer2D::DrawLine(const glm::vec3& p1,const glm::vec3& p2 , const glm::vec4& color, const float& width)
 	{
-		//if (m_data->m_LineVertCounter >= m_data->Line.size())
-		//{
-		//	LineEndScene();//if ran out of cache then partiatilly render the cache
-		//	Init();
-		//	return;
-		//}
+		if (m_data->m_LineVertCounter >= m_data->maxQuads)
+		{
+			FlushLine();
+			StartBatch();
+		}
+
 		m_data->Line[m_data->m_LineVertCounter + 0] = LineAttributes(glm::vec4(p1, 1), color);
 		m_data->Line[m_data->m_LineVertCounter + 1] = LineAttributes(glm::vec4(p2, 1), color);
 		m_data->m_LineVertCounter += 2;

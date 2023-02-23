@@ -36,7 +36,6 @@ namespace Hazel {
 		m_PerspectiveFar = Far;
 
 		RecalculateProjection();
-
 		RecalculateProjectionView();
 	}
 	
@@ -80,7 +79,7 @@ namespace Hazel {
 			auto delta = NewMousePos - OldMousePos;//get change in mouse position
 
 			m_ViewDirection = glm::mat3(glm::rotate(glm::radians(-delta.x) * 0.1f, Up)) * m_ViewDirection;//invert it
-			m_ViewDirection = glm::mat3(glm::rotate(glm::radians(delta.y) * 0.1f, RightVector)) * m_ViewDirection;
+			m_ViewDirection = glm::mat3(glm::rotate(glm::radians(delta.y) * 0.1f, RightVector)) * m_ViewDirection;//rotate along right vector
 		}
 		OldMousePos = NewMousePos;
 
