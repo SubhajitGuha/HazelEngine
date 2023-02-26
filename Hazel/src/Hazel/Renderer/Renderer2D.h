@@ -23,6 +23,7 @@ namespace Hazel {
 		static void BeginScene(EditorCamera&);
 		static void EndScene();
 		static void LineBeginScene(OrthographicCamera& camera);
+		static void LineBeginScene(EditorCamera& camera);
 		static void LineEndScene();
 
 	public:

@@ -8,11 +8,13 @@
 #include "Hazel/LoadMesh.h"
 
 namespace Hazel {
-	LoadMesh* m_LoadMesh;
+	LoadMesh* m_LoadMesh,*Cube,*Plane;
 	EditorCamera editor_cam;
 	Scene::Scene()
 	{
-		m_LoadMesh = new LoadMesh("Assets/Meshes/Cube.obj");
+		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");
+		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
+		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
 	}
 	Scene::~Scene()
 	{
@@ -63,9 +65,9 @@ namespace Hazel {
 		}
 
 		if (!MainCamera)
-			Renderer2D::BeginScene(editor_cam);
+			Renderer3D::BeginScene(editor_cam);
 		else
-			Renderer2D::BeginScene(*MainCamera);//pass only the main camera for rendering
+			Renderer3D::BeginScene(*MainCamera);//pass only the main camera for rendering
 
 		m_registry.each([&](auto m_entity)
 			{
@@ -77,16 +79,20 @@ namespace Hazel {
 				//if (camera.camera.bIsMainCamera) {
 				if (Entity.HasComponent<SpriteRenderer>()) {
 					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+					Renderer3D::DrawMesh(*m_LoadMesh, transform, SpriteRendererComponent.Color);
 					//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
 				}
-				//else
+				else
+					Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
 					//Renderer2D::DrawQuad(transform, Entity.m_DefaultColor,nullptr);//running the script
 				
 			});
-			Renderer2D::EndScene();
+			Renderer3D::EndScene();
 
 			Renderer3D::BeginScene(editor_cam);
 			Renderer3D::DrawMesh(*m_LoadMesh);
+			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
+			//Renderer3D::EndScene();
 
 			editor_cam.OnUpdate(ts);
 	}

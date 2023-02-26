@@ -18,5 +18,6 @@ namespace Hazel {
 		std::vector<glm::vec3> Normal;
 		std::vector<unsigned int> Vertex_Indices;
 		std::vector<unsigned int> TexCoord_Indices;
+		std::vector<unsigned int> Normal_Indices;
 	};
 }

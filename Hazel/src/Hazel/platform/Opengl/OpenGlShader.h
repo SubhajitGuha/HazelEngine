@@ -26,6 +26,8 @@ namespace Hazel {
 		void SetIntArray(const std::string& str, const size_t size, const void* pointer) override;
 		void SetFloat(const std::string& str, float& UniformFloat) override;
 		void SetFloat4(const std::string& str, const glm::vec4& UniformFloat4) override;
+		void SetFloat3(const std::string& str, const glm::vec3& UniformFloat4) override;
+
 
 	private://opengl specific
 		void UploadUniformMat4(const std::string& str, glm::mat4& UniformMat4);
@@ -33,6 +35,7 @@ namespace Hazel {
 		void UploadIntArray(const std::string& str, const size_t size, const void* pointer);
 		void UpladUniformFloat(const std::string& str, float& UniformFloat);
 		void UpladUniformFloat4(const std::string& str, const glm::vec4& UniformFloat4);
+		void UpladUniformFloat3(const std::string& str, const glm::vec3& UniformFloat4);
 		unsigned int program;
 		Shaders m_shaders;
 	};

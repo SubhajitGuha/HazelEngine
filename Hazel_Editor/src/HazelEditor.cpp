@@ -195,10 +195,6 @@ void  HazelEditor::OnUpdate(float deltatime )
 	m_scene->OnUpdate(deltatime);
 	m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
 
-
-	//Renderer2D::BeginScene(m_camera.GetCamera());
-	//Renderer2D::DrawQuad({ 1,2,0 }, { 1,1,1 }, { 1,0.1,0.7,1 });
-	//Renderer2D::EndScene();
 	m_FrameBuffer->UnBind();
 }
 

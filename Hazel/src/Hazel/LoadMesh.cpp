@@ -69,11 +69,12 @@ namespace Hazel {
 				ss >> tmp; {
 					int found_loc = 0;
 					found_loc = tmp.find("/", 0);
-					Vertex_Indices.push_back(std::stoi(tmp.substr(0, found_loc))-1);
+					Vertex_Indices.push_back(std::stoi(tmp.substr(0, found_loc)) - 1);
 					std::string res = tmp.substr(found_loc + 1, tmp.find("/", found_loc));
 					//if (res.find( "/")!=-1)//check if 
 						//res = "0";
-					TexCoord_Indices.push_back(std::stoi(res) - 1); }
+					TexCoord_Indices.push_back(std::stoi(res) - 1);
+					Normal_Indices.push_back(std::stoi(tmp.substr(tmp.find_last_of("/")+1)) - 1); }
 
 				ss >> tmp; {
 					int found_loc = 0;
@@ -82,7 +83,8 @@ namespace Hazel {
 					std::string res = tmp.substr(found_loc + 1, tmp.find("/", found_loc));
 					//if (res.find("/") != -1)
 						//res = "0";
-					TexCoord_Indices.push_back(std::stoi(res) - 1); }
+					TexCoord_Indices.push_back(std::stoi(res) - 1); 
+					Normal_Indices.push_back(std::stoi(tmp.substr(tmp.find_last_of("/")+1)) - 1); }
 
 				ss >> tmp; {
 					int found_loc = 0;
@@ -91,7 +93,9 @@ namespace Hazel {
 					std::string res = tmp.substr(found_loc + 1, tmp.find("/", found_loc));
 					//if (res.find("/") != -1)
 						//res = "0";
-					TexCoord_Indices.push_back(std::stoi(res) - 1); }
+					TexCoord_Indices.push_back(std::stoi(res) - 1); 
+					std::string res1 = tmp.substr(found_loc + 1);
+					Normal_Indices.push_back(std::stoi(tmp.substr(tmp.find_last_of("/")+1)) - 1); }
 
 			}
 		}

@@ -39,7 +39,7 @@ namespace Hazel {
 	};
 
 	struct Renderer2DStorage {
-		int maxQuads = 1000;
+		int maxQuads = 10000;
 		int NumIndices = maxQuads * 6;
 		int NumVertices = maxQuads * 4;
 		
@@ -178,6 +178,14 @@ namespace Hazel {
 		StartBatch();
 	}
 
+	void Renderer2D::LineBeginScene(EditorCamera& camera)
+	{
+		m_data->Lineshader->Bind();
+		m_data->Lineshader->SetMat4("u_ProjectionView", camera.GetProjectionView());
+
+		StartBatch();
+	}
+
 	void Renderer2D::LineEndScene()
 	{
 		FlushLine();
@@ -213,7 +221,6 @@ namespace Hazel {
 		//m_data->shader->SetFloat4("u_color", glm::vec4(1));//set the multiplying color to white so that the texture is selected in fragment shader
 		
 		m_data->m_VertexCounter += 4;
-
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color,ref<Texture2D> texture)
@@ -237,7 +244,6 @@ namespace Hazel {
 		texture->Bind(k);//for now bind at slot 0
 		//m_data->WhiteTex->Bind(0);//There is no need to bind the texture every frame .In this case the texture can be bound once and used all the time
 		m_data->m_VertexCounter += 4;
-		std::cout << m_data->m_VertexCounter << std::endl;
 		k++;
 		k = k % 10;
 	}
