@@ -8,6 +8,7 @@
 
 namespace Hazel {
 	class Entity;
+	class LoadMesh;
 	class Scene
 	{
 	public:
@@ -27,6 +28,7 @@ namespace Hazel {
 		
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
+		LoadMesh* m_LoadMesh = nullptr, *Cube = nullptr, *Plane=nullptr;
 		friend class Entity;
 
 	};

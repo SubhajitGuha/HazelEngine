@@ -57,21 +57,21 @@ namespace Hazel {
 
 		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
 																						//which will be used to render textures in batch renderer
-		SetLightPosition({ 0,-15,0});
+		SetLightPosition({ 3,-2,2});
 	}
 
 	void Renderer3D::BeginScene(OrthographicCamera& camera)
 	{
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionViewMatix());
-
+		m_data->shader->SetFloat3("EyePosition", camera.GetPosition());
 	}
 
 	void Renderer3D::BeginScene(Camera& camera)
 	{
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjection());
-
+		//dont calculate specular lighting on scene camera
 	}
 
 	void Renderer3D::BeginScene(EditorCamera& camera)
@@ -79,6 +79,7 @@ namespace Hazel {
 		//Init();
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+		m_data->shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
 		//Renderer2D::LineBeginScene(camera);
 	}
 

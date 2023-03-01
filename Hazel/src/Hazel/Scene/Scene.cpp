@@ -5,10 +5,11 @@
 #include "Hazel/Renderer/Renderer2D.h"
 #include "Hazel/Renderer/Renderer3D.h"
 #include "Hazel/Renderer/Camareas/EditorCamera.h"
+#include "glad/glad.h"
 #include "Hazel/LoadMesh.h"
 
 namespace Hazel {
-	LoadMesh* m_LoadMesh,*Cube,*Plane;
+	
 	EditorCamera editor_cam;
 	Scene::Scene()
 	{
@@ -38,7 +39,9 @@ namespace Hazel {
 	void Scene::OnUpdate(TimeStep ts)
 	{
 		//run scripts
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+		editor_cam.OnUpdate(ts);
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
 		{
 				if(nsc.m_Script==nullptr)
@@ -94,7 +97,10 @@ namespace Hazel {
 			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
 			//Renderer3D::EndScene();
 
-			editor_cam.OnUpdate(ts);
+
+
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 	}
 	void Scene::OnCreate()
 	{

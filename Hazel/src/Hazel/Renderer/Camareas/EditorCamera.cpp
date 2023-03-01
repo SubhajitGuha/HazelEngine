@@ -3,6 +3,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtx/quaternion.hpp"
+#include "Hazel/Renderer/CubeMapEnvironment.h"
 
 namespace Hazel {
 	EditorCamera::EditorCamera()
@@ -10,10 +11,12 @@ namespace Hazel {
 	{
 		m_Projection = glm::perspective(m_verticalFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		m_ProjectionView = m_Projection * m_View;
+		
 	}
 	EditorCamera::EditorCamera(float width, float Height)
 	{
 		bIsMainCamera = true;
+
 		SetViewportSize(width, Height);
 	}
 
@@ -52,6 +55,9 @@ namespace Hazel {
 
 	void EditorCamera::OnUpdate(TimeStep deltatime)
 	{
+
+		CubeMapEnvironment::RenderCubeMap(m_View, m_Projection);
+
 		RightVector  = glm::cross(m_ViewDirection, Up);//we get the right vector (as it is always perpendicular to up and m_ViewDirection)
 		
 		if (Input::IsKeyPressed(HZ_KEY_W))
@@ -84,6 +90,7 @@ namespace Hazel {
 		OldMousePos = NewMousePos;
 
 		RecalculateProjectionView();
+
 	}
 
 	void EditorCamera::RecalculateProjectionView()

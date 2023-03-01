@@ -1,4 +1,6 @@
 #include "HazelEditor.h"
+#include "Hazel/Renderer/CubeMapEnvironment.h"
+
 //#include "Hazel/Profiling.h"
 
 LoadMesh* mesh;
@@ -46,6 +48,7 @@ LoadMesh* mesh;
 
 	m_FrameBuffer = FrameBuffer::Create({1920,1080});//create a frame buffer object
 
+	CubeMapEnvironment::Init();
 	Renderer3D::Init();
 	Renderer2D::Init();
 }
@@ -221,12 +224,9 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::End();
 
 
-	ImGui::Begin("Curve Controller");
-	ImGui::DragFloat2("control_point0", (float*)&c1,0.10,-100.0,100.0);
-	ImGui::DragFloat2("control_point1", (float*)&c2, 0.10, -100.0, 100.0);
-	ImGui::DragFloat2("point2", (float*)&P2, 1.0, -100.0, 100.0);
-	ImGui::DragFloat2("point3", (float*)&P3, 1.0, -100.0, 100.0);
-	ImGui::DragFloat("Factor", &factor, 0.01, 0.0, 1.0);
+	ImGui::Begin("Light controller");
+	ImGui::DragFloat3("position", (float*)&Lightpos);
+	Renderer3D::SetLightPosition(Lightpos);
 	ImGui::End();
 
 	m_Pannel.OnImGuiRender();

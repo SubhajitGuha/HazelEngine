@@ -247,6 +247,7 @@
     <ClInclude Include="src\Hazel\Renderer\Camareas\EditorCamera.h" />
     <ClInclude Include="src\Hazel\LoadMesh.h" />
     <ClInclude Include="src\Hazel\Renderer\Renderer3D.h" />
+    <ClInclude Include="src\Hazel\Renderer\CubeMapEnvironment.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -357,5 +358,6 @@
     <ClCompile Include="src\Hazel\Renderer\Camareas\EditorCamera.cpp" />
     <ClCompile Include="src\Hazel\LoadMesh.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Renderer3D.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\CubeMapEnvironment.cpp" />
   </ItemGroup>
 </Project>

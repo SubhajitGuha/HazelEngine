@@ -38,12 +38,28 @@ in vec2 tcord;
 uniform sampler2D u_Texture[32];
 uniform vec4 u_color;
 uniform vec3 LightPosition;
+uniform vec3 EyePosition;
 
 void main()
 {
+	int index = int (m_slotindex);
+	
+	//diffuse
 	vec3 LightDirection = normalize(LightPosition - vec3(m_pos.x,m_pos.y,m_pos.z));
 	float brightness = dot(LightDirection , m_Normal);
-	vec4 f_color = m_color * vec4(brightness,brightness,brightness,1);
-	int index = int (m_slotindex);
-	color= texture(u_Texture[index],tcord) * f_color ;
+	vec4 diffuse = m_color * vec4(brightness,brightness,brightness,1);
+
+	//ambiance
+	vec4 ambiant = m_color * vec4(0.2,0.2,0.2,1.0);
+
+	//specular
+	vec3 EyeDirection = normalize(EyePosition - vec3(m_pos));
+	vec3 Reflected_Light = reflect(-LightDirection , m_Normal);
+	float s_brightness = clamp(dot(EyeDirection , Reflected_Light),0,1);
+	float b = pow(s_brightness,100);//to reduce the size of specular see the graph of (cosx)^2
+	vec4 specular = m_color * vec4(b,b,b,1);
+
+	float dist = length(LightPosition-vec3(m_pos));
+	float attenuation = 1/(0.1 + 0*dist + 0.008 * dist*dist);
+	color= texture(u_Texture[index],tcord) * clamp(diffuse,0,attenuation) + ambiant + clamp(specular,0,attenuation);
 }

@@ -29,6 +29,7 @@ private:
 	glm::vec2 P0 = { 0,0 }, P1 = { 3,3 }, P2 = { 5,-5 }, P3 = {8,-8},c2 = { 2,3 }, c1 = { 0.3,-2.2 };
 	float factor = 0.1;
 	
+	glm::vec3 Lightpos = { 0,1,0 };
 
 	SceneHierarchyPannel m_Pannel;
 	ref<Scene> m_scene;

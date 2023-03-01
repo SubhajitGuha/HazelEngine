@@ -18,6 +18,7 @@ namespace Hazel {
 		void OnEvent(Event& e);
 		void OnUpdate(TimeStep ts);
 		void SetViewportSize(float width,float Height);
+		inline glm::vec3 GetCameraPosition() { return m_Position; }
 
 	private:
 		void RecalculateProjection();
