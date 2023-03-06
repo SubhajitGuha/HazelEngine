@@ -10,6 +10,7 @@
 
 namespace Hazel {
 	
+	 LoadMesh* Scene::m_LoadMesh=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr;
 	EditorCamera editor_cam;
 	Scene::Scene()
 	{
@@ -30,6 +31,7 @@ namespace Hazel {
 		else
 			entity->AddComponent<TagComponent>(name);
 		//Entity_Map[entity->GetComponent<TagComponent>()] = entity;
+		Renderer3D::SetUpCubeMapReflections(*this);
 		return entity;
 	}
 	void Scene::DestroyEntity(const Entity& delete_entity)
@@ -39,7 +41,6 @@ namespace Hazel {
 	void Scene::OnUpdate(TimeStep ts)
 	{
 		//run scripts
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		editor_cam.OnUpdate(ts);
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
@@ -96,11 +97,6 @@ namespace Hazel {
 			Renderer3D::DrawMesh(*m_LoadMesh);
 			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
 			//Renderer3D::EndScene();
-
-
-
-			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 	}
 	void Scene::OnCreate()
 	{

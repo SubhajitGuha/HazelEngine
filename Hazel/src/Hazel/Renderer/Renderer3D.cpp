@@ -4,10 +4,12 @@
 #include "Buffer.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "stb_image.h"
 #include "glad/glad.h"
 
 namespace Hazel {
 	EditorCamera m_camera;
+	
 	struct VertexAttributes {
 		//glm::vec3 Position;
 		glm::vec4 Position;
@@ -29,6 +31,8 @@ namespace Hazel {
 	struct Renderer3DStorage {
 		int max_Vertices = 10000;
 
+		unsigned int tex_id, framebuffer_id;
+		ref<CubeMapReflection> reflection;
 		ref<Shader> shader;
 		ref<Texture2D> WhiteTex,tex;
 		ref<BufferLayout> bl;
@@ -40,7 +44,14 @@ namespace Hazel {
 	void Renderer3D::Init()
 	{
 		m_data = new Renderer3DStorage;
-		
+
+		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Loading cube map so that it can act as an environment light
+		m_data->reflection = CubeMapReflection::Create();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		m_data->bl = std::make_shared<BufferLayout>(); //buffer layout
 
 		m_data->bl->push("position", DataType::Float4);
@@ -51,13 +62,14 @@ namespace Hazel {
 
 		m_data->WhiteTex = Texture2D::Create(1, 1, 0xffffffff);//create a default white texture
 		m_data->tex = Texture2D::Create("Assets/Textures/Test.png");
-		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
+		//m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 
 		unsigned int TextureIDindex[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
 
 		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
 																						//which will be used to render textures in batch renderer
 		SetLightPosition({ 3,-2,2});
+		m_data->shader->SetInt("env", 10);//for now assign to 10 :)
 	}
 
 	void Renderer3D::BeginScene(OrthographicCamera& camera)
@@ -80,6 +92,7 @@ namespace Hazel {
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
 		m_data->shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
+		m_camera = camera;
 		//Renderer2D::LineBeginScene(camera);
 	}
 
@@ -128,7 +141,6 @@ namespace Hazel {
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color)
 	{
-		//m_data->shader->SetMat4("u_ModelTransform", transform);
 		std::vector< VertexAttributes> Quad(mesh.Vertex_Indices.size(), { glm::vec4(0.0),glm::vec2(0.0) });
 		std::vector<unsigned int> iba;
 
@@ -145,9 +157,10 @@ namespace Hazel {
 		ref<VertexArray> vao = VertexArray::Create();
 
 		ref<VertexBuffer> vb(VertexBuffer::Create(&Quad[0].Position.x, sizeof(VertexAttributes) * Quad.size()));
+		vb->Bind();
 		//ref<IndexBuffer> ib(IndexBuffer::Create(&mesh.Vertex_Indices[0], sizeof(unsigned int) * mesh.Vertex_Indices.size()));//create the index buffer here
 		ref<IndexBuffer> ib(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
-
+		ib->Bind();
 
 		vao->AddBuffer(m_data->bl, vb);
 		vao->SetIndexBuffer(ib);
@@ -158,6 +171,12 @@ namespace Hazel {
 		//vb->SetData(sizeof(VertexAttributes) * m_data->Quad.size(), &m_data->Quad[0].Position.x);
 		//Renderer2D::LineEndScene();
 		RenderCommand::DrawIndex(*vao);
+	}
+	
+	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
+	{
+		m_data->reflection->RenderToCubeMap(scene);
+		m_data->shader->Bind();
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)

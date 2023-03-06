@@ -25,11 +25,11 @@ namespace Hazel {
 		static ref<Scene> Create();
 
 	private:
+		static LoadMesh* m_LoadMesh, *Cube , *Plane;
 		
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
-		LoadMesh* m_LoadMesh = nullptr, *Cube = nullptr, *Plane=nullptr;
-		friend class Entity;
+		//friend class Entity;
 
 	};
 }

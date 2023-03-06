@@ -41,7 +41,11 @@
 #include "Hazel/Renderer/SubTexture.h"
 #include "Hazel/Renderer/FrameBuffer.h"
 #include "Hazel/Renderer/Camareas/SceneCamera.h"
+#include "Hazel/Renderer/Camareas/EditorCamera.h"
 // -----------------------------------
+
+//----------features------------------
+#include "Hazel/Renderer/CubeMapEnvironment.h"
 
 //.....EntryPoint................................
 //#include "Hazel/EntryPoint.h"

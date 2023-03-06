@@ -15,10 +15,17 @@ namespace Hazel {
 
 		void SetPerspctive(float v_FOV,float Near,float Far);
 		glm::mat4 GetProjectionView() { return m_ProjectionView; }
+		inline glm::mat4 GetViewMatrix() { return m_View; }
+		inline glm::mat4 GetProjectionMatrix() { return m_Projection; }
 		void OnEvent(Event& e);
 		void OnUpdate(TimeStep ts);
 		void SetViewportSize(float width,float Height);
 		inline glm::vec3 GetCameraPosition() { return m_Position; }
+
+		void SetCameraPosition(const glm::vec3& pos) { m_Position = pos; RecalculateProjectionView();}
+		void SetViewDirection(const glm::vec3& dir) { m_ViewDirection = dir; RecalculateProjectionView(); }
+		void SetUPVector(const glm::vec3& up) {	Up = up; RecalculateProjectionView();}
+		void RotateCamera(float yaw, float pitch);
 
 	private:
 		void RecalculateProjection();

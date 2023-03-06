@@ -69,5 +69,5 @@ void main()
 
 	float dist = length(LightPosition-vec3(m_pos));
 	float attenuation = 1/(0.1 + 0*dist + 0.008 * dist*dist);
-	color= texture(u_Texture[index],tcord) * clamp(diffuse,0,attenuation) + ambiant + clamp(specular,0,attenuation) + EnvironmentCol ;
+	color= clamp(diffuse,0,attenuation) + ambiant + clamp(specular,0,attenuation) + EnvironmentCol;
 }

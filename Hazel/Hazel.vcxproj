@@ -140,6 +140,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.h" />
+    <ClInclude Include="src\Hazel\Renderer\CubeMapReflection.h" />
     <ClInclude Include="src\Hazel\Renderer\CubeMapEnvironment.h" />
     <ClInclude Include="src\Hazel\Renderer\Renderer3D.h" />
     <ClInclude Include="src\Hazel\LoadMesh.h" />
@@ -208,6 +210,8 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\CubeMapReflection.cpp" />
     <ClCompile Include="src\Hazel\Renderer\CubeMapEnvironment.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Renderer3D.cpp" />
     <ClCompile Include="src\Hazel\LoadMesh.cpp" />

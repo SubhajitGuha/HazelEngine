@@ -48,7 +48,7 @@ namespace Hazel {
 	}
 	void CubeMapEnvironment::RenderCubeMap(const glm::mat4& view, const glm::mat4& proj)
 	{
-		
+		Cube_Shader->Bind();
 		glDepthMask(GL_FALSE);//disable depth testing
 
 		auto inv = glm::inverse(proj * glm::mat4(glm::mat3(view)));//get inverse of projection view to convert cannonical view to world space
@@ -71,7 +71,6 @@ namespace Hazel {
 		vao->AddBuffer(bl, vb);
 		vao->SetIndexBuffer(ib);
 
-		Cube_Shader->Bind();
 		RenderCommand::DrawIndex(*vao);
 
 		glDepthMask(GL_TRUE);//again enable depth testing

@@ -27,6 +27,14 @@ namespace Hazel {
 		RecalculateProjectionView();
 	}
 
+	void EditorCamera::RotateCamera(float yaw, float pitch)
+	{
+		RightVector = glm::cross(m_ViewDirection, Up);
+		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * m_ViewDirection;
+		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * m_ViewDirection;
+		RecalculateProjectionView();
+	}
+
 	void EditorCamera::RecalculateProjection()
 	{
 		m_Projection = glm::perspective(m_verticalFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
