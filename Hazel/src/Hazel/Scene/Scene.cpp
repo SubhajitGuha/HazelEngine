@@ -99,6 +99,9 @@ namespace Hazel {
 			Renderer3D::DrawMesh(*m_LoadMesh);
 			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
 			//Renderer3D::EndScene();
+
+			Renderer3D::SetUpCubeMapReflections(*this);
+
 	}
 	void Scene::OnCreate()
 	{

@@ -52,6 +52,8 @@ namespace Hazel {
 
 	void OpenGlCubeMapReflection::RenderToCubeMap(Scene& scene)
 	{
+		auto size = RenderCommand::GetViewportSize();
+
 		EditorCamera cam = EditorCamera();
 		cam.SetPerspctive(90.00f, 0.01, 1000);//mann this game me a headache (by not converting the FOV to radians) the fov is converted to radians in the editorCamera class :)
 		cam.SetUPVector({ 0,-1,0 });
@@ -83,7 +85,6 @@ namespace Hazel {
 			shader->Bind();
 			shader->SetMat4("u_ProjectionView", cam.GetProjectionView());
 			shader->SetFloat3("EyePosition", cam.GetCameraPosition());
-			Renderer3D::DrawMesh(*m_LoadMesh, { 0,0,30 }, { 10,10,10 }, { 0,0,0 }, {0,1,0.6,1});
 			scene.getRegistry().each([&](auto m_entity)
 				{
 					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
@@ -103,7 +104,6 @@ namespace Hazel {
 					Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
 		}
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		auto size = RenderCommand::GetViewportSize();
 		glViewport(0, 0, size.x, size.y);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindTextureUnit(10, tex_id);
@@ -148,7 +148,7 @@ namespace Hazel {
 			break;
 		case 3:
 			pitch = -90;
-			yaw = 0;
+			yaw = 180;
 			break;
 		case 4:
 			pitch = 0;
