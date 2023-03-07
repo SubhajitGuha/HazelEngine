@@ -50,6 +50,7 @@ namespace Hazel {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		m_data->reflection = CubeMapReflection::Create();
+		m_data->shader->Bind();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		m_data->bl = std::make_shared<BufferLayout>(); //buffer layout
@@ -69,7 +70,6 @@ namespace Hazel {
 		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
 																						//which will be used to render textures in batch renderer
 		SetLightPosition({ 3,-2,2});
-		m_data->shader->SetInt("env", 10);//for now assign to 10 :)
 	}
 
 	void Renderer3D::BeginScene(OrthographicCamera& camera)
@@ -141,6 +141,7 @@ namespace Hazel {
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color)
 	{
+
 		std::vector< VertexAttributes> Quad(mesh.Vertex_Indices.size(), { glm::vec4(0.0),glm::vec2(0.0) });
 		std::vector<unsigned int> iba;
 
@@ -175,8 +176,9 @@ namespace Hazel {
 	
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
 	{
+		m_data->shader->SetInt("env", 10);//for now assign to 10 :)
 		m_data->reflection->RenderToCubeMap(scene);
-		m_data->shader->Bind();
+		m_data->shader->Bind();//you need to bind this other wise nothing will be rendererd
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)

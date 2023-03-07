@@ -9,6 +9,7 @@ namespace Hazel {
 	EditorCamera::EditorCamera()
 		:m_View(1.0)
 	{
+		RightVector = glm::cross(m_ViewDirection, Up);
 		m_Projection = glm::perspective(m_verticalFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		m_ProjectionView = m_Projection * m_View;
 		
@@ -16,7 +17,7 @@ namespace Hazel {
 	EditorCamera::EditorCamera(float width, float Height)
 	{
 		bIsMainCamera = true;
-
+		RightVector = glm::cross(m_ViewDirection, Up);
 		SetViewportSize(width, Height);
 	}
 
@@ -29,15 +30,24 @@ namespace Hazel {
 
 	void EditorCamera::RotateCamera(float yaw, float pitch)
 	{
-		RightVector = glm::cross(m_ViewDirection, Up);
-		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * m_ViewDirection;
-		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * m_ViewDirection;
+		//pitch = glm::clamp(pitch, -89.0f, 89.0f);
+		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::vec3(0, 0, 1);
 		RecalculateProjectionView();
+
+		//debug
+		HAZEL_CORE_ERROR("X : {}", m_ViewDirection.x);
+		HAZEL_CORE_ERROR("Y : {}", m_ViewDirection.y);
+		HAZEL_CORE_ERROR("Z : {}", m_ViewDirection.z);
+
+		HAZEL_CORE_ERROR("position : {} {} {}", m_Position.x,m_Position.y,m_Position.z);
+		HAZEL_CORE_ERROR("fov : {}", m_verticalFOV);
+
 	}
 
 	void EditorCamera::RecalculateProjection()
 	{
-		m_Projection = glm::perspective(m_verticalFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+		// ** Take Vertical Fov in radians
+		m_Projection = glm::perspective(glm::radians(m_verticalFOV), m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 	}
 
 	void EditorCamera::SetPerspctive(float v_FOV, float Near, float Far)
@@ -98,7 +108,6 @@ namespace Hazel {
 		OldMousePos = NewMousePos;
 
 		RecalculateProjectionView();
-
 	}
 
 	void EditorCamera::RecalculateProjectionView()

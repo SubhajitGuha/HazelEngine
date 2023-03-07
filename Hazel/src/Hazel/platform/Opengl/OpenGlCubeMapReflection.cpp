@@ -4,14 +4,14 @@
 
 namespace Hazel {
 	LoadMesh* m_LoadMesh = nullptr;
-	LoadMesh* Cube = nullptr;
+	LoadMesh* Cube = nullptr,*Plane=nullptr;
 	OpenGlCubeMapReflection::OpenGlCubeMapReflection()
-		:cubemap_width(512),cubemap_height(512)
+		:cubemap_width(2048),cubemap_height(2048)
 	{
 		shader = Shader::Create("Assets/Shaders/ReflectionCubeMap.glsl");//texture shader
 		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");
 		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
-
+		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
 		CreateCubeMapTexture();
 	}
 	OpenGlCubeMapReflection::~OpenGlCubeMapReflection()
@@ -25,16 +25,21 @@ namespace Hazel {
 		glGenTextures(1, &tex_id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
 
+		glGenRenderbuffers(1, &depth_id);
+		glBindRenderbuffer(GL_RENDERBUFFER, depth_id);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, cubemap_width, cubemap_height);
+
 		for (int i = 0; i < 6; i++)//iterate over 6 images each representing the side of a cube
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, cubemap_width, cubemap_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, cubemap_width, cubemap_height, 0, GL_RGB, GL_FLOAT, nullptr);
 		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_id);
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 			HAZEL_CORE_WARN("FrameBuffer compleate!!");
@@ -45,55 +50,40 @@ namespace Hazel {
 		glBindTextureUnit(10, tex_id);
 	}
 
-	auto SwitchToFace = [&](int index)
-	{
-		switch (index)
-		{
-			//pitch , yaw
-		case 0:
-			return glm::vec2(0, 90.0f);
-		case 1:
-			return glm::vec2(0, -90.0f);
-		case 2:
-			return glm::vec2(-90.0f, 180.0f);
-		case 3:
-			return glm::vec2(90.0f, 180.0f);
-		case 4:
-			return glm::vec2(0, 180.0f);
-		case 5:
-			return glm::vec2(0, 0);
-		}
-	};
-
 	void OpenGlCubeMapReflection::RenderToCubeMap(Scene& scene)
 	{
-		shader->SetInt("env", slot);
-
-		EditorCamera cam = EditorCamera(cubemap_width, cubemap_height);
-		cam.SetPerspctive(90.00f, 0.01, 10000);
+		EditorCamera cam = EditorCamera();
+		cam.SetPerspctive(90.00f, 0.01, 1000);//mann this game me a headache (by not converting the FOV to radians) the fov is converted to radians in the editorCamera class :)
 		cam.SetUPVector({ 0,-1,0 });
-		cam.SetCameraPosition({ 0,-10,0 });
+		cam.SetCameraPosition({ 0,-5,0 });
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
-		glViewport(0, 0, cubemap_width, cubemap_height);
-		glm::vec3 pos = {0,-10,0};
+		glViewport(0, 0, cubemap_width , cubemap_height);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		std::vector<glm::vec3> dir = { {1,0,0},{-1,0,0},{0,-1,0},{0,1,0},{0,0,1},{0,0,-1} };
+		glm::vec3 pos = {0,-3,0};
 		shader->SetFloat3("LightPosition", pos);
+
 		for (int i = 0; i < 6; i++)
 		{
-			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, tex_id, 0);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+ i  , tex_id, 0);
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 				HAZEL_CORE_WARN("FrameBuffer compleate!!");
-			//cam.OnUpdate(1);
-			CubeMapEnvironment::RenderCubeMap(cam.GetViewMatrix(), cam.GetProjectionMatrix());
-			glm::vec2 dir = SwitchToFace(i);
-			cam.RotateCamera(dir.y, dir.x);
+
+			//glClearColor(1, 1, 1, 1);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			//cam.SetViewDirection(dir[i]);
+			SwitchToFace(i);//rotate the camera
+			cam.RotateCamera(yaw, pitch);
+
+			CubeMapEnvironment::RenderCubeMap(cam.GetViewMatrix(), cam.GetProjectionMatrix());//cubemap shader is binded here follow this order
 
 			shader->Bind();
 			shader->SetMat4("u_ProjectionView", cam.GetProjectionView());
 			shader->SetFloat3("EyePosition", cam.GetCameraPosition());
-
+			Renderer3D::DrawMesh(*m_LoadMesh, { 0,0,30 }, { 10,10,10 }, { 0,0,0 }, {0,1,0.6,1});
 			scene.getRegistry().each([&](auto m_entity)
 				{
 					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
@@ -110,10 +100,12 @@ namespace Hazel {
 						Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
 
 				});
+					Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
 		}
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		auto size = RenderCommand::GetViewportSize();
+		glViewport(0, 0, size.x, size.y);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glViewport(0, 0, 1920, 1080);
 		glBindTextureUnit(10, tex_id);
 	}
 
@@ -136,5 +128,36 @@ namespace Hazel {
 	{
 		cubemap_width = width;
 		cubemap_height = height;
+	}
+	void  OpenGlCubeMapReflection::SwitchToFace(int n)
+	{
+		switch (n)
+		{
+			//pitch , yaw
+		case 0:
+			pitch = 0;
+			yaw = -90;
+			break;
+		case 1:
+			pitch = 0;
+			yaw = 90;
+			break;
+		case 2:
+			pitch = 90.0f;
+			yaw = 180;
+			break;
+		case 3:
+			pitch = -90;
+			yaw = 0;
+			break;
+		case 4:
+			pitch = 0;
+			yaw = 0;
+			break;
+		case 5:
+			pitch = 0;
+			yaw = 180;
+			break;
+		}
 	}
 }

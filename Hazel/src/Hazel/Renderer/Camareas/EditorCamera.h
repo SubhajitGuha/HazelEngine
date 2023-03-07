@@ -26,6 +26,7 @@ namespace Hazel {
 		void SetViewDirection(const glm::vec3& dir) { m_ViewDirection = dir; RecalculateProjectionView(); }
 		void SetUPVector(const glm::vec3& up) {	Up = up; RecalculateProjectionView();}
 		void RotateCamera(float yaw, float pitch);
+		inline glm::vec3 GetViewDirection() { return m_ViewDirection; }
 
 	private:
 		void RecalculateProjection();

@@ -12,6 +12,7 @@ namespace Hazel {
 	
 	 LoadMesh* Scene::m_LoadMesh=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr;
 	EditorCamera editor_cam;
+	bool capture = false;
 	Scene::Scene()
 	{
 		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");
@@ -32,6 +33,7 @@ namespace Hazel {
 			entity->AddComponent<TagComponent>(name);
 		//Entity_Map[entity->GetComponent<TagComponent>()] = entity;
 		Renderer3D::SetUpCubeMapReflections(*this);
+		capture = true;
 		return entity;
 	}
 	void Scene::DestroyEntity(const Entity& delete_entity)
@@ -41,8 +43,8 @@ namespace Hazel {
 	void Scene::OnUpdate(TimeStep ts)
 	{
 		//run scripts
-
 		editor_cam.OnUpdate(ts);
+
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
 		{
 				if(nsc.m_Script==nullptr)
