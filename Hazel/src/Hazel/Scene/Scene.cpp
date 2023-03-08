@@ -42,9 +42,9 @@ namespace Hazel {
 	}
 	void Scene::OnUpdate(TimeStep ts)
 	{
-		//run scripts
-		editor_cam.OnUpdate(ts);
 
+		editor_cam.OnUpdate(ts);
+		//run scripts
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
 		{
 				if(nsc.m_Script==nullptr)
@@ -96,11 +96,12 @@ namespace Hazel {
 			Renderer3D::EndScene();
 
 			Renderer3D::BeginScene(editor_cam);
-			Renderer3D::DrawMesh(*m_LoadMesh);
-			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
+			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 0,0,0 });
 			//Renderer3D::EndScene();
-
+			
 			Renderer3D::SetUpCubeMapReflections(*this);
+
+			Renderer3D::RenderShadows(*this, editor_cam);
 
 	}
 	void Scene::OnCreate()

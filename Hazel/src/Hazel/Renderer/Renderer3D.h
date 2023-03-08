@@ -2,6 +2,7 @@
 #include "Hazel/Core.h"
 #include "Hazel.h"
 #include "Hazel//Renderer/CubeMapReflection.h"
+#include "Hazel/Renderer/Shadows.h"
 
 namespace Hazel {
 	class EditorCamera;
@@ -20,7 +21,11 @@ namespace Hazel {
 		static void DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale = {1,1,1}, const glm::vec3& rotation = { 0,0,0 }, const glm::vec4& color = { 1,1,1,1 });//take the mesh class reference
 		static void DrawMesh(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = {1,1,1,1});//take the mesh class reference
 		static void SetUpCubeMapReflections(Scene& scene);
+		static void RenderShadows(Scene& scene, EditorCamera& camera);
+
+		static unsigned int depth_id;
 	private:
+		static glm::vec3 m_LightPos;
 		friend class LoadMesh;
 	};
 }

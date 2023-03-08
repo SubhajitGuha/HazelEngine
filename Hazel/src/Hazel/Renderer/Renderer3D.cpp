@@ -9,7 +9,8 @@
 
 namespace Hazel {
 	EditorCamera m_camera;
-	
+	glm::vec3 Renderer3D::m_LightPos = { 0,-2,0 };//initial light position
+	unsigned int Renderer3D::depth_id = 0;
 	struct VertexAttributes {
 		//glm::vec3 Position;
 		glm::vec4 Position;
@@ -31,7 +32,7 @@ namespace Hazel {
 	struct Renderer3DStorage {
 		int max_Vertices = 10000;
 
-		unsigned int tex_id, framebuffer_id;
+		ref<Shadows> shadow_map;
 		ref<CubeMapReflection> reflection;
 		ref<Shader> shader;
 		ref<Texture2D> WhiteTex,tex;
@@ -50,8 +51,11 @@ namespace Hazel {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		m_data->reflection = CubeMapReflection::Create();
-		m_data->shader->Bind();
+		m_data->shadow_map = Shadows::Create(2048, 2048);//create a 2048x2048 shadow map
+		depth_id = m_data->shadow_map->GetDepth_ID();
+		//m_data->shader->Bind();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 		m_data->bl = std::make_shared<BufferLayout>(); //buffer layout
 
@@ -70,6 +74,7 @@ namespace Hazel {
 		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
 																						//which will be used to render textures in batch renderer
 		SetLightPosition({ 3,-2,2});
+		m_data->shader->SetInt("ShadowMap", 7);
 	}
 
 	void Renderer3D::BeginScene(OrthographicCamera& camera)
@@ -102,6 +107,7 @@ namespace Hazel {
 
 	void Renderer3D::SetLightPosition(const glm::vec3& pos)
 	{
+		m_LightPos = pos;
 		m_data->shader->SetFloat3("LightPosition", pos);
 	}
 
@@ -179,6 +185,15 @@ namespace Hazel {
 		m_data->shader->SetInt("env", 10);//for now assign to 10 :)
 		m_data->reflection->RenderToCubeMap(scene);
 		m_data->shader->Bind();//you need to bind this other wise nothing will be rendererd
+	}
+
+	void Renderer3D::RenderShadows(Scene& scene, EditorCamera& camera)
+	{
+		m_data->shader->SetInt("ShadowMap", 7);
+
+		m_data->shadow_map->RenderShadows(scene, m_LightPos , camera, m_data->shader);
+		m_data->shader->Bind();
+		//delete m_data->shadow_map.get();
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)

@@ -1,6 +1,6 @@
 #include "HazelEditor.h"
 #include "Hazel/Renderer/CubeMapEnvironment.h"
-
+#include "Hazel//Renderer/Shadows.h"
 //#include "Hazel/Profiling.h"
 
 LoadMesh* mesh;
@@ -229,6 +229,9 @@ void  HazelEditor::OnImGuiRender()
 	Renderer3D::SetLightPosition(Lightpos);
 	ImGui::End();
 
+	ImGui::Begin("Shadow Map");
+	ImGui::Image((void*)Renderer3D::depth_id, ImVec2(512, 512));
+	ImGui::End();
 	m_Pannel.OnImGuiRender();
 }
 

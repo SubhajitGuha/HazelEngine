@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlShadows.h" />
     <ClInclude Include="src\Hazel\Renderer\CubeMapReflection.h" />
     <ClInclude Include="src\Hazel\Renderer\CubeMapEnvironment.h" />
     <ClInclude Include="src\Hazel\Renderer\Renderer3D.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="src\Hazel\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Hazel\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Hazel\Renderer\Shader.h" />
+    <ClInclude Include="src\Hazel\Renderer\Shadows.h" />
     <ClInclude Include="src\Hazel\Renderer\SubTexture.h" />
     <ClInclude Include="src\Hazel\Renderer\Texture.h" />
     <ClInclude Include="src\Hazel\Scene\Component.h" />
@@ -211,6 +213,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlShadows.cpp" />
     <ClCompile Include="src\Hazel\Renderer\CubeMapReflection.cpp" />
     <ClCompile Include="src\Hazel\Renderer\CubeMapEnvironment.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Renderer3D.cpp" />
@@ -234,6 +237,7 @@
     <ClCompile Include="src\Hazel\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Hazel\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Shadows.cpp" />
     <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp" />
     <ClCompile Include="src\Hazel\Scene\Entity.cpp" />

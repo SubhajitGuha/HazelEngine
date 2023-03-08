@@ -250,6 +250,8 @@
     <ClInclude Include="src\Hazel\Renderer\CubeMapEnvironment.h" />
     <ClInclude Include="src\Hazel\Renderer\CubeMapReflection.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlShadows.h" />
+    <ClInclude Include="src\Hazel\Renderer\Shadows.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -363,5 +365,7 @@
     <ClCompile Include="src\Hazel\Renderer\CubeMapEnvironment.cpp" />
     <ClCompile Include="src\Hazel\Renderer\CubeMapReflection.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlShadows.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Shadows.cpp" />
   </ItemGroup>
 </Project>

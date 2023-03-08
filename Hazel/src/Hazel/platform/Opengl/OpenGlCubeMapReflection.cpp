@@ -8,6 +8,7 @@ namespace Hazel {
 	OpenGlCubeMapReflection::OpenGlCubeMapReflection()
 		:cubemap_width(2048),cubemap_height(2048)
 	{
+		RenderCommand::Init();
 		shader = Shader::Create("Assets/Shaders/ReflectionCubeMap.glsl");//texture shader
 		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");
 		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
@@ -45,7 +46,7 @@ namespace Hazel {
 			HAZEL_CORE_WARN("FrameBuffer compleate!!");
 
 		GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, draw_buffers);
+		glDrawBuffers(1, draw_buffers);//Tell the fragment shader to output the color in the RenderTarget GL_COLOR_ATTACHMENT0
 
 		glBindTextureUnit(10, tex_id);
 	}
@@ -55,7 +56,7 @@ namespace Hazel {
 		auto size = RenderCommand::GetViewportSize();
 
 		EditorCamera cam = EditorCamera();
-		cam.SetPerspctive(90.00f, 0.01, 1000);//mann this game me a headache (by not converting the FOV to radians) the fov is converted to radians in the editorCamera class :)
+		cam.SetPerspctive(90.00f, 0.01, 1000);//*** mann this game me a headache (by not converting the FOV to radians) the fov is converted to radians in the editorCamera class :)
 		cam.SetUPVector({ 0,-1,0 });
 		cam.SetCameraPosition({ 0,-5,0 });
 
@@ -65,27 +66,26 @@ namespace Hazel {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		std::vector<glm::vec3> dir = { {1,0,0},{-1,0,0},{0,-1,0},{0,1,0},{0,0,1},{0,0,-1} };
 		glm::vec3 pos = {0,-3,0};
-		shader->SetFloat3("LightPosition", pos);
+		shader->SetFloat3("LightPosition", pos);//world position
 
 		for (int i = 0; i < 6; i++)
 		{
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+ i  , tex_id, 0);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i , tex_id, 0);//Render the scene in the corresponding face on the cube map and "GL_COLOR_ATTACHMENT0" Represents the Render target where the fragment shader should output the color
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 				HAZEL_CORE_WARN("FrameBuffer compleate!!");
 
-			//glClearColor(1, 1, 1, 1);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//clear the buffers each time
 
-			//cam.SetViewDirection(dir[i]);
 			SwitchToFace(i);//rotate the camera
 			cam.RotateCamera(yaw, pitch);
 
+			//Render the cube map
 			CubeMapEnvironment::RenderCubeMap(cam.GetViewMatrix(), cam.GetProjectionMatrix());//cubemap shader is binded here follow this order
 
-			shader->Bind();
+			shader->Bind();//bind the shader and pass the projectionview and Eye pos as uniform.
 			shader->SetMat4("u_ProjectionView", cam.GetProjectionView());
 			shader->SetFloat3("EyePosition", cam.GetCameraPosition());
-			scene.getRegistry().each([&](auto m_entity)
+			scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
 				{
 					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
 					Entity Entity(&scene, m_entity);
@@ -103,7 +103,7 @@ namespace Hazel {
 				});
 					Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
 		}
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);//unbind the framebuffer to compleate the capturing process
 		glViewport(0, 0, size.x, size.y);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindTextureUnit(10, tex_id);

@@ -33,15 +33,6 @@ namespace Hazel {
 		//pitch = glm::clamp(pitch, -89.0f, 89.0f);
 		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::vec3(0, 0, 1);
 		RecalculateProjectionView();
-
-		//debug
-		HAZEL_CORE_ERROR("X : {}", m_ViewDirection.x);
-		HAZEL_CORE_ERROR("Y : {}", m_ViewDirection.y);
-		HAZEL_CORE_ERROR("Z : {}", m_ViewDirection.z);
-
-		HAZEL_CORE_ERROR("position : {} {} {}", m_Position.x,m_Position.y,m_Position.z);
-		HAZEL_CORE_ERROR("fov : {}", m_verticalFOV);
-
 	}
 
 	void EditorCamera::RecalculateProjection()
