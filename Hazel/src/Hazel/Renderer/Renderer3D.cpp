@@ -51,7 +51,7 @@ namespace Hazel {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		m_data->reflection = CubeMapReflection::Create();
-		m_data->shadow_map = Shadows::Create(2048, 2048);//create a 2048x2048 shadow map
+		m_data->shadow_map = Shadows::Create(512, 512);//create a 2048x2048 shadow map
 		depth_id = m_data->shadow_map->GetDepth_ID();
 		//m_data->shader->Bind();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,9 +189,9 @@ namespace Hazel {
 
 	void Renderer3D::RenderShadows(Scene& scene, EditorCamera& camera)
 	{
-		m_data->shader->SetInt("ShadowMap", 7);
-
-		m_data->shadow_map->RenderShadows(scene, m_LightPos , camera, m_data->shader);
+		//m_data->shader->SetInt("ShadowMap", 7);
+		m_data->shader->SetMat4("view", camera.GetViewMatrix());
+		m_data->shadow_map->RenderShadows(scene, m_LightPos , m_data->shader,camera);
 		m_data->shader->Bind();
 		//delete m_data->shadow_map.get();
 	}

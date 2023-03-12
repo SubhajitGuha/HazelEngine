@@ -1,6 +1,7 @@
 #include "HazelEditor.h"
 #include "Hazel/Renderer/CubeMapEnvironment.h"
 #include "Hazel//Renderer/Shadows.h"
+#include "Hazel/platform/Opengl/OpenGlShadows.h"
 //#include "Hazel/Profiling.h"
 
 LoadMesh* mesh;
@@ -231,6 +232,8 @@ void  HazelEditor::OnImGuiRender()
 
 	ImGui::Begin("Shadow Map");
 	ImGui::Image((void*)Renderer3D::depth_id, ImVec2(512, 512));
+	ImGui::DragInt("Cascade Level", &OpenGlShadows::Cascade_level, 1, 0, 100);
+	ImGui::DragFloat("lamda", &OpenGlShadows::m_lamda, 0.01, 0, 1);
 	ImGui::End();
 	m_Pannel.OnImGuiRender();
 }

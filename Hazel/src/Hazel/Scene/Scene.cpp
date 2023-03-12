@@ -18,6 +18,7 @@ namespace Hazel {
 		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");
 		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
 		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
+		editor_cam.SetViewportSize(1920.0,1080.0);
 	}
 	Scene::~Scene()
 	{
