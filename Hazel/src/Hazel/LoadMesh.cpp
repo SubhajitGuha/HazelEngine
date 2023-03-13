@@ -1,6 +1,9 @@
 #include "hzpch.h"
 #include "LoadMesh.h"
 #include "Log.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 namespace Hazel {
 	LoadMesh::LoadMesh()

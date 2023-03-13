@@ -1,0 +1,10 @@
+^G:\HAZEL_ENGINE\HAZEL\VENDOR\ASSIMP\CONTRIB\ZLIB\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SG:/Hazel_Engine/Hazel/vendor/assimp -BG:/Hazel_Engine/Hazel/vendor/assimp --check-stamp-file G:/Hazel_Engine/Hazel/vendor/assimp/contrib/zlib/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

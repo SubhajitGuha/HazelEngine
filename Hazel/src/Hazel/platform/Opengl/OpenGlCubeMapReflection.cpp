@@ -65,7 +65,7 @@ namespace Hazel {
 		glViewport(0, 0, cubemap_width , cubemap_height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		std::vector<glm::vec3> dir = { {1,0,0},{-1,0,0},{0,-1,0},{0,1,0},{0,0,1},{0,0,-1} };
-		glm::vec3 pos = {0,-3,0};
+		glm::vec3 pos = {2,3,6};
 		shader->SetFloat3("LightPosition", pos);//world position
 
 		for (int i = 0; i < 6; i++)

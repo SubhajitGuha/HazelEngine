@@ -40,7 +40,7 @@ namespace Hazel {
 
 		for (int i = 0; i < MAX_CASCADES; i++) 
 		{
-			glm::mat4 LightProjection = m_ShadowProjection[i] * LightView[i];
+			glm::mat4 LightProjection = m_ShadowProjection[i] * LightView[i]; //placing a orthographic camera on the light position(i.e position at centroid of each frustum)
 
 			shadow_shader->Bind();
 			shadow_shader->SetMat4("LightProjection", LightProjection);
@@ -111,7 +111,6 @@ namespace Hazel {
 
 			glBindTextureUnit(i+11, depth_id[i]);
 		}
-		m_Camera_Projection = glm::perspective(glm::radians(45.0f), 1.0f, 1.f, 1000.f);
 	}
 	void OpenGlShadows::PrepareShadowProjectionMatrix(EditorCamera& camera,const glm::vec3& LightPosition)
 	{
@@ -160,7 +159,7 @@ namespace Hazel {
 			}
 			centre /= 8.0f;//calculate the centroid of the frustum cube and this will be the position for the light view matrix
 
-			LightView[i-1] = glm::lookAt(centre , centre + glm::normalize(LightPosition), { 0,1,0 });
+			LightView[i-1] = glm::lookAt(centre , centre + glm::normalize(LightPosition), { 0,1,0 }); //move the camera to the centroid of each frustum
 
 			glm::mat4 matrix_lv = LightView[i - 1];
 			float min_x = std::numeric_limits<float>::max();

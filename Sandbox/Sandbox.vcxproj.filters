@@ -26,22 +26,21 @@
     <ClCompile Include="src\DisplayNews.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ImGuiInputText.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="src\Sandbox2dApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\SandboxApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ImGuiInputText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\Test.png">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\img_2.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\rickshaw.png">

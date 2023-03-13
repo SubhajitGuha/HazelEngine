@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="G:\Hazel_Engine\Hazel\vendor\assimp\CMakeFiles\7d34ad09c8fd44fd56bc304caadb4838\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{3EED20CC-A25D-3C4C-AB66-4C109BDE75FA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

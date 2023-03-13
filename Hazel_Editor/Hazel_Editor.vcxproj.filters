@@ -10,27 +10,46 @@
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Pannels">
+      <UniqueIdentifier>{ED937505-5949-EEFA-E23D-E8D14EF2E4FE}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HazelEditor.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Pannels\SceneHierarchy.h" />
+    <ClInclude Include="src\Pannels\SceneHierarchy.h">
+      <Filter>src\Pannels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HazelEditor.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Pannels\SceneHierarchy.cpp">
+      <Filter>src\Pannels</Filter>
+    </ClCompile>
     <ClCompile Include="src\SandboxApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Pannels\SceneHierarchy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\Test.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\img_0.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\img_1.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\img_2.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\img_3.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\rickshaw.png">

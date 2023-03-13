@@ -22,6 +22,7 @@ IncludeDir["stb_image"] = "Hazel/vendor/stb_image"
 IncludeDir["entt"] = "Hazel/vendor/entt"
 IncludeDir["curl"] = "Hazel/vendor/Curl/include"
 IncludeDir["json"]="Hazel/vendor/jsoncpp"
+IncludeDir["assimp"]="Hazel/vendor/assimp/include"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
@@ -55,7 +56,10 @@ project "Hazel"
 		"%{IncludeDir.json}/**.h",
 		"%{IncludeDir.json}/**.cpp",
 		"%{IncludeDir.json}/**.c",
-		"%{IncludeDir.entt}/**.hpp"
+		"%{IncludeDir.entt}/**.hpp",
+		"%{IncludeDir.assimp}/**.h",
+		"%{IncludeDir.assimp}/**.cpp",
+		"%{IncludeDir.assimp}/**.hpp"
 	}
 
 	includedirs
@@ -69,7 +73,8 @@ project "Hazel"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.curl}",
 		"%{IncludeDir.json}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.assimp}"
 	}
 
 	links{
@@ -82,7 +87,8 @@ project "Hazel"
 		"Wldap32.lib",
 		"Crypt32.lib",
 		"advapi32.lib",
-		"Hazel/vendor/Curl/lib/libcurl_a_debug.lib"
+		"Hazel/vendor/Curl/lib/libcurl_a_debug.lib",
+		"Hazel/vendor/assimp/lib/Release/assimp-vc142-mt.lib"
 	}
 
 	filter "system:windows"
