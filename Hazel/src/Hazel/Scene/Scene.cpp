@@ -102,8 +102,7 @@ namespace Hazel {
 			
 			Renderer3D::SetUpCubeMapReflections(*this);
 
-			Renderer3D::RenderShadows(*this, editor_cam);
-
+			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
 	}
 	void Scene::OnCreate()
 	{

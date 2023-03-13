@@ -4,8 +4,8 @@
 
 namespace Hazel {
 
-	int OpenGlShadows::Cascade_level = 0;
-	float OpenGlShadows::m_lamda = 0.2;
+	int Shadows::Cascade_level = 0;
+	float Shadows::m_lamda = 0.1;
 	OpenGlShadows::OpenGlShadows()
 		:m_width(2048), m_height(2048)
 	{
@@ -27,15 +27,16 @@ namespace Hazel {
 		GLint OFb;
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &OFb);
 		auto size = RenderCommand::GetViewportSize();
-		PrepareShadowProjectionMatrix(cam,LightPosition);
+		PrepareShadowProjectionMatrix(cam,LightPosition);//CREATE THE orthographic projection matrix
 
 		std::vector<glm::mat4> LightProj_Matrices(MAX_CASCADES);
 		for (int i = 0; i < MAX_CASCADES; i++)
 			LightProj_Matrices[i] = m_ShadowProjection[i] * LightView[i];
 		rendering_shader->SetMat4("MatrixShadow", LightProj_Matrices[0], MAX_CASCADES);
-		unsigned int arr[] = { 11,12,13,14 };
+		unsigned int arr[] = { 11,12,13,14 };//these slots are explicitly used for all 4 seperate shadow maps
 		rendering_shader->SetIntArray("ShadowMap", MAX_CASCADES, arr);
 		rendering_shader->SetFloatArray("Ranges", Ranges[0], MAX_CASCADES);
+		rendering_shader->SetMat4("view", cam.GetViewMatrix());//we need the camera's view matrix so that we can compute the distance comparison in view space
 
 		for (int i = 0; i < MAX_CASCADES; i++) 
 		{
@@ -127,11 +128,13 @@ namespace Hazel {
 			float practical = m_lamda * uniform_split + (1 - m_lamda) * log_split;
 			Ranges[i] = practical;
 		}
+		//iterate through all the cascade levels
 		for (int i = 1; i <= MAX_CASCADES; i++)
 		{
 			float m_NearPlane = Ranges[i - 1];
 			float m_FarPlane = Ranges[i];
 
+			// create the view camera projection matrix based on the near and far plane
 			m_Camera_Projection = glm::perspective(glm::radians(camera.GetVerticalFOV()), camera.GetAspectRatio(), m_NearPlane, m_FarPlane);
 			
 			glm::vec3 centre = glm::vec3(0.0f);
@@ -155,10 +158,9 @@ namespace Hazel {
 				frustum_corners[i] = p/p.w;
 				centre += glm::vec3(frustum_corners[i]);
 			}
-			centre /= 8.0f;
-			HAZEL_INFO("centre {} {} {}",centre.x,centre.y,centre.z);
+			centre /= 8.0f;//calculate the centroid of the frustum cube and this will be the position for the light view matrix
 
-			LightView[i-1] = glm::lookAt(centre + glm::normalize(LightPosition), centre, { 0,1,0 });
+			LightView[i-1] = glm::lookAt(centre , centre + glm::normalize(LightPosition), { 0,1,0 });
 
 			glm::mat4 matrix_lv = LightView[i - 1];
 			float min_x = std::numeric_limits<float>::max();
@@ -170,10 +172,8 @@ namespace Hazel {
 
 			for (int i = 0; i < 8; i++)
 			{
-				glm::vec4 corner = matrix_lv * frustum_corners[i];//convert to world coordinate
+				glm::vec4 corner = matrix_lv * frustum_corners[i];//convert to light's coordinate
 				corner /= corner.w;
-				//frustum_corners[i] = corner; //convert from world to light space
-				//frustum_corners[i] /= frustum_corners[i].w;
 
 				min_x = std::min(min_x, corner.x);
 				max_x = std::max(max_x, corner.x);
@@ -182,9 +182,6 @@ namespace Hazel {
 				min_z = std::min(min_z, corner.z);
 				max_z = std::max(max_z, corner.z);
 			}
-			HAZEL_CORE_ERROR("minX,MaxX,MinY,MaxY,MinZ,MaxZ {} {} {} {} {} {}", min_x, max_x, min_y, max_y , min_z, max_z);
-			int k = 5;
-
 			constexpr float zMult = 100.0f;
 			if (min_z < 0)
 			{

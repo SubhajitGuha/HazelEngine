@@ -71,12 +71,13 @@ void main()
 	VertexPosition_LightSpace = MatrixShadow[level] * m_pos;
 
 	//color = vec4(m_pos.xyz,1.0);
-	vec3 LightDirection = normalize(LightPosition - vec3(m_pos.x,m_pos.y,m_pos.z));
+	//vec3 LightDirection = normalize(LightPosition - vec3(m_pos.x,m_pos.y,m_pos.z)); //for point light
+	vec3 LightDirection = normalize(-LightPosition );//for directional light as it has no concept of position
 
 	//shadows
 	vec3 p = VertexPosition_LightSpace.xyz/VertexPosition_LightSpace.w;
 	p = p * 0.5 + 0.5;
-	float bias = 0.00002;//bias to resolve the artifact
+	float bias = 0.00001;//bias to resolve the artifact
 	float shadow = texture(ShadowMap[level],p.xy).r  < p.z - bias? 0:1;// sample the depth map and check the p.xy coordinate of depth map with the p.z value
 	
 	//diffuse
@@ -90,7 +91,7 @@ void main()
 	vec3 EyeDirection = normalize(EyePosition - vec3(m_pos));
 	vec3 Reflected_Light = reflect(-LightDirection , m_Normal);
 	float s_brightness = clamp(dot(EyeDirection , Reflected_Light),0,1);
-	float b = pow(s_brightness,100);//to reduce the size of specular see the graph of (cosx)^2
+	float b = pow(s_brightness,500);//to reduce the size of specular see the graph of (cosx)^2
 	vec4 specular = m_color * vec4(b,b,b,1) * vec4(shadow,shadow,shadow,1);
 
 	//environment reflections
@@ -100,7 +101,9 @@ void main()
 
 
 	float dist = length(LightPosition-vec3(m_pos));
-	float attenuation = 1/(0.1 + 0*dist + 0.008 * dist*dist);
-	color= texture(u_Texture[index],tcord) * clamp(diffuse,0,attenuation) + ambiant + clamp(specular,0,attenuation) ;
+	//float attenuation = 1/(0.1 + 0*dist + 0.008 * dist*dist); //attenuation is for point and spot light
+	//color= texture(u_Texture[index],tcord) * clamp(diffuse,0,attenuation) + ambiant + clamp(specular,0,attenuation) ;
+	color= texture(u_Texture[index],tcord) * clamp(diffuse,0,1) + ambiant + clamp(specular,0,1) ; //for directional light (no attenuation)
+
 
 }

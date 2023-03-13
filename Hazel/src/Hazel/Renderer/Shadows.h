@@ -13,5 +13,8 @@ namespace Hazel {
 		virtual unsigned int GetDepth_ID() = 0;
 		static ref<Shadows> Create(float width, float height);
 		static ref<Shadows> Create();//creates a texture map of 2048x2048 resolution
+	public:
+		static int Cascade_level;
+		static float m_lamda;
 	};
 }

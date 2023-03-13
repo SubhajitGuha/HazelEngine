@@ -232,8 +232,8 @@ void  HazelEditor::OnImGuiRender()
 
 	ImGui::Begin("Shadow Map");
 	ImGui::Image((void*)Renderer3D::depth_id, ImVec2(512, 512));
-	ImGui::DragInt("Cascade Level", &OpenGlShadows::Cascade_level, 1, 0, 100);
-	ImGui::DragFloat("lamda", &OpenGlShadows::m_lamda, 0.01, 0, 1);
+	ImGui::DragInt("Cascade Level", &Shadows::Cascade_level, 1, 0, 100);
+	ImGui::DragFloat("lamda", &Shadows::m_lamda, 0.00001, 0, 1,"%8f");
 	ImGui::End();
 	m_Pannel.OnImGuiRender();
 }

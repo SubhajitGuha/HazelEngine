@@ -13,8 +13,7 @@ namespace Hazel{
 		virtual void SetShadowMapResolution(const float& width, float height) override;
 		virtual unsigned int GetDepth_ID() override { return depth_id[0]; }
 		void CreateShdowMap();
-		static int Cascade_level;
-		static float m_lamda ;
+		
 	private:
 		void PrepareShadowProjectionMatrix(EditorCamera& camera,const glm::vec3& LightPosition);
 
