@@ -10,7 +10,7 @@
 
 namespace Hazel {
 	
-	 LoadMesh* Scene::m_LoadMesh=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr;
+	 LoadMesh* Scene::m_LoadMesh=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *plant;
 	EditorCamera editor_cam;
 	bool capture = false;
 	Scene::Scene()
@@ -18,6 +18,7 @@ namespace Hazel {
 		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");
 		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
 		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
+		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		editor_cam.SetViewportSize(1920.0,1080.0);
 	}
 	Scene::~Scene()
@@ -43,7 +44,6 @@ namespace Hazel {
 	}
 	void Scene::OnUpdate(TimeStep ts)
 	{
-
 		editor_cam.OnUpdate(ts);
 		//run scripts
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
@@ -98,6 +98,10 @@ namespace Hazel {
 
 			Renderer3D::BeginScene(editor_cam);
 			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 0,0,0 });
+			Renderer3D::DrawMesh(*plant, { 3,0,0 }, { 1,1,1 }, { 90,0,0 });
+			Renderer3D::DrawMesh(*plant, { 6,0,0 }, { 1,1,1 }, { 90,0,0 });
+
+
 			//Renderer3D::EndScene();
 			
 			Renderer3D::SetUpCubeMapReflections(*this);

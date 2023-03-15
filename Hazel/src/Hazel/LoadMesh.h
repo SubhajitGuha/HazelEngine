@@ -4,6 +4,9 @@
 #include <sstream>
 #include <vector>
 
+struct aiMesh;
+struct aiNode;
+struct aiScene;
 namespace Hazel {
 	class LoadMesh
 	{
@@ -19,5 +22,10 @@ namespace Hazel {
 		std::vector<unsigned int> Vertex_Indices;
 		std::vector<unsigned int> TexCoord_Indices;
 		std::vector<unsigned int> Normal_Indices;
+	private:
+		std::vector<aiMesh*> m_Mesh;
+	private:
+		void ProcessNode(aiNode* Node, const aiScene* scene);
+		void ProcessMesh();
 	};
 }

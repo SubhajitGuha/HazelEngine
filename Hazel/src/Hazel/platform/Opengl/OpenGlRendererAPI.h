@@ -9,6 +9,7 @@ namespace Hazel {
 		void ClearColor(const glm::vec4&)override;
 		void Clear()override;
 		void DrawIndex(VertexArray& vertexarray)override;
+		virtual void DrawArrays(VertexArray& vertexarray,size_t count, int first = 0) override;
 		void DrawLine(VertexArray& vertexarray,uint32_t count)override;
 		void Init() override;
 		void SetViewPort(unsigned int, unsigned int) override;

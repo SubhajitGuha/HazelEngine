@@ -29,6 +29,7 @@ namespace Hazel {
 		
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
+		std::thread shadow_thread;
 		//friend class Entity;
 
 	};

@@ -19,86 +19,60 @@ namespace Hazel {
 	}
 	void LoadMesh::LoadObj(const std::string& Path)
 	{
-		std::ifstream file(Path);
-		if (!file) {
-			HAZEL_CORE_ERROR("Mesh Cannot be loaded! File Not Found");
+		Assimp::Importer importer;
+		const aiScene* scene = importer.ReadFile(Path, aiProcess_Triangulate | aiProcess_OptimizeMeshes | aiProcess_FixInfacingNormals | aiProcess_GenNormals | aiProcess_GenSmoothNormals | aiProcess_SplitLargeMeshes);
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+		{
+			HAZEL_CORE_ERROR("ERROR::ASSIMP::");
+			HAZEL_CORE_ERROR(importer.GetErrorString());
 			return;
 		}
+		ProcessNode(scene->mRootNode, scene);
+		ProcessMesh();
+	}
 
-		std::string line;
-		while (std::getline(file, line))
+	void LoadMesh::ProcessNode(aiNode* Node, const aiScene* scene)
+	{
+		for (int i = 0; i < Node->mNumMeshes; i++)
 		{
-			std::string word;
-			std::stringstream ss(line);
-			ss >> word;
-			if (word == "v")
+			aiMesh* mesh = scene->mMeshes[Node->mMeshes[i]];
+			m_Mesh.push_back(mesh);
+		}
+		for (int i = 0; i < Node->mNumChildren; i++)
+		{
+			ProcessNode(Node->mChildren[i], scene);
+		}
+	}
+	void LoadMesh::ProcessMesh()
+	{
+		for (int i = 0; i < m_Mesh.size(); i++)
+		{
+			for (int k = 0; k < m_Mesh[i]->mNumVertices; k++) 
 			{
-				std::string tmp;
-				glm::vec3 vertex;
-				ss >> tmp;
-				vertex.x = std::stof(tmp);
-				ss >> tmp;
-				vertex.y = std::stof(tmp);
-				ss >> tmp;
-				vertex.z = std::stof(tmp);
-				vertices.push_back(vertex);
+				aiVector3D aivertices = m_Mesh[i]->mVertices[k];
+				vertices.push_back({ aivertices.x,aivertices.y,aivertices.z });
+
+				if (m_Mesh[i]->HasNormals()) {
+					aiVector3D ainormal = m_Mesh[i]->mNormals[k];
+					Normal.push_back({ ainormal.x,ainormal.y,ainormal.z });
+				}
+
+				glm::vec2 coord(0.0f);
+				if (m_Mesh[i]->mTextureCoords[0])
+				{
+					coord.x = m_Mesh[i]->mTextureCoords[0][k].x;
+					coord.y = m_Mesh[i]->mTextureCoords[0][k].y;
+
+					TexCoord.push_back(coord);
+				}
+				else
+					TexCoord.push_back(coord);
 			}
-			if (word == "vt")
+			for (int k = 0; k < m_Mesh[i]->mNumFaces; k++)
 			{
-				std::string tmp;
-				glm::vec3 tex_coord;
-				ss >> tmp;
-				tex_coord.x = std::stof(tmp);
-				ss >> tmp;
-				tex_coord.y = std::stof(tmp);
-				TexCoord.push_back(tex_coord);
-			}
-			if (word == "vn")
-			{
-				std::string tmp;
-				glm::vec3 vertex_normals;
-				ss >> tmp;
-				vertex_normals.x = std::stof(tmp);
-				ss >> tmp;
-				vertex_normals.y = std::stof(tmp);
-				ss >> tmp;
-				vertex_normals.z = std::stof(tmp);
-				Normal.push_back(vertex_normals);
-			}
-			if (word == "f")
-			{
-				std::string tmp;
-
-				ss >> tmp; {
-					int found_loc = 0;
-					found_loc = tmp.find("/", 0);
-					Vertex_Indices.push_back((unsigned int)std::stoi(tmp.substr(0, found_loc)) - 1);
-					std::string res = tmp.substr(found_loc + 1, tmp.find("/", found_loc));
-					//if (res.find( "/")!=-1)//check if 
-						//res = "0";
-					TexCoord_Indices.push_back((unsigned int)std::stoi(res) - 1);
-					Normal_Indices.push_back((unsigned int)std::stoi(tmp.substr(tmp.find_last_of("/")+1)) - 1); }
-
-				ss >> tmp; {
-					int found_loc = 0;
-					found_loc = tmp.find("/", 0);
-					Vertex_Indices.push_back((unsigned int)std::stoi(tmp.substr(0, found_loc)) - 1);
-					std::string res = tmp.substr(found_loc + 1, tmp.find("/", found_loc));
-					//if (res.find("/") != -1)
-						//res = "0";
-					TexCoord_Indices.push_back((unsigned int)std::stoi(res) - 1);
-					Normal_Indices.push_back((unsigned int)std::stoi(tmp.substr(tmp.find_last_of("/")+1)) - 1); }
-
-				ss >> tmp; {
-					int found_loc = 0;
-					found_loc = tmp.find("/", 0);
-					Vertex_Indices.push_back((unsigned int)std::stoi(tmp.substr(0, found_loc)) - 1);
-					std::string res = tmp.substr(found_loc + 1, tmp.find("/", found_loc));
-
-					TexCoord_Indices.push_back((unsigned int)std::stoi(res) - 1);
-					std::string res1 = tmp.substr(found_loc + 1);
-					Normal_Indices.push_back((unsigned int)std::stoi(tmp.substr(tmp.find_last_of("/")+1)) - 1); }
-
+				aiFace face = m_Mesh[i]->mFaces[k];
+				for (int j = 0; j < face.mNumIndices; j++)
+					Vertex_Indices.push_back(face.mIndices[j]);
 			}
 		}
 	}

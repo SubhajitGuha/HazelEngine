@@ -53,7 +53,7 @@ namespace Hazel {
 		m_data->reflection = CubeMapReflection::Create();
 		m_data->shadow_map = Shadows::Create(4096, 4096);//create a 2048x2048 shadow map
 		depth_id = m_data->shadow_map->GetDepth_ID();
-		//m_data->shader->Bind();
+		m_data->shader->Bind();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -74,7 +74,7 @@ namespace Hazel {
 		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
 																						//which will be used to render textures in batch renderer
 		SetLightPosition({ 3,-2,2});
-		m_data->shader->SetInt("ShadowMap", 7);
+		m_data->shader->SetInt("ShadowMap", 7);//explicitly setting it
 	}
 
 	void Renderer3D::BeginScene(OrthographicCamera& camera)
@@ -142,42 +142,38 @@ namespace Hazel {
 
 		//vb->SetData(sizeof(VertexAttributes) * m_data->Quad.size(), &m_data->Quad[0].Position.x);
 		//Renderer2D::LineEndScene();
-		RenderCommand::DrawIndex(*vao);
+		RenderCommand::DrawArrays(*vao, mesh.vertices.size());
+
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color)
 	{
-
 		std::vector< VertexAttributes> Quad(mesh.Vertex_Indices.size(), { glm::vec4(0.0),glm::vec2(0.0) });
-		std::vector<unsigned int> iba;
+		//std::vector<unsigned int> iba;
 
 		for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
 		{
-			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[mesh.Normal_Indices[i]]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-			Quad[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[mesh.Vertex_Indices[i]], 1), mesh.TexCoord[mesh.TexCoord_Indices[i]], color, 0, transformed_normals));
+			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
+			Quad[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, 1, transformed_normals));
 			//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
 		}
 
-		for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
-			iba.push_back(i);
+		//for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
+			//iba.push_back(i);
 
 		ref<VertexArray> vao = VertexArray::Create();
 
 		ref<VertexBuffer> vb(VertexBuffer::Create(&Quad[0].Position.x, sizeof(VertexAttributes) * Quad.size()));
-		vb->Bind();
-		//ref<IndexBuffer> ib(IndexBuffer::Create(&mesh.Vertex_Indices[0], sizeof(unsigned int) * mesh.Vertex_Indices.size()));//create the index buffer here
-		ref<IndexBuffer> ib(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
-		ib->Bind();
+		ref<IndexBuffer> ib(IndexBuffer::Create(&mesh.Vertex_Indices[0], sizeof(unsigned int) * mesh.Vertex_Indices.size()));//create the index buffer here
+		//ref<IndexBuffer> ib(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
 
 		vao->AddBuffer(m_data->bl, vb);
 		vao->SetIndexBuffer(ib);
 
-		//m_data->tex->Bind(1);
-		m_data->WhiteTex->Bind(0);
+		m_data->tex->Bind(1);
+		//m_data->WhiteTex->Bind(0);
 
-		//vb->SetData(sizeof(VertexAttributes) * m_data->Quad.size(), &m_data->Quad[0].Position.x);
-		//Renderer2D::LineEndScene();
-		RenderCommand::DrawIndex(*vao);
+		RenderCommand::DrawArrays(*vao,mesh.vertices.size());
 	}
 	
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
@@ -196,39 +192,37 @@ namespace Hazel {
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)
 	{
 		std::vector< VertexAttributes> Quad(mesh.Vertex_Indices.size(), { glm::vec4(0.0),glm::vec2(0.0) });
-		std::vector<unsigned int> iba;
+		//std::vector<unsigned int> iba;
 
 		auto Rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), { 1,0,0 }) *
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), { 0,1,0 }) *
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), { 0,0,1 });
 		auto transform = glm::translate(glm::mat4(1.0f), Position) * Rotation * glm::scale(glm::mat4(1.0), Scale);
 
-		for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
+		for (int i = 0; i < mesh.vertices.size(); i++)
 		{
-			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[mesh.Normal_Indices[i]]);
-			Quad[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[mesh.Vertex_Indices[i]], 1), mesh.TexCoord[mesh.TexCoord_Indices[i]], color, 0, transformed_normals));
+			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);
+			Quad[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, 0, transformed_normals));
 			//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
 		}
 
-		for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
-			iba.push_back(i);
+		//for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
+			//iba.push_back(i);
 
 		ref<VertexArray> vao = VertexArray::Create();
 
 		ref<VertexBuffer> vb(VertexBuffer::Create(&Quad[0].Position.x, sizeof(VertexAttributes) * Quad.size()));
-		//ref<IndexBuffer> ib(IndexBuffer::Create(&mesh.Vertex_Indices[0], sizeof(unsigned int) * mesh.Vertex_Indices.size()));//create the index buffer here
-		ref<IndexBuffer> ib(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
+		ref<IndexBuffer> ib(IndexBuffer::Create(&mesh.Vertex_Indices[0], sizeof(unsigned int) * mesh.Vertex_Indices.size()));//create the index buffer here
+		//ref<IndexBuffer> ib(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
 
 
 		vao->AddBuffer(m_data->bl, vb);
 		vao->SetIndexBuffer(ib);
 
-		//m_data->tex->Bind(1);
+		//m_data->tex->Bind(3);
 		m_data->WhiteTex->Bind(0);
 
-		//vb->SetData(sizeof(VertexAttributes) * m_data->Quad.size(), &m_data->Quad[0].Position.x);
-		//Renderer2D::LineEndScene();
-		RenderCommand::DrawIndex(*vao);
+		RenderCommand::DrawArrays(*vao, mesh.vertices.size());
 	}
 
 }

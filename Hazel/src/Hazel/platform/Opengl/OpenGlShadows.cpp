@@ -17,6 +17,7 @@ namespace Hazel {
 		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");//these should be the part of entity component system!!
 		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
 		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
+		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		CreateShdowMap();
 	}
 	OpenGlShadows::~OpenGlShadows()
@@ -27,7 +28,8 @@ namespace Hazel {
 		GLint OFb;
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &OFb);
 		auto size = RenderCommand::GetViewportSize();
-		PrepareShadowProjectionMatrix(cam,LightPosition);//CREATE THE orthographic projection matrix
+
+		PrepareShadowProjectionMatrix(cam, LightPosition);//CREATE THE orthographic projection matrix
 
 		std::vector<glm::mat4> LightProj_Matrices(MAX_CASCADES);
 		for (int i = 0; i < MAX_CASCADES; i++)
@@ -69,7 +71,7 @@ namespace Hazel {
 						Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
 				});
 			//Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
-
+			Renderer3D::DrawMesh(*plant, { 3,0,0 }, { 1,1,1 }, { 90,0,0 });
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glViewport(0, 0, size.x, size.y);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -114,6 +116,8 @@ namespace Hazel {
 	}
 	void OpenGlShadows::PrepareShadowProjectionMatrix(EditorCamera& camera,const glm::vec3& LightPosition)
 	{
+		m_ShadowProjection.clear();
+
 		float NearPlane = 1.0f;
 		float FarPlane = 100.0f;
 		Ranges.resize(MAX_CASCADES+1);//send this in the fragment shader for determining which cascade to use

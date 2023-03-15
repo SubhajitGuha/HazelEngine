@@ -22,6 +22,11 @@ namespace Hazel {
 		vertexarray.Bind();
 		glDrawElements(GL_TRIANGLES, vertexarray.GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (const void*)0);
 	}
+	void OpenGlRendererAPI::DrawArrays(VertexArray& vertexarray,size_t count,int first)
+	{
+		vertexarray.Bind();
+		glDrawArrays(GL_TRIANGLES, first, count);
+	}
 	void OpenGlRendererAPI::DrawLine(VertexArray& vertexarray,uint32_t count)
 	{
 		vertexarray.Bind();
