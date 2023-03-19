@@ -20,7 +20,7 @@ namespace Hazel {
 	void LoadMesh::LoadObj(const std::string& Path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(Path, aiProcess_Triangulate | aiProcess_OptimizeMeshes | aiProcess_FixInfacingNormals | aiProcess_GenNormals | aiProcess_GenSmoothNormals | aiProcess_SplitLargeMeshes);
+		const aiScene* scene = importer.ReadFile(Path, aiProcess_Triangulate | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes);
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HAZEL_CORE_ERROR("ERROR::ASSIMP::");
@@ -37,6 +37,19 @@ namespace Hazel {
 		{
 			aiMesh* mesh = scene->mMeshes[Node->mMeshes[i]];
 			m_Mesh.push_back(mesh);
+			if (mesh->mMaterialIndex >= 0)
+			{
+				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+				aiTextureType type = aiTextureType_BASE_COLOR;
+				
+				auto x = material->GetTextureCount(type);
+				for (unsigned int j = 0; j < x; j++)
+				{
+					std::string str;
+					material->GetTexture(type, j, (aiString*)&str);
+					Diffuse_Texture.push_back(str);
+				}
+			}
 		}
 		for (int i = 0; i < Node->mNumChildren; i++)
 		{

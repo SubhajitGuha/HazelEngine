@@ -99,13 +99,9 @@ namespace Hazel {
 			Renderer3D::BeginScene(editor_cam);
 			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 0,0,0 });
 			Renderer3D::DrawMesh(*plant, { 3,0,0 }, { 1,1,1 }, { 90,0,0 });
-			Renderer3D::DrawMesh(*plant, { 6,0,0 }, { 1,1,1 }, { 90,0,0 });
 
-
-			//Renderer3D::EndScene();
-			
 			Renderer3D::SetUpCubeMapReflections(*this);
-
+			
 			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
 	}
 	void Scene::OnCreate()

@@ -3,7 +3,6 @@
 #include "glad/glad.h"
 
 namespace Hazel {
-
 	int Shadows::Cascade_level = 0;
 	float Shadows::m_lamda = 0.1;
 	OpenGlShadows::OpenGlShadows()
@@ -40,45 +39,43 @@ namespace Hazel {
 		rendering_shader->SetFloatArray("Ranges", Ranges[0], MAX_CASCADES);
 		rendering_shader->SetMat4("view", cam.GetViewMatrix());//we need the camera's view matrix so that we can compute the distance comparison in view space
 
+		shadow_shader->Bind();
 		for (int i = 0; i < MAX_CASCADES; i++) 
-		{
-			glm::mat4 LightProjection = m_ShadowProjection[i] * LightView[i]; //placing a orthographic camera on the light position(i.e position at centroid of each frustum)
+			{
+				glm::mat4 LightProjection = m_ShadowProjection[i] * LightView[i]; //placing a orthographic camera on the light position(i.e position at centroid of each frustum)
 
-			shadow_shader->Bind();
-			shadow_shader->SetMat4("LightProjection", LightProjection);
+				shadow_shader->SetMat4("LightProjection", LightProjection);
 
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
-			glViewport(0, 0, m_width, m_height);
-			//glClear(GL_DEPTH_BUFFER_BIT);
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
+				glViewport(0, 0, m_width, m_height);
+				//glClear(GL_DEPTH_BUFFER_BIT);
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_id[i], 0);
-			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-				HAZEL_CORE_INFO("shadow map FrameBuffer compleate!!");
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_id[i], 0);
+				if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+					HAZEL_CORE_INFO("shadow map FrameBuffer compleate!!");
 
-			glClear(GL_DEPTH_BUFFER_BIT);
-			scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
-				{
-					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
-					Entity Entity(&scene, m_entity);
-					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
+				glClear(GL_DEPTH_BUFFER_BIT);
+				scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
+					{
+						//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
+						Entity Entity(&scene, m_entity);
+						auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
 
-					//if (camera.camera.bIsMainCamera) {
-					if (Entity.HasComponent<SpriteRenderer>()) {
-						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-						Renderer3D::DrawMesh(*m_LoadMesh, transform, SpriteRendererComponent.Color);
-					}
-					else
-						Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
-				});
-			//Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
-			Renderer3D::DrawMesh(*plant, { 3,0,0 }, { 1,1,1 }, { 90,0,0 });
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glViewport(0, 0, size.x, size.y);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glBindTextureUnit(i + 11, depth_id[i]);
-		}
-		
-		
+						//if (camera.camera.bIsMainCamera) {
+						if (Entity.HasComponent<SpriteRenderer>()) {
+							auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+							Renderer3D::DrawMesh(*m_LoadMesh, transform, SpriteRendererComponent.Color);
+						}
+						else
+							Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
+					});
+				//Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
+				Renderer3D::DrawMesh(*plant, { 3,0,0 }, { 1,1,1 }, { 90,0,0 });
+				
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+				glViewport(0, 0, size.x, size.y);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			}
 		//glBindTextureUnit(7, depth_id);
 	}
 	void OpenGlShadows::SetShadowMapResolution(const float& width, float height)
@@ -155,11 +152,11 @@ namespace Hazel {
 
 			auto camera_view = camera.GetViewMatrix();
 			glm::mat4 pv_inverse = glm::inverse(m_Camera_Projection * camera_view);
-			for (int i = 0; i < 8; i++)
+			for (int j = 0; j < 8; j++)
 			{
-				glm::vec4 p = pv_inverse * frustum_corners[i];//get the world space coordinate of frustum cube from cannonical-view-volume
-				frustum_corners[i] = p/p.w;
-				centre += glm::vec3(frustum_corners[i]);
+				glm::vec4 p = pv_inverse * frustum_corners[j];//get the world space coordinate of frustum cube from cannonical-view-volume
+				frustum_corners[j] = p/p.w;
+				centre += glm::vec3(frustum_corners[j]);
 			}
 			centre /= 8.0f;//calculate the centroid of the frustum cube and this will be the position for the light view matrix
 
@@ -173,9 +170,9 @@ namespace Hazel {
 			float min_z = std::numeric_limits<float>::max();
 			float max_z = std::numeric_limits<float>::lowest();
 
-			for (int i = 0; i < 8; i++)
+			for (int j = 0; j < 8; j++)
 			{
-				glm::vec4 corner = matrix_lv * frustum_corners[i];//convert to light's coordinate
+				glm::vec4 corner = matrix_lv * frustum_corners[j];//convert to light's coordinate
 				corner /= corner.w;
 
 				min_x = std::min(min_x, corner.x);

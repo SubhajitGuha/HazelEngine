@@ -5,7 +5,9 @@
 //This Buffer file contains Both index and vertex Buffer oi
 namespace Hazel {
 
-
+	enum BufferStorage_Type {
+		MUTABLE, IMMUTABLE
+	};
 	enum class DataType {
 		None=0,Float,Float2,Float3,Float4,Int,Int2,Int3,Int4,Mat2,Mat3,Mat4
 	};
@@ -41,9 +43,10 @@ namespace Hazel {
 		virtual void Bind()const = 0;
 		virtual void UnBind()const = 0;
 		virtual void SetData(size_t size, const void* data) = 0;
+		virtual void* MapBuffer(size_t size) = 0;
 
 		static ref<VertexBuffer> Create(float* data, size_t size);
-		static ref<VertexBuffer> Create(size_t size);
+		static ref<VertexBuffer> Create(size_t size, BufferStorage_Type Storage_Type=MUTABLE);
 	};
 
 

@@ -22,6 +22,9 @@ namespace Hazel {
 		std::vector<unsigned int> Vertex_Indices;
 		std::vector<unsigned int> TexCoord_Indices;
 		std::vector<unsigned int> Normal_Indices;
+		std::vector<std::string> Diffuse_Texture;
+		std::vector<std::string> Specular_Texture;
+
 	private:
 		std::vector<aiMesh*> m_Mesh;
 	private:

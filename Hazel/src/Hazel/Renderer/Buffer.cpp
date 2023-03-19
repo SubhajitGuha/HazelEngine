@@ -20,11 +20,11 @@ namespace Hazel {
 		return nullptr;
 	}
 
-	ref<VertexBuffer> VertexBuffer::Create(size_t size)
+	ref<VertexBuffer> VertexBuffer::Create(size_t size, BufferStorage_Type Storage_Type)
 	{
 		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::OpenGL:
-			return std::make_shared<OpenGlVertexBuffer>(size);
+			return std::make_shared<OpenGlVertexBuffer>(size,Storage_Type);
 		case GraphicsAPI::None:
 			HAZEL_CORE_ERROR("NOT A VALID GRAPHICS API");
 			break;

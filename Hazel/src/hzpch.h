@@ -13,6 +13,7 @@
 #include <sstream>
 #include <chrono>
 #include <thread>
+#include <execution>
 
 #ifdef HZ_PLATFORM_WINDOWS
 //#include <windows.h>

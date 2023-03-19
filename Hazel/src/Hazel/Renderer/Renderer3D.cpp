@@ -9,7 +9,8 @@
 
 namespace Hazel {
 	EditorCamera m_camera;
-	glm::vec3 Renderer3D::m_LightPos = { 0,-2,0 };//initial light position
+	GLsync syncObj;
+	glm::vec3 Renderer3D::m_SunLightDir = { 0,-2,0 };//initial light position
 	unsigned int Renderer3D::depth_id = 0;
 	struct VertexAttributes {
 		//glm::vec3 Position;
@@ -30,13 +31,17 @@ namespace Hazel {
 	};
 
 	struct Renderer3DStorage {
-		int max_Vertices = 10000;
-
+		int max_Vertices = 200000;
+		VertexAttributes* Vertex=nullptr;
+		uint32_t vertexb_id;
 		ref<Shadows> shadow_map;
 		ref<CubeMapReflection> reflection;
 		ref<Shader> shader;
 		ref<Texture2D> WhiteTex,tex;
 		ref<BufferLayout> bl;
+		ref<VertexBuffer> vb;
+		ref<IndexBuffer> ib;
+		ref<VertexArray> va;
 
 		uint32_t m_VertexCounter = 0;
 	};
@@ -56,6 +61,13 @@ namespace Hazel {
 		m_data->shader->Bind();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		m_data->va = VertexArray::Create();
+
+		//select IMMUTABLE buffer storage for mapping into a static buffer
+		m_data->vb = VertexBuffer::Create(sizeof(VertexAttributes)*m_data->max_Vertices,BufferStorage_Type::IMMUTABLE);
+		m_data->Vertex = (VertexAttributes*)m_data->vb->MapBuffer(sizeof(VertexAttributes) * m_data->max_Vertices);//do this only when BufferStorage_Type is IMMUTABLE (alternate for BufferData)
+
+		//m_data->ib=(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
 
 		m_data->bl = std::make_shared<BufferLayout>(); //buffer layout
 
@@ -65,16 +77,23 @@ namespace Hazel {
 		m_data->bl->push("Normal", DataType::Float3);
 		m_data->bl->push("TextureSlot", DataType::Int);
 
+		m_data->va->AddBuffer(m_data->bl, m_data->vb);
+
 		m_data->WhiteTex = Texture2D::Create(1, 1, 0xffffffff);//create a default white texture
 		m_data->tex = Texture2D::Create("Assets/Textures/Test.png");
+		m_data->tex->Bind(1);
+		m_data->WhiteTex->Bind(0);
 		//m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 
 		unsigned int TextureIDindex[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
 
 		m_data->shader->SetIntArray("u_Texture", sizeof(TextureIDindex), TextureIDindex);//pass the the array of texture slots
 																						//which will be used to render textures in batch renderer
-		SetLightPosition({ 3,-2,2});
+		SetSunLightDirection({ 3,-2,2});
 		m_data->shader->SetInt("ShadowMap", 7);//explicitly setting it
+		//unsigned int arr[] = { 11,12,13,14 };//these slots are explicitly used for all 4 seperate shadow maps
+		//m_data->shader->SetIntArray("ShadowMap", 4, arr);
+		syncObj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	}
 
 	void Renderer3D::BeginScene(OrthographicCamera& camera)
@@ -98,6 +117,7 @@ namespace Hazel {
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
 		m_data->shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
 		m_camera = camera;
+		m_data->m_VertexCounter = 0;
 		//Renderer2D::LineBeginScene(camera);
 	}
 
@@ -105,75 +125,58 @@ namespace Hazel {
 	{
 	}
 
-	void Renderer3D::SetLightPosition(const glm::vec3& pos)
+	void Renderer3D::SetSunLightDirection(const glm::vec3& pos)
 	{
-		m_LightPos = pos;
-		m_data->shader->SetFloat3("LightPosition", pos);
+		m_SunLightDir = pos;
+		m_data->shader->SetFloat3("DirectionalLight_Direction", pos);
 	}
 
-	void Renderer3D::DrawMesh(LoadMesh& mesh)
+	void Renderer3D::SetPointLightPosition(const glm::vec3& pos)
 	{
-		std::vector< VertexAttributes> Quad(mesh.Vertex_Indices.size(), { glm::vec4(0.0),glm::vec2(0.0)});
-		std::vector<unsigned int> iba;
-		auto transform = glm::scale(glm::mat4(1.0), { 2,2,2 });
-
-		for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
-		{
-			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[mesh.Normal_Indices[i]]);
-			Quad[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[mesh.Vertex_Indices[i]], 1), mesh.TexCoord[mesh.TexCoord_Indices[i]], {1,1,1,1}, 0, transformed_normals));
-			//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
-		}
-
-		for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
-			iba.push_back(i);
-
-		ref<VertexArray> vao = VertexArray::Create();
-
-		ref<VertexBuffer> vb(VertexBuffer::Create(&Quad[0].Position.x, sizeof(VertexAttributes) * Quad.size()));
-		//ref<IndexBuffer> ib(IndexBuffer::Create(&mesh.Vertex_Indices[0], sizeof(unsigned int) * mesh.Vertex_Indices.size()));//create the index buffer here
-		ref<IndexBuffer> ib(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
-
-
-		vao->AddBuffer(m_data->bl, vb);
-		vao->SetIndexBuffer(ib);
-
-		//m_data->tex->Bind(1);
-		m_data->WhiteTex->Bind(0);
-
-		//vb->SetData(sizeof(VertexAttributes) * m_data->Quad.size(), &m_data->Quad[0].Position.x);
-		//Renderer2D::LineEndScene();
-		RenderCommand::DrawArrays(*vao, mesh.vertices.size());
-
+		m_data->shader->SetFloat3("PointLight_Position", pos);
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color)
 	{
-		std::vector< VertexAttributes> Quad(mesh.Vertex_Indices.size(), { glm::vec4(0.0),glm::vec2(0.0) });
-		//std::vector<unsigned int> iba;
+		m_data->shader->SetFloat("Roughness", 0.2f);
 
-		for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
+		// waiting for the buffer
+		GLenum waitReturn = GL_UNSIGNALED;
+		while (waitReturn != GL_ALREADY_SIGNALED && waitReturn != GL_CONDITION_SATISFIED)
 		{
-			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-			Quad[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, 1, transformed_normals));
-			//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
+			waitReturn = glClientWaitSync(syncObj, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
 		}
+		//std::vector< VertexAttributes> Quad(mesh.Vertex_Indices.size(), { glm::vec4(0.0),glm::vec2(0.0) });
+		//std::vector<unsigned int> iba;
+		/*m_data->m_VertexCounter = mesh.vertices.size();
+		if (m_data->m_VertexCounter > m_data->max_Vertices)
+		{
+			for(int i=1;i<=(ceil(m_data->m_VertexCounter/m_data->max_Vertices));i++)
+			{
+			}
+		}*/
+		std::vector<int> n_meshes;
+		for (int i = 0; i < mesh.vertices.size(); i++)
+			n_meshes.push_back(i);
 
-		//for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
-			//iba.push_back(i);
+		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
+			{
 
-		ref<VertexArray> vao = VertexArray::Create();
+				glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
+				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, 0, transformed_normals));
+				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
+			});
 
-		ref<VertexBuffer> vb(VertexBuffer::Create(&Quad[0].Position.x, sizeof(VertexAttributes) * Quad.size()));
-		ref<IndexBuffer> ib(IndexBuffer::Create(&mesh.Vertex_Indices[0], sizeof(unsigned int) * mesh.Vertex_Indices.size()));//create the index buffer here
-		//ref<IndexBuffer> ib(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
+		//m_data->vb->SetData(sizeof(VertexAttributes) * mesh.vertices.size(), &Quad[0]);
 
-		vao->AddBuffer(m_data->bl, vb);
-		vao->SetIndexBuffer(ib);
+		//m_data->tex->Bind(1);
+		m_data->WhiteTex->Bind(0);
+		RenderCommand::DrawArrays(*m_data->va, mesh.vertices.size());
+		//m_data->myPointer = &Quad[0];
 
-		m_data->tex->Bind(1);
-		//m_data->WhiteTex->Bind(0);
-
-		RenderCommand::DrawArrays(*vao,mesh.vertices.size());
+		// lock the buffer:
+		glDeleteSync(syncObj);
+		syncObj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	}
 	
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
@@ -185,44 +188,48 @@ namespace Hazel {
 
 	void Renderer3D::RenderShadows(Scene& scene, EditorCamera& camera)
 	{
-		m_data->shadow_map->RenderShadows(scene, m_LightPos , m_data->shader,camera);//Light position is the light direction used for directional light
+		m_data->shadow_map->RenderShadows(scene, m_SunLightDir, m_data->shader,camera);//Light position is the light direction used for directional light
 		m_data->shader->Bind();
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)
 	{
-		std::vector< VertexAttributes> Quad(mesh.Vertex_Indices.size(), { glm::vec4(0.0),glm::vec2(0.0) });
-		//std::vector<unsigned int> iba;
-
+		
+		m_data->shader->SetFloat("Roughness", 0.1f);
 		auto Rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), { 1,0,0 }) *
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), { 0,1,0 }) *
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), { 0,0,1 });
 		auto transform = glm::translate(glm::mat4(1.0f), Position) * Rotation * glm::scale(glm::mat4(1.0), Scale);
 
-		for (int i = 0; i < mesh.vertices.size(); i++)
+		// waiting for the buffer
+		GLenum waitReturn = GL_UNSIGNALED;
+		while (waitReturn != GL_ALREADY_SIGNALED && waitReturn != GL_CONDITION_SATISFIED)
 		{
-			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);
-			Quad[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, 0, transformed_normals));
-			//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
+			waitReturn = glClientWaitSync(syncObj, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
 		}
+		
+		std::vector<int> n_meshes;
+		for (int i = 0; i < mesh.vertices.size(); i++)
+			n_meshes.push_back(i);
 
-		//for (int i = 0; i < mesh.Vertex_Indices.size(); i++)
-			//iba.push_back(i);
+		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
+			{
 
-		ref<VertexArray> vao = VertexArray::Create();
+				glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
+				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, 0, transformed_normals));
+				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
+			});
 
-		ref<VertexBuffer> vb(VertexBuffer::Create(&Quad[0].Position.x, sizeof(VertexAttributes) * Quad.size()));
-		ref<IndexBuffer> ib(IndexBuffer::Create(&mesh.Vertex_Indices[0], sizeof(unsigned int) * mesh.Vertex_Indices.size()));//create the index buffer here
-		//ref<IndexBuffer> ib(IndexBuffer::Create(&iba[0], sizeof(unsigned int) * iba.size()));//create the index buffer here
+		//m_data->vb->SetData(sizeof(VertexAttributes) * mesh.vertices.size(), &Quad[0]);
 
-
-		vao->AddBuffer(m_data->bl, vb);
-		vao->SetIndexBuffer(ib);
-
-		//m_data->tex->Bind(3);
+		//m_data->tex->Bind(1);
 		m_data->WhiteTex->Bind(0);
+		RenderCommand::DrawArrays(*m_data->va, mesh.vertices.size());
+		//m_data->myPointer = &Quad[0];
 
-		RenderCommand::DrawArrays(*vao, mesh.vertices.size());
+		// lock the buffer:
+		glDeleteSync(syncObj);
+		syncObj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	}
 
 }

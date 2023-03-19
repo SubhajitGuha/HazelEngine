@@ -24,7 +24,7 @@ namespace Hazel {
 		void SetMat4(const std::string& str, glm::mat4& UniformMat4, size_t count=1) override;
 		void SetInt(const std::string& str, const int& UniformInt) override;
 		void SetIntArray(const std::string& str, const size_t size, const void* pointer) override;
-		void SetFloat(const std::string& str, float& UniformFloat) override;
+		void SetFloat(const std::string& str,const float& UniformFloat) override;
 		virtual void SetFloatArray(const std::string& str, float& UniformFloat, size_t count) override;
 		void SetFloat4(const std::string& str, const glm::vec4& UniformFloat4) override;
 		void SetFloat3(const std::string& str, const glm::vec3& UniformFloat4) override;
@@ -34,7 +34,7 @@ namespace Hazel {
 		void UploadUniformMat4(const std::string& str, glm::mat4& UniformMat4, size_t count = 1);
 		void UploadUniformInt(const std::string& str,const int& UniformInt);
 		void UploadIntArray(const std::string& str, const size_t size, const void* pointer);
-		void UpladUniformFloat(const std::string& str, float& UniformFloat);
+		void UpladUniformFloat(const std::string& str,const float& UniformFloat);
 		void UpladUniformFloatArray(const std::string& str, size_t count, float& UniformFloat);
 		void UpladUniformFloat4(const std::string& str, const glm::vec4& UniformFloat4);
 		void UpladUniformFloat3(const std::string& str, const glm::vec3& UniformFloat4);

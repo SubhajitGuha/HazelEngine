@@ -27,5 +27,7 @@ namespace Hazel{
 		glm::mat4 m_Camera_Projection;
 		float m_ShadowAspectRatio = 1.0f;
 		glm::mat4 LightView[MAX_CASCADES] = { glm::mat4(1.0f) };
+		
+		std::vector<int> n_cascades = { 0,1,2,3 };
 	};
 }

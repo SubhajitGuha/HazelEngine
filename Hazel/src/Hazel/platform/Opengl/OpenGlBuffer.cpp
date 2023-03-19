@@ -8,6 +8,7 @@ namespace Hazel {
 	/// Vertex Buffer //////////////////////////////////////
 	//////////////////////////////////////////////////////
 
+
 	OpenGlVertexBuffer::OpenGlVertexBuffer(float* data, size_t size)
 	{
 		glGenBuffers(1, &m_RendererID);//set up vertex buffer
@@ -15,11 +16,24 @@ namespace Hazel {
 		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	}
 
-	OpenGlVertexBuffer::OpenGlVertexBuffer(size_t size)
+	OpenGlVertexBuffer::OpenGlVertexBuffer(size_t size,BufferStorage_Type Storage_Type)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
-		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+		auto flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+		switch (Storage_Type)
+		{
+		case BufferStorage_Type::MUTABLE:
+			glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+			break;
+		case BufferStorage_Type::IMMUTABLE:
+			glBufferStorage(GL_ARRAY_BUFFER, size, 0, flags);
+			break;
+		default:
+			HAZEL_CORE_ERROR("Select correct storage type");
+			glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+			break;
+		}
 	}
 
 	OpenGlVertexBuffer::~OpenGlVertexBuffer()
@@ -41,6 +55,12 @@ namespace Hazel {
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 		glBufferSubData(GL_ARRAY_BUFFER, 0,size,data);
+	}
+
+	void* OpenGlVertexBuffer::MapBuffer(size_t size)
+	{
+		auto flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+		return glMapBufferRange(GL_ARRAY_BUFFER, 0, size, flags);
 	}
 	
 	////////////////////////////////////////////////////////
