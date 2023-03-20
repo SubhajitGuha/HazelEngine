@@ -178,6 +178,7 @@
     <ClInclude Include="src\Hazel\Renderer\Texture.h" />
     <ClInclude Include="src\Hazel\Scene\Component.h" />
     <ClInclude Include="src\Hazel\Scene\Entity.h" />
+    <ClInclude Include="src\Hazel\Scene\PointLight.h" />
     <ClInclude Include="src\Hazel\Scene\Scene.h" />
     <ClInclude Include="src\Hazel\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Hazel\Window.h" />
@@ -322,6 +323,7 @@
     <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp" />
     <ClCompile Include="src\Hazel\Scene\Entity.cpp" />
+    <ClCompile Include="src\Hazel\Scene\PointLight.cpp" />
     <ClCompile Include="src\Hazel\Scene\Scene.cpp" />
     <ClCompile Include="src\Hazel\Window.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBuffer.cpp" />

@@ -5,6 +5,7 @@
 #include "Hazel/Log.h"
 
 namespace Hazel {
+	class PointLight;
 	class SceneHierarchyPannel {
 	public:
 		SceneHierarchyPannel();
@@ -14,7 +15,9 @@ namespace Hazel {
 	private:
 		ref<Scene> m_Context;
 		ref<Entity> m_selected_entity;
+		PointLight* m_selected_Light = nullptr;
 
+		glm::vec3 PointLight_position = { 0,0,0 }, PointLight_color = {1,1,1};
 		//For properties pannel (camera ui)
 		//glm::vec3 translation=glm::vec3(0);
 	private:

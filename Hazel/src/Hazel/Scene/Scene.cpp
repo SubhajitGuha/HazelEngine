@@ -7,9 +7,12 @@
 #include "Hazel/Renderer/Camareas/EditorCamera.h"
 #include "glad/glad.h"
 #include "Hazel/LoadMesh.h"
+#include "PointLight.h"
+
 
 namespace Hazel {
 	
+	//std::vector<PointLight*> Scene::m_PointLights;
 	 LoadMesh* Scene::m_LoadMesh=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *plant;
 	EditorCamera editor_cam;
 	bool capture = false;
@@ -60,6 +63,9 @@ namespace Hazel {
 					});
 			nsc.m_Script->OnUpdate(ts);//update to get the script values
 			});
+
+		if (m_PointLights.size() > 0)
+			Renderer3D::SetPointLightPosition(m_PointLights);
 
 		Camera* MainCamera=nullptr;//if there is no main camera Then dont render
 		{
@@ -121,6 +127,12 @@ namespace Hazel {
 	{
 		editor_cam.OnEvent(e);
 	}
+
+	void Scene::AddPointLight(PointLight* light)
+	{
+		m_PointLights.push_back(light);
+	}
+
 	ref<Scene> Scene::Create()
 	{
 		return std::make_shared<Scene>();

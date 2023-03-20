@@ -5,10 +5,10 @@
 #include "Hazel/Core/TimeSteps.h"
 #include "Hazel/Core.h"
 
-
 namespace Hazel {
 	class Entity;
 	class LoadMesh;
+	class PointLight;
 	class Scene
 	{
 	public:
@@ -22,7 +22,11 @@ namespace Hazel {
 		void OnCreate();
 		void Resize(float Width, float Height);
 		void OnEvent(Event& e);
+		void AddPointLight(PointLight* light);
 		static ref<Scene> Create();
+
+	public:
+		std::vector<PointLight*> m_PointLights;
 
 	private:
 		static LoadMesh* m_LoadMesh, *Cube , *Plane;

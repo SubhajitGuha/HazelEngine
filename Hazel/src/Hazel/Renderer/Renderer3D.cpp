@@ -6,6 +6,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "stb_image.h"
 #include "glad/glad.h"
+#include "Hazel/Scene/PointLight.h"
 
 namespace Hazel {
 	EditorCamera m_camera;
@@ -127,13 +128,27 @@ namespace Hazel {
 
 	void Renderer3D::SetSunLightDirection(const glm::vec3& pos)
 	{
+		m_data->shader->Bind();
 		m_SunLightDir = pos;
 		m_data->shader->SetFloat3("DirectionalLight_Direction", pos);
 	}
 
-	void Renderer3D::SetPointLightPosition(const glm::vec3& pos)
+	void Renderer3D::SetPointLightPosition(const std::vector<PointLight*>& Lights)
 	{
-		m_data->shader->SetFloat3("PointLight_Position", pos);
+		m_data->shader->Bind();
+		std::vector<glm::vec3> pos(Lights.size());
+		std::vector<glm::vec3> col(Lights.size());
+		for (int i=0 ;i<Lights.size();i++)
+		{
+			pos[i] = Lights[i]->GetLightPosition();
+		}
+		for (int i = 0; i < Lights.size(); i++)
+		{
+			col[i] = Lights[i]->GetLightColor();
+		}
+		m_data->shader->SetFloat3Array("PointLight_Position", &pos[0].x,Lights.size());
+		m_data->shader->SetFloat3Array("PointLight_Color", &col[0].x, Lights.size());
+		m_data->shader->SetInt("Num_PointLights", pos.size());
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color)

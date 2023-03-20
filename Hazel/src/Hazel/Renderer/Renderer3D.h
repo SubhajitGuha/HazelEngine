@@ -17,7 +17,7 @@ namespace Hazel {
 		static void EndScene();
 	public:
 		static void SetSunLightDirection(const glm::vec3& dir);
-		static void SetPointLightPosition(const glm::vec3& pos);
+		static void SetPointLightPosition(const std::vector<PointLight*>& Lights);
 		static void DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale = {1,1,1}, const glm::vec3& rotation = { 0,0,0 }, const glm::vec4& color = { 1,1,1,1 });//take the mesh class reference
 		static void DrawMesh(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = {1,1,1,1});//take the mesh class reference
 		static void SetUpCubeMapReflections(Scene& scene);

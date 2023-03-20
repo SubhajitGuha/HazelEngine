@@ -2,13 +2,16 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui_internal.h"
 #include "imgui.h"
+#include "Hazel/Scene/PointLight.h"
 namespace Hazel {
 	std::string texture_path = "Assets/Textures/Test.png";
 	SceneHierarchyPannel::SceneHierarchyPannel() = default;
 	SceneHierarchyPannel::~SceneHierarchyPannel()
-	{}
+	{
+		//delete m_selected_Light;
+	}
 
-	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f ,char *x ="X",char *y="Y",char *z="Z")
 	{
 		ImGui::PushID(label.c_str());
 
@@ -26,7 +29,7 @@ namespace Hazel {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		if (ImGui::Button("X", buttonSize))
+		if (ImGui::Button(x, buttonSize))
 			values.x = resetValue;
 		ImGui::PopStyleColor(3);
 
@@ -38,7 +41,7 @@ namespace Hazel {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		if (ImGui::Button("Y", buttonSize))
+		if (ImGui::Button(y, buttonSize))
 			values.y = resetValue;
 		ImGui::PopStyleColor(3);
 
@@ -50,7 +53,7 @@ namespace Hazel {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		if (ImGui::Button("Z", buttonSize))
+		if (ImGui::Button(z, buttonSize))
 			values.z = resetValue;
 		ImGui::PopStyleColor(3);
 
@@ -79,9 +82,13 @@ namespace Hazel {
 		
 			if (ImGui::BeginPopupContextWindow("Actions",1,false))
 			{
-				if (ImGui::Button("Create Entity", { 120,30 }))
+				if (ImGui::Button("Create Entity", { 130,30 }))
 				{
 					m_Context->CreateEntity();
+				}
+				if (ImGui::Button("Add Point Light", { 130,30 }))
+				{
+					m_Context->AddPointLight(new PointLight({ 0,0,0 }, { 1,1,1 }));
 				}
 				ImGui::EndPopup();
 			}
@@ -103,7 +110,22 @@ namespace Hazel {
 					ImGui::TreePop();
 				}
 				});
+			for (int i = 0; i < m_Context->m_PointLights.size(); i++)
+			{
+				std::string s = "Point Light_"+std::to_string(i);
+				//m_Context->m_PointLights[i]->SetLightTag(s);
+				if (m_selected_Light) {
+					flags = ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnArrow;//| ((m_selected_Light->GetLightTag() == m_Context->m_PointLights[i]->GetLightTag()) ? ImGuiTreeNodeFlags_Selected : 0);
+				}
+				bool opened = ImGui::TreeNodeEx(s.c_str(), flags);
 
+				if (ImGui::IsItemClicked())
+					m_selected_Light = m_Context->m_PointLights[i];//gets casted to uint32_t
+				if (opened)
+				{
+					ImGui::TreePop();
+				}
+			}
 		if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered())
 			m_selected_entity = nullptr;
 
@@ -157,6 +179,18 @@ namespace Hazel {
 		{
 			DrawSpriteRendererUI();
 		
+		}
+		ImGui::End();
+
+		ImGui::Begin("World Light Properties");
+		if (m_selected_Light) 
+		{
+			glm::vec3 position = m_selected_Light->GetLightPosition();
+			glm::vec3 color = m_selected_Light->GetLightColor();
+			DrawVec3Control("Position", position);
+			m_selected_Light->SetLightPosition(position);
+			DrawVec3Control("Color", color,0,100,"R","G","B");
+			m_selected_Light->SetLightColor(color);
 		}
 		ImGui::End();
 

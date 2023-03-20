@@ -228,8 +228,6 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Begin("Light controller");
 	ImGui::DragFloat3("Sun Direction", (float*)&SunDirection);
 	Renderer3D::SetSunLightDirection(SunDirection);
-	ImGui::DragFloat3("position", (float*)&PointLightPos);
-	Renderer3D::SetPointLightPosition(PointLightPos);
 	ImGui::End();
 
 	ImGui::Begin("Shadow Map");

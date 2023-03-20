@@ -537,6 +537,7 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Scene\PointLight.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -668,5 +669,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\Scene\PointLight.cpp" />
   </ItemGroup>
 </Project>

@@ -17,6 +17,7 @@ namespace Hazel {
 		virtual void SetFloatArray(const std::string& str, float& UniformFloat, size_t count) = 0;
 		virtual void SetFloat4(const std::string& str, const glm::vec4& UniformFloat4)=0;
 		virtual void SetFloat3(const std::string& str, const glm::vec3& UniformFloat4) = 0;
+		virtual void SetFloat3Array(const std::string& str,const float* arr , size_t count) = 0;
 
 		static ref<Shader> Create(const std::string& path);
 		static ref<Shader> Create(std::string&,std::string&);
