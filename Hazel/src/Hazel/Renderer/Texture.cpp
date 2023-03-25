@@ -3,6 +3,8 @@
 #include "stb_image.h"
 #include "RendererAPI.h"
 #include "Hazel/platform/Opengl/OpenGlTexture2D.h"
+#include "Hazel/platform/Opengl/OpenGlTexture2DArray.h"
+
 namespace Hazel {
 	bool Texture2D::ValidateTexture(const std::string& path)
 	{
@@ -32,6 +34,17 @@ namespace Hazel {
 			return nullptr;
 		case GraphicsAPI::OpenGL:
 			return std::make_shared<OpenGlTexture2D>(Width,Height,data);
+		default:
+			return nullptr;
+		}
+	}
+	ref<Texture2DArray> Texture2DArray::Create(const std::vector<std::string>& paths, int numMaterials)
+	{
+		switch (RendererAPI::GetAPI()) {
+		case GraphicsAPI::None:
+			return nullptr;
+		case GraphicsAPI::OpenGL:
+			return std::make_shared<OpenGlTexture2DArray>(paths, numMaterials);
 		default:
 			return nullptr;
 		}

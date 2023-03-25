@@ -18,5 +18,10 @@ namespace Hazel {
 		static ref<Texture2D> Create(const std::string& path);
 		static ref<Texture2D> Create(const unsigned int Width,const unsigned int Height, unsigned int);
 	};
+	class Texture2DArray : public Texture {
+	public:
+		virtual void UnBind()const = 0;
+		static ref<Texture2DArray> Create(const std::vector<std::string>& paths, int numMaterials = 1);
+	};
 }
 

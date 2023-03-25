@@ -41,8 +41,8 @@ namespace Hazel {
 
 		glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
 		//glActiveTexture(GL_TEXTURE1);
-		glBindTextureUnit(5, tex_id);
-		Cube_Shader->SetInt("env", 5);
+		glBindTextureUnit(18, tex_id);//use 18th slot ("explicitly binded")
+		Cube_Shader->SetInt("env", 18);
 
 		//glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}

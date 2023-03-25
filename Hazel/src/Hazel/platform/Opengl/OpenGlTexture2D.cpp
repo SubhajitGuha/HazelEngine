@@ -3,7 +3,6 @@
 #include "glad/glad.h"
 #include "stb_image.h"
 #include "Hazel/Log.h"
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 
 namespace Hazel {
@@ -32,7 +31,7 @@ namespace Hazel {
 			HAZEL_CORE_ERROR("Invalid Texture format");
 		
 
-		Resize_Image(1080, 1080);//resize the image if width,height > 100 (for the #trading application this is necessary)
+		Resize_Image(2048, 2048);//resize the image if width,height > 100 (for the #trading application this is necessary)
 							//otherwise not needed (i might resize the image if img dimension < 1080p or it will crash)
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
@@ -91,10 +90,10 @@ namespace Hazel {
 		if (m_Height > width && m_Width > height)//resize the 
 		{
 			//float ar = m_Width / m_Height;
-			resized_image = new unsigned char[1080 * 1080 * channels];
-			stbir_resize_uint8(pixel_data, m_Width, m_Height, 0, resized_image, 1080, 1080, 0, channels);
-			m_Height = 1080;
-			m_Width = 1080;
+			resized_image = new unsigned char[width * height * channels];
+			stbir_resize_uint8(pixel_data, m_Width, m_Height, 0, resized_image, width, height, 0, channels);
+			m_Height = height;
+			m_Width = width;
 		}
 	}
 }

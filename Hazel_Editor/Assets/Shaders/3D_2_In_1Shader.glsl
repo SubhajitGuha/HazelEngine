@@ -45,8 +45,11 @@ uniform float Ranges[5];
 uniform mat4 view;
 
 uniform samplerCube env;
-uniform sampler2D u_Texture[32];
-uniform vec4 u_color;
+uniform sampler2D u_texture[32];
+uniform sampler2DArray u_Albedo;
+uniform sampler2DArray u_Roughness;
+uniform float u_depth;
+
 uniform vec3 EyePosition;
 
 //Lights
@@ -72,7 +75,7 @@ float metallic = 0.0;
 
 float NormalDistribution_GGX(float NdotH)
 {
-	float alpha2 =  pow(alpha,4);
+	float alpha2 =  pow(alpha,4); // alpha is actually the Roughness
 	return alpha2 / (PI * pow( (pow(NdotH,2) * (alpha2 - 1.0) + 1.0) ,2) ) ;
 }
 
@@ -114,6 +117,8 @@ void main()
 {
 	int index = int (m_slotindex);
 
+	alpha = texture(u_Roughness , vec3(tcord,index)).x * Roughness; //multiplying the texture-normal with the float val gives control on how much of the normal we need
+
 	vec4 vert_pos = view * m_pos; //get depth value(z value) in the camera-view space
 	vec3 v_position = vert_pos.xyz/vert_pos.w;
 	float depth = abs(v_position.z);
@@ -139,6 +144,9 @@ void main()
 	float bias = 0.00001;//bias to resolve the artifact
 	float shadow = texture(ShadowMap[level],p.xy).r  < p.z - bias? 0:1;// sample the depth map and check the p.xy coordinate of depth map with the p.z value
 	
+	//environment reflections
+	vec3 Light_dir_i = reflect(-EyeDirection,m_Normal);
+	vec3 EnvironmentCol = texture(env,Light_dir_i).xyz * (1.0 - alpha) ;
 
 	//ambiance
 		vec3 ambiant = m_color.xyz * vec3(0.1,0.1,0.1);
@@ -148,7 +156,7 @@ void main()
 		kd = vec3(1.0) - ks;
 		kd *= (1.0 - metallic);
 
-	PBR_Color += ( (kd * texture(u_Texture[index],tcord).xyz * m_color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection)) * shadow * max(dot(m_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
+	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection) ) * shadow * max(dot(m_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 
 	//color=vec4(PointLight_Position[0],1.0);
 	for(int i=0 ; i< Num_PointLights ; i++)
@@ -162,25 +170,20 @@ void main()
 		//diffuse
 		kd = vec3(1.0) - ks;
 		kd *= (1.0 - metallic);
-		vec3 diffuse = kd * texture(u_Texture[index],tcord).xyz * m_color.xyz / PI; // no alpha channel is being used
-
-
-		//environment reflections
-		vec3 Light_dir_i = reflect(-EyeDirection,m_Normal);
-		vec4 EnvironmentCol = m_color * texture(env,Light_dir_i) ;
+		vec3 diffuse = kd * texture(u_Albedo,vec3(tcord , index)).xyz * m_color.xyz / PI; // no alpha channel is being used
 
 		float dist = length(PointLight_Position[i] - m_pos.xyz/m_pos.w);
 		float attenuation = 1 / ( 0.01 * dist * dist ); //attenuation is for point and spot light
 		radiance = PointLight_Color[i] * attenuation;
-
 		
 		float NdotL = max(dot(m_Normal,LightDirection), 0.0);
 		PBR_Color += (diffuse + specular)  * radiance * NdotL ; //for Point light (attenuation)
 	}
 
 	PBR_Color += ambiant;
-	PBR_Color = PBR_Color / (PBR_Color + vec3(1.0));
-	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); 
+	//PBR_Color = PBR_Color / (PBR_Color + vec3(1.0));
+	//PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); 
 
 	color = vec4(PBR_Color,1);
+	//color = texture(u_Roughness, vec3(tcord.x,tcord.y , 1.0));
 }
