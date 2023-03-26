@@ -70,17 +70,17 @@ namespace Hazel {
 		RightVector  = glm::cross(m_ViewDirection, Up);//we get the right vector (as it is always perpendicular to up and m_ViewDirection)
 		
 		if (Input::IsKeyPressed(HZ_KEY_W))
-			m_Position += m_ViewDirection * glm::vec3(m_movespeed);//move along the View direction
+			m_Position += m_ViewDirection * glm::vec3(m_movespeed*deltatime);//move along the View direction
 		if (Input::IsKeyPressed(HZ_KEY_S))
-			m_Position -= m_ViewDirection * glm::vec3(m_movespeed);//move along the View direction
+			m_Position -= m_ViewDirection * glm::vec3(m_movespeed*deltatime);//move along the View direction
 		if (Input::IsKeyPressed(HZ_KEY_A))
-			m_Position -= RightVector * glm::vec3(m_movespeed);//move along the right vector
+			m_Position -= RightVector * glm::vec3(m_movespeed*deltatime);//move along the right vector
 		if (Input::IsKeyPressed(HZ_KEY_D))
-			m_Position += RightVector * glm::vec3(m_movespeed);
+			m_Position += RightVector * glm::vec3(m_movespeed*deltatime);
 		if(Input::IsKeyPressed(HZ_KEY_Q))
-			m_Position -= Up * glm::vec3(m_movespeed);//move along up vector
+			m_Position -= Up * glm::vec3(m_movespeed*deltatime);//move along up vector
 		if (Input::IsKeyPressed(HZ_KEY_E))
-			m_Position += Up * glm::vec3(m_movespeed);
+			m_Position += Up * glm::vec3(m_movespeed*deltatime);
 		if (Input::IsKeyPressed(HZ_KEY_R))//reset camera when R is pressed
 		{
 			m_Position = { 0,0,-1 };

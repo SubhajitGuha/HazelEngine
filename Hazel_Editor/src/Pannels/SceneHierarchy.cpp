@@ -170,6 +170,11 @@ namespace Hazel {
 			DrawTransformUI();
 		}
 
+		if (m_selected_entity.get() && m_selected_entity->HasComponent<StaticMeshComponent>())
+		{
+			DrawStaticMeshComponentUI();
+		}
+
 		if (m_selected_entity.get() && m_selected_entity->HasComponent<CameraComponent>())
 		{
 			DrawCameraUI();
@@ -366,9 +371,43 @@ namespace Hazel {
 			{
 				Sprite_Renderer.texture = Texture2D::Create(buf);
 			}
+			ImGui::DragFloat("Roughness", &Sprite_Renderer.m_Roughness, 0.1, 0.0, 1.0);
+			ImGui::DragFloat("Metallic", &Sprite_Renderer.m_Metallic, 0.1, 0.0, 1.0);
+
 			ImGui::TreePop();
 		}
 		if (delete_component)
 			m_selected_entity->RemoveComponent<SpriteRenderer>();
+	}
+	void SceneHierarchyPannel::DrawStaticMeshComponentUI()
+	{
+		if (ImGui::TreeNodeEx("Static Mesh Component", ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Cube", { 100,30 }))
+			{
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Cube);
+			}
+			if (ImGui::Button("Sphere", { 100,30 }))
+			{
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Sphere);
+			}
+			if (ImGui::Button("Plane", { 100,30 }))
+			{
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Plane);
+			}
+			if (ImGui::Button("Plant", { 100,30 }))
+			{
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::plant);
+			}
+			if (ImGui::Button("House", { 100,30 }))
+			{
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::House);
+			}
+			if (ImGui::Button("Windmill", { 100,30 }))
+			{
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Windmill);
+			}
+			ImGui::TreePop();
+		}
 	}
 }

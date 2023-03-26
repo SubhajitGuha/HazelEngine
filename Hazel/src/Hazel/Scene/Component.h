@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Hazel/Renderer/Camareas/SceneCamera.h"
+#include "Hazel/LoadMesh.h"
 #include "ScriptableEntity.h"
 
 namespace Hazel {
@@ -57,9 +58,22 @@ namespace Hazel {
 	struct SpriteRenderer
 	{
 		glm::vec4 Color = { 1,1,1,1 };
+		float m_Roughness = 1.0f;
+		float m_Metallic = 0.0f;
 		ref<Texture2D> texture = nullptr;
 		SpriteRenderer() = default;
-		SpriteRenderer(const glm::vec4& color,const ref<Texture2D> tex=nullptr)
-			:Color(color),texture(tex){}
+		SpriteRenderer(const glm::vec4& color, float roughness = 1.0f, float metallic = 0.0f, const ref<Texture2D> tex = nullptr)
+			:Color(color),texture(tex),m_Metallic(metallic),m_Roughness(roughness)
+		{}
+	};
+
+	struct StaticMeshComponent
+	{
+		LoadMesh* static_mesh = nullptr;
+		StaticMeshComponent() = default;
+		StaticMeshComponent(LoadMesh* staticmesh)
+			:static_mesh(staticmesh)
+		{}
+		operator LoadMesh* () { return static_mesh; }
 	};
 }

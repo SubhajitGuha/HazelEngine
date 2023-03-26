@@ -6,7 +6,7 @@ namespace Hazel {
 	LoadMesh* m_LoadMesh = nullptr;
 	LoadMesh* Cube = nullptr,*Plane=nullptr;
 	OpenGlCubeMapReflection::OpenGlCubeMapReflection()
-		:cubemap_width(2048),cubemap_height(2048)
+		:cubemap_width(16),cubemap_height(16)
 	{
 		RenderCommand::Init();
 		shader = Shader::Create("Assets/Shaders/ReflectionCubeMap.glsl");//texture shader
@@ -32,13 +32,16 @@ namespace Hazel {
 
 		for (int i = 0; i < 6; i++)//iterate over 6 images each representing the side of a cube
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, cubemap_width, cubemap_height, 0, GL_RGB, GL_FLOAT, nullptr);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, cubemap_width, cubemap_height, 0, GL_RGB, GL_FLOAT, nullptr);
 		}
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		HAZEL_CORE_WARN(glGetError());
 
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_id);
 
@@ -67,7 +70,7 @@ namespace Hazel {
 		std::vector<glm::vec3> dir = { {1,0,0},{-1,0,0},{0,-1,0},{0,1,0},{0,0,1},{0,0,-1} };
 		glm::vec3 pos = {2,3,6};
 		shader->SetFloat3("LightPosition", pos);//world position
-
+		shader->SetInt("env", 18);
 		for (int i = 0; i < 6; i++)
 		{
 			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i , tex_id, 0);//Render the scene in the corresponding face on the cube map and "GL_COLOR_ATTACHMENT0" Represents the Render target where the fragment shader should output the color
@@ -101,7 +104,7 @@ namespace Hazel {
 						Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
 
 				});
-					Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
+					Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 0,0,0 });
 		}
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);//unbind the framebuffer to compleate the capturing process
 		glViewport(0, 0, size.x, size.y);

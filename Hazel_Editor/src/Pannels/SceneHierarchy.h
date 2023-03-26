@@ -27,5 +27,6 @@ namespace Hazel {
 		void DrawCameraUI();
 		void DrawTagUI();
 		void DrawSpriteRendererUI();
+		void DrawStaticMeshComponentUI();
 	};
 }

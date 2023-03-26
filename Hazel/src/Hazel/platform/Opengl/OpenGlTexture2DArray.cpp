@@ -23,7 +23,7 @@ Hazel::OpenGlTexture2DArray::OpenGlTexture2DArray(const std::vector<std::string>
 		glTextureParameteri(m_Renderid, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_R, GL_REPEAT);
-		HAZEL_CORE_WARN(glGetError());
+		//HAZEL_CORE_WARN(glGetError());
 
 		for (int i = 0; i < numMaterials; i++) {
 			if (resized_image)
@@ -67,7 +67,7 @@ Hazel::OpenGlTexture2DArray::OpenGlTexture2DArray(const std::vector<std::string>
 		glTextureParameteri(m_Renderid, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_R, GL_REPEAT);
-		HAZEL_CORE_TRACE(glGetError());
+		//HAZEL_CORE_TRACE(glGetError());
 	}
 	for (int i = 0; i < paths.size(); i++)
 	{
@@ -83,7 +83,7 @@ Hazel::OpenGlTexture2DArray::OpenGlTexture2DArray(const std::vector<std::string>
 		if (resized_image)
 		{
 			glTextureSubImage3D(m_Renderid, 0, 0, 0, i, m_Width, m_Height, 1, Format, GL_UNSIGNED_BYTE, resized_image);
-			HAZEL_CORE_ERROR(glGetError());
+			//HAZEL_CORE_ERROR(glGetError());
 			stbi_image_free(resized_image);
 		}
 		else if (pixel_data) {

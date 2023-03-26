@@ -12,22 +12,23 @@ namespace Hazel {
 
 		unsigned int tex_id;
 		int width = 2048, height = 2048, channels;
-		unsigned char* cube_map_data = nullptr, *resized_image=nullptr;
+		float* cube_map_data = nullptr, *resized_image=nullptr;
 
 		glGenTextures(1, &tex_id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
 
-		std::string filename = "Assets/Textures/Yokohama2/";
+		std::string filename = "Assets/Textures/Outdoor-Cube-Map/";
 
 		for (int i = 0; i < 6; i++)//iterate over 6 images each representing the side of a cube
 		{
 			stbi_set_flip_vertically_on_load(1);
-			cube_map_data = stbi_load((filename + std::to_string(i) + ".jpg").c_str(), &width, &height, &channels, 0);
+			cube_map_data = stbi_loadf((filename + std::to_string(i) + ".png").c_str(), &width, &height, &channels, 0);
 			if (!cube_map_data) {
 				HAZEL_CORE_ERROR("Cube Map NOT LOADED !!");
 			}
 			else {
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, cube_map_data);
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, cube_map_data);
+				
 				glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

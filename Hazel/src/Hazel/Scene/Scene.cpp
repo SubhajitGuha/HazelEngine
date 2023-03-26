@@ -13,15 +13,17 @@
 namespace Hazel {
 	
 	//std::vector<PointLight*> Scene::m_PointLights;
-	 LoadMesh* Scene::m_LoadMesh=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *plant;
+	 LoadMesh* Scene::Sphere=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill;
 	EditorCamera editor_cam;
 	bool capture = false;
 	Scene::Scene()
 	{
-		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");
+		Sphere = new LoadMesh("Assets/Meshes/Sphere.obj");
 		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
 		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
+		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
+		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		editor_cam.SetViewportSize(1920.0,1080.0);
 	}
 	Scene::~Scene()
@@ -32,6 +34,7 @@ namespace Hazel {
 		m_entity = m_registry.create();
 		auto entity = new Entity( this,m_entity);
 		entity->AddComponent<TransformComponent>();
+		entity->AddComponent<StaticMeshComponent>(Cube);
 		if (name == "")//if no name is give to an entity just call it entity (i.e define tag with entity)
 			entity->AddComponent<TagComponent>("Entity");//automatically add a tag component when an entity is created
 		else
@@ -89,25 +92,21 @@ namespace Hazel {
 				auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
 				glm::vec4 color;
 
+				auto mesh = Entity.GetComponent<StaticMeshComponent>();
 				//if (camera.camera.bIsMainCamera) {
 				if (Entity.HasComponent<SpriteRenderer>()) {
 					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-					Renderer3D::DrawMesh(*m_LoadMesh, transform, SpriteRendererComponent.Color);
+					Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color,SpriteRendererComponent.m_Roughness,SpriteRendererComponent.m_Metallic);
 					//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
 				}
 				else
-					Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
-					//Renderer2D::DrawQuad(transform, Entity.m_DefaultColor,nullptr);//running the script
-				
+					Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
 			});
 			Renderer3D::EndScene();
 
 			Renderer3D::BeginScene(editor_cam);
 			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 0,0,0 });
-			Renderer3D::DrawMesh(*plant, { 3,0,0 }, { 1,1,1 }, { 90,0,0 });
 
-			Renderer3D::SetUpCubeMapReflections(*this);
-			
 			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
 	}
 	void Scene::OnCreate()

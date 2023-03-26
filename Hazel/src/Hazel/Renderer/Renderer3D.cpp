@@ -32,7 +32,7 @@ namespace Hazel {
 	};
 
 	struct Renderer3DStorage {
-		int max_Vertices = 200000;
+		int max_Vertices = 2000000;
 		VertexAttributes* Vertex=nullptr;
 		uint32_t vertexb_id;
 		ref<Shadows> shadow_map;
@@ -151,9 +151,10 @@ namespace Hazel {
 		m_data->shader->SetInt("Num_PointLights", pos.size());
 	}
 
-	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color)
+	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color, const float& material_Roughness , const float& material_metallic)
 	{
-		m_data->shader->SetFloat("Roughness", 0.2f);
+		m_data->shader->SetFloat("Roughness",material_Roughness); //send the roughness value
+		m_data->shader->SetFloat("Metallic", material_metallic); //send the metallic value
 
 		// waiting for the buffer
 		GLenum waitReturn = GL_UNSIGNALED;
@@ -161,14 +162,14 @@ namespace Hazel {
 		{
 			waitReturn = glClientWaitSync(syncObj, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
 		}
-
+		m_data->m_VertexCounter = mesh.vertices.size();
+		
 		std::vector<int> n_meshes;
-		for (int i = 0; i < mesh.vertices.size(); i++)
+		for (int i = 0; i < m_data->m_VertexCounter; i++)
 			n_meshes.push_back(i);
 
 		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
 			{
-
 				glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
 				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, transformed_normals, mesh.Material_Index[i]));
 				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
@@ -202,7 +203,9 @@ namespace Hazel {
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)
 	{
-		m_data->shader->SetFloat("Roughness", 1.0f);
+		m_data->shader->SetFloat("Roughness", 0.6f);
+		m_data->shader->SetFloat("Metallic", 0.0f);
+
 		auto Rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), { 1,0,0 }) *
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), { 0,1,0 }) *
 			glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), { 0,0,1 });

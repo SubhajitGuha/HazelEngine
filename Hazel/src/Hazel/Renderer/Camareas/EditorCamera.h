@@ -50,7 +50,7 @@ namespace Hazel {
 		float m_AspectRatio = 1.0;
 
 		//camera parameters
-		float m_movespeed = 0.2;
+		float m_movespeed = 20;
 		glm::vec2 OldMousePos = { 0,0};
 	};
 }

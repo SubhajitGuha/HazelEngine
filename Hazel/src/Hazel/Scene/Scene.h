@@ -27,9 +27,9 @@ namespace Hazel {
 
 	public:
 		std::vector<PointLight*> m_PointLights;
+		static LoadMesh* Sphere, *Cube , *Plane,*plant,*House,* Windmill;
 
 	private:
-		static LoadMesh* m_LoadMesh, *Cube , *Plane;
 		
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};

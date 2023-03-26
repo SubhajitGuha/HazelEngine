@@ -6,17 +6,13 @@ namespace Hazel {
 	int Shadows::Cascade_level = 0;
 	float Shadows::m_lamda = 0.1;
 	OpenGlShadows::OpenGlShadows()
-		:m_width(2048), m_height(2048)
+		:m_width(4096), m_height(4096)
 	{
 	}
 	OpenGlShadows::OpenGlShadows(const float& width, const float& height)
 		:m_width(width),m_height(height)
 	{
 		shadow_shader = Shader::Create("Assets/Shaders/ShadowShader.glsl");//texture shader
-		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");//these should be the part of entity component system!!
-		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
-		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
-		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		CreateShdowMap();
 	}
 	OpenGlShadows::~OpenGlShadows()
@@ -60,17 +56,15 @@ namespace Hazel {
 						//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
 						Entity Entity(&scene, m_entity);
 						auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-
+						auto mesh = Entity.GetComponent<StaticMeshComponent>();
 						//if (camera.camera.bIsMainCamera) {
 						if (Entity.HasComponent<SpriteRenderer>()) {
 							auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-							Renderer3D::DrawMesh(*m_LoadMesh, transform, SpriteRendererComponent.Color);
+							Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color);
 						}
 						else
-							Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
+							Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
 					});
-				//Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 10,10,10 }, { 0,0,0 });
-				Renderer3D::DrawMesh(*plant, { 3,0,0 }, { 1,1,1 }, { 90,0,0 });
 				
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 				glViewport(0, 0, size.x, size.y);
@@ -96,8 +90,8 @@ namespace Hazel {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -135,7 +129,7 @@ namespace Hazel {
 			float m_FarPlane = Ranges[i];
 
 			// create the view camera projection matrix based on the near and far plane
-			m_Camera_Projection = glm::perspective(glm::radians(camera.GetVerticalFOV()), camera.GetAspectRatio(), m_NearPlane, m_FarPlane);
+			m_Camera_Projection = glm::perspective(glm::radians(camera.GetVerticalFOV()), camera.GetAspectRatio(), m_NearPlane - 20.f, m_FarPlane );
 			
 			glm::vec3 centre = glm::vec3(0.0f);
 			glm::vec4 frustum_corners[8] = //cube coordinate in cannonical view volume
@@ -160,7 +154,7 @@ namespace Hazel {
 			}
 			centre /= 8.0f;//calculate the centroid of the frustum cube and this will be the position for the light view matrix
 
-			LightView[i-1] = glm::lookAt(centre , centre + glm::normalize(LightPosition), { 0,1,0 }); //move the camera to the centroid of each frustum
+			LightView[i-1] = glm::lookAt(centre - glm::normalize(LightPosition), centre, { 0.0,1.0,0.0 }); //move the camera to the centroid of each frustum
 
 			glm::mat4 matrix_lv = LightView[i - 1];
 			float min_x = std::numeric_limits<float>::max();

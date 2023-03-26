@@ -42,6 +42,36 @@ uniform vec4 u_color;
 uniform vec3 LightPosition;
 uniform vec3 EyePosition;
 
+const float PI = 3.14159265359;
+
+vec3 GetIrradiance()
+{
+	vec3 normal = normalize(m_pos.xyz);
+	vec3 irradiance = vec3(0.0);  
+	
+	vec3 up    = vec3(0.0, 1.0, 0.0);
+	vec3 right = normalize(cross(up, normal));
+	up         = normalize(cross(normal, right));
+	
+	float sampleDelta = 0.025;
+	float nrSamples = 0.0; 
+	for(float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta)
+	{
+	    for(float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta)
+	    {
+	        // spherical to cartesian (in tangent space)
+	        vec3 tangentSample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
+	        // tangent space to world
+	        vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * m_Normal; 
+	
+	        irradiance += texture(env, sampleVec).rgb * cos(theta) * sin(theta);
+	        nrSamples++;
+	    }
+	}
+	irradiance = PI * irradiance * (1.0 / float(nrSamples));
+	return irradiance;
+}
+
 void main()
 {
 	int index = int (m_slotindex);
@@ -70,4 +100,5 @@ void main()
 	float dist = length(LightPosition-vec3(m_pos));
 	float attenuation = 1/(0.1 + 0*dist + 0.008 * dist*dist);
 	color= clamp(diffuse,0,attenuation) + ambiant + clamp(specular,0,attenuation);
+	//color = vec4(GetIrradiance(),1.0);
 }
