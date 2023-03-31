@@ -38,4 +38,6 @@ private:
 	ref <Texture2D> texture, tex2;
 	ref<SubTexture2D> tree,land,mud,water;
 	ref<FrameBuffer> m_FrameBuffer;
+
+	float frame_time = 0;//capture the delta time
 };

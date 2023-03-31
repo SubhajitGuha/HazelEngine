@@ -60,24 +60,24 @@ LoadMesh* mesh;
 
 	Square_entity = m_scene->CreateEntity("Square");
 	
-	Square_entity->AddComponent<TransformComponent>(glm::vec3(1,2,0));
+	Square_entity->AddComponent<TransformComponent>(glm::vec3(5,-2,0));
 	Square_entity->AddComponent<CameraComponent>();
 	Square_entity->AddComponent<SpriteRenderer>(glm::vec4(1, 0.2, 0, 1));
 
 	 camera_entity = m_scene->CreateEntity("Camera");//create the camera entity
-	 camera_entity->AddComponent<TransformComponent>(glm::vec3(0,-1,0));
+	 camera_entity->AddComponent<TransformComponent>(glm::vec3(-6,-1,0));
 	 camera_entity->AddComponent<CameraComponent>();
 
 	 camera_entity->GetComponent<CameraComponent>().camera.bIsMainCamera = false;
 	 camera_entity->GetComponent<CameraComponent>().camera.SetOrthographic(50);
 
 	 Square2 = m_scene->CreateEntity("2ndSquare");
-	 Square2->AddComponent<TransformComponent>(glm::vec3(-1,0,0));
+	 Square2->AddComponent<TransformComponent>(glm::vec3(-1,0,5));
 	 Square2->AddComponent<CameraComponent>();
 	 //Square2->GetComponent<CameraComponent>();
 
 	 Square3 = m_scene->CreateEntity("3rdSquare");
-	 Square3->AddComponent<TransformComponent>(glm::vec3(-2,0,0));
+	 Square3->AddComponent<TransformComponent>(glm::vec3(-2,0,-5));
 //....................script......................................................................
 
 	 class CustomScript :public ScriptableEntity {
@@ -135,7 +135,7 @@ void  HazelEditor::OnDetach()
 
 void  HazelEditor::OnUpdate(float deltatime )
 {
-
+	frame_time = deltatime;
 	HZ_PROFILE_SCOPE(" HazelEditor::OnUpdate");
 	{
 		m_FrameBuffer->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
@@ -234,6 +234,16 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Image((void*)Renderer3D::depth_id, ImVec2(512, 512));
 	ImGui::DragInt("Cascade Level", &Shadows::Cascade_level, 1, 0, 100);
 	ImGui::DragFloat("lamda", &Shadows::m_lamda, 0.00001, 0, 1,"%8f");
+	ImGui::End();
+
+	ImGui::Begin("Benchmark");
+	ImGui::Text("FPS :  ");
+	ImGui::SameLine();
+	ImGui::TextColored({ 1,0.2,1,1 }, std::to_string(1.0f/frame_time).c_str());
+	//ImGui::NewLine();
+	ImGui::Text("frame time : ");
+	ImGui::SameLine();
+	ImGui::TextColored({ 0,1,0,1 }, std::to_string(frame_time).c_str());
 	ImGui::End();
 	m_Pannel.OnImGuiRender();
 }

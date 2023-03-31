@@ -78,7 +78,7 @@ namespace Hazel {
 			float time = glfwGetTime();
 			TimeStep ts = time - m_LastFrameTime;//this is the delta time (time btn last and present frame or time required to render a frame)
 			m_LastFrameTime = time;
-
+			
 			//layers render layer and game layers
 			for (Layer* layer : m_layerstack)
 				layer->OnUpdate(ts);

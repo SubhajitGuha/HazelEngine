@@ -86,6 +86,7 @@ namespace Hazel {
 	{
 		int NumMaterials = scene->mNumMaterials;
 
+		std::string relative_path = "Assets/Textures/MeshTextures/";
 		auto CreateTextureArray = [&](ref<Texture2DArray>& texture, aiTextureType type) 
 		{
 			std::vector<std::string> texture_path;
@@ -98,7 +99,9 @@ namespace Hazel {
 				{
 					aiString str;
 					material->GetTexture(type, 0, &str);
-					texture_path.push_back(str.data);
+					std::string absolute_path = str.data;
+					
+					texture_path.push_back(relative_path + absolute_path.substr(absolute_path.find_last_of("\\")));
 				}
 			}
 			ref<Texture2DArray> tex = Texture2DArray::Create(texture_path, NumMaterials);

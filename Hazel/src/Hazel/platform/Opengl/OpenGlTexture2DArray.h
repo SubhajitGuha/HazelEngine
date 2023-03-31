@@ -21,5 +21,6 @@ namespace Hazel {
 		unsigned char* pixel_data = nullptr;
 	private:
 		void Resize_Image(const float& width, const float& height);
+		void CreateWhiteTextureArray(int numMat);
 	};
 }

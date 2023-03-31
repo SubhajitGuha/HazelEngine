@@ -80,9 +80,9 @@ float CalculateShadow(int cascade_level)
 	float bias = 0.00001;//bias to resolve the artifact
 	float TexelSize = 1.0/4096.0; // 4k texture
 
-	for(int i=-2; i <=2; i++)
+	for(int i=-1; i <=1; i++)
 	{
-		for(int j=-2; j<=2; j++)
+		for(int j=-1; j<=1; j++)
 		{
 			vec2 offset = vec2(i,j) * TexelSize; 
 			float depth = texture(ShadowMap[cascade_level],p.xy + offset).r;
@@ -92,7 +92,7 @@ float CalculateShadow(int cascade_level)
 	}
 	//depth < p.z - bias? 0:1;// sample the depth map and check the p.xy coordinate of depth map with the p.z value
 	
-	return ShadowSum/25.0;
+	return ShadowSum/9.0;
 }
 
 float NormalDistribution_GGX(float NdotH)
@@ -180,7 +180,7 @@ void main()
 	//vec3 IBL_diffuse =  texture(env,m_Normal).rgb * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * kd;
 
 	//ambiance
-		vec3 ambiant = texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * vec3(0.2,0.2,0.2);
+		vec3 ambiant = texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * vec3(0.1,0.1,0.1);
 
 
 	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection) ) * shadow * max(dot(m_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
