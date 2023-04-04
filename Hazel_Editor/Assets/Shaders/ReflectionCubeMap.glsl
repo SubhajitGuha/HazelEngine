@@ -1,53 +1,30 @@
 #shader vertex
 #version 410 core
 layout (location = 0) in vec4 pos;
-layout (location = 1) in vec2 cord;
-layout (location = 2) in vec4 color;
-layout (location = 3) in vec3 Normal;
-layout (location = 4) in float slotindex;
+layout (location = 1) in vec4 dir;
 
-out vec2 tcord;
-out vec4 m_pos;
-out vec4 m_color;
-out vec3 m_Normal;
-flat out float m_slotindex;
-
-uniform mat4 u_ProjectionView;
-uniform mat4 u_ModelTransform;
+varying vec3 direction;
 
 void main()
 {
-	gl_Position = u_ProjectionView * pos;
-	m_color = color;
-	m_slotindex = slotindex;
-	tcord = cord;
-	m_Normal = Normal;
-	m_pos = pos;
+	direction = dir.xyz/dir.w;
+	gl_Position = pos;
 }
 
 #shader fragment
 #version 410 core
 layout (location = 0) out vec4 color;
 
-in vec4 m_color;
-in vec4 m_pos;
-in vec3 m_Normal;
-flat in float m_slotindex;
-in vec2 tcord;
+varying vec3 direction;
 
-//uniform samplerCube cube_map;
 uniform samplerCube env;
-uniform sampler2D u_Texture[32];
-uniform vec4 u_color;
-uniform vec3 LightPosition;
-uniform vec3 EyePosition;
 
 const float PI = 3.14159265359;
 
 vec3 GetIrradiance()
 {
-	vec3 normal = normalize(m_pos.xyz);
-	vec3 irradiance = vec3(0.0);  
+	vec3 normal = normalize(-direction.xyz);
+	vec3 irradiance = vec3(0.0);
 	
 	vec3 up    = vec3(0.0, 1.0, 0.0);
 	vec3 right = normalize(cross(up, normal));
@@ -62,7 +39,7 @@ vec3 GetIrradiance()
 	        // spherical to cartesian (in tangent space)
 	        vec3 tangentSample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
 	        // tangent space to world
-	        vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * m_Normal; 
+	        vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * normal; 
 	
 	        irradiance += texture(env, sampleVec).rgb * cos(theta) * sin(theta);
 	        nrSamples++;
@@ -74,31 +51,10 @@ vec3 GetIrradiance()
 
 void main()
 {
-	int index = int (m_slotindex);
-	
-	//diffuse
-	vec3 LightDirection = normalize(LightPosition - vec3(m_pos.x,m_pos.y,m_pos.z));
-	float brightness = dot(LightDirection , m_Normal);
-	vec4 diffuse = m_color * vec4(brightness,brightness,brightness,1);
+	vec3 envColor = GetIrradiance();
+	envColor = envColor / (envColor + vec3(1.0));
+	//envColor = vec3(1.0) - exp(-envColor * 3.0);//exposure
+	envColor = pow(envColor, vec3(1.0/2.2)); 
 
-	//ambiance
-	vec4 ambiant = m_color * vec4(0.2,0.2,0.2,1.0);
-
-	//specular
-	vec3 EyeDirection = normalize(EyePosition - vec3(m_pos));
-	vec3 Reflected_Light = reflect(-LightDirection , m_Normal);
-	float s_brightness = clamp(dot(EyeDirection , Reflected_Light),0,1);
-	float b = pow(s_brightness,100);//to reduce the size of specular see the graph of (cosx)^2
-	vec4 specular = m_color * vec4(b,b,b,1);
-
-	//environment reflections
-	vec3 Light_dir_i = reflect(-EyeDirection,m_Normal);
-	vec4 EnvironmentCol = m_color * texture(env,Light_dir_i);
-	//vec4 CubeMap = m_color * texture(cube_map,Light_dir_i);
-
-
-	float dist = length(LightPosition-vec3(m_pos));
-	float attenuation = 1/(0.1 + 0*dist + 0.008 * dist*dist);
-	color= clamp(diffuse,0,attenuation) + ambiant + clamp(specular,0,attenuation);
-	//color = vec4(GetIrradiance(),1.0);
+	color= vec4(envColor,1.0);
 }

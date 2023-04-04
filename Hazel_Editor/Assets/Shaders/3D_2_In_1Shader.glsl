@@ -44,7 +44,9 @@ uniform sampler2D ShadowMap[4];
 uniform float Ranges[5];
 uniform mat4 view;
 
-uniform samplerCube env;
+uniform samplerCube diffuse_env;
+uniform samplerCube specular_env;
+
 uniform sampler2D u_texture[32];
 uniform sampler2DArray u_Albedo;
 uniform sampler2DArray u_Roughness;
@@ -71,6 +73,7 @@ float vdoth;
 
 float alpha = Roughness; //Roughness value
 const float PI = 3.14159265359;
+#define MAX_MIP_LEVEL 25
 
 float CalculateShadow(int cascade_level)
 {
@@ -116,15 +119,17 @@ vec3 Fresnel(float VdotH)
 	else
 		f0 = vec3(0.4); // for metallic
 	f0 = mix(f0,m_color.xyz,Metallic);
-	return f0 + (1.0 - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+	//return f0 + (1.0 - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+	//greater roughness = lesser fresnel value
+	return f0 + (max(vec3(1.0- alpha),f0) - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
 }
 
 vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir)
 {
 	vec3 Half = normalize( ViewDir + LightDir);
 	float NdotH = max(dot(m_Normal,Half) , 0.0);
-	float NdotV = max(dot(m_Normal,ViewDir) , 0.0);
-	float NdotL = max(dot(m_Normal,LightDir) , 0.0);
+	float NdotV = max(dot(m_Normal,ViewDir) , 0.000001);
+	float NdotL = max(dot(m_Normal,LightDir) , 0.000001);
 	float VdotH = max(dot(ViewDir,Half) , 0.0);
 
 	vdoth = VdotH;
@@ -168,19 +173,21 @@ void main()
 	//shadows
 	float shadow = CalculateShadow(level);
 
-	//environment reflections
-	//vec3 Light_dir_i = reflect(-EyeDirection,m_Normal);
-	//vec3 EnvironmentCol = texture(env,Light_dir_i).xyz * (1.0 - alpha) ;
+	//diffuse_environment reflections
+	vec3 Light_dir_i = reflect(-EyeDirection,m_Normal);
+	//vec3 diffuse_environmentCol = texture(diffuse_env,Light_dir_i).xyz * (1.0 - alpha) ;
 
 	vdoth = max(dot( EyeDirection, normalize( EyeDirection + DirectionalLight_Direction)) ,0.0);//for directional light
 	ks = Fresnel(vdoth);
 	kd = vec3(1.0) - ks;
 	kd *= (1.0 - Metallic);
 
-	//vec3 IBL_diffuse =  texture(env,m_Normal).rgb * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * kd;
-
+	vec3 IBL_diffuse =  texture(diffuse_env,m_Normal).rgb * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * kd; //sampling the irradiance map
+	vec3 BRDFintegration =  ks*alpha + max(dot(m_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
+	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
+	
 	//ambiance
-		vec3 ambiant = texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * vec3(0.1,0.1,0.1);
+		vec3 ambiant = (IBL_diffuse + IBL_specular) * 1.0;
 
 
 	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection) ) * shadow * max(dot(m_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
@@ -203,7 +210,7 @@ void main()
 		float attenuation = 1 / ( 0.01 * dist * dist ); //attenuation is for point and spot light
 		radiance = PointLight_Color[i] * attenuation;
 		
-		float NdotL = max(dot(m_Normal,LightDirection), 0.0);
+		float NdotL = max(dot(m_Normal,LightDirection), 0.00001);
 		PBR_Color += (diffuse + specular)  * radiance * NdotL ; //for Point light (attenuation)
 	}
 

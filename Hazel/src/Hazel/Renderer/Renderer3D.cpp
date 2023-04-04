@@ -190,9 +190,11 @@ namespace Hazel {
 	
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
 	{
-		m_data->shader->SetInt("env", 10);//for now assign to 10 :)
-		m_data->reflection->RenderToCubeMap(scene);
+		//m_data->reflection->RenderToCubeMap(scene);
 		m_data->shader->Bind();//you need to bind this other wise nothing will be rendererd
+		m_data->shader->SetInt("diffuse_env", 10);//for now assign to 10 :)
+		m_data->shader->SetInt("specular_env", 18);//for now assign to 10 :)
+
 	}
 
 	void Renderer3D::RenderShadows(Scene& scene, EditorCamera& camera)

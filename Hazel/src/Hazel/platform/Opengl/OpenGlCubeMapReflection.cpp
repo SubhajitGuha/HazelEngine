@@ -1,12 +1,14 @@
 #include "hzpch.h"
 #include "OpenGlCubeMapReflection.h"
 #include "glad/glad.h"
+#include "stb_image.h"
+#include "stb_image_resize.h"
 
 namespace Hazel {
 	LoadMesh* m_LoadMesh = nullptr;
 	LoadMesh* Cube = nullptr,*Plane=nullptr;
 	OpenGlCubeMapReflection::OpenGlCubeMapReflection()
-		:cubemap_width(16),cubemap_height(16)
+		:cubemap_width(2048),cubemap_height(2048)
 	{
 		RenderCommand::Init();
 		shader = Shader::Create("Assets/Shaders/ReflectionCubeMap.glsl");//texture shader
@@ -20,8 +22,8 @@ namespace Hazel {
 	}
 	void OpenGlCubeMapReflection::CreateCubeMapTexture()
 	{
-		glGenFramebuffers(1, &framebuffer_id);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+		float* data = nullptr;
+		int width, height, channels;
 
 		glGenTextures(1, &tex_id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
@@ -30,9 +32,16 @@ namespace Hazel {
 		glBindRenderbuffer(GL_RENDERBUFFER, depth_id);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, cubemap_width, cubemap_height);
 
+		std::string filename = "Assets/Textures/Interior-Cube-map/";
+
 		for (int i = 0; i < 6; i++)//iterate over 6 images each representing the side of a cube
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, cubemap_width, cubemap_height, 0, GL_RGB, GL_FLOAT, nullptr);
+			stbi_set_flip_vertically_on_load_thread(1);
+			data = stbi_loadf((filename + "irr_" + std::to_string(i) + ".jpg").c_str(), &width, &height, &channels, 0);
+			if (!data)
+				HAZEL_CORE_ERROR("Irradiance map not loaded");
+			else
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
 		}
 
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -43,73 +52,68 @@ namespace Hazel {
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		HAZEL_CORE_WARN(glGetError());
 
-		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_id);
-
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-			HAZEL_CORE_WARN("FrameBuffer compleate!!");
-
-		GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, draw_buffers);//Tell the fragment shader to output the color in the RenderTarget GL_COLOR_ATTACHMENT0
-
 		glBindTextureUnit(10, tex_id);
 	}
 
 	void OpenGlCubeMapReflection::RenderToCubeMap(Scene& scene)
 	{
-		auto size = RenderCommand::GetViewportSize();
-
-		EditorCamera cam = EditorCamera();
-		cam.SetPerspctive(90.00f, 0.01, 1000);//*** mann this game me a headache (by not converting the FOV to radians) the fov is converted to radians in the editorCamera class :)
-		cam.SetUPVector({ 0,-1,0 });
-		cam.SetCameraPosition({ 0,-5,0 });
-
+		//shader->Bind();
+		//auto size = RenderCommand::GetViewportSize();
+		//
+		//EditorCamera cam = EditorCamera();
+		//cam.SetPerspctive(90.00f, -10.0f, 1000.0f);//*** mann this game me a headache (by not converting the FOV to radians) the fov is converted to radians in the editorCamera class :)
+		//cam.SetUPVector({ 0,-1,0 });
+		//cam.SetCameraPosition({ 0,-5,0 });
+		//
+		////glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
+		//glViewport(0, 0, cubemap_width , cubemap_height);
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
-		glViewport(0, 0, cubemap_width , cubemap_height);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		std::vector<glm::vec3> dir = { {1,0,0},{-1,0,0},{0,-1,0},{0,1,0},{0,0,1},{0,0,-1} };
-		glm::vec3 pos = {2,3,6};
-		shader->SetFloat3("LightPosition", pos);//world position
-		shader->SetInt("env", 18);
-		for (int i = 0; i < 6; i++)
-		{
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i , tex_id, 0);//Render the scene in the corresponding face on the cube map and "GL_COLOR_ATTACHMENT0" Represents the Render target where the fragment shader should output the color
-			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-				HAZEL_CORE_WARN("FrameBuffer compleate!!");
-
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//clear the buffers each time
-
-			SwitchToFace(i);//rotate the camera
-			cam.RotateCamera(yaw, pitch);
-
-			//Render the cube map
-			CubeMapEnvironment::RenderCubeMap(cam.GetViewMatrix(), cam.GetProjectionMatrix());//cubemap shader is binded here follow this order
-
-			shader->Bind();//bind the shader and pass the projectionview and Eye pos as uniform.
-			shader->SetMat4("u_ProjectionView", cam.GetProjectionView());
-			shader->SetFloat3("EyePosition", cam.GetCameraPosition());
-			scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
-				{
-					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
-					Entity Entity(&scene, m_entity);
-					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-					glm::vec4 color;
-
-					//if (camera.camera.bIsMainCamera) {
-					if (Entity.HasComponent<SpriteRenderer>()) {
-						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-						Renderer3D::DrawMesh(*m_LoadMesh, transform, SpriteRendererComponent.Color);
-					}
-					else
-						Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
-
-				});
-					Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 0,0,0 });
-		}
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);//unbind the framebuffer to compleate the capturing process
-		glViewport(0, 0, size.x, size.y);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glBindTextureUnit(10, tex_id);
+		//std::vector<glm::vec3> dir = { {1,0,0},{-1,0,0},{0,-1,0},{0,1,0},{0,0,1},{0,0,-1} };
+		//glm::vec3 pos = {2,3,6};
+		////shader->SetFloat3("LightPosition", pos);//world position
+		//shader->SetInt("env", 18);//18th slot is the slot that stores cubemap texture
+		//for (int i = 0; i < 6; i++)
+		//{
+		//	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i , tex_id, 0);//Render the scene in the corresponding face on the cube map and "GL_COLOR_ATTACHMENT0" Represents the Render target where the fragment shader should output the color
+		//	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+		//		HAZEL_CORE_WARN("FrameBuffer compleate!!");
+		//
+		//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//clear the buffers each time
+		//	//HAZEL_CORE_ERROR(glGetError());
+		//
+		//	SwitchToFace(i);//rotate the camera
+		//	cam.RotateCamera(yaw, pitch);
+		//
+		//	//Render the cube map
+		//	//shader->Bind();
+		//	CubeMapEnvironment::RenderQuad(cam.GetViewMatrix(), cam.GetProjectionMatrix());//cubemap shader is binded here follow this order
+		//
+		//	/*shader->Bind();//bind the shader and pass the projectionview and Eye pos as uniform.
+		//	shader->SetMat4("u_ProjectionView", cam.GetProjectionView());
+		//	shader->SetFloat3("EyePosition", cam.GetCameraPosition());
+		//	scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
+		//		{
+		//			//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
+		//			Entity Entity(&scene, m_entity);
+		//			auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
+		//			glm::vec4 color;
+		//
+		//			//if (camera.camera.bIsMainCamera) {
+		//			if (Entity.HasComponent<SpriteRenderer>()) {
+		//				auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+		//				Renderer3D::DrawMesh(*m_LoadMesh, transform, SpriteRendererComponent.Color);
+		//			}
+		//			else
+		//				Renderer3D::DrawMesh(*Cube, transform, Entity.m_DefaultColor);
+		//
+		//		});
+		//			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 0,0,0 });*/
+		//}
+		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);//unbind the framebuffer to compleate the capturing process
+		//glViewport(0, 0, size.x, size.y);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glBindTextureUnit(10, tex_id);
 	}
 
 	void OpenGlCubeMapReflection::Bind(int slot)

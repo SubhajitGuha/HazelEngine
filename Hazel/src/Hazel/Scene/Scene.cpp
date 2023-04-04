@@ -25,6 +25,8 @@ namespace Hazel {
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		editor_cam.SetViewportSize(1920.0,1080.0);
+		Renderer3D::SetUpCubeMapReflections(*this);
+
 	}
 	Scene::~Scene()
 	{
@@ -40,7 +42,6 @@ namespace Hazel {
 		else
 			entity->AddComponent<TagComponent>(name);
 		//Entity_Map[entity->GetComponent<TagComponent>()] = entity;
-		Renderer3D::SetUpCubeMapReflections(*this);
 		capture = true;
 		return entity;
 	}
