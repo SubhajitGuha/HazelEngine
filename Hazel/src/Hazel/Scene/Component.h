@@ -70,10 +70,12 @@ namespace Hazel {
 	struct StaticMeshComponent
 	{
 		LoadMesh* static_mesh = nullptr;
+		bool isFoliage = false;
 		StaticMeshComponent() = default;
 		StaticMeshComponent(LoadMesh* staticmesh)
 			:static_mesh(staticmesh)
 		{}
 		operator LoadMesh* () { return static_mesh; }
 	};
+
 }

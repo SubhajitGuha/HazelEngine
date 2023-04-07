@@ -407,6 +407,11 @@ namespace Hazel {
 			{
 				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Windmill);
 			}
+			if (ImGui::Button("Fern plant", { 100,30 }))
+			{
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Fern);
+				m_selected_entity->GetComponent<StaticMeshComponent>().isFoliage = true;
+			}
 			ImGui::TreePop();
 		}
 	}

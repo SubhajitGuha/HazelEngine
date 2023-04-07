@@ -154,7 +154,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\irradianceCubeMapShader.glsl" />
+    <None Include="Assets\Shaders\FoliageShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

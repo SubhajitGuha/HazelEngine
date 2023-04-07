@@ -18,22 +18,13 @@ namespace Hazel {
 	OpenGlShadows::~OpenGlShadows()
 	{
 	}
-	void OpenGlShadows::RenderShadows(Scene& scene,const glm::vec3& LightPosition,ref<Shader> rendering_shader,EditorCamera& cam)
+	void OpenGlShadows::RenderShadows(Scene& scene,const glm::vec3& LightPosition ,EditorCamera& cam)
 	{
 		GLint OFb;
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &OFb);
 		auto size = RenderCommand::GetViewportSize();
 
 		PrepareShadowProjectionMatrix(cam, LightPosition);//CREATE THE orthographic projection matrix
-
-		std::vector<glm::mat4> LightProj_Matrices(MAX_CASCADES);
-		for (int i = 0; i < MAX_CASCADES; i++)
-			LightProj_Matrices[i] = m_ShadowProjection[i] * LightView[i];
-		rendering_shader->SetMat4("MatrixShadow", LightProj_Matrices[0], MAX_CASCADES);
-		unsigned int arr[] = { 11,12,13,14 };//these slots are explicitly used for all 4 seperate shadow maps
-		rendering_shader->SetIntArray("ShadowMap", MAX_CASCADES, arr);
-		rendering_shader->SetFloatArray("Ranges", Ranges[0], MAX_CASCADES);
-		rendering_shader->SetMat4("view", cam.GetViewMatrix());//we need the camera's view matrix so that we can compute the distance comparison in view space
 
 		shadow_shader->Bind();
 		for (int i = 0; i < MAX_CASCADES; i++) 
@@ -77,6 +68,21 @@ namespace Hazel {
 		m_height = height;
 		m_width = width;
 	}
+
+	void OpenGlShadows::PassShadowUniforms(EditorCamera& cam, ref<Shader> rendering_shader)
+	{
+		//this function passes the uniforms required for shadow rendering to the rendering shader
+		rendering_shader->Bind();
+		std::vector<glm::mat4> LightProj_Matrices(MAX_CASCADES);
+		for (int i = 0; i < MAX_CASCADES; i++)
+			LightProj_Matrices[i] = m_ShadowProjection[i] * LightView[i];
+		rendering_shader->SetMat4("MatrixShadow", LightProj_Matrices[0], MAX_CASCADES);
+		unsigned int arr[] = { 11,12,13,14 };//these slots are explicitly used for all 4 seperate shadow maps
+		rendering_shader->SetIntArray("ShadowMap", MAX_CASCADES, arr);
+		rendering_shader->SetFloatArray("Ranges", Ranges[0], MAX_CASCADES);
+		rendering_shader->SetMat4("view", cam.GetViewMatrix());//we need the camera's view matrix so that we can compute the distance comparison in view space
+	}
+
 	void OpenGlShadows::CreateShdowMap()
 	{
 		glGenFramebuffers(1, &framebuffer_id);
@@ -88,13 +94,11 @@ namespace Hazel {
 			glBindTexture(GL_TEXTURE_2D, depth_id[i]);
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 			glDrawBuffer(GL_NONE);
 			glReadBuffer(GL_NONE);

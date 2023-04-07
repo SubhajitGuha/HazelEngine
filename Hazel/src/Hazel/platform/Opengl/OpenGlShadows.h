@@ -9,8 +9,9 @@ namespace Hazel{
 		OpenGlShadows();
 		OpenGlShadows(const float& width, const float& height);
 		~OpenGlShadows();
-		void RenderShadows(Scene& scene, const glm::vec3& LightPosition, ref<Shader> rendering_shader, EditorCamera& cam) override;
-		virtual void SetShadowMapResolution(const float& width, float height) override;
+		void RenderShadows(Scene& scene, const glm::vec3& LightPosition, EditorCamera& cam) override;
+		void SetShadowMapResolution(const float& width, float height) override;
+		void PassShadowUniforms(EditorCamera& cam, ref<Shader> rendering_shader) override;
 		virtual unsigned int GetDepth_ID() override { return depth_id[0]; }
 		void CreateShdowMap();
 		
