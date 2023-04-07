@@ -32,6 +32,8 @@ namespace Hazel {
 				glm::mat4 LightProjection = m_ShadowProjection[i] * LightView[i]; //placing a orthographic camera on the light position(i.e position at centroid of each frustum)
 
 				shadow_shader->SetMat4("LightProjection", LightProjection);
+				//Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
+				shadow_shader->SetInt("u_Alpha", 3);//'3' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
 
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
 				glViewport(0, 0, m_width, m_height);

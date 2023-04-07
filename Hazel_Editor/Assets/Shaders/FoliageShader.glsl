@@ -4,13 +4,13 @@ layout (location = 0) in vec4 pos;
 layout (location = 1) in vec2 cord;
 layout (location = 2) in vec4 color;
 layout (location = 3) in vec3 Normal;
-layout (location = 4) in float slotindex;
+layout (location = 4) in float materialindex;
 
 out vec2 tcord;
 out vec4 m_pos;
 out vec4 m_color;
 out vec3 m_Normal;
-flat out float m_slotindex;
+flat out float m_materialindex;
 
 uniform mat4 u_ProjectionView;
 uniform mat4 u_ModelTransform;
@@ -19,7 +19,7 @@ void main()
 {
 	gl_Position = u_ProjectionView * pos;
 	m_color = color;
-	m_slotindex = slotindex;
+	m_materialindex = materialindex;
 	tcord = cord;
 	m_Normal = normalize(Normal);
 	m_pos = pos;
@@ -35,7 +35,7 @@ layout (location = 0) out vec4 color;
 in vec4 m_color;
 in vec4 m_pos;
 in vec3 m_Normal;
-flat in float m_slotindex;
+flat in float m_materialindex;
 in vec2 tcord;
 
 #define MAX_LIGHTS 100
@@ -151,7 +151,7 @@ int level = 3; // cascade levels
 float ao = 1.0;
 void main()
 {
-	int index = int (m_slotindex);
+	int index = int (m_materialindex);
 
 	float opacity = texture(u_Roughness , vec3(tcord,index)).r;// Opacity on R-Channel
 	if(opacity <= 0.1)

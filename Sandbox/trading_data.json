@@ -2,10 +2,24 @@
     "Meta Data": {
         "1. Information": "Weekly Prices (open, high, low, close) and Volumes",
         "2. Symbol": "IBM",
-        "3. Last Refreshed": "2023-03-24",
+        "3. Last Refreshed": "2023-04-06",
         "4. Time Zone": "US/Eastern"
     },
     "Weekly Time Series": {
+        "2023-04-06": {
+            "1. open": "130.9700",
+            "2. high": "132.6100",
+            "3. low": "130.3150",
+            "4. close": "130.5000",
+            "5. volume": "13172262"
+        },
+        "2023-03-31": {
+            "1. open": "126.4700",
+            "2. high": "131.4800",
+            "3. low": "126.4700",
+            "4. close": "131.0900",
+            "5. volume": "20779522"
+        },
         "2023-03-24": {
             "1. open": "124.3100",
             "2. high": "127.2150",

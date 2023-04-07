@@ -231,7 +231,7 @@ namespace Hazel {
 			});
 
 		mesh.Diffuse_Texture->Bind(1);
-		mesh.Roughness_Texture->Bind(3);
+		mesh.Roughness_Texture->Bind(3);//explicitely bind to slot 3
 
 		m_data->foliage_shader->SetInt("u_Albedo", 1);//bind albedo texture array to slot1;
 		m_data->foliage_shader->SetInt("u_Roughness", 3);
