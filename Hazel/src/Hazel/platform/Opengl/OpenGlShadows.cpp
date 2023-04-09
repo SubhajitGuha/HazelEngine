@@ -46,8 +46,12 @@ namespace Hazel {
 				glClear(GL_DEPTH_BUFFER_BIT);
 				scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
 					{
-						//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
 						Entity Entity(&scene, m_entity);
+						if (Entity.GetComponent<StaticMeshComponent>().isFoliage == true)
+							shadow_shader->SetInt("isFoliage", 1); //if the mesh is a foliage then in shader set it to true
+						else
+							shadow_shader->SetInt("isFoliage", 0);
+
 						auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
 						auto mesh = Entity.GetComponent<StaticMeshComponent>();
 						//if (camera.camera.bIsMainCamera) {

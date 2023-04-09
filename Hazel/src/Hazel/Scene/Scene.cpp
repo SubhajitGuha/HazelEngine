@@ -18,9 +18,9 @@ namespace Hazel {
 	bool capture = false;
 	Scene::Scene()
 	{
-		Sphere = new LoadMesh("Assets/Meshes/Sphere.obj");
-		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
-		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
+		Sphere = new LoadMesh("Assets/Meshes/Sphere.fbx");
+		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
+		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
 		Fern = new LoadMesh("Assets/Meshes/shrub.fbx");
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
@@ -127,7 +127,7 @@ namespace Hazel {
 			//Renderer3D::EndScene();
 		
 			Renderer3D::BeginScene(editor_cam);
-			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 0,0,0 });
+			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 90,0,0 });
 
 			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
 	}

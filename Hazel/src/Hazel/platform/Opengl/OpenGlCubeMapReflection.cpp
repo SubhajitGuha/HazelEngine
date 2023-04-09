@@ -5,16 +5,11 @@
 #include "stb_image_resize.h"
 
 namespace Hazel {
-	LoadMesh* m_LoadMesh = nullptr;
-	LoadMesh* Cube = nullptr,*Plane=nullptr;
 	OpenGlCubeMapReflection::OpenGlCubeMapReflection()
 		:cubemap_width(2048),cubemap_height(2048)
 	{
 		RenderCommand::Init();
 		shader = Shader::Create("Assets/Shaders/ReflectionCubeMap.glsl");//texture shader
-		m_LoadMesh = new LoadMesh("Assets/Meshes/Sphere.obj");
-		Cube = new LoadMesh("Assets/Meshes/Cube.obj");
-		Plane = new LoadMesh("Assets/Meshes/Plane.obj");
 		CreateCubeMapTexture();
 	}
 	OpenGlCubeMapReflection::~OpenGlCubeMapReflection()

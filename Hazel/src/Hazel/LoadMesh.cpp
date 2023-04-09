@@ -10,7 +10,7 @@ namespace Hazel {
 	{
 	}
 	LoadMesh::LoadMesh(const std::string& Path)
-		:vertices(0),Normal(0),TexCoord(0)
+		:Vertices(0),Normal(0),TexCoord(0)
 	{
 		LoadObj(Path);
 	}
@@ -20,7 +20,7 @@ namespace Hazel {
 	void LoadMesh::LoadObj(const std::string& Path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(Path, aiProcess_Triangulate | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes);
+		const aiScene* scene = importer.ReadFile(Path, aiProcess_Triangulate | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace);
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HAZEL_CORE_ERROR("ERROR::ASSIMP::");
@@ -51,12 +51,13 @@ namespace Hazel {
 		for (int i = 0; i < m_Mesh.size(); i++)
 		{
 			unsigned int material_ind = m_Mesh[i]->mMaterialIndex;
+
 			for (int k = 0; k < m_Mesh[i]->mNumVertices; k++) 
 			{
-				aiVector3D aivertices = m_Mesh[i]->mVertices[k];
 				Material_Index.push_back(material_ind);
 				
-				vertices.push_back({ aivertices.x,aivertices.y,aivertices.z });
+				aiVector3D aivertices = m_Mesh[i]->mVertices[k];
+				Vertices.push_back({ aivertices.x,aivertices.y,aivertices.z });
 
 				if (m_Mesh[i]->HasNormals()) {
 					aiVector3D ainormal = m_Mesh[i]->mNormals[k];
@@ -73,6 +74,20 @@ namespace Hazel {
 				}
 				else
 					TexCoord.push_back(coord);
+
+				if (m_Mesh[i]->HasTangentsAndBitangents())
+				{
+					aiVector3D tangent = m_Mesh[i]->mTangents[k];
+					aiVector3D bitangent = m_Mesh[i]->mBitangents[k];
+					Tangent.push_back({ tangent.x, tangent.y, tangent.z });
+					BiTangent.push_back({ bitangent.x,bitangent.y,bitangent.z });
+					//m_Mesh[i]->biTange
+				}
+				else
+				{
+					Tangent.push_back({ 0,0,0 });
+					BiTangent.push_back({ 0,0,0 });
+				}
 			}
 			for (int k = 0; k < m_Mesh[i]->mNumFaces; k++)
 			{
@@ -110,6 +125,11 @@ namespace Hazel {
 		CreateTextureArray(Diffuse_Texture, aiTextureType_DIFFUSE);
 		CreateTextureArray(Normal_Texture, aiTextureType_NORMALS);
 		CreateTextureArray(Roughness_Texture, aiTextureType_SHININESS);
+
+	}
+	void LoadMesh::CalculateTangent()
+	{
+		glm::vec3 tangent = { 0.f,0.f,0.f };
 
 	}
 }

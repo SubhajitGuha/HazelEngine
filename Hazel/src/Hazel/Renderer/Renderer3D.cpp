@@ -19,14 +19,18 @@ namespace Hazel {
 		glm::vec2 TextureCoordinate;
 		glm::vec4 Color;
 		glm::vec3 Normal;
+		glm::vec3 Tangent;
+		glm::vec3 BiNormal;
 		unsigned int Material_index = 0;//serves as an index to the array of texture slot which is passed as an uniform in init()
-		VertexAttributes(const glm::vec4& Position, const glm::vec2& TextureCoordinate,const glm::vec4& Color = { 1,1,1,1 },const glm::vec3& normal = {0,0,0}, unsigned int Material_index = 0)
+		VertexAttributes(const glm::vec4& Position, const glm::vec2& TextureCoordinate, const glm::vec4& Color = { 1,1,1,1 }, const glm::vec3& normal = { 0,0,0 }, const glm::vec3& Tangent = { 0,0,0 }, const glm::vec3& BiNormal = {0,0,0}, unsigned int Material_index = 0)
 		{
 			this->Position = Position;
 			this->TextureCoordinate = TextureCoordinate;
 			this->Color = Color;
 			this->Material_index = Material_index;
 			Normal = normal;
+			this->Tangent = Tangent;
+			this->BiNormal = BiNormal;
 		}
 		//may more ..uv coord , tangents , normals..
 	};
@@ -78,6 +82,8 @@ namespace Hazel {
 		m_data->bl->push("TexCoord", DataType::Float2);
 		m_data->bl->push("Color", DataType::Float4);
 		m_data->bl->push("Normal", DataType::Float3);
+		m_data->bl->push("Tangent", DataType::Float3);
+		m_data->bl->push("BiTangent", DataType::Float3);
 		m_data->bl->push("Material_Index", DataType::Int);
 	
 		m_data->va->AddBuffer(m_data->bl, m_data->vb);
@@ -179,7 +185,7 @@ namespace Hazel {
 		{
 			waitReturn = glClientWaitSync(syncObj, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
 		}
-		m_data->m_VertexCounter = mesh.vertices.size();
+		m_data->m_VertexCounter = mesh.Vertices.size();
 		
 		std::vector<int> n_meshes;
 		for (int i = 0; i < m_data->m_VertexCounter; i++)
@@ -188,17 +194,21 @@ namespace Hazel {
 		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
 			{
 				glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, transformed_normals, mesh.Material_Index[i]));
+				glm::vec3 transformed_tangents = glm::normalize(glm::mat3(transform) * mesh.Tangent[i]);
+				glm::vec3 transformed_binormals = glm::normalize(glm::mat3(transform) * mesh.BiTangent[i]);
+				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.Vertices[i], 1), mesh.TexCoord[i], color, transformed_normals,transformed_tangents, transformed_binormals, mesh.Material_Index[i]));
 				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
 			});
 
 		mesh.Diffuse_Texture->Bind(1);
 		mesh.Roughness_Texture->Bind(3);
+		mesh.Normal_Texture->Bind(4);
 
 		m_data->shader->SetInt("u_Albedo", 1);//bind albedo texture array to slot1;
 		m_data->shader->SetInt("u_Roughness", 3);
+		m_data->shader->SetInt("u_NormalMap", 4);
 
-		RenderCommand::DrawArrays(*m_data->va, mesh.vertices.size());
+		RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
 
 		// lock the buffer:
 		glDeleteSync(syncObj);
@@ -217,7 +227,7 @@ namespace Hazel {
 		{
 			waitReturn = glClientWaitSync(syncObj, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
 		}
-		m_data->m_VertexCounter = mesh.vertices.size();
+		m_data->m_VertexCounter = mesh.Vertices.size();
 
 		std::vector<int> n_meshes;
 		for (int i = 0; i < m_data->m_VertexCounter; i++)
@@ -226,17 +236,21 @@ namespace Hazel {
 		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
 			{
 				glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, transformed_normals, mesh.Material_Index[i]));
+				glm::vec3 transformed_tangents = glm::normalize(glm::mat3(transform) * mesh.Tangent[i]);
+				glm::vec3 transformed_binormals = glm::normalize(glm::mat3(transform) * mesh.BiTangent[i]);
+				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.Vertices[i], 1), mesh.TexCoord[i], color, transformed_normals, transformed_tangents, transformed_binormals, mesh.Material_Index[i]));
 				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
 			});
 
 		mesh.Diffuse_Texture->Bind(1);
-		mesh.Roughness_Texture->Bind(3);//explicitely bind to slot 3
+		mesh.Roughness_Texture->Bind(3);
+		mesh.Normal_Texture->Bind(4);
 
-		m_data->foliage_shader->SetInt("u_Albedo", 1);//bind albedo texture array to slot1;
-		m_data->foliage_shader->SetInt("u_Roughness", 3);
+		m_data->shader->SetInt("u_Albedo", 1);//bind albedo texture array to slot1;
+		m_data->shader->SetInt("u_Roughness", 3);
+		m_data->shader->SetInt("u_NormalMap", 4);
 
-		RenderCommand::DrawArrays(*m_data->va, mesh.vertices.size());
+		RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
 
 		// lock the buffer:
 		glDeleteSync(syncObj);
@@ -282,25 +296,27 @@ namespace Hazel {
 		}
 		
 		std::vector<int> n_meshes;
-		for (int i = 0; i < mesh.vertices.size(); i++)
+		for (int i = 0; i < mesh.Vertices.size(); i++)
 			n_meshes.push_back(i);
 
 		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
 			{
-
 				glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.vertices[i], 1), mesh.TexCoord[i], color, transformed_normals, mesh.Material_Index[i]));
+				glm::vec3 transformed_tangents = glm::normalize(glm::mat3(transform) * mesh.Tangent[i]);
+				glm::vec3 transformed_binormals = glm::normalize(glm::mat3(transform) * mesh.BiTangent[i]);
+				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.Vertices[i], 1), mesh.TexCoord[i], color, transformed_normals, transformed_tangents, transformed_binormals, mesh.Material_Index[i]));
 				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
 			});
 
 		mesh.Diffuse_Texture->Bind(1);
 		mesh.Roughness_Texture->Bind(3);
+		mesh.Normal_Texture->Bind(4);
 
 		m_data->shader->SetInt("u_Albedo", 1);//bind albedo texture array to slot1;
 		m_data->shader->SetInt("u_Roughness", 3);
+		m_data->shader->SetInt("u_NormalMap", 4);
 
-
-		RenderCommand::DrawArrays(*m_data->va, mesh.vertices.size());
+		RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
 
 		// lock the buffer:
 		glDeleteSync(syncObj);

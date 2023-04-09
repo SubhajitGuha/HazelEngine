@@ -22,7 +22,6 @@ namespace Hazel{
 		unsigned int depth_id[MAX_CASCADES],framebuffer_id;//max 4 cascades
 		float m_width, m_height;
 		ref<Shader> shadow_shader;
-		LoadMesh* m_LoadMesh, *Cube, *Plane, *plant;//these needs to be changed
 		std::vector<glm::mat4> m_ShadowProjection;
 		std::vector<float> Ranges;
 		glm::mat4 m_Camera_Projection;

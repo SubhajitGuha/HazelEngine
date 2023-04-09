@@ -17,9 +17,11 @@ namespace Hazel {
 		~LoadMesh();
 		void LoadObj(const std::string& Path);
 	public:
-		std::vector<glm::vec3> vertices;
+		std::vector<glm::vec3> Vertices;
 		std::vector<glm::vec2> TexCoord;
 		std::vector<glm::vec3> Normal;
+		std::vector<glm::vec3> Tangent;
+		std::vector<glm::vec3> BiTangent;
 		std::vector<unsigned int> Vertex_Indices;
 		std::vector<unsigned int> Material_Index;
 		ref<Texture2DArray> Diffuse_Texture = nullptr;
@@ -32,5 +34,6 @@ namespace Hazel {
 		void ProcessNode(aiNode* Node, const aiScene* scene);
 		void ProcessMesh();
 		void ProcessMaterials(const aiScene* scene);
+		void CalculateTangent();
 	};
 }

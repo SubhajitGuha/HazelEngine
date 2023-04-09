@@ -4,12 +4,16 @@ layout (location = 0) in vec4 pos;
 layout (location = 1) in vec2 cord;
 layout (location = 2) in vec4 color;
 layout (location = 3) in vec3 Normal;
-layout (location = 4) in float materialindex;
+layout (location = 4) in vec3 Tangent;
+layout (location = 5) in vec3 BiTangent;
+layout (location = 6) in float materialindex;
 
 out vec2 tcord;
 out vec4 m_pos;
 out vec4 m_color;
 out vec3 m_Normal;
+out vec3 m_Tangent;
+out vec3 m_BiTangent;
 flat out float m_materialindex;
 
 uniform mat4 u_ProjectionView;
@@ -21,7 +25,9 @@ void main()
 	m_color = color;
 	m_materialindex = materialindex;
 	tcord = cord;
-	m_Normal = normalize(Normal);
+	m_Normal = Normal;
+	m_Tangent = Tangent;
+	m_BiTangent = BiTangent;
 	m_pos = pos;
 }
 
@@ -35,6 +41,8 @@ layout (location = 0) out vec4 color;
 in vec4 m_color;
 in vec4 m_pos;
 in vec3 m_Normal;
+in vec3 m_Tangent;
+in vec3 m_BiTangent;
 flat in float m_materialindex;
 in vec2 tcord;
 
@@ -53,6 +61,7 @@ uniform samplerCube specular_env;
 uniform sampler2D u_texture[32];
 uniform sampler2DArray u_Albedo;
 uniform sampler2DArray u_Roughness;
+uniform sampler2DArray u_NormalMap;
 uniform float u_depth;
 
 uniform vec3 EyePosition;
@@ -76,7 +85,19 @@ float vdoth;
 
 float alpha = Roughness; //Roughness value
 const float PI = 3.14159265359;
-#define MAX_MIP_LEVEL 25
+#define MAX_MIP_LEVEL 28
+int level = 3; // cascade levels
+
+vec3 NormalMapping(int index) // index implies which material index normal map to use
+{
+	vec3 normal = texture(u_NormalMap , vec3(tcord,index)).rgb;
+	normal = normal*2.0 - 1.0;
+	mat3 TBN = mat3(m_Tangent , m_BiTangent , m_Normal);
+	if(normal == vec3(1.0))
+		return m_Normal;
+	else
+		return normalize(TBN * normal);
+}
 
 float CalculateShadow(int cascade_level)
 {
@@ -127,12 +148,12 @@ vec3 Fresnel(float VdotH)
 	return f0 + (max(vec3(1.0- alpha),f0) - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
 }
 
-vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir)
+vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir , vec3 Normal)
 {
 	vec3 Half = normalize( ViewDir + LightDir);
-	float NdotH = max(dot(m_Normal,Half) , 0.0);
-	float NdotV = max(dot(m_Normal,ViewDir) , 0.000001);
-	float NdotL = max(dot(m_Normal,LightDir) , 0.000001);
+	float NdotH = max(dot(Normal,Half) , 0.0);
+	float NdotV = max(dot(Normal,ViewDir) , 0.000001);
+	float NdotL = max(dot(Normal,LightDir) , 0.000001);
 	float VdotH = max(dot(ViewDir,Half) , 0.0);
 
 	vdoth = VdotH;
@@ -147,15 +168,16 @@ vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir)
 }
 
 
-int level = 3; // cascade levels
 float ao = 1.0;
 void main()
 {
 	int index = int (m_materialindex);
-
+	
 	float opacity = texture(u_Roughness , vec3(tcord,index)).r;// Opacity on R-Channel
 	if(opacity <= 0.1)
 		discard; // if the texture value is less than a certain threshold then discard that pixel
+
+	vec3 Modified_Normal = NormalMapping(index);
 
 	alpha = texture(u_Roughness , vec3(tcord,index)).g * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
 	ao = texture(u_Roughness , vec3(tcord,index)).b; // Ambient occlusion on B-Channel
@@ -184,7 +206,7 @@ void main()
 	shadow = CalculateShadow(level);
 
 	//diffuse_environment reflections
-	vec3 Light_dir_i = reflect(-EyeDirection,m_Normal);
+	vec3 Light_dir_i = reflect(-EyeDirection,Modified_Normal);
 	//vec3 diffuse_environmentCol = texture(diffuse_env,Light_dir_i).xyz * (1.0 - alpha) ;
 
 	vdoth = max(dot( EyeDirection, normalize( EyeDirection + DirectionalLight_Direction)) ,0.0);//for directional light
@@ -192,15 +214,15 @@ void main()
 	kd = vec3(1.0) - ks;
 	kd *= (1.0 - Metallic);
 
-	vec3 IBL_diffuse =  texture(diffuse_env,m_Normal).rgb * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * kd; //sampling the irradiance map
-	vec3 BRDFintegration =  ks*alpha + max(dot(m_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
+	vec3 IBL_diffuse =  texture(diffuse_env,Modified_Normal).rgb * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * kd; //sampling the irradiance map
+	vec3 BRDFintegration =  ks*alpha + max(dot(Modified_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
 	//ambiance
 		vec3 ambiant = (IBL_diffuse + IBL_specular) * ao *0.3;
 
 
-	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection) ) * shadow * max(dot(m_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
+	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 
 	//color=vec4(PointLight_Position[0],1.0);
 	for(int i=0 ; i< Num_PointLights ; i++)
@@ -208,7 +230,7 @@ void main()
 		vec3 LightDirection = normalize(PointLight_Position[i] - m_pos.xyz/m_pos.w); //for point light
 
 		//specular
-		vec3 specular = SpecularBRDF(LightDirection , EyeDirection) ;
+		vec3 specular = SpecularBRDF(LightDirection , EyeDirection , Modified_Normal) ;
 		ks = Fresnel(vdoth);
 
 		//diffuse
@@ -220,7 +242,7 @@ void main()
 		float attenuation = 1 / ( 0.01 * dist * dist ); //attenuation is for point and spot light
 		radiance = PointLight_Color[i] * attenuation;
 		
-		float NdotL = max(dot(m_Normal,LightDirection), 0.00001);
+		float NdotL = max(dot(Modified_Normal,LightDirection), 0.00001);
 		PBR_Color += (diffuse + specular)  * radiance * NdotL ; //for Point light (attenuation)
 	}
 
