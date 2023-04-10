@@ -158,6 +158,7 @@
     <ClInclude Include="src\Hazel\LoadMesh.h" />
     <ClInclude Include="src\Hazel\Log.h" />
     <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlSSAO.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.h" />
     <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
     <ClInclude Include="src\Hazel\Renderer\Camareas\Camera.h" />
@@ -305,6 +306,7 @@
     <ClCompile Include="src\Hazel\LoadMesh.cpp" />
     <ClCompile Include="src\Hazel\Log.cpp" />
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlSSAO.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Camareas\Camera.cpp" />

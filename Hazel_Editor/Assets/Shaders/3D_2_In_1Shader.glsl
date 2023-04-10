@@ -107,7 +107,7 @@ float CalculateShadow(int cascade_level)
 	vec3 p = VertexPosition_LightSpace.xyz/VertexPosition_LightSpace.w;
 	p = p * 0.5 + 0.5;//convert -1 to +1 to 0 to 1 this is needed for getting the location in the texture
 	float bias = 0.00001;//bias to resolve the artifact
-	float TexelSize = 1.0/4096.0; // 4k texture
+	float TexelSize = 1.0/textureSize(ShadowMap[cascade_level],0).x; // 4k texture
 
 	for(int i=-1; i <=1; i++)
 	{
@@ -216,7 +216,7 @@ void main()
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
 	//ambiance
-		vec3 ambiant = (IBL_diffuse + IBL_specular) * ao *0.8;
+		vec3 ambiant = (IBL_diffuse + IBL_specular) * ao *0.6;
 
 
 	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
@@ -245,8 +245,8 @@ void main()
 
 	PBR_Color += ambiant;
 	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
-	PBR_Color = vec3(1.0) - exp(-PBR_Color * 2.0);//exposure
-	PBR_Color = pow(PBR_Color, vec3(1.0/1.2)); //Gamma correction
+	PBR_Color = vec3(1.0) - exp(-PBR_Color * 2);//exposure
+	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
 
 	color = vec4(PBR_Color,1.0);
 }

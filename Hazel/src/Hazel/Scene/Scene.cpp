@@ -27,7 +27,6 @@ namespace Hazel {
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		editor_cam.SetViewportSize(1920.0,1080.0);
 		Renderer3D::SetUpCubeMapReflections(*this);
-
 	}
 	Scene::~Scene()
 	{
@@ -86,49 +85,50 @@ namespace Hazel {
 		//else
 		//	Renderer3D::BeginScene(*MainCamera);//pass only the main camera for rendering
 
-			m_registry.each([&](auto m_entity)
+		m_registry.each([&](auto m_entity)
 			{
-					Entity Entity(this, m_entity);
-					if (Entity.GetComponent<StaticMeshComponent>().isFoliage==false)
-					{
-						Renderer3D::BeginScene(editor_cam);
-						//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
-						auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-						glm::vec4 color;
+				Entity Entity(this, m_entity);
+				if (Entity.GetComponent<StaticMeshComponent>().isFoliage == false)
+				{
+					Renderer3D::BeginScene(editor_cam);
+					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
+					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
+					glm::vec4 color;
 
-						auto mesh = Entity.GetComponent<StaticMeshComponent>();
-						//if (camera.camera.bIsMainCamera) {
-						if (Entity.HasComponent<SpriteRenderer>()) {
-							auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-							Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
-							//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
-						}
-						else
-							Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
+					auto mesh = Entity.GetComponent<StaticMeshComponent>();
+					//if (camera.camera.bIsMainCamera) {
+					if (Entity.HasComponent<SpriteRenderer>()) {
+						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
+						//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
 					}
 					else
-					{
-						Renderer3D::BeginSceneFoliage(editor_cam);
-						//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
-						auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-						glm::vec4 color;
+						Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
+				}
+				else
+				{
+					Renderer3D::BeginSceneFoliage(editor_cam);
+					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
+					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
+					glm::vec4 color;
 
-						auto mesh = Entity.GetComponent<StaticMeshComponent>();
-						//if (camera.camera.bIsMainCamera) {
-						if (Entity.HasComponent<SpriteRenderer>()) {
-							auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-							Renderer3D::DrawFoliage(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
-							//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
-						}
-						else
-							Renderer3D::DrawFoliage(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
+					auto mesh = Entity.GetComponent<StaticMeshComponent>();
+					//if (camera.camera.bIsMainCamera) {
+					if (Entity.HasComponent<SpriteRenderer>()) {
+						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+						Renderer3D::DrawFoliage(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
+						//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
 					}
-				});
+					else
+						Renderer3D::DrawFoliage(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
+				}
+			});
 			//Renderer3D::EndScene();
 		
 			Renderer3D::BeginScene(editor_cam);
 			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 90,0,0 });
 
+			//Renderer3D::AddSSAO();
 			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
 	}
 	void Scene::OnCreate()

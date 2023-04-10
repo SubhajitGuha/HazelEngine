@@ -32,6 +32,18 @@
 #define HZ_ASSERT(x, ...)
 #endif
 #define BIT(x) (1<<x)
+#define GAMMA 2.2
+
+//engine texture slots
+#define ALBEDO_SLOT 1
+#define ROUGHNESS_SLOT 2
+#define NORMAL_SLOT 3
+#define ENV_SLOT 4
+#define IRR_ENV_SLOT 5
+#define SHDOW_MAP1 6
+#define SHDOW_MAP2 7
+#define SHDOW_MAP3 8
+#define SHDOW_MAP4 9
 
 namespace Hazel {
 

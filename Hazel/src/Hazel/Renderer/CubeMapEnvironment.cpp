@@ -11,7 +11,7 @@ namespace Hazel {
 	unsigned int CubeMapEnvironment::irradiance_map_id = 0, CubeMapEnvironment::framebuffer_id = 0;
 	void CubeMapEnvironment::Init()
 	{
-		irradiance_shader = Shader::Create("Assets/Shaders/irradianceCubeMapShader.glsl");
+		//irradiance_shader = Shader::Create("Assets/Shaders/irradianceCubeMapShader.glsl");
 		Cube_Shader = (Shader::Create("Assets/Shaders/CubeMapShader.glsl"));
 
 		unsigned int tex_id;
@@ -46,8 +46,8 @@ namespace Hazel {
 		}
 
 		glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
-		glBindTextureUnit(18, tex_id);//use 18th slot ("explicitly binded")
-		Cube_Shader->SetInt("env", 18);
+		glBindTextureUnit(ENV_SLOT, tex_id);//use 18th slot ("explicitly binded")
+		Cube_Shader->SetInt("env", ENV_SLOT);
 		//glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 
@@ -64,7 +64,7 @@ namespace Hazel {
 	{
 		int width = 1080, height = 1080;
 		irradiance_shader->Bind();
-		irradiance_shader->SetInt("env", 18);
+		irradiance_shader->SetInt("env", ENV_SLOT);
 
 		glGenFramebuffers(1, &framebuffer_id);
 		//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);

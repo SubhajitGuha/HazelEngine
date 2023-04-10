@@ -57,10 +57,7 @@ namespace Hazel {
 		m_data = new Renderer3DStorage;
 
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
-		m_data->shader->SetInt("ShadowMap", 7);//explicitly setting it
 		m_data->foliage_shader = Shader::Create("Assets/Shaders/FoliageShader.glsl");//foliage shader
-		m_data->foliage_shader->SetInt("ShadowMap", 7);//explicitly setting it
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		m_data->reflection = CubeMapReflection::Create();
@@ -200,13 +197,13 @@ namespace Hazel {
 				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
 			});
 
-		mesh.Diffuse_Texture->Bind(1);
-		mesh.Roughness_Texture->Bind(3);
-		mesh.Normal_Texture->Bind(4);
+		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
+		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
+		mesh.Normal_Texture->Bind(NORMAL_SLOT);
 
-		m_data->shader->SetInt("u_Albedo", 1);//bind albedo texture array to slot1;
-		m_data->shader->SetInt("u_Roughness", 3);
-		m_data->shader->SetInt("u_NormalMap", 4);
+		m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+		m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+		m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
 
 		RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
 
@@ -242,13 +239,13 @@ namespace Hazel {
 				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
 			});
 
-		mesh.Diffuse_Texture->Bind(1);
-		mesh.Roughness_Texture->Bind(3);
-		mesh.Normal_Texture->Bind(4);
+		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
+		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
+		mesh.Normal_Texture->Bind(NORMAL_SLOT);
 
-		m_data->shader->SetInt("u_Albedo", 1);//bind albedo texture array to slot1;
-		m_data->shader->SetInt("u_Roughness", 3);
-		m_data->shader->SetInt("u_NormalMap", 4);
+		m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+		m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+		m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
 
 		RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
 
@@ -262,12 +259,12 @@ namespace Hazel {
 	{
 		//m_data->reflection->RenderToCubeMap(scene);
 		m_data->shader->Bind();//you need to bind this other wise nothing will be rendererd
-		m_data->shader->SetInt("diffuse_env", 10);//for now assign to 10 :)
-		m_data->shader->SetInt("specular_env", 18);//for now assign to 10 :)
+		m_data->shader->SetInt("diffuse_env", IRR_ENV_SLOT);//for now assign to 10 :)
+		m_data->shader->SetInt("specular_env", ENV_SLOT);//for now assign to 18 :)
 
 		m_data->foliage_shader->Bind();//you need to bind this other wise nothing will be rendererd
-		m_data->foliage_shader->SetInt("diffuse_env", 10);//for now assign to 10 :)
-		m_data->foliage_shader->SetInt("specular_env", 18);//for now assign to 10 :)
+		m_data->foliage_shader->SetInt("diffuse_env", IRR_ENV_SLOT);//for now assign to 10 :)
+		m_data->foliage_shader->SetInt("specular_env", ENV_SLOT);//for now assign to 18 :)
 
 	}
 
@@ -308,13 +305,13 @@ namespace Hazel {
 				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
 			});
 
-		mesh.Diffuse_Texture->Bind(1);
-		mesh.Roughness_Texture->Bind(3);
-		mesh.Normal_Texture->Bind(4);
+		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
+		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
+		mesh.Normal_Texture->Bind(NORMAL_SLOT);
 
-		m_data->shader->SetInt("u_Albedo", 1);//bind albedo texture array to slot1;
-		m_data->shader->SetInt("u_Roughness", 3);
-		m_data->shader->SetInt("u_NormalMap", 4);
+		m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+		m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+		m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
 
 		RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
 

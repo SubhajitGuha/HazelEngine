@@ -33,7 +33,7 @@ namespace Hazel {
 
 				shadow_shader->SetMat4("LightProjection", LightProjection);
 				//Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
-				shadow_shader->SetInt("u_Alpha", 3);//'3' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
+				shadow_shader->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
 
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
 				glViewport(0, 0, m_width, m_height);
@@ -83,7 +83,7 @@ namespace Hazel {
 		for (int i = 0; i < MAX_CASCADES; i++)
 			LightProj_Matrices[i] = m_ShadowProjection[i] * LightView[i];
 		rendering_shader->SetMat4("MatrixShadow", LightProj_Matrices[0], MAX_CASCADES);
-		unsigned int arr[] = { 11,12,13,14 };//these slots are explicitly used for all 4 seperate shadow maps
+		unsigned int arr[] = { SHDOW_MAP1,SHDOW_MAP2,SHDOW_MAP3,SHDOW_MAP4 };//these slots are explicitly used for all 4 seperate shadow maps
 		rendering_shader->SetIntArray("ShadowMap", MAX_CASCADES, arr);
 		rendering_shader->SetFloatArray("Ranges", Ranges[0], MAX_CASCADES);
 		rendering_shader->SetMat4("view", cam.GetViewMatrix());//we need the camera's view matrix so that we can compute the distance comparison in view space
@@ -111,9 +111,12 @@ namespace Hazel {
 
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 				HAZEL_CORE_INFO("shadow map FrameBuffer compleate!!");
-
-			glBindTextureUnit(i+11, depth_id[i]);
 		}
+
+		glBindTextureUnit(SHDOW_MAP1, depth_id[0]);
+		glBindTextureUnit(SHDOW_MAP2, depth_id[1]);
+		glBindTextureUnit(SHDOW_MAP3, depth_id[2]);
+		glBindTextureUnit(SHDOW_MAP4, depth_id[3]);
 	}
 	void OpenGlShadows::PrepareShadowProjectionMatrix(EditorCamera& camera,const glm::vec3& LightPosition)
 	{

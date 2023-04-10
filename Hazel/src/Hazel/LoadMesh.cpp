@@ -116,7 +116,7 @@ namespace Hazel {
 					material->GetTexture(type, 0, &str);
 					std::string absolute_path = str.data;
 					
-					texture_path.push_back(relative_path + absolute_path.substr(absolute_path.find_last_of("\\")));
+					texture_path.push_back(relative_path + absolute_path.substr(absolute_path.find_last_of("\\")+1));
 				}
 			}
 			ref<Texture2DArray> tex = Texture2DArray::Create(texture_path, NumMaterials);

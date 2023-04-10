@@ -50,7 +50,7 @@ namespace Hazel {
 
         glGenTextures(1, &m_SceneTexture);//Create texture object
         glBindTexture(GL_TEXTURE_2D, m_SceneTexture);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, spec.Width, spec.Height);
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_SRGB8_ALPHA8, spec.Width, spec.Height);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);

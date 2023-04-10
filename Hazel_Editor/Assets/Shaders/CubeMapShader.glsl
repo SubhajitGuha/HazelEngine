@@ -21,9 +21,9 @@ uniform samplerCube env;
 void main()
 {
 	vec3 envColor = texture(env,direction).xyz;
-	envColor = envColor / (envColor + vec3(1.0));
-	envColor = vec3(1.0) - exp(-envColor * 5.0);//exposure
-	envColor = pow(envColor, vec3(1.0/2.2)); 
+	//envColor = envColor / (envColor + vec3(1.0));
+	vec3 mapped = vec3(1.0) - exp(-envColor * 3.0);//exposure
+	mapped = pow(mapped, vec3(1.0/2.2)); 
 
-	color= vec4(envColor,1.0);
+	color= vec4(mapped,1.0);
 }
