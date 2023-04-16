@@ -16,11 +16,13 @@ namespace Hazel {
     }
     void OpenGlFrameBuffer::Bind()
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_RenderID);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_RenderID);
+        HAZEL_CORE_ERROR(glGetError());
+
     }
     void OpenGlFrameBuffer::UnBind()
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     }
     void OpenGlFrameBuffer::Resize(unsigned int width, unsigned int height)
     {
@@ -50,26 +52,31 @@ namespace Hazel {
 
         glGenTextures(1, &m_SceneTexture);//Create texture object
         glBindTexture(GL_TEXTURE_2D, m_SceneTexture);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_SRGB8_ALPHA8, spec.Width, spec.Height);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, spec.Width, spec.Height, 0, GL_RGBA, GL_FLOAT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_SceneTexture, 0);
+        GLenum buffers[1] = { GL_COLOR_ATTACHMENT0 };
+        glDrawBuffers(1, buffers);
 
         glGenTextures(1, &m_DepthTexture);
         glBindTexture(GL_TEXTURE_2D, m_DepthTexture);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, spec.Width, spec.Height);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, spec.Width, spec.Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glBindTexture(GL_TEXTURE_2D, 0);//unbind
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthTexture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthTexture, 0);
+
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-            HAZEL_CORE_INFO("FrameBuffer Compleate");
+            HAZEL_CORE_INFO("Scene FrameBuffer Compleate");
         else
-            HAZEL_CORE_ERROR("FrameBuffer inCompleate !!");
+            HAZEL_CORE_ERROR("Scene FrameBuffer inCompleate !!");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }

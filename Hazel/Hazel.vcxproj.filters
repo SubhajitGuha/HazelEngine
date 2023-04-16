@@ -192,6 +192,9 @@
     <ClInclude Include="src\Hazel\Scene\Entity.h">
       <Filter>src\Hazel\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Scene\PointLight.h">
+      <Filter>src\Hazel\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Scene\Scene.h">
       <Filter>src\Hazel\Scene</Filter>
     </ClInclude>
@@ -216,6 +219,9 @@
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlRendererAPI.h">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlSSAO.h">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlShader.h">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
@@ -223,6 +229,9 @@
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlTexture2D.h">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.h">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenglVertexArray.h">
@@ -537,9 +546,6 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hazel\Scene\PointLight.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlSSAO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -623,6 +629,9 @@
     <ClCompile Include="src\Hazel\Scene\Entity.cpp">
       <Filter>src\Hazel\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\Scene\PointLight.cpp">
+      <Filter>src\Hazel\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\Scene\Scene.cpp">
       <Filter>src\Hazel\Scene</Filter>
     </ClCompile>
@@ -644,6 +653,9 @@
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlRendererAPI.cpp">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlSSAO.cpp">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlShader.cpp">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
@@ -651,6 +663,9 @@
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlTexture2D.cpp">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.cpp">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenglVertexArray.cpp">
@@ -671,9 +686,8 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hazel\Scene\PointLight.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.cpp" />
-    <ClCompile Include="vendor\stb_image\stb_image_resize.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlSSAO.cpp" />
+    <ClCompile Include="vendor\stb_image\stb_image_resize.cpp">
+      <Filter>vendor\stb_image</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

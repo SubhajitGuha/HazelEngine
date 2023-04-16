@@ -140,6 +140,18 @@
     <ClCompile Include="src\SandboxApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Textures\Interior-Cube-Map\0.png" />
+    <Image Include="Assets\Textures\Interior-Cube-Map\1.png" />
+    <Image Include="Assets\Textures\Interior-Cube-Map\2.png" />
+    <Image Include="Assets\Textures\Interior-Cube-Map\3.png" />
+    <Image Include="Assets\Textures\Interior-Cube-Map\4.png" />
+    <Image Include="Assets\Textures\Interior-Cube-Map\5.png" />
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\0.png" />
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\1.png" />
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\2.png" />
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\3.png" />
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\4.png" />
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\5.png" />
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png" />
     <Image Include="Assets\Textures\Test.png" />
     <Image Include="Assets\Textures\img_0.png" />
@@ -154,7 +166,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\FoliageShader.glsl" />
+    <None Include="Assets\Shaders\SSAOblurShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

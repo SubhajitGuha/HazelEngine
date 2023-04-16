@@ -43,7 +43,7 @@ namespace Hazel {
 		//m_Viewdirection is the location we are looking at (it is the vector multiplied with rotation matrix)
 		glm::vec3 Up = { 0,1,0 } , RightVector;//we get right vector by getting the cross product of m_ViewDirection and Up vectors
 
-		float m_verticalFOV = 90.0f;
+		float m_verticalFOV = 90.f;
 		float m_PerspectiveNear = 0.01;
 		float m_PerspectiveFar = 1000;
 		

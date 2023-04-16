@@ -17,7 +17,6 @@ out vec3 m_BiTangent;
 flat out float m_slotindex;
 
 uniform mat4 u_ProjectionView;
-uniform mat4 u_ModelTransform;
 
 void main()
 {
@@ -54,11 +53,12 @@ uniform mat4 MatrixShadow[4];
 uniform sampler2D ShadowMap[4];
 uniform float Ranges[5];
 uniform mat4 view;
+uniform mat4 u_ProjectionView;
 
 uniform samplerCube diffuse_env;
 uniform samplerCube specular_env;
 
-uniform sampler2D u_texture[32];
+uniform sampler2D SSAO;
 uniform sampler2DArray u_Albedo;
 uniform sampler2DArray u_Roughness;
 uniform sampler2DArray u_NormalMap;
@@ -215,8 +215,11 @@ void main()
 	vec3 BRDFintegration =  ks*alpha + max(dot(Modified_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
+	vec4 coordinate = u_ProjectionView * m_pos;
+	coordinate.xyz /= coordinate.w;
+	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
 	//ambiance
-		vec3 ambiant = (IBL_diffuse + IBL_specular) * ao *0.6;
+		vec3 ambiant = (IBL_diffuse + IBL_specular) * (texture(SSAO,coordinate.xy).r);
 
 
 	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)

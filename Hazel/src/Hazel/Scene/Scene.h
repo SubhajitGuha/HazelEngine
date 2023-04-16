@@ -1,6 +1,7 @@
 #pragma once
 #include "entt.hpp"
 #include "Hazel/Log.h"
+#include"Hazel/Renderer/FrameBuffer.h"
 #include "Hazel/Events/Event.h"
 #include "Hazel/Core/TimeSteps.h"
 #include "Hazel/Core.h"
@@ -28,7 +29,9 @@ namespace Hazel {
 	public:
 		std::vector<PointLight*> m_PointLights;
 		static LoadMesh* Sphere, *Cube , *Plane,*plant,*House,* Windmill ,*Fern;
-
+		static unsigned int m_Scene_tex_id;
+		static unsigned int m_Scene_depth_id;
+		ref<FrameBuffer> framebuffer;
 	private:
 		
 		entt::registry m_registry;

@@ -158,8 +158,6 @@
     <ClInclude Include="src\Hazel\LoadMesh.h" />
     <ClInclude Include="src\Hazel\Log.h" />
     <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlSSAO.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.h" />
     <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
     <ClInclude Include="src\Hazel\Renderer\Camareas\Camera.h" />
     <ClInclude Include="src\Hazel\Renderer\Camareas\EditorCamera.h" />
@@ -189,9 +187,11 @@
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlRendererAPI.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlSSAO.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlShader.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlShadows.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlTexture2D.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenglVertexArray.h" />
     <ClInclude Include="src\Hazel\platform\WindowsInput.h" />
     <ClInclude Include="src\Hazel\platform\WindowsWindow.h" />
@@ -306,8 +306,6 @@
     <ClCompile Include="src\Hazel\LoadMesh.cpp" />
     <ClCompile Include="src\Hazel\Log.cpp" />
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlSSAO.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Camareas\Camera.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Camareas\EditorCamera.cpp" />
@@ -335,9 +333,11 @@
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlRendererAPI.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlSSAO.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlShader.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlShadows.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlTexture2D.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlTexture2DArray.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenglVertexArray.cpp" />
     <ClCompile Include="src\Hazel\platform\WindowsInput.cpp" />
     <ClCompile Include="src\Hazel\platform\WindowsWindow.cpp" />

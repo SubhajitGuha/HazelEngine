@@ -1,0 +1,85 @@
+#shader vertex
+#version 410 core
+layout (location = 0) in vec4 pos;
+layout (location = 1) in vec2 cord;
+layout (location = 2) in vec4 color;
+layout (location = 3) in vec3 Normal;
+layout (location = 4) in vec3 Tangent;
+layout (location = 5) in vec3 BiTangent;
+layout (location = 6) in float slotindex;
+
+out vec2 tcord;
+out vec3 m_Normal;
+out vec4 m_pos;
+
+uniform mat4 u_ProjectionView;
+uniform mat4 u_View;
+
+void main()
+{
+	gl_Position = u_ProjectionView * pos;
+	m_Normal = (u_View * vec4(Normal,0.0)).xyz;
+	m_pos = pos;
+}
+
+#shader fragment
+#version 410 core
+layout (location = 0) out vec4 color;
+
+in vec3 m_Normal;
+in vec2 tcord;
+in vec4 m_pos;
+
+uniform float ScreenWidth;
+uniform float ScreenHeight;
+
+uniform vec3 Samples[128];
+uniform sampler2D GPosition;
+uniform sampler2D noisetex;
+uniform mat4 u_projection;
+uniform mat4 u_ProjectionView;
+
+float radius = 0.60;
+float bias = 0.025;
+
+void main()
+{
+	vec4 coordinate = u_ProjectionView * m_pos;
+	coordinate.xyz /= coordinate.w;
+	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
+
+	vec4 position = texture(GPosition,coordinate.xy);
+	if(position.w <=0.0f)
+		discard;
+
+	vec2 noiseScale = vec2(ScreenWidth/4.0 , ScreenHeight/4.0);
+	float occlusion = 0.0;
+	vec3 FragPos = position.xyz;
+	vec3 RandomVec = texture(noisetex , coordinate.xy*noiseScale).xyz;
+	vec3 normal = m_Normal;
+
+	vec3 tangent = normalize(RandomVec - normal*dot(RandomVec , normal));
+	vec3 bitangent = cross(normal , tangent);
+	mat3 TBN = mat3(tangent , bitangent, normal);
+	for(int i=0; i<128; i++)
+	{
+		 //view space
+		vec4 SamplePoint = vec4(FragPos + TBN * Samples[i] * vec3(radius),1.0);
+
+		//vec4 offset = SamplePoint;
+		vec4 offset = u_projection * SamplePoint;
+		offset.xyz = offset.xyz/offset.w;
+		offset.xyz = offset.xyz*0.5 + vec3(0.5); // 0 - 1 range
+
+		vec3 depth = texture(GPosition,offset.xy).rgb;
+
+		float RangeCheck = smoothstep(0.0,1.0 , radius/abs(FragPos.z - depth.z));
+			occlusion += (depth.z >= SamplePoint.z + bias ? 1.0:0.0) * RangeCheck;
+	}
+	occlusion = 1.0 - occlusion/128.0;
+	vec3 output = vec3(pow(occlusion,8.0));
+
+	//output = vec3(1.0) - exp(-output * 2);//exposure
+	//output = pow(output, vec3(1.0/2.2)); //Gamma correction
+	color =  vec4(output,1.0);
+}

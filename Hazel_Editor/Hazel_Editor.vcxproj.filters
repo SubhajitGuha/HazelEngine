@@ -7,6 +7,12 @@
     <Filter Include="Assets\Textures">
       <UniqueIdentifier>{0B35254A-77C0-920E-80D1-1503ECDBEE0E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Textures\Interior-Cube-Map">
+      <UniqueIdentifier>{3DA10909-A90F-5F88-F2F8-19885EA65424}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Textures\Outdoor-Cube-Map">
+      <UniqueIdentifier>{DDBECBBF-C90F-B701-F273-A5C3DE234A6B}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
@@ -34,6 +40,42 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Textures\Interior-Cube-Map\0.png">
+      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Interior-Cube-Map\1.png">
+      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Interior-Cube-Map\2.png">
+      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Interior-Cube-Map\3.png">
+      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Interior-Cube-Map\4.png">
+      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Interior-Cube-Map\5.png">
+      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\0.png">
+      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\1.png">
+      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\2.png">
+      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\3.png">
+      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\4.png">
+      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Outdoor-Cube-Map\5.png">
+      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    </Image>
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png">
       <Filter>Assets\Textures</Filter>
     </Image>
@@ -57,6 +99,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\FoliageShader.glsl" />
+    <None Include="Assets\Shaders\SSAOblurShader.glsl" />
   </ItemGroup>
 </Project>

@@ -44,6 +44,9 @@
 #define SHDOW_MAP2 7
 #define SHDOW_MAP3 8
 #define SHDOW_MAP4 9
+#define SSAO_SLOT 10
+#define SSAO_BLUR_SLOT 11
+#define DEPTH_SLOT 12
 
 namespace Hazel {
 

@@ -18,6 +18,8 @@ namespace Hazel {
 	bool capture = false;
 	Scene::Scene()
 	{
+		//framebuffer = FrameBuffer::Create({ 2048,2048 });
+
 		Sphere = new LoadMesh("Assets/Meshes/Sphere.fbx");
 		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
@@ -67,7 +69,7 @@ namespace Hazel {
 					});
 			nsc.m_Script->OnUpdate(ts);//update to get the script values
 			});
-
+		
 		if (m_PointLights.size() > 0)
 			Renderer3D::SetPointLightPosition(m_PointLights);
 
@@ -80,11 +82,7 @@ namespace Hazel {
 					MainCamera = &camera.camera;
 			}
 		}
-		//if (!MainCamera)
-		//	Renderer3D::BeginScene(editor_cam);
-		//else
-		//	Renderer3D::BeginScene(*MainCamera);//pass only the main camera for rendering
-
+	
 		m_registry.each([&](auto m_entity)
 			{
 				Entity Entity(this, m_entity);
@@ -124,11 +122,12 @@ namespace Hazel {
 				}
 			});
 			//Renderer3D::EndScene();
-		
+
 			Renderer3D::BeginScene(editor_cam);
 			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 90,0,0 });
 
-			//Renderer3D::AddSSAO();
+			Renderer3D::AmbiantOcclusion(*this, editor_cam);
+
 			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
 	}
 	void Scene::OnCreate()

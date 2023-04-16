@@ -7,6 +7,7 @@
 #include "stb_image.h"
 #include "glad/glad.h"
 #include "Hazel/Scene/PointLight.h"
+#include "Hazel/platform/Opengl/OpenGlSSAO.h"//temporary testing purpose
 
 namespace Hazel {
 	EditorCamera m_camera;
@@ -39,6 +40,7 @@ namespace Hazel {
 		int max_Vertices = 2000000;
 		VertexAttributes* Vertex=nullptr;
 		uint32_t vertexb_id;
+		ref<OpenGlSSAO> ssao;
 		ref<Shadows> shadow_map;
 		ref<CubeMapReflection> reflection;
 		ref<Shader> shader, foliage_shader;
@@ -57,12 +59,14 @@ namespace Hazel {
 		m_data = new Renderer3DStorage;
 
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
+		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);
 		m_data->foliage_shader = Shader::Create("Assets/Shaders/FoliageShader.glsl");//foliage shader
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		m_data->reflection = CubeMapReflection::Create();
+		m_data->ssao = std::make_shared<OpenGlSSAO>();
 		m_data->shadow_map = Shadows::Create(4096, 4096);//create a 2048x2048 shadow map
-		depth_id = m_data->shadow_map->GetDepth_ID();
+		depth_id = m_data->ssao->GetSSAOid();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		m_data->va = VertexArray::Create();
@@ -214,7 +218,6 @@ namespace Hazel {
 
 	void Renderer3D::DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
 	{
-
 		m_data->foliage_shader->SetFloat("Roughness", material_Roughness); //send the roughness value
 		m_data->foliage_shader->SetFloat("Metallic", material_metallic); //send the metallic value
 
@@ -252,7 +255,6 @@ namespace Hazel {
 		// lock the buffer:
 		glDeleteSync(syncObj);
 		syncObj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-
 	}
 	
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
@@ -265,7 +267,6 @@ namespace Hazel {
 		m_data->foliage_shader->Bind();//you need to bind this other wise nothing will be rendererd
 		m_data->foliage_shader->SetInt("diffuse_env", IRR_ENV_SLOT);//for now assign to 10 :)
 		m_data->foliage_shader->SetInt("specular_env", ENV_SLOT);//for now assign to 18 :)
-
 	}
 
 	void Renderer3D::RenderShadows(Scene& scene, EditorCamera& camera)
@@ -273,6 +274,12 @@ namespace Hazel {
 		m_data->shadow_map->RenderShadows(scene, m_SunLightDir, camera);//Light position is the light direction used for directional light
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->shader);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->foliage_shader);
+	}
+
+	void Renderer3D::AmbiantOcclusion(Scene& scene, EditorCamera& camera)
+	{
+		m_data->ssao->CaptureScene(scene, camera);
+		m_data->shader->Bind();
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)

@@ -25,6 +25,7 @@ namespace Hazel {
 		static void DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = { 1,1,1,1 }, const float& material_Roughness = 1.0f, const float& material_metallic = 0.0f);//take the mesh class reference
 		static void SetUpCubeMapReflections(Scene& scene);
 		static void RenderShadows(Scene& scene, EditorCamera& camera);
+		static void AmbiantOcclusion(Scene& scene, EditorCamera& camera);
 
 		static unsigned int depth_id;
 	private:

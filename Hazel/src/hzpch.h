@@ -14,6 +14,7 @@
 #include <chrono>
 #include <thread>
 #include <execution>
+#include <random>
 
 #ifdef HZ_PLATFORM_WINDOWS
 //#include <windows.h>
