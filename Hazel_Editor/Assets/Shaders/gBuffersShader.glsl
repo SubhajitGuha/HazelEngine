@@ -6,7 +6,7 @@ layout (location = 2) in vec4 color;
 layout (location = 3) in vec3 Normal;
 layout (location = 4) in vec3 Tangent;
 layout (location = 5) in vec3 BiTangent;
-layout (location = 6) in float slotindex;
+layout (location = 6) in float materialindex;
 
 out vec2 tcord;
 out vec4 m_pos;
@@ -14,7 +14,7 @@ out vec4 m_color;
 out vec3 m_Normal;
 out vec3 m_Tangent;
 out vec3 m_BiTangent;
-flat out float m_slotindex;
+flat out float m_materialindex;
 
 uniform mat4 u_ProjectionView;
 uniform mat4 u_View;
@@ -23,7 +23,7 @@ void main()
 {
 	gl_Position = u_ProjectionView * pos;
 	m_color = color;
-	m_slotindex = slotindex;
+	m_materialindex = materialindex;
 	tcord = cord;
 	m_Normal = Normal;
 	m_Tangent = Tangent;
@@ -40,11 +40,19 @@ in vec4 m_pos;
 in vec3 m_Normal;
 in vec3 m_Tangent;
 in vec3 m_BiTangent;
-flat in float m_slotindex;
+flat in float m_materialindex;
 in vec2 tcord;
 
+uniform sampler2DArray alpha_texture;
+uniform int isFoliage;//For foliages
 
 void main()
 {
+	//for foliage only
+	int index = int (m_materialindex);
+	vec3 alpha = texture(alpha_texture , vec3(tcord , index)).rgb;
+	if(isFoliage == 1 && alpha.r <=0.06 ) // check if the tex value is less than a certain threshold then discard
+		discard;
+
 	color = m_pos;
 }

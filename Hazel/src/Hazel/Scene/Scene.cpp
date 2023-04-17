@@ -121,14 +121,13 @@ namespace Hazel {
 						Renderer3D::DrawFoliage(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
 				}
 			});
-			//Renderer3D::EndScene();
+			Renderer3D::EndScene();
 
-			Renderer3D::BeginScene(editor_cam);
-			Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 90,0,0 });
-
-			Renderer3D::AmbiantOcclusion(*this, editor_cam);
+			//Renderer3D::BeginScene(editor_cam);
+			//Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 90,0,0 });
 
 			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
+			Renderer3D::AmbiantOcclusion(*this, editor_cam);
 	}
 	void Scene::OnCreate()
 	{

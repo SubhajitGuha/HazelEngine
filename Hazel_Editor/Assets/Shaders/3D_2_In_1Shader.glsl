@@ -219,8 +219,7 @@ void main()
 	coordinate.xyz /= coordinate.w;
 	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
 	//ambiance
-		vec3 ambiant = (IBL_diffuse + IBL_specular) * (texture(SSAO,coordinate.xy).r);
-
+		vec3 ambiant = (IBL_diffuse + IBL_specular) * texture(SSAO,coordinate.xy).r;
 
 	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 

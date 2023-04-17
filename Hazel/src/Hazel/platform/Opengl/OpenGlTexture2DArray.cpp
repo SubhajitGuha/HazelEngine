@@ -21,7 +21,7 @@ Hazel::OpenGlTexture2DArray::OpenGlTexture2DArray(const std::vector<std::string>
 		pixel_data = stbi_load(paths[0].c_str(), &m_Width, &m_Height, &channels, 0);//if one image is not found then i think other images will also not be found
 
 		if (pixel_data == nullptr) {
-			HAZEL_CORE_ERROR("Image not found!!");
+			HAZEL_CORE_ERROR("2D array Image not found!!");
 			CreateWhiteTextureArray(numMaterials);
 		}
 		else //if the image is loaded

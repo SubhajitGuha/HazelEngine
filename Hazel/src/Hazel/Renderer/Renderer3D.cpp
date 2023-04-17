@@ -61,6 +61,7 @@ namespace Hazel {
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);
 		m_data->foliage_shader = Shader::Create("Assets/Shaders/FoliageShader.glsl");//foliage shader
+		m_data->foliage_shader->SetInt("SSAO", SSAO_BLUR_SLOT);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		m_data->reflection = CubeMapReflection::Create();
@@ -279,7 +280,7 @@ namespace Hazel {
 	void Renderer3D::AmbiantOcclusion(Scene& scene, EditorCamera& camera)
 	{
 		m_data->ssao->CaptureScene(scene, camera);
-		m_data->shader->Bind();
+		//m_data->shader->Bind();
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)

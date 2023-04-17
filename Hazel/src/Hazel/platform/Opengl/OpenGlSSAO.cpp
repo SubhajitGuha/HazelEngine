@@ -27,6 +27,7 @@ namespace Hazel {
 		GbufferPosition->Bind();
 		GbufferPosition->SetMat4("u_ProjectionView", cam.GetProjectionView());
 		GbufferPosition->SetMat4("u_View", cam.GetViewMatrix());
+		GbufferPosition->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, SSAOframebuffer_id);
 		glViewport(0, 0, m_width, m_height);
@@ -35,38 +36,42 @@ namespace Hazel {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GBufferPos_id, 0);
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 			HAZEL_CORE_TRACE("GBuffer Position Framebuffer compleate -_- ");
-		HAZEL_CORE_WARN(glGetError());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
-			{
-				Entity Entity(&scene, m_entity);
-				auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-				auto mesh = Entity.GetComponent<StaticMeshComponent>();
-				if (Entity.HasComponent<SpriteRenderer>()) {
-					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-					Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color);
-				}
-				else
-					Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
-			});
+		
+		RenderScene(scene);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
 
 		//Generate Random samples
-		//std::uniform_real_distribution<float> RandomFloats(0.0, 1.0);//generate random floats between [0.0,1.0)
-		//std::default_random_engine generator; // random number generator
+		std::uniform_real_distribution<float> RandomFloats(0.0, 1.0);//generate random floats between [0.0,1.0)
+		std::default_random_engine generator; // random number generator
+		for (int i = 0; i < RANDOM_SAMPLES_SIZE; i++)
+		{
+			samples[i] = glm::vec3(
+				RandomFloats(generator) * 2.0 - 1.0,
+				RandomFloats(generator) * 2.0 - 1.0,
+				RandomFloats(generator)
+			);
+			samples[i] = glm::normalize(samples[i]);
+			samples[i] *= RandomFloats(generator);
+
+			float scale = (float)i / RANDOM_SAMPLES_SIZE;
+			float val = 0.1 * scale * scale + (1.0 - 0.1) * scale * scale;
+			samples[i] *= val;
+			//HAZEL_CORE_ERROR("random float {} {} {}",samples[i].x, samples[i].y, samples[i].z);
+		}
 
 		SSAOShader->Bind();
 		SSAOShader->SetFloat("ScreenWidth", m_width);
 		SSAOShader->SetFloat("ScreenHeight", m_height);
 		SSAOShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
 		SSAOShader->SetMat4("u_View", cam.GetViewMatrix());
-		SSAOShader->SetFloat3Array("Samples", &samples[0].x, 128);
+		SSAOShader->SetFloat3Array("Samples", &samples[0].x, RANDOM_SAMPLES_SIZE);
 		SSAOShader->SetMat4("u_projection", cam.GetProjectionMatrix());
-		SSAOShader->SetInt("noisetex", 20);
+		SSAOShader->SetInt("noisetex", NOISE_SLOT);
 		SSAOShader->SetInt("GPosition", DEPTH_SLOT);
+		SSAOShader->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, SSAOframebuffer_id);
 		glViewport(0, 0, m_width, m_height);
@@ -77,18 +82,7 @@ namespace Hazel {
 			HAZEL_CORE_TRACE("SSAO Framebuffer compleate -_- ");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//HAZEL_CORE_WARN(glGetError());
-		scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
-			{
-				Entity Entity(&scene, m_entity);
-				auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-				auto mesh = Entity.GetComponent<StaticMeshComponent>();
-				if (Entity.HasComponent<SpriteRenderer>()) {
-					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-					Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color);
-				}
-				else
-					Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
-			});
+		RenderScene(scene);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
@@ -96,6 +90,8 @@ namespace Hazel {
 		SSAOblurShader->Bind();
 		SSAOblurShader->SetInt("SSAOtex", SSAO_SLOT);
 		SSAOblurShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
+		SSAOblurShader->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
+
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, SSAOframebuffer_id);
 		glViewport(0, 0, m_width, m_height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, SSAOdepth_id);
@@ -104,22 +100,10 @@ namespace Hazel {
 			HAZEL_CORE_TRACE("SSAO blur Framebuffer compleate ^_^ ");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//HAZEL_CORE_WARN(glGetError());
-		scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
-			{
-				Entity Entity(&scene, m_entity);
-				auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-				auto mesh = Entity.GetComponent<StaticMeshComponent>();
-				if (Entity.HasComponent<SpriteRenderer>()) {
-					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-					Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color);
-				}
-				else
-					Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
-			});
+		RenderScene(scene);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
-
 	}
 	void OpenGlSSAO::CreateSSAOTexture()
 	{
@@ -171,22 +155,6 @@ namespace Hazel {
 		std::uniform_real_distribution<float> RandomFloats(0.0, 1.0);//generate random floats between [0.0,1.0)
 		std::default_random_engine generator; // random number generator
 
-		for (int i = 0; i < 128; i++)
-		{
-			samples[i] = glm::vec3(
-				RandomFloats(generator) * 2.0 - 1.0,
-				RandomFloats(generator) * 2.0 - 1.0,
-				RandomFloats(generator)
-			);
-			samples[i] = glm::normalize(samples[i]);
-			samples[i] *= RandomFloats(generator);
-
-			float scale = (float)i / 64.0f;
-			float val = 0.1 * scale * scale + (1.0 - 0.1) * scale * scale;
-			samples[i] *= val;
-			//HAZEL_CORE_ERROR("random float {} {} {}",samples[i].x, samples[i].y, samples[i].z);
-		}
-
 		std::vector<glm::vec3> noisetexture;
 		for (int i = 0; i < 16; i++)
 		{
@@ -201,13 +169,37 @@ namespace Hazel {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		HAZEL_CORE_WARN(glGetError());
 
-		glBindTextureUnit(20, noisetex_id);
+		glBindTextureUnit(NOISE_SLOT, noisetex_id);
 		glBindTextureUnit(SSAO_BLUR_SLOT, SSAOblur_id);
 		glBindTextureUnit(SSAO_SLOT, SSAOtexture_id);
 		glBindTextureUnit(DEPTH_SLOT, GBufferPos_id);
 	}
-	void OpenGlSSAO::RenderScene(Scene& scene, EditorCamera& editor_cam)
+	void OpenGlSSAO::RenderScene(Scene& scene)
 	{
-		
+		scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
+			{
+				Entity Entity(&scene, m_entity);
+				auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
+				auto mesh = Entity.GetComponent<StaticMeshComponent>();
+
+				//for foliage handeling
+				if (mesh.isFoliage == true) {
+					SSAOShader->SetInt("isFoliage", 1);
+					GbufferPosition->SetInt("isFoliage", 1);
+					SSAOblurShader->SetInt("isFoliage", 1);
+				}
+				else {
+					SSAOShader->SetInt("isFoliage", 0);
+					GbufferPosition->SetInt("isFoliage", 0);
+					SSAOblurShader->SetInt("isFoliage", 0);
+				}
+
+				if (Entity.HasComponent<SpriteRenderer>()) {
+					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+					Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color);
+				}
+				else
+					Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
+			});
 	}
 }

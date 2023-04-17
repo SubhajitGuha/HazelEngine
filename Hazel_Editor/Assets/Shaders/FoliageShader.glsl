@@ -17,7 +17,6 @@ out vec3 m_BiTangent;
 flat out float m_materialindex;
 
 uniform mat4 u_ProjectionView;
-uniform mat4 u_ModelTransform;
 
 void main()
 {
@@ -58,11 +57,12 @@ uniform mat4 view;
 uniform samplerCube diffuse_env;
 uniform samplerCube specular_env;
 
-uniform sampler2D u_texture[32];
+uniform sampler2D SSAO;
 uniform sampler2DArray u_Albedo;
 uniform sampler2DArray u_Roughness;
 uniform sampler2DArray u_NormalMap;
 uniform float u_depth;
+uniform mat4 u_ProjectionView;
 
 uniform vec3 EyePosition;
 
@@ -174,6 +174,7 @@ void main()
 	int index = int (m_materialindex);
 	
 	float opacity = texture(u_Roughness , vec3(tcord,index)).r;// Opacity on R-Channel
+	//color = vec4(vec3(opacity),1.0);
 	if(opacity <= 0.1)
 		discard; // if the texture value is less than a certain threshold then discard that pixel
 
@@ -200,7 +201,6 @@ void main()
 	vec3 DirectionalLight_Direction = normalize(-DirectionalLight_Direction );//for directional light as it has no concept of position
 	vec3 EyeDirection = normalize(EyePosition - m_pos.xyz/m_pos.w);
 
-
 	//shadows
 	float shadow;
 	shadow = CalculateShadow(level);
@@ -218,8 +218,12 @@ void main()
 	vec3 BRDFintegration =  ks*alpha + max(dot(Modified_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
+	vec4 coordinate = u_ProjectionView * m_pos;
+	coordinate.xyz /= coordinate.w;
+	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
 	//ambiance
-		vec3 ambiant = (IBL_diffuse + IBL_specular) * ao * 0.6;
+		vec3 ambiant = (IBL_diffuse + IBL_specular) * pow(texture(SSAO,coordinate.xy).r,4);
+
 
 
 	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)

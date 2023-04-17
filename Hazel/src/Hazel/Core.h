@@ -47,6 +47,7 @@
 #define SSAO_SLOT 10
 #define SSAO_BLUR_SLOT 11
 #define DEPTH_SLOT 12
+#define NOISE_SLOT 13
 
 namespace Hazel {
 
