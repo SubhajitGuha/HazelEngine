@@ -20,7 +20,7 @@ namespace Hazel {
 	void LoadMesh::LoadObj(const std::string& Path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(Path,aiProcess_FindDegenerates| aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes| aiProcess_Triangulate | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace);
+		const aiScene* scene = importer.ReadFile(Path,aiProcess_FindDegenerates| aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace);
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HAZEL_CORE_ERROR("ERROR::ASSIMP::");
@@ -31,6 +31,7 @@ namespace Hazel {
 		ProcessMaterials(scene);
 		ProcessNode(scene->mRootNode, scene);
 		ProcessMesh();
+		CreateStaticBuffers();
 	}
 
 	void LoadMesh::ProcessNode(aiNode* Node, const aiScene* scene)
@@ -131,5 +132,35 @@ namespace Hazel {
 	{
 		glm::vec3 tangent = { 0.f,0.f,0.f };
 
+	}
+	void LoadMesh::CreateStaticBuffers()
+	{
+		std::vector<VertexAttributes> buffer(Vertices.size());
+		VertexArray = VertexArray::Create();
+
+		std::vector<int> n_meshes;
+		for (int i = 0; i < Vertices.size(); i++)
+			n_meshes.push_back(i);
+
+		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
+			{
+				glm::vec3 transformed_normals = (Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
+				glm::vec3 transformed_tangents = (Tangent[i]);
+				glm::vec3 transformed_binormals = (BiTangent[i]);
+				buffer[i] = (VertexAttributes(glm::vec4(Vertices[i], 1.0), TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals, Material_Index[i]));
+			});
+		//select MUTABLE buffer storage for mapping into a static buffer
+		vb = VertexBuffer::Create(&buffer[0].Position.x,sizeof(VertexAttributes) * Vertices.size());
+
+		bl = std::make_shared<BufferLayout>(); //buffer layout
+
+		bl->push("position", DataType::Float4);
+		bl->push("TexCoord", DataType::Float2);
+		bl->push("Normal", DataType::Float3);
+		bl->push("Tangent", DataType::Float3);
+		bl->push("BiTangent", DataType::Float3);
+		bl->push("Material_Index", DataType::Int);
+
+		VertexArray->AddBuffer(bl, vb);
 	}
 }

@@ -2,32 +2,30 @@
 #version 410 core
 layout (location = 0) in vec4 pos;
 layout (location = 1) in vec2 cord;
-layout (location = 2) in vec4 color;
-layout (location = 3) in vec3 Normal;
-layout (location = 4) in vec3 Tangent;
-layout (location = 5) in vec3 BiTangent;
-layout (location = 6) in float slotindex;
+layout (location = 2) in vec3 Normal;
+layout (location = 3) in vec3 Tangent;
+layout (location = 4) in vec3 BiTangent;
+layout (location = 5) in float slotindex;
 
 out vec2 tcord;
 out vec4 m_pos;
-out vec4 m_color;
 out vec3 m_Normal;
 out vec3 m_Tangent;
 out vec3 m_BiTangent;
 flat out float m_slotindex;
 
 uniform mat4 u_ProjectionView;
+uniform mat4 u_Model;
 
 void main()
 {
-	gl_Position = u_ProjectionView * pos;
-	m_color = color;
+	gl_Position = u_ProjectionView * u_Model * pos;
 	m_slotindex = slotindex;
 	tcord = cord;
-	m_Normal = Normal;
-	m_Tangent = Tangent;
-	m_BiTangent = BiTangent;
-	m_pos = pos;
+	m_Normal = normalize(mat3(u_Model) * Normal);
+	m_Tangent = normalize(mat3(u_Model) * Tangent);
+	m_BiTangent = normalize(mat3(u_Model) * BiTangent);
+	m_pos = u_Model * pos;
 }
 
 #shader fragment
@@ -37,7 +35,6 @@ layout (location = 0) out vec4 color;
 //pbr mapping
 //the u_Roughness texture contains "Roughness map" on R-channel "Metallic" on G-channel and "Ambient occlusion" on B-channel
 
-in vec4 m_color;
 in vec4 m_pos;
 in vec3 m_Normal;
 in vec3 m_Tangent;
@@ -65,6 +62,7 @@ uniform sampler2DArray u_NormalMap;
 uniform float u_depth;
 
 uniform vec3 EyePosition;
+uniform vec4 m_color;
 
 //Lights
 uniform vec3 DirectionalLight_Direction; //sun light world position
@@ -176,7 +174,7 @@ void main()
 	vec3 Modified_Normal = NormalMapping(index);
 	
 	//color = vec4(Modified_Normal,1.0);
-	alpha = texture(u_Roughness , vec3(tcord,index)).r * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
+	alpha = texture(u_Roughness , vec3(tcord,index)).g * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
 	//ao = texture(u_Roughness , vec3(tcord,index)).b;
 	//to do metallic in Green channel
 
@@ -211,7 +209,7 @@ void main()
 	kd = vec3(1.0) - ks;
 	kd *= (1.0 - Metallic);
 
-	vec3 IBL_diffuse =  texture(diffuse_env,Modified_Normal).rgb * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * kd; //sampling the irradiance map
+	vec3 IBL_diffuse =  texture(diffuse_env,Modified_Normal).rgb * kd; //sampling the irradiance map
 	vec3 BRDFintegration =  ks*alpha + max(dot(Modified_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
@@ -219,7 +217,7 @@ void main()
 	coordinate.xyz /= coordinate.w;
 	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
 	//ambiance
-		vec3 ambiant = (IBL_diffuse + IBL_specular) * texture(SSAO,coordinate.xy).r;
+		vec3 ambiant = (IBL_diffuse + IBL_specular)* texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * texture(SSAO,coordinate.xy).r;
 
 	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 

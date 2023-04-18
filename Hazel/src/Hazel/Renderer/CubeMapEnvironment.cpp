@@ -53,10 +53,6 @@ namespace Hazel {
 
 	void CubeMapEnvironment::RenderCubeMap(const glm::mat4& view, const glm::mat4& proj)
 	{
-		//if (irradiance_map_id == 0)
-		//{
-		//	ConstructIrradianceMap();
-		//}
 		Cube_Shader->Bind();
 		RenderQuad(view, proj);
 	}

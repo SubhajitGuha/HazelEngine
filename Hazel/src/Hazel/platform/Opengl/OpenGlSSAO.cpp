@@ -30,7 +30,7 @@ namespace Hazel {
 		GbufferPosition->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, SSAOframebuffer_id);
-		glViewport(0, 0, m_width, m_height);
+		glViewport(0, 0, 512, 512);
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, SSAOdepth_id);// LOL this is required for proper capture to framebuffer
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GBufferPos_id, 0);
@@ -38,7 +38,7 @@ namespace Hazel {
 			HAZEL_CORE_TRACE("GBuffer Position Framebuffer compleate -_- ");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		RenderScene(scene);
+		RenderScene(scene, GbufferPosition);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
@@ -63,8 +63,8 @@ namespace Hazel {
 		}
 
 		SSAOShader->Bind();
-		SSAOShader->SetFloat("ScreenWidth", m_width);
-		SSAOShader->SetFloat("ScreenHeight", m_height);
+		SSAOShader->SetFloat("ScreenWidth", viewport_size.x);
+		SSAOShader->SetFloat("ScreenHeight", viewport_size.y);
 		SSAOShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
 		SSAOShader->SetMat4("u_View", cam.GetViewMatrix());
 		SSAOShader->SetFloat3Array("Samples", &samples[0].x, RANDOM_SAMPLES_SIZE);
@@ -72,6 +72,7 @@ namespace Hazel {
 		SSAOShader->SetInt("noisetex", NOISE_SLOT);
 		SSAOShader->SetInt("GPosition", DEPTH_SLOT);
 		SSAOShader->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
+		SSAOShader->SetFloat3("u_CamPos", cam.GetCameraPosition());
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, SSAOframebuffer_id);
 		glViewport(0, 0, m_width, m_height);
@@ -82,7 +83,7 @@ namespace Hazel {
 			HAZEL_CORE_TRACE("SSAO Framebuffer compleate -_- ");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//HAZEL_CORE_WARN(glGetError());
-		RenderScene(scene);
+		RenderScene(scene, SSAOShader);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
@@ -100,7 +101,7 @@ namespace Hazel {
 			HAZEL_CORE_TRACE("SSAO blur Framebuffer compleate ^_^ ");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//HAZEL_CORE_WARN(glGetError());
-		RenderScene(scene);
+		RenderScene(scene, SSAOblurShader);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
@@ -141,7 +142,7 @@ namespace Hazel {
 		glGenTextures(1, &GBufferPos_id);//GBuffer view space position texture
 		glBindTexture(GL_TEXTURE_2D, GBufferPos_id);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_width, m_height, 0, GL_RGBA, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -174,25 +175,20 @@ namespace Hazel {
 		glBindTextureUnit(SSAO_SLOT, SSAOtexture_id);
 		glBindTextureUnit(DEPTH_SLOT, GBufferPos_id);
 	}
-	void OpenGlSSAO::RenderScene(Scene& scene)
+	void OpenGlSSAO::RenderScene(Scene& scene , ref<Shader>& current_shader)
 	{
 		scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
 			{
 				Entity Entity(&scene, m_entity);
 				auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
 				auto mesh = Entity.GetComponent<StaticMeshComponent>();
+				current_shader->SetMat4("u_Model", transform);
 
 				//for foliage handeling
-				if (mesh.isFoliage == true) {
-					SSAOShader->SetInt("isFoliage", 1);
-					GbufferPosition->SetInt("isFoliage", 1);
-					SSAOblurShader->SetInt("isFoliage", 1);
-				}
-				else {
-					SSAOShader->SetInt("isFoliage", 0);
-					GbufferPosition->SetInt("isFoliage", 0);
-					SSAOblurShader->SetInt("isFoliage", 0);
-				}
+				if (mesh.isFoliage == true)
+					current_shader->SetInt("isFoliage", 1);
+				else
+					current_shader->SetInt("isFoliage", 0);
 
 				if (Entity.HasComponent<SpriteRenderer>()) {
 					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();

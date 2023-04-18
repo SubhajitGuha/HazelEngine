@@ -9,6 +9,7 @@
 namespace Hazel {
 	class Entity;
 	class LoadMesh;
+	//class EditorCamera;
 	class PointLight;
 	class Scene
 	{
@@ -25,15 +26,14 @@ namespace Hazel {
 		void OnEvent(Event& e);
 		void AddPointLight(PointLight* light);
 		static ref<Scene> Create();
-
+		void PreProcessScene() {}
 	public:
 		std::vector<PointLight*> m_PointLights;
-		static LoadMesh* Sphere, *Cube , *Plane,*plant,*House,* Windmill ,*Fern;
+		static LoadMesh* Sphere, *Cube , *Plane,*plant,*House,* Windmill ,*Fern, *Sponza;
 		static unsigned int m_Scene_tex_id;
 		static unsigned int m_Scene_depth_id;
 		ref<FrameBuffer> framebuffer;
 	private:
-		
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
 		std::thread shadow_thread;

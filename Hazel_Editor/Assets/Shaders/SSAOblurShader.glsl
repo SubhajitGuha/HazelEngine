@@ -2,23 +2,22 @@
 #version 410 core
 layout (location = 0) in vec4 pos;
 layout (location = 1) in vec2 cord;
-layout (location = 2) in vec4 color;
-layout (location = 3) in vec3 Normal;
-layout (location = 4) in vec3 Tangent;
-layout (location = 5) in vec3 BiTangent;
-layout (location = 6) in float materialindex;
+layout (location = 2) in vec3 Normal;
+layout (location = 3) in vec3 Tangent;
+layout (location = 4) in vec3 BiTangent;
+layout (location = 5) in float materialindex;
 
 out vec2 tcord;
-out vec3 m_Normal;
 out vec4 m_pos;
 flat out float m_materialindex;
 
 uniform mat4 u_ProjectionView;
+uniform mat4 u_Model;
 
 void main()
 {
-	gl_Position = u_ProjectionView * pos;
-	m_pos = pos;
+	gl_Position = u_ProjectionView * u_Model * pos;
+	m_pos = u_Model * pos;
 	tcord = cord;
 	m_materialindex = materialindex;
 }
@@ -27,7 +26,6 @@ void main()
 #version 410 core
 layout (location = 0) out vec4 color;
 
-in vec3 m_Normal;
 in vec2 tcord;
 in vec4 m_pos;
 flat in float m_materialindex;

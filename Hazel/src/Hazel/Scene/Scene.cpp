@@ -13,9 +13,9 @@
 namespace Hazel {
 	
 	//std::vector<PointLight*> Scene::m_PointLights;
-	 LoadMesh* Scene::Sphere=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern;
-	EditorCamera editor_cam;
-	bool capture = false;
+	 LoadMesh* Scene::Sphere=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza;
+	 EditorCamera editor_cam;
+	 bool capture = false;
 	Scene::Scene()
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
@@ -27,6 +27,8 @@ namespace Hazel {
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
+		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
+
 		editor_cam.SetViewportSize(1920.0,1080.0);
 		Renderer3D::SetUpCubeMapReflections(*this);
 	}
@@ -82,23 +84,21 @@ namespace Hazel {
 					MainCamera = &camera.camera;
 			}
 		}
-	
+		//Renderer3D::AmbiantOcclusion(*this, editor_cam);
+		
 		m_registry.each([&](auto m_entity)
 			{
 				Entity Entity(this, m_entity);
 				if (Entity.GetComponent<StaticMeshComponent>().isFoliage == false)
 				{
 					Renderer3D::BeginScene(editor_cam);
-					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
 					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
 					glm::vec4 color;
 
 					auto mesh = Entity.GetComponent<StaticMeshComponent>();
-					//if (camera.camera.bIsMainCamera) {
 					if (Entity.HasComponent<SpriteRenderer>()) {
 						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
 						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
-						//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
 					}
 					else
 						Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
@@ -106,16 +106,13 @@ namespace Hazel {
 				else
 				{
 					Renderer3D::BeginSceneFoliage(editor_cam);
-					//auto entt = item.second->GetEntity();//get the original entity (i.e. entt::entity returns an unsigned int)
 					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
 					glm::vec4 color;
 
 					auto mesh = Entity.GetComponent<StaticMeshComponent>();
-					//if (camera.camera.bIsMainCamera) {
 					if (Entity.HasComponent<SpriteRenderer>()) {
 						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
 						Renderer3D::DrawFoliage(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
-						//Renderer2D::DrawQuad(transform, SpriteRendererComponent.Color, SpriteRendererComponent.texture);
 					}
 					else
 						Renderer3D::DrawFoliage(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
@@ -156,5 +153,4 @@ namespace Hazel {
 	{
 		return std::make_shared<Scene>();
 	}
-
 }

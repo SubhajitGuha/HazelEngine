@@ -53,6 +53,9 @@ namespace Hazel {
 							shadow_shader->SetInt("isFoliage", 0);
 
 						auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
+
+						shadow_shader->SetMat4("u_Model", transform);
+
 						auto mesh = Entity.GetComponent<StaticMeshComponent>();
 						//if (camera.camera.bIsMainCamera) {
 						if (Entity.HasComponent<SpriteRenderer>()) {

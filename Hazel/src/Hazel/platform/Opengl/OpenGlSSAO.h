@@ -1,6 +1,6 @@
 #pragma once
 #include "Hazel.h"
-#define RANDOM_SAMPLES_SIZE 128
+#define RANDOM_SAMPLES_SIZE 64
 namespace Hazel {
 	class OpenGlSSAO
 	{
@@ -13,7 +13,7 @@ namespace Hazel {
 		unsigned int GetSSAOid() { return SSAOblur_id; }
 	private:
 		void CreateSSAOTexture();
-		void RenderScene(Scene& scene);// This will be changed later
+		void RenderScene(Scene& scene , ref<Shader>& current_shader);// This will be changed later
 		int m_width=2048, m_height=2048;
 		unsigned int SSAOframebuffer_id,SSAOtexture_id,GBufferPos_id , SSAOdepth_id , SSAOblur_id;
 		unsigned int noisetex_id;
