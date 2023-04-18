@@ -8,6 +8,11 @@ then launch the .sln file and then build and run the application using vs2019.
 
 Some Screen shots of PBR rendering in my engine.
 ![Screenshot (2239)](https://user-images.githubusercontent.com/102531274/230664441-498f418d-9bb1-472f-98d7-2b574f9b454b.png)
+With Ambiant occlusion(SSAO) Applied:
+![Screenshot (2317)](https://user-images.githubusercontent.com/102531274/232682315-b756998f-3cf1-46d1-9556-368a71567b83.png)
+
+All other pics are Without Ambiant Occlusion Applied!
+
 Normal Mapping:
 ![Screenshot (2256)](https://user-images.githubusercontent.com/102531274/230779526-20c0415b-10c0-4a10-81a8-258b6b5a2432.png)
 ![Screenshot (2257)](https://user-images.githubusercontent.com/102531274/230782421-6a3082ca-26b3-40f2-9ebe-52009025430a.png)
