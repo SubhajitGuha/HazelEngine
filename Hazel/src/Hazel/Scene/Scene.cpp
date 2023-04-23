@@ -8,11 +8,12 @@
 #include "glad/glad.h"
 #include "Hazel/LoadMesh.h"
 #include "PointLight.h"
-
+#include "Hazel/Physics/Physics3D.h"
 
 namespace Hazel {
 	
 	//std::vector<PointLight*> Scene::m_PointLights;
+	Physics3D* physics;
 	 LoadMesh* Scene::Sphere=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza;
 	 EditorCamera editor_cam;
 	 bool capture = false;
@@ -29,6 +30,7 @@ namespace Hazel {
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
 
+		physics = new Physics3D();
 		editor_cam.SetViewportSize(1920.0,1080.0);
 		Renderer3D::SetUpCubeMapReflections(*this);
 	}
@@ -84,8 +86,7 @@ namespace Hazel {
 					MainCamera = &camera.camera;
 			}
 		}
-		//Renderer3D::AmbiantOcclusion(*this, editor_cam);
-		
+
 		m_registry.each([&](auto m_entity)
 			{
 				Entity Entity(this, m_entity);
@@ -119,12 +120,13 @@ namespace Hazel {
 				}
 			});
 			Renderer3D::EndScene();
-
-			//Renderer3D::BeginScene(editor_cam);
-			//Renderer3D::DrawMesh(*Plane, { 0,0,0 }, { 100,100,100 }, { 90,0,0 });
+			
+			physics->OnUpdate(ts, editor_cam, *Cube);
+			
 
 			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
 			Renderer3D::AmbiantOcclusion(*this, editor_cam);
+
 	}
 	void Scene::OnCreate()
 	{

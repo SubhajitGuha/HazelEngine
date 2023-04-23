@@ -2,6 +2,7 @@
 #include "Hazel/Renderer/CubeMapEnvironment.h"
 #include "Hazel//Renderer/Shadows.h"
 #include "Hazel/platform/Opengl/OpenGlShadows.h"
+#include "Hazel/Physics/Physics3D.h"
 //#include "Hazel/Profiling.h"
 
 LoadMesh* mesh;
@@ -244,6 +245,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Text("frame time : ");
 	ImGui::SameLine();
 	ImGui::TextColored({ 0,1,0,1 }, std::to_string(frame_time).c_str());
+	ImGui::Checkbox("Simulate Physics", &Physics3D::SimulatePhysics);
 	ImGui::End();
 	m_Pannel.OnImGuiRender();
 }

@@ -30,7 +30,7 @@ namespace Hazel {
 		GbufferPosition->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, SSAOframebuffer_id);
-		glViewport(0, 0, 512, 512);
+		glViewport(0, 0, m_width, m_height);
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, SSAOdepth_id);// LOL this is required for proper capture to framebuffer
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GBufferPos_id, 0);
@@ -115,7 +115,7 @@ namespace Hazel {
 		glCreateTextures(GL_TEXTURE_2D,1, &SSAOtexture_id);
 		glBindTexture(GL_TEXTURE_2D, SSAOtexture_id);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_width, m_height, 0, GL_RED, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, m_width, m_height, 0, GL_RED, GL_FLOAT, nullptr);
 
 		//glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -127,7 +127,7 @@ namespace Hazel {
 		glCreateTextures(GL_TEXTURE_2D, 1, &SSAOblur_id);
 		glBindTexture(GL_TEXTURE_2D, SSAOblur_id);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_width, m_height, 0, GL_RED, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, m_width, m_height, 0, GL_RED, GL_FLOAT, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -142,7 +142,7 @@ namespace Hazel {
 		glGenTextures(1, &GBufferPos_id);//GBuffer view space position texture
 		glBindTexture(GL_TEXTURE_2D, GBufferPos_id);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, m_width, m_height, 0, GL_RGB, GL_FLOAT, nullptr);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

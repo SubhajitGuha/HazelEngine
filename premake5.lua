@@ -23,6 +23,7 @@ IncludeDir["entt"] = "Hazel/vendor/entt"
 IncludeDir["curl"] = "Hazel/vendor/Curl/include"
 IncludeDir["json"]="Hazel/vendor/jsoncpp"
 IncludeDir["assimp"]="Hazel/vendor/assimp/include"
+IncludeDir["Physx"]="Hazel/vendor/physx_x64-windows/include"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
@@ -33,7 +34,7 @@ project "Hazel"
 	location "Hazel"
 	kind "StaticLib"
 	language "c++"
-	staticruntime "on"
+	staticruntime "off"
 	cppdialect "c++17"
 
 	targetdir ("bin/"..outputdir.."/%{prj.name}")
@@ -59,7 +60,10 @@ project "Hazel"
 		"%{IncludeDir.entt}/**.hpp",
 		"%{IncludeDir.assimp}/**.h",
 		"%{IncludeDir.assimp}/**.cpp",
-		"%{IncludeDir.assimp}/**.hpp"
+		"%{IncludeDir.assimp}/**.hpp",
+		"%{IncludeDir.Physx}/**.h",
+		"%{IncludeDir.Physx}/**.hpp",
+		"%{IncludeDir.Physx}/**.cpp",
 	}
 
 	includedirs
@@ -74,7 +78,8 @@ project "Hazel"
 		"%{IncludeDir.curl}",
 		"%{IncludeDir.json}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.assimp}"
+		"%{IncludeDir.assimp}",
+		"%{IncludeDir.Physx}"
 	}
 
 	links{
@@ -88,7 +93,21 @@ project "Hazel"
 		"Crypt32.lib",
 		"advapi32.lib",
 		"Hazel/vendor/Curl/lib/libcurl_a_debug.lib",
-		"Hazel/vendor/assimp/lib/Release/assimp-vc142-mt.lib"
+		"Hazel/vendor/assimp/lib/Release/assimp-vc142-mt.lib",
+		"Hazel/vendor/physx_x64-windows/lib/LowLevel_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/LowLevelAABB_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/LowLevelDynamics_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysX_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysXCharacterKinematic_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysXCommon_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysXCooking_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysXExtensions_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysXFoundation_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysXPvdSDK_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysXTask_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/PhysXVehicle_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/SceneQuery_static_64.lib",
+		"Hazel/vendor/physx_x64-windows/lib/SimulationController_static_64.lib",
 	}
 
 	filter "system:windows"
@@ -99,22 +118,27 @@ project "Hazel"
 		{
 			"HZ_PLATFORM_WINDOWS",
 			"HZ_BUILD_DLL",
-			"GLFW_INCLUDE_NONE"
+			"GLFW_INCLUDE_NONE",
+			"NDEBUG",
+			"PX_PHYSX_STATIC_LIB"
 		}
 
 
 	filter "configurations:Debug"
 		defines "HZ_DEBUG"
+		staticruntime "off"
 		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "HZ_RELEASE"
+		staticruntime "off"
 		runtime "Release"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "HZ_DIST"
+		staticruntime "off"
 		runtime "Release"
 		optimize "On"
 	
@@ -178,7 +202,7 @@ project "Hazel_Editor"
 	location "Hazel_Editor"
 	kind "ConsoleApp"
 	language "c++"
-	staticruntime "on"
+	staticruntime "off"
 	cppdialect "c++17"
 
 	targetdir ("bin/"..outputdir.."/%{prj.name}")

@@ -76,11 +76,11 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -88,7 +88,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -96,14 +96,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -112,7 +112,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -120,14 +120,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -136,7 +136,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -158,6 +158,7 @@
     <ClInclude Include="src\Hazel\LoadMesh.h" />
     <ClInclude Include="src\Hazel\Log.h" />
     <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
+    <ClInclude Include="src\Hazel\Physics\Physics3D.h" />
     <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
     <ClInclude Include="src\Hazel\Renderer\Camareas\Camera.h" />
     <ClInclude Include="src\Hazel\Renderer\Camareas\EditorCamera.h" />
@@ -294,6 +295,194 @@
     <ClInclude Include="vendor\entt\entt.hpp" />
     <ClInclude Include="vendor\jsoncpp\json\json-forwards.h" />
     <ClInclude Include="vendor\jsoncpp\json\json.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxActor.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxAggregate.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxArticulation.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxArticulationBase.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxArticulationJoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxArticulationJointReducedCoordinate.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxArticulationLink.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxArticulationReducedCoordinate.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxBatchQuery.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxBatchQueryDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxBroadPhase.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxClient.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxConfig.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxConstraint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxConstraintDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxContact.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxContactModifyCallback.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxDeletionListener.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxFiltering.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxForceMode.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxFoundation.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxImmediateMode.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxLockedData.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxMaterial.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxPhysXConfig.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxPhysics.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxPhysicsAPI.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxPhysicsSerialization.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxPhysicsVersion.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxPruningStructure.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxQueryFiltering.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxQueryReport.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxRigidActor.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxRigidBody.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxRigidDynamic.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxRigidStatic.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxScene.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxSceneDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxSceneLock.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxShape.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxSimulationEventCallback.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxSimulationStatistics.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\PxVisualizationParameter.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\characterkinematic\PxBoxController.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\characterkinematic\PxCapsuleController.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\characterkinematic\PxController.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\characterkinematic\PxControllerBehavior.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\characterkinematic\PxControllerManager.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\characterkinematic\PxControllerObstacles.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\characterkinematic\PxExtended.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\collision\PxCollisionDefs.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxBase.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxCollection.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxCoreUtilityTypes.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxMetaData.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxMetaDataFlags.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxPhysXCommonConfig.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxPhysicsInsertionCallback.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxProfileZone.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxRenderBuffer.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxSerialFramework.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxSerializer.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxStringTable.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxTolerancesScale.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\PxTypeInfo.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\common\windows\PxWindowsDelayLoadHook.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cooking\PxBVH33MidphaseDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cooking\PxBVH34MidphaseDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cooking\PxBVHStructureDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cooking\PxConvexMeshDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cooking\PxCooking.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cooking\PxMidphaseDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cooking\PxTriangleMeshDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cooking\Pxc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cudamanager\PxCudaContextManager.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\cudamanager\PxCudaMemoryManager.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxBinaryConverter.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxBroadPhaseExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxCollectionExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxConstraintExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxContactJoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxConvexMeshExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxD6Joint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxD6JointCreate.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxDefaultAllocator.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxDefaultCpuDispatcher.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxDefaultErrorCallback.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxDefaultSimulationFilterShader.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxDefaultStreams.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxDistanceJoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxExtensionsAPI.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxFixedJoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxJoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxJointLimit.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxMassProperties.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxPrismaticJoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxRaycastCCD.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxRepXSerializer.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxRepXSimpleType.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxRevoluteJoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxRigidActorExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxRigidBodyExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxSceneQueryExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxSerialization.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxShapeExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxSimpleFactory.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxSmoothNormals.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxSphericalJoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxStringTableExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\extensions\PxTriangleMeshExt.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\filebuf\PxFileBuf.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\Px.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxAllocatorCallback.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxAssert.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxBitAndData.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxBounds3.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxErrorCallback.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxErrors.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxFlags.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxFoundationConfig.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxIO.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxIntrinsics.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxMat33.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxMat44.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxMath.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxMathUtils.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxMemory.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxPlane.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxPreprocessor.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxProfiler.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxQuat.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxSharedAssert.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxSimpleTypes.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxStrideIterator.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxTransform.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxUnionCast.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxVec2.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxVec3.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\PxVec4.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\unix\PxUnixIntrinsics.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\foundation\windows\PxWindowsIntrinsics.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxBVHStructure.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxBoxGeometry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxCapsuleGeometry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxConvexMesh.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxConvexMeshGeometry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxGeometry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxGeometryHelpers.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxGeometryQuery.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxHeightField.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxHeightFieldDesc.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxHeightFieldFlag.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxHeightFieldGeometry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxHeightFieldSample.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxMeshQuery.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxMeshScale.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxPlaneGeometry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxSimpleTriangleMesh.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxSphereGeometry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxTriangle.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxTriangleMesh.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geometry\PxTriangleMeshGeometry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geomutils\GuContactBuffer.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\geomutils\GuContactPoint.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\gpu\PxGpu.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\pvd\PxPvd.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\pvd\PxPvdSceneClient.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\pvd\PxPvdTransport.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\solver\PxSolverDefs.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\task\PxCpuDispatcher.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\task\PxTask.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\task\PxTaskDefine.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\task\PxTaskManager.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleComponents.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleDrive.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleDrive4W.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleDriveNW.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleDriveTank.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleNoDrive.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleSDK.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleShaders.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleTireFriction.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleUpdate.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleUtil.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleUtilControl.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleUtilSetup.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleUtilTelemetry.h" />
+    <ClInclude Include="vendor\physx_x64-windows\include\vehicle\PxVehicleWheels.h" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />
     <ClInclude Include="vendor\stb_image\stb_image_resize.h" />
   </ItemGroup>
@@ -306,6 +495,7 @@
     <ClCompile Include="src\Hazel\LoadMesh.cpp" />
     <ClCompile Include="src\Hazel\Log.cpp" />
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
+    <ClCompile Include="src\Hazel\Physics\Physics3D.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Camareas\Camera.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Camareas\EditorCamera.cpp" />

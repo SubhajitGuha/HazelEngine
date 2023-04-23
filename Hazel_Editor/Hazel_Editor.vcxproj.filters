@@ -98,7 +98,4 @@
       <Filter>Assets\Textures</Filter>
     </Image>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\SSAOblurShader.glsl" />
-  </ItemGroup>
 </Project>

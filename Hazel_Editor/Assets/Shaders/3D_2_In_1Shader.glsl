@@ -174,7 +174,7 @@ void main()
 	vec3 Modified_Normal = NormalMapping(index);
 	
 	//color = vec4(Modified_Normal,1.0);
-	alpha = texture(u_Roughness , vec3(tcord,index)).g * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
+	alpha = texture(u_Roughness , vec3(tcord,index)).r * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
 	//ao = texture(u_Roughness , vec3(tcord,index)).b;
 	//to do metallic in Green channel
 

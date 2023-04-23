@@ -50,10 +50,10 @@ uniform vec3 u_CamPos;
 uniform sampler2DArray alpha_texture; //for foliages
 uniform int isFoliage;//For foliages
 
-float radius = 0.8;
-float bias = 0.025;
+float radius = 0.7;
+float bias = 0.085;//tested value
 
-const float Threshold_dist = 200.0;
+const float Threshold_dist = 1000.0;
 void main()
 {
 	if(abs(length(u_CamPos - m_pos.xyz))>Threshold_dist) // SSAO rendering threshold beyond this the ambiant color will be pure white 
@@ -90,7 +90,7 @@ void main()
 			vec4 offset = u_projection * SamplePoint;
 			offset.xyz = offset.xyz/offset.w;
 			offset.xyz = offset.xyz*0.5 + vec3(0.5); // 0 - 1 range
-		
+
 			vec3 depth = texture(GPosition,offset.xy).rgb;
 
 			float RangeCheck = smoothstep(0.0,1.0 , radius/abs(FragPos.z - depth.z));

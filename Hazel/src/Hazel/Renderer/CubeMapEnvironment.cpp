@@ -21,7 +21,7 @@ namespace Hazel {
 		glGenTextures(1, &tex_id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
 
-		std::string filename = "Assets/Textures/Outdoor-Cube-Map/";
+		std::string filename = "Assets/Textures/Interior-Cube-Map/";
 
 		for (int i = 0; i < 6; i++)//iterate over 6 images each representing the side of a cube
 		{
