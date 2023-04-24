@@ -6,6 +6,10 @@ HazelEngine is a 3D and 2D Rendering engine that is capable of making 2D and 3D 
 First run "GenerateProjectFiles.bat" then the appropriate project files will be created (vs2019 files)
 then launch the .sln file and then build and run the application using vs2019.
 
+Youtube showcases.
+https://www.youtube.com/watch?v=v013iI91Nms&t=268s
+https://www.youtube.com/watch?v=cyJuWrRfjhA&t=5s
+
 Some Screen shots of PBR rendering in my engine.
 ![Screenshot (2239)](https://user-images.githubusercontent.com/102531274/230664441-498f418d-9bb1-472f-98d7-2b574f9b454b.png)
 With Ambiant occlusion(SSAO) Applied:
