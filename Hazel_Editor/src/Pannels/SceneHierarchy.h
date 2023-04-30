@@ -28,5 +28,6 @@ namespace Hazel {
 		void DrawTagUI();
 		void DrawSpriteRendererUI();
 		void DrawStaticMeshComponentUI();
+		void DrawPhysicsComponentUI();
 	};
 }

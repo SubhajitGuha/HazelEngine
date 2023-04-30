@@ -2,7 +2,7 @@
 #include "Hazel.h"
 
 namespace physx {
-	class PxFoundation;
+	static class PxFoundation;
 	class PxPhysics;
 	class PxScene;
 	class PxDefaultCpuDispatcher;
@@ -18,29 +18,37 @@ namespace Hazel {
 	public:
 		Physics3D();
 		~Physics3D();
-		void Initilize();
-		void OnUpdate(TimeStep ts,EditorCamera& cam, LoadMesh& mesh);
+		static void Initilize();
+		static void OnUpdate(TimeStep ts,EditorCamera& cam, LoadMesh& mesh);
+		static void UpdateTransform(TransformComponent& transform_component, PhysicsComponent& physics_component);
+		static void AddBoxCollider(const glm::vec3& HalfExtent,const glm::mat4& transform , bool isStatic = false , const float& StaticFriction = 0.5,const float& DynamicFriction=0.5,const float& Restitution=0.6);
+		static void AddBoxCollider(PhysicsComponent& physics_component);
+		static void AddSphereCollider(PhysicsComponent& physics_component);
+		static void AddCapsuleCollider(PhysicsComponent& physics_component);
+		static void AddPlaneCollider(PhysicsComponent& physics_component);
+		static void AddMeshCollider(const std::vector<glm::vec3>& Vertices, const std::vector<unsigned int>& indices, const glm::vec3& scaling,PhysicsComponent& physics_component);
+		static void RemoveActor(PhysicsComponent& physics_component);
+		static uint32_t GetNbActors();
 		//void AddCollider();
-		void CleanUpPhysics();
-		void StepPhysics();
+		static void CleanUpPhysics();
+		static void StepPhysics();
 	public:
 		static bool SimulatePhysics;
+		glm::mat4 physics_transform;
 	private:
-		physx::PxFoundation* m_foundation = nullptr;
-		physx::PxPhysics* m_physics = nullptr;
-		physx::PxScene* m_scene = nullptr;
-		physx::PxDefaultCpuDispatcher* m_dispatcher = nullptr;
-		physx::PxMaterial* m_defaultMaterial = nullptr;
-		physx::PxRigidDynamic* m_boxActor = nullptr;
-		physx::PxRigidStatic* m_groundActor = nullptr;
-		physx::PxCooking* m_cooking;
-		physx::PxPvd* gPvd = NULL;
-		//glm::mat4 transform;
+		static physx::PxFoundation* m_foundation;
+		static physx::PxPhysics* m_physics ;
+		static physx::PxScene* m_scene;
+		static physx::PxDefaultCpuDispatcher* m_dispatcher ;
+		static physx::PxMaterial* m_defaultMaterial ;
+		static physx::PxRigidDynamic* m_boxActor;
+		static physx::PxRigidStatic* m_groundActor ;
+		static std::vector<physx::PxRigidDynamic*> m_RigidDynamic_arr;
+		static std::vector<physx::PxRigidStatic*> m_RigidStatic_arr;
+		static physx::PxCooking* m_cooking;
+		static physx::PxPvd* gPvd ;
 
-		std::thread physics_thread;
-		std::mutex m1;
-
-		//LoadMesh* cube;
-		//EditorCamera cam;
+	private:
+		static void SetUpPhysics();
 	};
 }

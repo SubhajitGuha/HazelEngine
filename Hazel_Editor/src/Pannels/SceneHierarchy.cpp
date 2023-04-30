@@ -3,6 +3,8 @@
 #include "imgui_internal.h"
 #include "imgui.h"
 #include "Hazel/Scene/PointLight.h"
+#include "Hazel/Physics/Physics3D.h"
+
 namespace Hazel {
 	std::string texture_path = "Assets/Textures/Test.png";
 	SceneHierarchyPannel::SceneHierarchyPannel() = default;
@@ -158,6 +160,10 @@ namespace Hazel {
 			{
 				m_selected_entity->AddComponent<CameraComponent>();
 			}
+			if (ImGui::Button("Create Physics Component", { 220,30 }))
+			{
+				m_selected_entity->AddComponent<PhysicsComponent>();
+			}
 			ImGui::EndPopup();
 		}
 		if (m_selected_entity.get() && m_selected_entity->HasComponent<TagComponent>())
@@ -178,6 +184,11 @@ namespace Hazel {
 		if (m_selected_entity.get() && m_selected_entity->HasComponent<CameraComponent>())
 		{
 			DrawCameraUI();
+		}
+		
+		if (m_selected_entity.get() && m_selected_entity->HasComponent<PhysicsComponent>())
+		{
+			DrawPhysicsComponentUI();
 		}
 
 		if (m_selected_entity.get() && m_selected_entity->HasComponent<SpriteRenderer>())
@@ -416,6 +427,71 @@ namespace Hazel {
 			{
 				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Sponza);
 			}
+			ImGui::TreePop();
+		}
+	}
+	void SceneHierarchyPannel::DrawPhysicsComponentUI()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 2,2 });
+		bool open = ImGui::TreeNodeEx("Physics Component", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow);
+		bool delete_component = false;
+		ImGui::SameLine(ImGui::GetWindowWidth() - 40.f);
+		if (ImGui::Button("+", { 20,20 }))
+		{
+			ImGui::OpenPopup("ComponentSettings");
+		}
+		ImGui::PopStyleVar();
+		if (ImGui::BeginPopup("ComponentSettings"))
+		{
+			if (ImGui::MenuItem("Remove Component"))
+				delete_component = true;
+			ImGui::EndPopup();
+		}
+		if (open)
+		{
+			auto& physics_component = m_selected_entity->GetComponent<PhysicsComponent>();
+			ImGui::DragFloat("Static Friction", &physics_component.m_StaticFriction, 0.1f);
+			ImGui::DragFloat("Dynamic Friction", &physics_component.m_DynamicFriction, 0.1f);
+			ImGui::DragFloat("Restitution", &physics_component.m_Restitution, 0.1f);
+			ImGui::DragFloat("Mass", &physics_component.m_mass, 0.1f);
+			ImGui::DragFloat("Sphere Radius", &physics_component.m_radius, 0.1f);
+			ImGui::DragFloat3("Box Collider Dimension", &physics_component.m_halfextent.x, 0.1f);
+			ImGui::Checkbox("Is Actor Static", &physics_component.isStatic);
+
+			auto& transform = m_selected_entity->GetComponent<TransformComponent>();
+			//if (ImGui::BeginPopupContextWindow("physics action", 1, false))
+			//{
+
+			if (ImGui::Button("Add Box collider", { 200.f,30.f }))
+			{
+				physics_component.m_transform = transform.GetTransform();
+				Physics3D::AddBoxCollider(physics_component);
+			}
+
+			if (ImGui::Button("Add Sphere collider", { 200.f,30.f }))
+			{
+				physics_component.m_transform = transform.GetTransform();
+				Physics3D::AddSphereCollider(physics_component);
+			}
+			if (ImGui::Button("Add Mesh collider", { 200.f,30.f }))
+			{
+				if (m_selected_entity->HasComponent<StaticMeshComponent>())
+				{
+					auto& mesh = m_selected_entity->GetComponent<StaticMeshComponent>();
+					physics_component.m_transform = transform.GetTransform();
+					Physics3D::AddMeshCollider(mesh.static_mesh->Vertices,mesh.static_mesh->Vertex_Indices,transform.Scale, physics_component);
+				}
+			}
+			//ImGui::EndPopup();
+		//}
+
+			if (ImGui::Button("Reset Simulation", { 100,20 }))
+			{
+				m_selected_entity->RemoveComponent<PhysicsComponent>();
+				Physics3D::RemoveActor(physics_component);
+				m_selected_entity->GetComponent<TransformComponent>().m_transform = glm::mat4(1.0f);
+			}
+				//HAZEL_CORE_WARN(Physics3D::GetNbActors());
 			ImGui::TreePop();
 		}
 	}

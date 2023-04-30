@@ -13,7 +13,6 @@
 namespace Hazel {
 	
 	//std::vector<PointLight*> Scene::m_PointLights;
-	Physics3D* physics;
 	 LoadMesh* Scene::Sphere=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza;
 	 EditorCamera editor_cam;
 	 bool capture = false;
@@ -30,9 +29,9 @@ namespace Hazel {
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
 
-		physics = new Physics3D();
 		editor_cam.SetViewportSize(1920.0,1080.0);
 		Renderer3D::SetUpCubeMapReflections(*this);
+		Physics3D::Initilize();
 	}
 	Scene::~Scene()
 	{
@@ -97,6 +96,12 @@ namespace Hazel {
 					glm::vec4 color;
 
 					auto mesh = Entity.GetComponent<StaticMeshComponent>();
+					if (Entity.HasComponent<PhysicsComponent>())
+					{
+						auto physics_cmp = Entity.GetComponent<PhysicsComponent>();
+						//physics_cmp.m_transform = transform;
+						Physics3D::UpdateTransform(Entity.GetComponent<TransformComponent>(), physics_cmp);
+					}
 					if (Entity.HasComponent<SpriteRenderer>()) {
 						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
 						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
@@ -121,9 +126,8 @@ namespace Hazel {
 			});
 			Renderer3D::EndScene();
 			
-			physics->OnUpdate(ts, editor_cam, *Cube);
+			//physics->OnUpdate(ts, editor_cam, *Cube);
 			
-
 			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
 			Renderer3D::AmbiantOcclusion(*this, editor_cam);
 

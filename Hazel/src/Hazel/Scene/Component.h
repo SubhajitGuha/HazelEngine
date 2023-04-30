@@ -6,6 +6,11 @@
 #include "Hazel/LoadMesh.h"
 #include "ScriptableEntity.h"
 
+namespace physx {
+	class PxRigidDynamic;
+	class PxRigidStatic;
+}
+
 namespace Hazel {
 	struct TagComponent {
 		std::string tag;
@@ -18,14 +23,19 @@ namespace Hazel {
 		glm::vec3 Translation = { 0,0,0 };
 		glm::vec3 Rotation = { 0,0,0 };//in degrees
 		glm::vec3 Scale = { 1,1,1 };
+		glm::mat4 m_transform = glm::mat4(1.0f); // can be set to the physx_transform
 		TransformComponent() = default;
 		TransformComponent(const glm::vec3& translation,const glm::vec3& rotatation=glm::vec3(0),const glm::vec3& scale=glm::vec3(1))
-			:Translation(translation),Rotation(rotatation),Scale(scale){}
+			:Translation(translation),Rotation(rotatation),Scale(scale)
+		{}
 		glm::mat4 GetTransform() {
 			glm::mat4 rotation = glm::rotate(glm::mat4(1.0), glm::radians(Rotation.x), { 1,0,0 }) *
 				glm::rotate(glm::mat4(1.0), glm::radians(Rotation.y), { 0,1,0 }) *
 				glm::rotate(glm::mat4(1.0), glm::radians(Rotation.z), { 0,0,1 });
-			return glm::translate(glm::mat4(1.0), Translation) * rotation * glm::scale(glm::mat4(1), Scale);
+			if (m_transform != glm::mat4(1.0))
+				return m_transform;
+			else
+				return glm::translate(glm::mat4(1.0), Translation) * rotation * glm::scale(glm::mat4(1), Scale);
 		}
 	};
 
@@ -78,4 +88,21 @@ namespace Hazel {
 		operator LoadMesh* () { return static_mesh; }
 	};
 
+
+	class Physics3D;
+	struct PhysicsComponent {
+		float m_mass = 1.0f;
+		float m_StaticFriction = 0.5;
+		float m_DynamicFriction = 0.5;
+		float m_Restitution = 0.6;
+		float m_radius = 1.0f;
+		float m_height = 1.0f;
+
+		glm::vec3 m_halfextent;
+		glm::mat4 m_transform;
+
+		physx::PxRigidDynamic* m_DynamicActor= nullptr;
+		physx::PxRigidStatic* m_StaticActor = nullptr;
+		bool isStatic = false; //defines whether the object is a static rigid body or a dynamic rigid body
+	};
 }
