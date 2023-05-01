@@ -3,6 +3,7 @@
 #include "Hazel//Renderer/Shadows.h"
 #include "Hazel/platform/Opengl/OpenGlShadows.h"
 #include "Hazel/Physics/Physics3D.h"
+
 //#include "Hazel/Profiling.h"
 
 LoadMesh* mesh;
@@ -59,26 +60,26 @@ LoadMesh* mesh;
  {
 	 m_scene = Scene::Create();
 
-	Square_entity = m_scene->CreateEntity("Square");
-	
-	Square_entity->AddComponent<TransformComponent>(glm::vec3(5,-2,0));
-	Square_entity->AddComponent<CameraComponent>();
-	Square_entity->AddComponent<SpriteRenderer>(glm::vec4(1, 0.2, 0, 1));
-
-	 camera_entity = m_scene->CreateEntity("Camera");//create the camera entity
-	 camera_entity->AddComponent<TransformComponent>(glm::vec3(-6,-1,0));
-	 camera_entity->AddComponent<CameraComponent>();
-
-	 camera_entity->GetComponent<CameraComponent>().camera.bIsMainCamera = false;
-	 camera_entity->GetComponent<CameraComponent>().camera.SetOrthographic(50);
-
-	 Square2 = m_scene->CreateEntity("2ndSquare");
-	 Square2->AddComponent<TransformComponent>(glm::vec3(-1,0,5));
-	 Square2->AddComponent<CameraComponent>();
-	 //Square2->GetComponent<CameraComponent>();
-
-	 Square3 = m_scene->CreateEntity("3rdSquare");
-	 Square3->AddComponent<TransformComponent>(glm::vec3(-2,0,-5));
+	//Square_entity = m_scene->CreateEntity("Square");
+	//
+	//Square_entity->AddComponent<TransformComponent>(glm::vec3(5,-2,0));
+	//Square_entity->AddComponent<CameraComponent>();
+	//Square_entity->AddComponent<SpriteRenderer>(glm::vec4(1, 0.2, 0, 1));
+	//
+	// camera_entity = m_scene->CreateEntity("Camera");//create the camera entity
+	// camera_entity->AddComponent<TransformComponent>(glm::vec3(-6,-1,0));
+	// camera_entity->AddComponent<CameraComponent>();
+	//
+	// camera_entity->GetComponent<CameraComponent>().camera.bIsMainCamera = false;
+	// camera_entity->GetComponent<CameraComponent>().camera.SetOrthographic(50);
+	//
+	// Square2 = m_scene->CreateEntity("2ndSquare");
+	// Square2->AddComponent<TransformComponent>(glm::vec3(-1,0,5));
+	// Square2->AddComponent<CameraComponent>();
+	// //Square2->GetComponent<CameraComponent>();
+	//
+	// Square3 = m_scene->CreateEntity("3rdSquare");
+	// Square3->AddComponent<TransformComponent>(glm::vec3(-2,0,-5));
 //....................script......................................................................
 
 	 class CustomScript :public ScriptableEntity {
@@ -125,8 +126,8 @@ LoadMesh* mesh;
 	 };
 	 //.........................script.........................................................
 //	 Square_entity->AddComponent<ScriptComponent>().Bind<CustomScript>();
-	 Square3->AddComponent<ScriptComponent>().Bind<CustomScript>();
-	 Square3->AddComponent<CameraComponent>();
+	 //Square3->AddComponent<ScriptComponent>().Bind<CustomScript>();
+	//Square3->AddComponent<CameraComponent>();
 	 m_Pannel.Context(m_scene);
  }
 
@@ -208,10 +209,6 @@ void  HazelEditor::OnImGuiRender()
 	HZ_PROFILE_SCOPE("ImGUI RENDER");
 
 	ImGui::DockSpaceOverViewport();//always keep DockSpaceOverViewport() above all other ImGui windows to make the other windows docable
-	
-	ImGui::Begin("Color");
-	ImGui::ColorPicker4("Color3", glm::value_ptr(Color1));
-	ImGui::End();
 
 	ImGui::Begin("Viewport");
 	isWindowFocused = ImGui::IsWindowFocused();

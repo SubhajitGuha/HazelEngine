@@ -77,7 +77,7 @@
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -97,7 +97,7 @@
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -121,7 +121,7 @@
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -181,6 +181,7 @@
     <ClInclude Include="src\Hazel\Scene\Entity.h" />
     <ClInclude Include="src\Hazel\Scene\PointLight.h" />
     <ClInclude Include="src\Hazel\Scene\Scene.h" />
+    <ClInclude Include="src\Hazel\Scene\SceneSerializer.h" />
     <ClInclude Include="src\Hazel\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Hazel\Window.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBuffer.h" />
@@ -517,6 +518,7 @@
     <ClCompile Include="src\Hazel\Scene\Entity.cpp" />
     <ClCompile Include="src\Hazel\Scene\PointLight.cpp" />
     <ClCompile Include="src\Hazel\Scene\Scene.cpp" />
+    <ClCompile Include="src\Hazel\Scene\SceneSerializer.cpp" />
     <ClCompile Include="src\Hazel\Window.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBuffer.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlContext.cpp" />
@@ -547,6 +549,9 @@
     </ProjectReference>
     <ProjectReference Include="vendor\imgui\ImGui.vcxproj">
       <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
+    </ProjectReference>
+    <ProjectReference Include="vendor\yaml_cpp\yaml_cpp.vcxproj">
+      <Project>{7A5CBC57-6629-1763-8F42-050B7B6E4CF1}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

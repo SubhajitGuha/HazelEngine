@@ -59,6 +59,10 @@ namespace Hazel {
 	}
 	void Physics3D::UpdateTransform(TransformComponent& transform_component, PhysicsComponent& physics_component)
 	{
+		//if (physics_component.ResetSimulation) {
+		//	physics_component.ResetSimulation = false;
+		//	return;
+		//}
 		if (physics_component.m_DynamicActor) {
 			physx::PxTransform pxtransform = physics_component.m_DynamicActor->getGlobalPose();
 			transform_component.m_transform = glm::translate(glm::mat4(1.0f), { pxtransform.p.x, pxtransform.p.y, pxtransform.p.z }) * glm::mat4(glm::quat(pxtransform.q.w, pxtransform.q.x, pxtransform.q.y, pxtransform.q.z));
@@ -135,25 +139,26 @@ namespace Hazel {
 	}
 	void Physics3D::AddMeshCollider(const std::vector<glm::vec3>& vertices , const std::vector<unsigned int>& indices, const glm::vec3& scaling , PhysicsComponent& physics_component)
 	{
-		physx::PxTriangleMeshDesc TriMeshDesc;
-		TriMeshDesc.points.count = vertices.size();
-		TriMeshDesc.points.data = &vertices[0];
-		TriMeshDesc.points.stride = sizeof(glm::vec3);
-		TriMeshDesc.triangles.count = indices.size();
-		TriMeshDesc.triangles.data = &indices[0];
-		TriMeshDesc.triangles.stride = 3 * sizeof(unsigned int);
-
-		physx::PxConvexMeshDesc convexMeshdesc;
-		convexMeshdesc.points.data = &vertices[0];
-		convexMeshdesc.points.count = vertices.size();
-		convexMeshdesc.points.stride = sizeof(glm::vec3);
-		convexMeshdesc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
-
 		m_defaultMaterial = m_physics->createMaterial(physics_component.m_StaticFriction, physics_component.m_DynamicFriction, physics_component.m_Restitution);
 		physx::PxTransform localTm(*(physx::PxMat44*)glm::value_ptr(physics_component.m_transform));
 
 		if (physics_component.isStatic == true)// for static rigid bodies use triangle mesh for better accuracy of the volume being covered
 		{
+			physx::PxTriangleMeshDesc TriMeshDesc;
+			TriMeshDesc.points.count = vertices.size();
+			TriMeshDesc.points.data = &vertices[0];
+			TriMeshDesc.points.stride = sizeof(glm::vec3);
+			TriMeshDesc.triangles.count = indices.size();
+			TriMeshDesc.triangles.data = &indices[0];
+			TriMeshDesc.triangles.stride = 3 * sizeof(unsigned int);
+			
+			//physx::PxCookingParams params = m_cooking->getParams();
+			//params.midphaseDesc = physx::PxMeshMidPhase::eBVH34;
+			//params.suppressTriangleMeshRemapTable = false;
+			//params.midphaseDesc.mBVH33Desc.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
+			//params.midphaseDesc.mBVH33Desc.meshSizePerformanceTradeOff = 0.55f;
+			//m_cooking->setParams(params);
+
 			//cook the triangle mesh
 			physx::PxDefaultMemoryOutputStream outBuffer;
 			physx::PxTriangleMeshCookingResult::Enum cookingResult;
@@ -172,6 +177,12 @@ namespace Hazel {
 		}
 		else //for dynamic rigid bodies use convex colliders
 		{
+			physx::PxConvexMeshDesc convexMeshdesc;
+			convexMeshdesc.points.data = &vertices[0];
+			convexMeshdesc.points.count = vertices.size();
+			convexMeshdesc.points.stride = sizeof(glm::vec3);
+			convexMeshdesc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
+
 			physx::PxDefaultMemoryOutputStream cookedMeshOutput;
 			physx::PxConvexMeshCookingResult::Enum cookingResult;
 			if (!m_cooking->cookConvexMesh(convexMeshdesc, cookedMeshOutput, &cookingResult))
@@ -192,10 +203,16 @@ namespace Hazel {
 	}
 	void Physics3D::RemoveActor(PhysicsComponent& physics_component)
 	{
-		if (physics_component.m_DynamicActor)
+		if (physics_component.m_DynamicActor) {
 			m_scene->removeActor(*physics_component.m_DynamicActor);
-		if (physics_component.m_StaticActor)
+			physics_component.m_DynamicActor->release();
+			physics_component.m_DynamicActor = nullptr;
+		}
+		if (physics_component.m_StaticActor) {
 			m_scene->removeActor(*physics_component.m_StaticActor);
+			physics_component.m_StaticActor->release();
+			physics_component.m_StaticActor = nullptr;
+		}
 	}
 	uint32_t Physics3D::GetNbActors()
 	{
@@ -234,7 +251,7 @@ void Physics3D::SetUpPhysics()
 	TollarenceScale.length = 100;
 	TollarenceScale.speed = 981;
 	m_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_foundation, physx::PxCookingParams(TollarenceScale));
-	m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, physx::PxTolerancesScale());
+	m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, TollarenceScale);
 
 	if (!m_physics)
 		HAZEL_CORE_ERROR("Error in creating physics object");

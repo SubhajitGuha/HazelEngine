@@ -24,10 +24,12 @@ IncludeDir["curl"] = "Hazel/vendor/Curl/include"
 IncludeDir["json"]="Hazel/vendor/jsoncpp"
 IncludeDir["assimp"]="Hazel/vendor/assimp/include"
 IncludeDir["Physx"]="Hazel/vendor/physx_x64-windows/include"
+IncludeDir["yaml_cpp"] = "Hazel/vendor/yaml_cpp/include"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
 include "Hazel/vendor/imgui"
+include "Hazel/vendor/yaml_cpp"
 
 project "Hazel"
 
@@ -79,13 +81,15 @@ project "Hazel"
 		"%{IncludeDir.json}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.assimp}",
-		"%{IncludeDir.Physx}"
+		"%{IncludeDir.Physx}",
+		"%{IncludeDir.yaml_cpp}"
 	}
 
 	links{
 		"GLFW",
 		"Glad",
 		"imgui",
+		"yaml_cpp",
 		"opengl32.lib",
 		"Normaliz.lib",
 		"Ws2_32.lib",
@@ -148,7 +152,7 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "c++"
-	staticruntime "on"
+	staticruntime "off"
 	cppdialect "c++17"
 
 	targetdir ("bin/"..outputdir.."/%{prj.name}")
@@ -222,7 +226,9 @@ project "Hazel_Editor"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.curl}",
 		"%{IncludeDir.json}",
-		"Hazel/src"
+		"Hazel/src",
+		"%{IncludeDir.Physx}",
+		"%{IncludeDir.yaml_cpp}"
 	}
 	links "Hazel"
 

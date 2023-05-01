@@ -12,6 +12,7 @@ namespace Hazel {
 	LoadMesh::LoadMesh(const std::string& Path)
 		:Vertices(0),Normal(0),TexCoord(0)
 	{
+		m_path = Path;
 		LoadObj(Path);
 	}
 	LoadMesh::~LoadMesh()

@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "Hazel/Scene/PointLight.h"
 #include "Hazel/Physics/Physics3D.h"
+#include "Hazel/Scene/SceneSerializer.h"
 
 namespace Hazel {
 	std::string texture_path = "Assets/Textures/Test.png";
@@ -81,7 +82,16 @@ namespace Hazel {
 		ref<Entity> m_Entity;
 		ImGuiTreeNodeFlags flags = 0;
 		ImGui::Begin("Scene Hierarchy Pannel");
-		
+		if (ImGui::Button("Save Scene", { 100,20 }))
+		{
+			SceneSerializer serialize(m_Context);
+			serialize.Serialize("SceneSaved.hz");
+		}
+		if (ImGui::Button("Load Scene", { 100,20 }))
+		{
+			SceneSerializer serialize(m_Context);
+			serialize.DeSerialize("SceneSaved.hz");
+		}
 			if (ImGui::BeginPopupContextWindow("Actions",1,false))
 			{
 				if (ImGui::Button("Create Entity", { 130,30 }))
@@ -466,12 +476,14 @@ namespace Hazel {
 			{
 				physics_component.m_transform = transform.GetTransform();
 				Physics3D::AddBoxCollider(physics_component);
+				physics_component.m_shapes = BOX_COLLIDER;
 			}
 
 			if (ImGui::Button("Add Sphere collider", { 200.f,30.f }))
 			{
 				physics_component.m_transform = transform.GetTransform();
 				Physics3D::AddSphereCollider(physics_component);
+				physics_component.m_shapes = SPHERE_COLLIDER;
 			}
 			if (ImGui::Button("Add Mesh collider", { 200.f,30.f }))
 			{
@@ -479,7 +491,8 @@ namespace Hazel {
 				{
 					auto& mesh = m_selected_entity->GetComponent<StaticMeshComponent>();
 					physics_component.m_transform = transform.GetTransform();
-					Physics3D::AddMeshCollider(mesh.static_mesh->Vertices,mesh.static_mesh->Vertex_Indices,transform.Scale, physics_component);
+					Physics3D::AddMeshCollider(mesh.static_mesh->Vertices, mesh.static_mesh->Vertex_Indices, transform.Scale, physics_component);
+					physics_component.m_shapes = MESH_COLLIDER;
 				}
 			}
 			//ImGui::EndPopup();
@@ -487,8 +500,9 @@ namespace Hazel {
 
 			if (ImGui::Button("Reset Simulation", { 100,20 }))
 			{
-				m_selected_entity->RemoveComponent<PhysicsComponent>();
+				//m_selected_entity->RemoveComponent<PhysicsComponent>();
 				Physics3D::RemoveActor(physics_component);
+				physics_component.ResetSimulation = true;
 				m_selected_entity->GetComponent<TransformComponent>().m_transform = glm::mat4(1.0f);
 			}
 				//HAZEL_CORE_WARN(Physics3D::GetNbActors());

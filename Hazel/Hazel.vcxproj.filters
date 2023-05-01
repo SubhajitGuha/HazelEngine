@@ -264,6 +264,9 @@
     <ClInclude Include="src\Hazel\Scene\Scene.h">
       <Filter>src\Hazel\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Scene\SceneSerializer.h">
+      <Filter>src\Hazel\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Scene\ScriptableEntity.h">
       <Filter>src\Hazel\Scene</Filter>
     </ClInclude>
@@ -1266,6 +1269,9 @@
       <Filter>src\Hazel\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Scene\Scene.cpp">
+      <Filter>src\Hazel\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Scene\SceneSerializer.cpp">
       <Filter>src\Hazel\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Window.cpp">

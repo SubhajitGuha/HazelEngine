@@ -12,6 +12,15 @@ namespace physx {
 }
 
 namespace Hazel {
+	enum ShapeTypes //FOR PHYSICS SIMULATION ONLY
+	{
+		BOX_COLLIDER,
+		SPHERE_COLLIDER,
+		PLANE_COLLIDER,
+		CAPSULE_COLLIDER,
+		MESH_COLLIDER
+	};
+
 	struct TagComponent {
 		std::string tag;
 		TagComponent() {tag = "";}
@@ -104,5 +113,7 @@ namespace Hazel {
 		physx::PxRigidDynamic* m_DynamicActor= nullptr;
 		physx::PxRigidStatic* m_StaticActor = nullptr;
 		bool isStatic = false; //defines whether the object is a static rigid body or a dynamic rigid body
+		ShapeTypes m_shapes = BOX_COLLIDER;
+		bool ResetSimulation = false;
 	};
 }

@@ -17,6 +17,7 @@ namespace Hazel {
 		~LoadMesh();
 		void LoadObj(const std::string& Path);
 	public:
+		std::string m_path;
 		std::vector<glm::vec3> Vertices;
 		std::vector<glm::vec2> TexCoord;
 		std::vector<glm::vec3> Normal;

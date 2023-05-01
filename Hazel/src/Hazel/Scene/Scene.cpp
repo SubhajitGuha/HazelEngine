@@ -9,6 +9,7 @@
 #include "Hazel/LoadMesh.h"
 #include "PointLight.h"
 #include "Hazel/Physics/Physics3D.h"
+#include "Hazel/Scene/SceneSerializer.h"
 
 namespace Hazel {
 	
@@ -99,7 +100,6 @@ namespace Hazel {
 					if (Entity.HasComponent<PhysicsComponent>())
 					{
 						auto physics_cmp = Entity.GetComponent<PhysicsComponent>();
-						//physics_cmp.m_transform = transform;
 						Physics3D::UpdateTransform(Entity.GetComponent<TransformComponent>(), physics_cmp);
 					}
 					if (Entity.HasComponent<SpriteRenderer>()) {
