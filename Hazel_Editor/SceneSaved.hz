@@ -1,4 +1,17 @@
 Scene: Untitled
+PointLight:
+  - PointLight0:
+      LightPosition: [0, 6.0999999, 0]
+      LightColor: [20.3999996, 1, 1]
+  - PointLight1:
+      LightPosition: [47.4000015, 0, 0]
+      LightColor: [1, 24.2000008, 1]
+  - PointLight2:
+      LightPosition: [-34.7000008, -26.3999996, -42.2000008]
+      LightColor: [19, 18.1000004, 0]
+  - PointLight3:
+      LightPosition: [-46.7999992, -28.6000004, 13]
+      LightColor: [44.2999992, 1, 1]
 Entities:
   - Entity: 13212514564232
     TagComponent:
@@ -99,7 +112,7 @@ Entities:
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
     SpriteRenderer:
-      Color: [0.00771540869, 0.382239401, 0.00590332085, 1]
+      Color: [0, 0.540540576, 0, 1]
       Roughness: 1
       Metallic: 0
     StaticMeshComponent:

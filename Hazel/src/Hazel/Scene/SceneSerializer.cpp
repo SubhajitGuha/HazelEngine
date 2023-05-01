@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "SceneSerializer.h"
 #include "Hazel/Physics/Physics3D.h"
+#include "PointLight.h"
 #include "yaml-cpp/yaml.h"
 
 namespace YAML {
@@ -85,6 +86,7 @@ namespace Hazel {
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << "Entity" << YAML::Value << "13212514564232";
+		
 		if (entity.HasComponent<TagComponent>())
 		{
 			out << YAML::Key << "TagComponent";
@@ -151,6 +153,21 @@ namespace Hazel {
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
+
+		out << YAML::Key << "PointLight";
+		out << YAML::BeginSeq;
+		for (int i = 0; i < m_scene->m_PointLights.size(); i++) {
+			std::string light_name = "PointLight" + std::to_string(i);
+			out << YAML::BeginMap;
+			out << YAML::Key << light_name.c_str();
+			out << YAML::BeginMap;
+			out << YAML::Key << "LightPosition" << YAML::Value << m_scene->m_PointLights[i]->GetLightPosition();
+			out << YAML::Key << "LightColor" << YAML::Value << m_scene->m_PointLights[i]->GetLightColor();
+			out << YAML::EndMap;//Light end map
+			out << YAML::EndMap;
+		}
+		out << YAML::EndSeq;//Light end map
+
 		out << YAML::Key << "Entities" << YAML::BeginSeq;
 		m_scene->getRegistry().each([&](auto entity_ID) {
 			Entity entity(m_scene.get(), entity_ID);
@@ -179,6 +196,24 @@ namespace Hazel {
 		}
 		std::string SceneName = data["Scene"].as<std::string>();
 		HAZEL_CORE_INFO("Deserializing Scene {}", SceneName);
+
+		auto pointLight = data["PointLight"];
+		if (pointLight)
+		{
+			int i = 0;
+			for (auto light : pointLight)
+			{
+				std::string light_name = "PointLight" + std::to_string(i);
+				auto light_param = light[light_name.c_str()];
+				if (light_param) {
+					glm::vec3 lposition = light_param["LightPosition"].as<glm::vec3>();
+					glm::vec3 lcolor = light_param["LightColor"].as<glm::vec3>();
+
+					m_scene->AddPointLight(new PointLight(lposition, lcolor));
+				}
+				i++;
+			}
+		}
 
 		auto entities = data["Entities"];
 		if (entities)
