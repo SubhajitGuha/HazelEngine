@@ -465,8 +465,12 @@ namespace Hazel {
 			ImGui::DragFloat("Restitution", &physics_component.m_Restitution, 0.1f);
 			ImGui::DragFloat("Mass", &physics_component.m_mass, 0.1f);
 			ImGui::DragFloat("Sphere Radius", &physics_component.m_radius, 0.1f);
+			ImGui::DragFloat("Angular Damping", &physics_component.m_AngularDamping, 0.1f);
+			ImGui::DragFloat("Linear Damping", &physics_component.m_LinearDamping, 0.1f);
 			ImGui::DragFloat3("Box Collider Dimension", &physics_component.m_halfextent.x, 0.1f);
+			ImGui::DragFloat3("Force Direction", &physics_component.m_ForceDirection.x, 0.1f);
 			ImGui::Checkbox("Is Actor Static", &physics_component.isStatic);
+			ImGui::Checkbox("Is Kinamatic", &physics_component.isKinamatic);
 
 			auto& transform = m_selected_entity->GetComponent<TransformComponent>();
 			//if (ImGui::BeginPopupContextWindow("physics action", 1, false))
@@ -494,6 +498,10 @@ namespace Hazel {
 					Physics3D::AddMeshCollider(mesh.static_mesh->Vertices, mesh.static_mesh->Vertex_Indices, transform.Scale, physics_component);
 					physics_component.m_shapes = MESH_COLLIDER;
 				}
+			}
+			if (ImGui::Button("Add Force"))
+			{
+				Physics3D::AddForce(physics_component);
 			}
 			//ImGui::EndPopup();
 		//}

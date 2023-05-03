@@ -27,6 +27,7 @@ namespace Hazel {
 		static void AddCapsuleCollider(PhysicsComponent& physics_component);
 		static void AddPlaneCollider(PhysicsComponent& physics_component);
 		static void AddMeshCollider(const std::vector<glm::vec3>& Vertices, const std::vector<unsigned int>& indices, const glm::vec3& scaling,PhysicsComponent& physics_component);
+		static void AddForce(PhysicsComponent& physics_component);// physicsComponent has all the parameters required for physics simulation
 		static void RemoveActor(PhysicsComponent& physics_component);
 		static uint32_t GetNbActors();
 		//void AddCollider();

@@ -142,6 +142,7 @@ namespace Hazel {
 			out << YAML::Key << "HalfExtent" << YAML::Value << pc.m_halfextent;
 			out << YAML::Key << "Transform" << YAML::Value << pc.m_transform;
 			out << YAML::Key << "isStatic" << YAML::Value << (int)pc.isStatic;
+			out << YAML::Key << "isKinamatic" << YAML::Value << (int)pc.isKinamatic;
 			out << YAML::Key << "Shape" << YAML::Value << pc.m_shapes;
 
 			out << YAML::EndMap;
@@ -276,6 +277,7 @@ namespace Hazel {
 					glm::vec3 halfExtent = PhysicsComp["HalfExtent"].as<glm::vec3>();
 					//glm::mat4 transform = PhysicsComp["Transform"].as<glm::mat4>();
 					bool isStatic = PhysicsComp["isStatic"].as<int>();
+					bool isKinamatic = PhysicsComp["isKinamatic"].as<int>();
 					int Shape = PhysicsComp["Shape"].as<int>();
 
 					physics_component.m_mass = mass;
@@ -287,6 +289,7 @@ namespace Hazel {
 					physics_component.m_halfextent = halfExtent;
 					physics_component.m_transform = DeserializedEntity->GetComponent<TransformComponent>().GetTransform();
 					physics_component.isStatic = isStatic;
+					physics_component.isKinamatic = isKinamatic;
 					physics_component.m_shapes = (ShapeTypes)Shape;
 
 					if (Shape == ShapeTypes::BOX_COLLIDER)

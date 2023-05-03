@@ -106,14 +106,17 @@ namespace Hazel {
 		float m_Restitution = 0.6;
 		float m_radius = 1.0f;
 		float m_height = 1.0f;
-
+		bool isStatic = false; //defines whether the object is a static rigid body or a dynamic rigid body
+		bool ResetSimulation = false;
+		bool isKinamatic = false;
+		float m_AngularDamping = 0.0f;
+		float m_LinearDamping = 0.0f;
+		glm::vec3 m_ForceDirection = { 0.f,0.f,0.f };
 		glm::vec3 m_halfextent;
 		glm::mat4 m_transform;
 
 		physx::PxRigidDynamic* m_DynamicActor= nullptr;
 		physx::PxRigidStatic* m_StaticActor = nullptr;
-		bool isStatic = false; //defines whether the object is a static rigid body or a dynamic rigid body
 		ShapeTypes m_shapes = BOX_COLLIDER;
-		bool ResetSimulation = false;
 	};
 }

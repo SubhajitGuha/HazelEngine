@@ -22,57 +22,50 @@ namespace Hazel {
 	}
 	Physics3D::~Physics3D()
 	{
-		
+
 		//CleanUpPhysics();
 	}
 	void Physics3D::Initilize()
 	{
-			std::thread physics_thread = std::thread([&]() {SetUpPhysics(); });
-			physics_thread.detach();
+		std::thread physics_thread = std::thread([&]() {SetUpPhysics(); });
+		physics_thread.detach();
 	}
-	void Physics3D::OnUpdate(TimeStep ts, EditorCamera& cam, LoadMesh& mesh)
+	
+	void Physics3D::UpdateTransform(TransformComponent& transform_component, PhysicsComponent& physics_component)
 	{
-		if (m_physics == nullptr && SimulatePhysics) 
-		{
-			std::thread physics_thread = std::thread([&]() {Initilize(); });
-			physics_thread.detach();
-		}
-		if (m_scene) {
-			auto number_of_actors =  m_scene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC);
-			std::vector<physx::PxActor*> actors(number_of_actors);
-			m_scene->getActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC, &actors[0], number_of_actors, 0);
-			for (physx::PxActor* actor : actors) 
-			{
-				//if (actor->is<physx::PxRigidDynamic*>())
-				{
-					physx::PxRigidDynamic* rigidDynamic = dynamic_cast<physx::PxRigidDynamic*>(actor);
-					physx::PxTransform pxtransform = rigidDynamic->getGlobalPose();
+		if (!physics_component.m_DynamicActor)
+			return;
 
-					glm::mat4 transform = glm::translate(glm::mat4(1.0f), { pxtransform.p.x, pxtransform.p.y, pxtransform.p.z }) * glm::mat4(glm::quat(pxtransform.q.w, pxtransform.q.x, pxtransform.q.y, pxtransform.q.z));
-					//transform = glm::scale(transform, glm::vec3(2));
-					Renderer3D::BeginScene(cam);
-					Renderer3D::DrawMesh(mesh, transform, { 1,0,0,1});
-					//I need to copy the transform of the physics to the
-				}
+		physics_component.m_DynamicActor->setAngularDamping(physics_component.m_AngularDamping);
+		physics_component.m_DynamicActor->setLinearDamping(physics_component.m_LinearDamping);
+		physics_component.m_DynamicActor->setMass(physics_component.m_mass);
+
+		if (physics_component.isKinamatic)
+		{
+			glm::mat4x4 trans = transform_component.GetTransform();
+			physx::PxTransform kinamatic_transform = physx::PxTransform(*(physx::PxMat44*)glm::value_ptr(trans));
+			physics_component.m_DynamicActor->setKinematicTarget(kinamatic_transform);
+		}
+		else {
+			if (SimulatePhysics)//if simulate physics is on then update transform
+			{
+				physx::PxTransform pxtransform = physics_component.m_DynamicActor->getGlobalPose();
+				transform_component.m_transform = glm::translate(glm::mat4(1.0f), { pxtransform.p.x, pxtransform.p.y, pxtransform.p.z }) * glm::mat4(glm::quat(pxtransform.q.w, pxtransform.q.x, pxtransform.q.y, pxtransform.q.z));
+				transform_component.m_transform = glm::scale(transform_component.m_transform, transform_component.Scale);
+			}
+			else //if the simulate physics is false then set the collider transform same as the mesh
+			{
+				transform_component.m_transform = glm::mat4(1.0f);
+				glm::mat4x4 trans = transform_component.GetTransform();
+				physx::PxTransform transform = physx::PxTransform(*(physx::PxMat44*)glm::value_ptr(trans));
+				physics_component.m_DynamicActor->setGlobalPose(transform);
 			}
 		}
 	}
-	void Physics3D::UpdateTransform(TransformComponent& transform_component, PhysicsComponent& physics_component)
-	{
-		//if (physics_component.ResetSimulation) {
-		//	physics_component.ResetSimulation = false;
-		//	return;
-		//}
-		if (physics_component.m_DynamicActor) {
-			physx::PxTransform pxtransform = physics_component.m_DynamicActor->getGlobalPose();
-			transform_component.m_transform = glm::translate(glm::mat4(1.0f), { pxtransform.p.x, pxtransform.p.y, pxtransform.p.z }) * glm::mat4(glm::quat(pxtransform.q.w, pxtransform.q.x, pxtransform.q.y, pxtransform.q.z));
-		}
-	}
-
-	void Physics3D::AddBoxCollider(const glm::vec3& halfExtent, const glm::mat4& transform, bool isStatic , const float& StaticFriction, const float& DynamicFriction, const float& Restitution)
+	void Physics3D::AddBoxCollider(const glm::vec3& halfExtent, const glm::mat4& transform, bool isStatic, const float& StaticFriction, const float& DynamicFriction, const float& Restitution)
 	{
 		m_defaultMaterial = m_physics->createMaterial(StaticFriction, DynamicFriction, Restitution);
-		
+
 		if (isStatic == true)
 		{
 			m_groundActor = m_physics->createRigidStatic(physx::PxTransform(*(physx::PxMat44*)glm::value_ptr(transform)));
@@ -85,7 +78,7 @@ namespace Hazel {
 		else {
 			physx::PxShape* shape = m_physics->createShape(physx::PxBoxGeometry(halfExtent.x, halfExtent.y, halfExtent.z), *m_defaultMaterial);
 			physx::PxTransform localTm(*(physx::PxMat44*)glm::value_ptr(transform));
-			
+
 			m_boxActor = physx::PxCreateDynamic(*m_physics, localTm, *shape, 10.0);
 			m_RigidDynamic_arr.push_back(m_boxActor);
 
@@ -112,6 +105,11 @@ namespace Hazel {
 		}
 		else {
 			physics_component.m_DynamicActor = physx::PxCreateDynamic(*m_physics, localTm, *shape, physics_component.m_mass);
+			if (physics_component.isKinamatic)
+				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+			else
+				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
+
 			physx::PxRigidBodyExt::updateMassAndInertia(*physics_component.m_DynamicActor, physics_component.m_mass);
 			m_scene->addActor(*physics_component.m_DynamicActor);
 			shape->release();
@@ -121,13 +119,25 @@ namespace Hazel {
 	{
 		m_defaultMaterial = m_physics->createMaterial(physics_component.m_StaticFriction, physics_component.m_DynamicFriction, physics_component.m_Restitution);
 		physx::PxShape* shape = m_physics->createShape(physx::PxSphereGeometry(physics_component.m_radius), *m_defaultMaterial);
-		
+
 		physx::PxTransform localTm(*(physx::PxMat44*)glm::value_ptr(physics_component.m_transform));
 		if (physics_component.isStatic == false)
 		{
 			physics_component.m_DynamicActor = physx::PxCreateDynamic(*m_physics, localTm, *shape, physics_component.m_mass);
+
+			if (physics_component.isKinamatic)
+				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+			else
+				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
+
 			physx::PxRigidBodyExt::updateMassAndInertia(*physics_component.m_DynamicActor, physics_component.m_mass);
 			m_scene->addActor(*physics_component.m_DynamicActor);
+			shape->release();
+		}
+		else
+		{
+			physics_component.m_StaticActor = physx::PxCreateStatic(*m_physics, localTm, *shape);
+			m_scene->addActor(*physics_component.m_StaticActor);
 			shape->release();
 		}
 	}
@@ -137,7 +147,7 @@ namespace Hazel {
 	void Physics3D::AddPlaneCollider(PhysicsComponent& physics_component)
 	{
 	}
-	void Physics3D::AddMeshCollider(const std::vector<glm::vec3>& vertices , const std::vector<unsigned int>& indices, const glm::vec3& scaling , PhysicsComponent& physics_component)
+	void Physics3D::AddMeshCollider(const std::vector<glm::vec3>& vertices, const std::vector<unsigned int>& indices, const glm::vec3& scaling, PhysicsComponent& physics_component)
 	{
 		m_defaultMaterial = m_physics->createMaterial(physics_component.m_StaticFriction, physics_component.m_DynamicFriction, physics_component.m_Restitution);
 		physx::PxTransform localTm(*(physx::PxMat44*)glm::value_ptr(physics_component.m_transform));
@@ -151,7 +161,7 @@ namespace Hazel {
 			TriMeshDesc.triangles.count = indices.size();
 			TriMeshDesc.triangles.data = &indices[0];
 			TriMeshDesc.triangles.stride = 3 * sizeof(unsigned int);
-			
+
 			//physx::PxCookingParams params = m_cooking->getParams();
 			//params.midphaseDesc = physx::PxMeshMidPhase::eBVH34;
 			//params.suppressTriangleMeshRemapTable = false;
@@ -162,7 +172,7 @@ namespace Hazel {
 			//cook the triangle mesh
 			physx::PxDefaultMemoryOutputStream outBuffer;
 			physx::PxTriangleMeshCookingResult::Enum cookingResult;
-			if (!m_cooking->cookTriangleMesh(TriMeshDesc, outBuffer,&cookingResult))
+			if (!m_cooking->cookTriangleMesh(TriMeshDesc, outBuffer, &cookingResult))
 				HAZEL_CORE_ERROR("Cannot cook the triangle mesh!!");
 
 			physx::PxDefaultMemoryInputData stream(outBuffer.getData(), outBuffer.getSize());
@@ -192,13 +202,26 @@ namespace Hazel {
 			physx::PxDefaultMemoryInputData cookedMeshInput(cookedMeshOutput.getData(), cookedMeshOutput.getSize());
 			physx::PxConvexMesh* convexMesh = m_physics->createConvexMesh(cookedMeshInput);
 			physx::PxShape* shape = m_physics->createShape(physx::PxConvexMeshGeometry(convexMesh, physx::PxMeshScale(*(physx::PxVec3*)glm::value_ptr(scaling))), *m_defaultMaterial);
-			
+
 			//set up dynamic rigid body
 			physics_component.m_DynamicActor = physx::PxCreateDynamic(*m_physics, localTm, *shape, physics_component.m_mass);
+
+			if (physics_component.isKinamatic)
+				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+			else
+				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
+
 			physx::PxRigidBodyExt::updateMassAndInertia(*physics_component.m_DynamicActor, physics_component.m_mass);
 			m_scene->addActor(*physics_component.m_DynamicActor);
 			shape->release();
 			convexMesh->release();
+		}
+	}
+	void Physics3D::AddForce(PhysicsComponent& physics_component)
+	{
+		if (physics_component.m_DynamicActor)
+		{
+			physics_component.m_DynamicActor->addForce(*(physx::PxVec3*)glm::value_ptr(physics_component.m_ForceDirection),physx::PxForceMode::eVELOCITY_CHANGE);
 		}
 	}
 	void Physics3D::RemoveActor(PhysicsComponent& physics_component)
@@ -233,41 +256,41 @@ namespace Hazel {
 		m_boxActor = nullptr;
 		m_groundActor = nullptr;
 	}
-physx::PxU32 x;
-void Physics3D::StepPhysics()
-{
-	float ts = 1.0f / 120.0f;
-	m_scene->simulate(ts);
-	m_scene->fetchResults(true);
-	//std::cout << "Simulating" <<x<< std::endl;
-	std::this_thread::sleep_for(std::chrono::milliseconds(int(ts*1000)));
-}
-void Physics3D::SetUpPhysics()
-{
-	physx::PxDefaultAllocator      mDefaultAllocatorCallback;
-	physx::PxDefaultErrorCallback  mDefaultErrorCallback;
-	m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
-	physx::PxTolerancesScale TollarenceScale;
-	TollarenceScale.length = 100;
-	TollarenceScale.speed = 981;
-	m_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_foundation, physx::PxCookingParams(TollarenceScale));
-	m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, TollarenceScale);
-
-	if (!m_physics)
-		HAZEL_CORE_ERROR("Error in creating physics object");
-
-	physx::PxSceneDesc sceneDesc(m_physics->getTolerancesScale());
-	sceneDesc.flags.set(physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS);
-	sceneDesc.gravity = physx::PxVec3(0.0f, 9.81f, 0.0f);
-	m_dispatcher = physx::PxDefaultCpuDispatcherCreate(8);
-	sceneDesc.cpuDispatcher = m_dispatcher;
-	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-	m_scene = m_physics->createScene(sceneDesc);
-
-	while (1) {
-		if (SimulatePhysics)
-			StepPhysics();
+	physx::PxU32 x;
+	void Physics3D::StepPhysics()
+	{
+		float ts = 1.0f / 120.0f;
+		m_scene->simulate(ts);
+		m_scene->fetchResults(true);
+		//std::cout << "Simulating" <<x<< std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(int(ts * 1000)));
 	}
-	CleanUpPhysics();
-}
+	void Physics3D::SetUpPhysics()
+	{
+		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
+		physx::PxDefaultErrorCallback  mDefaultErrorCallback;
+		m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
+		physx::PxTolerancesScale TollarenceScale;
+		TollarenceScale.length = 100;
+		TollarenceScale.speed = 981;
+		m_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_foundation, physx::PxCookingParams(TollarenceScale));
+		m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, TollarenceScale);
+
+		if (!m_physics)
+			HAZEL_CORE_ERROR("Error in creating physics object");
+
+		physx::PxSceneDesc sceneDesc(m_physics->getTolerancesScale());
+		sceneDesc.flags.set(physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS);
+		sceneDesc.gravity = physx::PxVec3(0.0f, 9.81f, 0.0f);
+		m_dispatcher = physx::PxDefaultCpuDispatcherCreate(8);
+		sceneDesc.cpuDispatcher = m_dispatcher;
+		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+		m_scene = m_physics->createScene(sceneDesc);
+
+		while (1) {
+			if (SimulatePhysics)
+				StepPhysics();
+		}
+		CleanUpPhysics();
+	}
 }
