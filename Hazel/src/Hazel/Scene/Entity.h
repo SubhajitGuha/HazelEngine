@@ -65,7 +65,10 @@ namespace Hazel {
 		bool operator!= (uint32_t id) {
 			return !(*this == id);
 		}
-
+		Scene* GetScene()
+		{
+			return scene;
+		}
 	//default entity parameters like color of the quad,texture,subtexture,transform,shader
 	public:
 		glm::vec4 m_DefaultColor = glm::vec4(1.0f);

@@ -29,5 +29,7 @@ namespace Hazel {
 		void DrawSpriteRendererUI();
 		void DrawStaticMeshComponentUI();
 		void DrawPhysicsComponentUI();
+		void DrawScriptComponentUI();
+		bool bDrawScript_comp = false;
 	};
 }

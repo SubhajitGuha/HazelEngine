@@ -27,6 +27,7 @@
     <ClInclude Include="src\Pannels\SceneHierarchy.h">
       <Filter>src\Pannels</Filter>
     </ClInclude>
+    <ClInclude Include="src\CustomScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HazelEditor.cpp">

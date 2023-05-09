@@ -127,7 +127,14 @@ namespace Hazel {
 			out << YAML::Key << "MeshPath" << YAML::Value << sm.static_mesh->m_path;
 			out << YAML::EndMap;
 		}
-
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			auto& sm = entity.GetComponent<ScriptComponent>();
+			out << YAML::Key << "ScriptComponent";
+			out << YAML::BeginMap;
+			out << YAML::Key << "id" << YAML::Value << typeid(*sm.m_Script).hash_code();
+			out << YAML::EndMap;
+		}
 		if (entity.HasComponent<PhysicsComponent>())
 		{
 			auto& pc = entity.GetComponent<PhysicsComponent>();
@@ -142,7 +149,7 @@ namespace Hazel {
 			out << YAML::Key << "HalfExtent" << YAML::Value << pc.m_halfextent;
 			out << YAML::Key << "Transform" << YAML::Value << pc.m_transform;
 			out << YAML::Key << "isStatic" << YAML::Value << (int)pc.isStatic;
-			out << YAML::Key << "isKinamatic" << YAML::Value << (int)pc.isKinamatic;
+			out << YAML::Key << "isKinematic" << YAML::Value << (int)pc.isKinematic;
 			out << YAML::Key << "Shape" << YAML::Value << pc.m_shapes;
 
 			out << YAML::EndMap;
@@ -261,46 +268,62 @@ namespace Hazel {
 
 					DeserializedEntity->AddComponent<SpriteRenderer>(color,roughness,metallic);
 				}
+				auto ScriptComp = entity["ScriptComponent"];
+				if (ScriptComp)
+				{
+					if (ScriptComp["id"]) {
+						auto script = m_scene->m_scriptsMap[ScriptComp["id"].as<size_t>()];
+						DeserializedEntity->AddComponent<ScriptComponent>().Bind(*script);
+					}
+				}
 
 				auto PhysicsComp = entity["PhysicsComponent"];
 				if (PhysicsComp)
 				{
 					DeserializedEntity->AddComponent<PhysicsComponent>();
 					auto& physics_component = DeserializedEntity->GetComponent<PhysicsComponent>();
+					
+					if (PhysicsComp["Mass"])
+						physics_component.m_mass = PhysicsComp["Mass"].as<float>();
 
-					float mass = PhysicsComp["Mass"].as<float>();
-					float staticFriction = PhysicsComp["StaticFriction"].as<float>();
-					float dynamicFriction = PhysicsComp["DynamicFriction"].as<float>();
-					float restitution = PhysicsComp["Restitution"].as<float>();
-					float radius = PhysicsComp["Radius"].as<float>();
-					float height = PhysicsComp["Height"].as<float>();
-					glm::vec3 halfExtent = PhysicsComp["HalfExtent"].as<glm::vec3>();
-					//glm::mat4 transform = PhysicsComp["Transform"].as<glm::mat4>();
-					bool isStatic = PhysicsComp["isStatic"].as<int>();
-					bool isKinamatic = PhysicsComp["isKinamatic"].as<int>();
-					int Shape = PhysicsComp["Shape"].as<int>();
+					if (PhysicsComp["StaticFriction"])
+						physics_component.m_StaticFriction = PhysicsComp["StaticFriction"].as<float>();
+					
+					if(PhysicsComp["DynamicFriction"])
+						physics_component.m_DynamicFriction  = PhysicsComp["DynamicFriction"].as<float>();
 
-					physics_component.m_mass = mass;
-					physics_component.m_StaticFriction = staticFriction;
-					physics_component.m_DynamicFriction = dynamicFriction;
-					physics_component.m_Restitution = restitution;
-					physics_component.m_radius = radius;
-					physics_component.m_height = height;
-					physics_component.m_halfextent = halfExtent;
+					if (PhysicsComp["Restitution"])
+						physics_component.m_Restitution = PhysicsComp["Restitution"].as<float>();
+
+					if (PhysicsComp["Radius"])
+						physics_component.m_radius = PhysicsComp["Radius"].as<float>();
+
+					if(PhysicsComp["Height"])
+						physics_component.m_height = PhysicsComp["Height"].as<float>();
+
+					if(PhysicsComp["HalfExtent"])
+						physics_component.m_halfextent = PhysicsComp["HalfExtent"].as<glm::vec3>();
+
+					if(PhysicsComp["isStatic"])
+						physics_component.isStatic = PhysicsComp["isStatic"].as<int>();
+
+					if(PhysicsComp["isKinematic"])
+						physics_component.isKinematic = PhysicsComp["isKinematic"].as<int>();
+
+					if(PhysicsComp["Shape"])
+						physics_component.m_shapes = (ShapeTypes)PhysicsComp["Shape"].as<int>();
+
 					physics_component.m_transform = DeserializedEntity->GetComponent<TransformComponent>().GetTransform();
-					physics_component.isStatic = isStatic;
-					physics_component.isKinamatic = isKinamatic;
-					physics_component.m_shapes = (ShapeTypes)Shape;
 
-					if (Shape == ShapeTypes::BOX_COLLIDER)
+					if (physics_component.m_shapes == ShapeTypes::BOX_COLLIDER)
 						Physics3D::AddBoxCollider(physics_component);
-					if (Shape == ShapeTypes::SPHERE_COLLIDER)
+					if (physics_component.m_shapes == ShapeTypes::SPHERE_COLLIDER)
 						Physics3D::AddSphereCollider(physics_component);
-					if (Shape == ShapeTypes::PLANE_COLLIDER)
+					if (physics_component.m_shapes == ShapeTypes::PLANE_COLLIDER)
 						Physics3D::AddPlaneCollider(physics_component);
-					if (Shape == ShapeTypes::CAPSULE_COLLIDER)
+					if (physics_component.m_shapes == ShapeTypes::CAPSULE_COLLIDER)
 						Physics3D::AddCapsuleCollider(physics_component);
-					if (Shape == ShapeTypes::MESH_COLLIDER)
+					if (physics_component.m_shapes == ShapeTypes::MESH_COLLIDER)
 					{
 						if (DeserializedEntity->HasComponent<StaticMeshComponent>())
 						{

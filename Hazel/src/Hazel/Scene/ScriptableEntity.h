@@ -8,6 +8,8 @@ namespace Hazel
 	public:
 		Entity* m_Entity = nullptr;
 		friend class Scene;
+		std::pair<size_t, ScriptableEntity*> m_scriptPair;
+
 	public:
 		ScriptableEntity() = default;
 		
@@ -16,8 +18,10 @@ namespace Hazel
 		}
 
 		//overridable methods
-		virtual void OnUpdate(TimeStep ts) {}
-		virtual void OnCreate() {}
-		virtual void OnDestroy() {}
+		virtual void OnUpdate(TimeStep ts){}
+		virtual void OnCreate(){}
+		virtual void OnDestroy(){}
+
 	};
+	//std::unordered_map<size_t, ScriptableEntity*> ScriptableEntity::m_scriptMap = {};
 }

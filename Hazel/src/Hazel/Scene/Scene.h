@@ -9,6 +9,7 @@
 namespace Hazel {
 	class Entity;
 	class LoadMesh;
+	class ScriptableEntity;
 	//class EditorCamera;
 	class PointLight;
 	class Scene
@@ -33,6 +34,7 @@ namespace Hazel {
 		static unsigned int m_Scene_tex_id;
 		static unsigned int m_Scene_depth_id;
 		ref<FrameBuffer> framebuffer;
+		std::unordered_map<size_t, ScriptableEntity*> m_scriptsMap;
 	private:
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};

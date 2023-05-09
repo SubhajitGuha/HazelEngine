@@ -65,7 +65,7 @@ namespace Hazel {
 		m_data->reflection = CubeMapReflection::Create();
 		m_data->ssao = std::make_shared<OpenGlSSAO>();
 		m_data->shadow_map = Shadows::Create(4096, 4096);//create a 2048x2048 shadow map
-		depth_id = m_data->ssao->GetSSAOid();
+		depth_id = m_data->shadow_map->GetDepth_ID();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		m_data->WhiteTex = Texture2D::Create(1, 1, 0xffffffff);//create a default white texture

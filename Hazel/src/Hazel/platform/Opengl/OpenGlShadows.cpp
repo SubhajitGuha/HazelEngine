@@ -145,7 +145,7 @@ namespace Hazel {
 			float m_FarPlane = Ranges[i];
 
 			// create the view camera projection matrix based on the near and far plane
-			m_Camera_Projection = glm::perspective(glm::radians(camera.GetVerticalFOV()), camera.GetAspectRatio(), m_NearPlane - 20.f, m_FarPlane );
+			m_Camera_Projection = glm::perspective(glm::radians(90.0f), camera.GetAspectRatio(), m_NearPlane - 20.f, m_FarPlane );
 			
 			glm::vec3 centre = glm::vec3(0.0f);
 			glm::vec4 frustum_corners[8] = //cube coordinate in cannonical view volume

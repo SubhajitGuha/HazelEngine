@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\CustomScript.h" />
     <ClInclude Include="src\HazelEditor.h" />
     <ClInclude Include="src\Pannels\SceneHierarchy.h" />
   </ItemGroup>

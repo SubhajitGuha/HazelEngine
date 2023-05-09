@@ -1,10 +1,12 @@
 #pragma once
+#include <hzpch.h>
 #include "Hazel.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Hazel/Renderer/Camareas/SceneCamera.h"
 #include "Hazel/LoadMesh.h"
 #include "ScriptableEntity.h"
+
 
 namespace physx {
 	class PxRigidDynamic;
@@ -71,6 +73,14 @@ namespace Hazel {
 			CreateInstance = [&]() {m_Script = new t(); };
 			DeleteInstance = [&]() {delete m_Script; };
 		}
+		void Bind(ScriptableEntity& script)
+		{
+			CreateInstance = [&]() {
+				m_Script = &script;
+				m_Script->m_scriptPair = std::make_pair(typeid(script).hash_code(),&script );
+			};
+			DeleteInstance = [&]() {delete m_Script; };
+		}
 	};
 
 	class Texture2D;
@@ -108,7 +118,7 @@ namespace Hazel {
 		float m_height = 1.0f;
 		bool isStatic = false; //defines whether the object is a static rigid body or a dynamic rigid body
 		bool ResetSimulation = false;
-		bool isKinamatic = false;
+		bool isKinematic = false;
 		float m_AngularDamping = 0.0f;
 		float m_LinearDamping = 0.0f;
 		glm::vec3 m_ForceDirection = { 0.f,0.f,0.f };

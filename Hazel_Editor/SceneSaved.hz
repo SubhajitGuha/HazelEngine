@@ -15,9 +15,29 @@ PointLight:
 Entities:
   - Entity: 13212514564232
     TagComponent:
-      tag: sphere2
+      tag: Entity
     TransformComponent:
-      Translation: [0, -5.69999981, -59.2000008]
+      Translation: [0, -140.456833, 0]
+      Rotation: [0, -606, 0]
+      Scale: [1, 1, 1]
+      Transform:
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, 0, 0, 1]
+    SpriteRenderer:
+      Color: [0, 1.12915058e-27, 1, 1]
+      Roughness: 1
+      Metallic: 0
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/Windmill.fbx
+    ScriptComponent:
+      id: 6685720988103015343
+  - Entity: 13212514564232
+    TagComponent:
+      tag: House
+    TransformComponent:
+      Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
       Transform:
@@ -25,13 +45,31 @@ Entities:
         - [0, 1, 0, 0]
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
+    SpriteRenderer:
+      Color: [0, 5.63963644e-13, 1, 1]
+      Roughness: 1
+      Metallic: 0
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/cityHouse_Unreal.fbx
+  - Entity: 13212514564232
+    TagComponent:
+      tag: sphere
+    TransformComponent:
+      Translation: [-42.5999985, -55.7999992, -36.9000015]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+      Transform:
+        - [0.994024396, 0.0761867985, -0.0781735033, 0]
+        - [-0.00200898945, 0.728795528, 0.684728503, 0]
+        - [0.10913977, -0.680479765, 0.724593639, 0]
+        - [-54.6032753, 14.6141062, 115.442642, 1]
     StaticMeshComponent:
       MeshPath: Assets/Meshes/Sphere.fbx
     PhysicsComponent:
-      Mass: 1
+      Mass: 50000
       StaticFriction: 0.5
       DynamicFriction: 0.5
-      Restitution: 0.600000024
+      Restitution: 1.10000002
       Radius: 1
       Height: 1
       HalfExtent: [0, 0, 0]
@@ -39,9 +77,39 @@ Entities:
         - [1, 0, 0, 0]
         - [0, 1, 0, 0]
         - [0, 0, 1, 0]
-        - [0, -5.69999981, -59.2000008, 1]
+        - [-42.5999985, -55.7999992, -36.9000015, 1]
       isStatic: 0
-      isKinamatic: 0
+      isKinematic: 0
+      Shape: 1
+  - Entity: 13212514564232
+    TagComponent:
+      tag: cube
+    TransformComponent:
+      Translation: [0, -87.4000015, 26.8999996]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 2]
+      Transform:
+        - [0.831116438, -0.0980479717, 1.81648898, 0]
+        - [-1.71416342, -0.710795164, 0.745932221, 0]
+        - [0.60900712, -1.86685765, -0.379412174, 0]
+        - [20.3987064, 8.80152321, -9.52535725, 1]
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/Cube.fbx
+    PhysicsComponent:
+      Mass: 500000
+      StaticFriction: 0.5
+      DynamicFriction: 0.5
+      Restitution: 0.600000024
+      Radius: 1
+      Height: 1
+      HalfExtent: [0, 0, 0]
+      Transform:
+        - [2, 0, 0, 0]
+        - [0, 2, 0, 0]
+        - [0, 0, 2, 0]
+        - [0, -87.4000015, 26.8999996, 1]
+      isStatic: 0
+      isKinematic: 0
       Shape: 4
   - Entity: 13212514564232
     TagComponent:
@@ -56,7 +124,7 @@ Entities:
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
     SpriteRenderer:
-      Color: [0.0288096983, 0.361038268, 1.98592097e-05, 1]
+      Color: [0.0397281088, 0.791505814, 0.138416961, 1]
       Roughness: 1
       Metallic: 0
     StaticMeshComponent:
@@ -75,24 +143,30 @@ Entities:
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
       isStatic: 1
-      isKinamatic: 0
+      isKinematic: 0
       Shape: 4
   - Entity: 13212514564232
     TagComponent:
-      tag: cube
+      tag: sphere2
     TransformComponent:
-      Translation: [0, -87.4000015, 26.8999996]
-      Rotation: [0, 0, 0]
-      Scale: [2, 2, 2]
+      Translation: [0, -140.456833, 0]
+      Rotation: [0, -606, 0]
+      Scale: [1, 1, 1]
       Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
+        - [0.395187914, -0.162602723, -0.904094577, 0]
+        - [-0.737829089, 0.530102253, -0.417851627, 0]
+        - [0.547206521, 0.83219713, 0.0895169973, 0]
+        - [24.3297787, 10.4282675, -6.10995388, 1]
+    SpriteRenderer:
+      Color: [0, 0.0707402825, 1, 1]
+      Roughness: 1
+      Metallic: 0
     StaticMeshComponent:
-      MeshPath: Assets/Meshes/Cube.fbx
+      MeshPath: Assets/Meshes/Sphere.fbx
+    ScriptComponent:
+      id: 6685720988103015343
     PhysicsComponent:
-      Mass: 500000
+      Mass: 1
       StaticFriction: 0.5
       DynamicFriction: 0.5
       Restitution: 0.600000024
@@ -100,68 +174,10 @@ Entities:
       Height: 1
       HalfExtent: [0, 0, 0]
       Transform:
-        - [2, 0, 0, 0]
-        - [0, 2, 0, 0]
-        - [0, 0, 2, 0]
-        - [0, -3.70000005, 26.8999996, 1]
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, -4.30000019, -59.2000008, 1]
       isStatic: 0
-      isKinamatic: 0
+      isKinematic: 0
       Shape: 4
-  - Entity: 13212514564232
-    TagComponent:
-      tag: sphere
-    TransformComponent:
-      Translation: [-42.5999985, -55.7999992, -36.9000015]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/Sphere.fbx
-    PhysicsComponent:
-      Mass: 50000
-      StaticFriction: 0.5
-      DynamicFriction: 0.5
-      Restitution: 1.10000002
-      Radius: 1
-      Height: 1
-      HalfExtent: [0, 0, 0]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [-42.5999985, -55.7999992, -36.9000015, 1]
-      isStatic: 0
-      isKinamatic: 0
-      Shape: 1
-  - Entity: 13212514564232
-    TagComponent:
-      tag: House
-    TransformComponent:
-      Translation: [45.5, 4.5999999, -16.5]
-      Rotation: [90, -13.5, 0]
-      Scale: [1, 1, 1]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/cityHouse_Unreal.fbx
-  - Entity: 13212514564232
-    TagComponent:
-      tag: Entity
-    TransformComponent:
-      Translation: [-46.5999985, -72, 0]
-      Rotation: [0, 0, 90]
-      Scale: [0.5, 0.300000012, 0.100000001]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/Windmill.fbx

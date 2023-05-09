@@ -1,3 +1,4 @@
+#include "hzpch.h"
 #include "SceneHierarchy.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui_internal.h"
@@ -5,6 +6,7 @@
 #include "Hazel/Scene/PointLight.h"
 #include "Hazel/Physics/Physics3D.h"
 #include "Hazel/Scene/SceneSerializer.h"
+#include "../CustomScript.h"
 
 namespace Hazel {
 	std::string texture_path = "Assets/Textures/Test.png";
@@ -74,6 +76,11 @@ namespace Hazel {
 	void SceneHierarchyPannel::Context(const ref<Scene>& context)
 	{
 		m_Context = context;
+		/*the m_scriptMap is a map that contains all the scripts object with the class hash_code as its key.
+		* for now I have to mannually include all the scripts then manually bind them here (one by one)
+		*/
+		m_Context->m_scriptsMap[typeid(CustomScript).hash_code()] = new CustomScript();
+		HAZEL_CORE_WARN(typeid(CustomScript).hash_code());
 	}
 	void SceneHierarchyPannel::OnImGuiRender()
 	{
@@ -174,6 +181,7 @@ namespace Hazel {
 			{
 				m_selected_entity->AddComponent<PhysicsComponent>();
 			}
+			
 			ImGui::EndPopup();
 		}
 		if (m_selected_entity.get() && m_selected_entity->HasComponent<TagComponent>())
@@ -200,6 +208,9 @@ namespace Hazel {
 		{
 			DrawPhysicsComponentUI();
 		}
+
+		if (m_selected_entity.get())
+			DrawScriptComponentUI();
 
 		if (m_selected_entity.get() && m_selected_entity->HasComponent<SpriteRenderer>())
 		{
@@ -467,10 +478,10 @@ namespace Hazel {
 			ImGui::DragFloat("Sphere Radius", &physics_component.m_radius, 0.1f);
 			ImGui::DragFloat("Angular Damping", &physics_component.m_AngularDamping, 0.1f);
 			ImGui::DragFloat("Linear Damping", &physics_component.m_LinearDamping, 0.1f);
-			ImGui::DragFloat3("Box Collider Dimension", &physics_component.m_halfextent.x, 0.1f);
-			ImGui::DragFloat3("Force Direction", &physics_component.m_ForceDirection.x, 0.1f);
+			DrawVec3Control("Box Collider Dimension", physics_component.m_halfextent);
+			DrawVec3Control("Force Direction", physics_component.m_ForceDirection);
 			ImGui::Checkbox("Is Actor Static", &physics_component.isStatic);
-			ImGui::Checkbox("Is Kinamatic", &physics_component.isKinamatic);
+			ImGui::Checkbox("Is Kinematic", &physics_component.isKinematic);
 
 			auto& transform = m_selected_entity->GetComponent<TransformComponent>();
 			//if (ImGui::BeginPopupContextWindow("physics action", 1, false))
@@ -514,6 +525,24 @@ namespace Hazel {
 				m_selected_entity->GetComponent<TransformComponent>().m_transform = glm::mat4(1.0f);
 			}
 				//HAZEL_CORE_WARN(Physics3D::GetNbActors());
+			ImGui::TreePop();
+		}
+	}
+	void SceneHierarchyPannel::DrawScriptComponentUI()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 2,2 });
+		bool open = ImGui::TreeNodeEx("Script Component", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow);
+		ImGui::PopStyleVar();
+
+		if (open) {
+			if (m_selected_entity->HasComponent<ScriptComponent>())
+				ImGui::TextColored({ 0,1,0,1 }, "HAS A SELECTED SCRIPT");
+			else
+				ImGui::TextColored({ 1,0,0,1 }, "DOSENT HAVE A SELECTED SCRIPT");
+
+			if (ImGui::Button("Add Custom Script", { 100,20 }))
+				m_selected_entity->AddComponent<ScriptComponent>().Bind(*m_Context->m_scriptsMap[typeid(CustomScript).hash_code()]);
+			//ImGui::TextColored({ 1,0,0,1 }, std::to_string(typeid(*m_selected_entity->GetComponent<ScriptComponent>().m_Script).hash_code()).c_str());
 			ImGui::TreePop();
 		}
 	}

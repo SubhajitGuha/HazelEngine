@@ -40,17 +40,18 @@ namespace Hazel {
 		physics_component.m_DynamicActor->setLinearDamping(physics_component.m_LinearDamping);
 		physics_component.m_DynamicActor->setMass(physics_component.m_mass);
 
-		if (physics_component.isKinamatic)
+		if (physics_component.isKinematic)
 		{
 			glm::mat4x4 trans = transform_component.GetTransform();
-			physx::PxTransform kinamatic_transform = physx::PxTransform(*(physx::PxMat44*)glm::value_ptr(trans));
-			physics_component.m_DynamicActor->setKinematicTarget(kinamatic_transform);
+			physx::PxTransform kinematic_transform = physx::PxTransform(*(physx::PxMat44*)glm::value_ptr(trans));
+			physics_component.m_DynamicActor->setKinematicTarget(kinematic_transform);
 		}
 		else {
 			if (SimulatePhysics)//if simulate physics is on then update transform
 			{
 				physx::PxTransform pxtransform = physics_component.m_DynamicActor->getGlobalPose();
-				transform_component.m_transform = glm::translate(glm::mat4(1.0f), { pxtransform.p.x, pxtransform.p.y, pxtransform.p.z }) * glm::mat4(glm::quat(pxtransform.q.w, pxtransform.q.x, pxtransform.q.y, pxtransform.q.z));
+				transform_component.m_transform = glm::translate(glm::mat4(1.0f), { pxtransform.p.x, pxtransform.p.y, pxtransform.p.z }) 
+					* glm::mat4(glm::quat(pxtransform.q.w, pxtransform.q.x, pxtransform.q.y, pxtransform.q.z));
 				transform_component.m_transform = glm::scale(transform_component.m_transform, transform_component.Scale);
 			}
 			else //if the simulate physics is false then set the collider transform same as the mesh
@@ -105,7 +106,7 @@ namespace Hazel {
 		}
 		else {
 			physics_component.m_DynamicActor = physx::PxCreateDynamic(*m_physics, localTm, *shape, physics_component.m_mass);
-			if (physics_component.isKinamatic)
+			if (physics_component.isKinematic)
 				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 			else
 				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
@@ -125,7 +126,7 @@ namespace Hazel {
 		{
 			physics_component.m_DynamicActor = physx::PxCreateDynamic(*m_physics, localTm, *shape, physics_component.m_mass);
 
-			if (physics_component.isKinamatic)
+			if (physics_component.isKinematic)
 				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 			else
 				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
@@ -206,7 +207,7 @@ namespace Hazel {
 			//set up dynamic rigid body
 			physics_component.m_DynamicActor = physx::PxCreateDynamic(*m_physics, localTm, *shape, physics_component.m_mass);
 
-			if (physics_component.isKinamatic)
+			if (physics_component.isKinematic)
 				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 			else
 				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
