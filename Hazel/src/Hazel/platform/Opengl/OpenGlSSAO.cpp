@@ -20,7 +20,7 @@ namespace Hazel {
 	{
 	}
 
-	void OpenGlSSAO::CaptureScene(Scene& scene , EditorCamera& cam)
+	void OpenGlSSAO::CaptureScene(Scene& scene , Camera& cam)
 	{
 		auto viewport_size = RenderCommand::GetViewportSize();
 

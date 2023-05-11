@@ -14,8 +14,9 @@
 namespace Hazel {
 	
 	//std::vector<PointLight*> Scene::m_PointLights;
+	Camera* MainCamera = nullptr;//if there is no main camera Then dont render
+	EditorCamera editor_cam;
 	 LoadMesh* Scene::Sphere=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza;
-	 EditorCamera editor_cam;
 	 bool capture = false;
 	Scene::Scene()
 	{
@@ -29,8 +30,7 @@ namespace Hazel {
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
-
-		editor_cam.SetViewportSize(1920.0,1080.0);
+		//editor_cam = (EditorCamera*)Camera::GetCamera(EDITOR_CAMERA).get();
 		Renderer3D::SetUpCubeMapReflections(*this);
 		Physics3D::Initilize();
 	}
@@ -57,7 +57,21 @@ namespace Hazel {
 	}
 	void Scene::OnUpdate(TimeStep ts)
 	{
-		editor_cam.OnUpdate(ts);
+		MainCamera = nullptr;//if there is no main camera Then dont render
+		
+		auto view = m_registry.view<CameraComponent>();
+		for (auto entt : view) {
+			auto& camera = m_registry.get<CameraComponent>(entt);
+			if (camera.camera.bIsMainCamera)
+				MainCamera = (&camera.camera);
+		}
+
+		if (!MainCamera)
+		{
+			MainCamera = &editor_cam;
+		}
+
+		MainCamera->OnUpdate(ts);
 		//run scripts
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
 		{
@@ -77,22 +91,12 @@ namespace Hazel {
 		if (m_PointLights.size() > 0)
 			Renderer3D::SetPointLightPosition(m_PointLights);
 
-		Camera* MainCamera=nullptr;//if there is no main camera Then dont render
-		{
-			auto view = m_registry.view<CameraComponent>();
-			for (auto entt : view) {
-				auto& camera = m_registry.get<CameraComponent>(entt);
-				if (camera.camera.bIsMainCamera)
-					MainCamera = &camera.camera;
-			}
-		}
-
 		m_registry.each([&](auto m_entity)
 			{
 				Entity Entity(this, m_entity);
 				if (Entity.GetComponent<StaticMeshComponent>().isFoliage == false)
 				{
-					Renderer3D::BeginScene(editor_cam);
+					Renderer3D::BeginScene(*MainCamera);
 					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
 					glm::vec4 color;
 
@@ -111,7 +115,7 @@ namespace Hazel {
 				}
 				else
 				{
-					Renderer3D::BeginSceneFoliage(editor_cam);
+					Renderer3D::BeginSceneFoliage(*MainCamera);
 					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
 					glm::vec4 color;
 
@@ -126,10 +130,10 @@ namespace Hazel {
 			});
 			Renderer3D::EndScene();
 			
-			//physics->OnUpdate(ts, editor_cam, *Cube);
+			//physics->OnUpdate(ts, MainCamera, *Cube);
 			
-			Renderer3D::RenderShadows(*this, editor_cam);//shadows should be computed at last
-			Renderer3D::AmbiantOcclusion(*this, editor_cam);
+			Renderer3D::RenderShadows(*this, *MainCamera);//shadows should be computed at last
+			Renderer3D::AmbiantOcclusion(*this, *MainCamera);
 
 	}
 	void Scene::OnCreate()
@@ -143,11 +147,11 @@ namespace Hazel {
 			if(camera.IsResiziable && camera.IsResiziable)
 				m_registry.get<CameraComponent>(entity).camera.SetViewportSize(Width,Height);
 		}
-		editor_cam.SetViewportSize(Width, Height);//resize the editor camera
+		MainCamera->SetViewportSize(Width, Height);//resize the editor camera
 	}
 	void Scene::OnEvent(Event& e)
 	{
-		editor_cam.OnEvent(e);
+		MainCamera->OnEvent(e);
 	}
 
 	void Scene::AddPointLight(PointLight* light)

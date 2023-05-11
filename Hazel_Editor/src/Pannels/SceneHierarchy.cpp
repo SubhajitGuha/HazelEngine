@@ -333,9 +333,9 @@ namespace Hazel {
 			}
 			else
 			{
-				float PersFOV = camera.GetPerspectiveVerticalFOV();
+				float PersFOV = camera.GetVerticalFOV();
 				if (ImGui::DragFloat("Perspective size", &PersFOV, 0.2))
-					camera.SetPerspectiveVerticalFOV(PersFOV);
+					camera.SetVerticalFOV(PersFOV);
 
 				float PersNear = camera.GetPerspectiveNear();
 				if (ImGui::DragFloat("Perspective Near", &PersNear, 0.2))

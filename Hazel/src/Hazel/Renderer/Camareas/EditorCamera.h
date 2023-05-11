@@ -1,6 +1,6 @@
 #pragma once
-#include "Camera.h"
 #include "Hazel.h"
+#include "Camera.h"
 #include "Hazel/Events/ApplicationEvent.h"
 #include "Hazel/Events/KeyEvent.h"
 #include "Hazel/Events/MouseEvent.h"
@@ -13,23 +13,28 @@ namespace Hazel {
 		EditorCamera(float width, float Height);
 		~EditorCamera() = default;
 
-		void SetPerspctive(float v_FOV,float Near,float Far);
-		glm::mat4 GetProjectionView() { return m_ProjectionView; }
-		inline glm::mat4 GetViewMatrix() { return m_View; }
-		inline glm::mat4 GetProjectionMatrix() { return m_Projection; }
-		void OnEvent(Event& e);
-		void OnUpdate(TimeStep ts);
-		void SetViewportSize(float width,float Height);
-		inline glm::vec3 GetCameraPosition() { return m_Position; }
+		void SetPerspctive(float v_FOV,float Near,float Far) override;
+		void SetCameraPosition(const glm::vec3& pos) override { m_Position = pos; RecalculateProjectionView();}
+		void SetViewDirection(const glm::vec3& dir) override { m_ViewDirection = dir; RecalculateProjectionView(); }
+		void SetUPVector(const glm::vec3& up) override {	Up = up; RecalculateProjectionView();}
+		void SetViewportSize(float width,float Height) override;
+		void SetVerticalFOV(float fov) override { m_verticalFOV = fov; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar); }
+		void SetPerspectiveNear(float val) override { m_PerspectiveNear = val; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar);}
+		void SetPerspectiveFar(float val) override { m_PerspectiveFar = val; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar);}
 
-		void SetCameraPosition(const glm::vec3& pos) { m_Position = pos; RecalculateProjectionView();}
-		void SetViewDirection(const glm::vec3& dir) { m_ViewDirection = dir; RecalculateProjectionView(); }
-		void SetUPVector(const glm::vec3& up) {	Up = up; RecalculateProjectionView();}
-		void RotateCamera(float yaw, float pitch);
-		inline glm::vec3 GetViewDirection() { return m_ViewDirection; }
-		inline float GetAspectRatio() { return m_AspectRatio; }
-		inline float GetVerticalFOV() { return m_verticalFOV; }
+		float GetPerspectiveNear() override { return m_PerspectiveNear; };
+		float GetPerspectiveFar() override { return m_PerspectiveFar; };
+		glm::mat4 GetProjectionView() override { return m_ProjectionView; }
+		inline glm::mat4 GetViewMatrix() override { return m_View; }
+		inline glm::mat4 GetProjectionMatrix() override { return m_Projection; }
+		inline glm::vec3 GetCameraPosition() override { return m_Position; }
+		inline glm::vec3 GetViewDirection() override { return m_ViewDirection; }
+		inline float GetAspectRatio() override { return m_AspectRatio; }
+		inline float GetVerticalFOV() override { return m_verticalFOV; }
 
+		void OnEvent(Event& e) override;
+		void OnUpdate(TimeStep ts) override;
+		void RotateCamera(float yaw, float pitch) override;
 	private:
 		void RecalculateProjection();
 		void RecalculateProjectionView();

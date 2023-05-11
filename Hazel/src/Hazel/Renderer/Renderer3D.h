@@ -5,16 +5,16 @@
 #include "Hazel/Renderer/Shadows.h"
 
 namespace Hazel {
-	class EditorCamera;
+	class Camera;
 	class LoadMesh;
 	class Renderer3D
 	{
 	public:
 		static void Init();
 		static void BeginScene(OrthographicCamera& camera);
-		static void BeginScene(Camera& camera);
-		static void BeginScene(EditorCamera&);
-		static void BeginSceneFoliage(EditorCamera&);
+		//static void BeginScene(Camera& camera);
+		static void BeginScene(Camera&);
+		static void BeginSceneFoliage(Camera&);
 
 		static void EndScene();
 	public:
@@ -24,8 +24,8 @@ namespace Hazel {
 		static void DrawMesh(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = {1,1,1,1} ,const float& material_Roughness=1.0f,const float& material_metallic = 0.0f );//take the mesh class reference
 		static void DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = { 1,1,1,1 }, const float& material_Roughness = 1.0f, const float& material_metallic = 0.0f);//take the mesh class reference
 		static void SetUpCubeMapReflections(Scene& scene);
-		static void RenderShadows(Scene& scene, EditorCamera& camera);
-		static void AmbiantOcclusion(Scene& scene, EditorCamera& camera);
+		static void RenderShadows(Scene& scene, Camera& camera);
+		static void AmbiantOcclusion(Scene& scene, Camera& camera);
 
 		static unsigned int depth_id;
 	private:

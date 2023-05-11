@@ -3,7 +3,7 @@
 
 namespace Hazel {
 	enum ProjectionTypes {
-		Orhtographic=0, perspective=1
+		Orhtographic, perspective
 	};
 
 	class SceneCamera :public Camera {
@@ -12,11 +12,9 @@ namespace Hazel {
 		SceneCamera();
 		~SceneCamera() = default;
 
+		//no support for orthographic projection these are just place holders for future
 		void SetProjectionType(ProjectionTypes type) { m_projection_type = type; RecalculateProjection(); }
-		void SetViewportSize(float, float);
-		void SetPerspective(float verticalFOV, float Near, float Far);
 		void SetOrthographic(float Size, float Near = -1.0f, float Far = 1.0f);
-
 		inline float GetOrthographicSize() { return m_OrthographicSize; }
 		inline float GetOrthographicNear() { return m_OrthographicNear; }
 		inline float GetOrthographicFar() { return m_OrthographicFar; }
@@ -24,23 +22,50 @@ namespace Hazel {
 		void SetOrthographicNear(float Near) { m_OrthographicNear = Near; RecalculateProjection(); }
 		void SetOrthographicFar(float Far) { m_OrthographicFar = Far; RecalculateProjection(); }
 
-		inline float GetPerspectiveVerticalFOV() { return m_verticalFOV; }
-		inline float GetPerspectiveNear() { return m_PerspectiveNear; }
-		inline float GetPerspectiveFar() { return m_PerspectiveFar; }
-		void SetPerspectiveVerticalFOV(float vFOV) { m_verticalFOV = vFOV; }
-		void SetPerspectiveNear(float Near) { m_PerspectiveNear = Near; RecalculateProjection(); }
-		void SetPerspectiveFar(float Far) { m_PerspectiveFar = Far; RecalculateProjection(); }
+		virtual void SetPerspctive(float v_FOV, float Near, float Far) override;
+		virtual void SetCameraPosition(const glm::vec3& pos) override;
+		virtual void SetViewDirection(const glm::vec3& dir) override;
+		virtual void SetUPVector(const glm::vec3& up) override;
+		virtual void SetViewportSize(float width, float Height) override;
+		virtual void SetVerticalFOV(float fov) override { m_verticalFOV = fov; }
+		void SetPerspectiveNear(float val) override { m_PerspectiveNear = val; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar); }
+		void SetPerspectiveFar(float val) override { m_PerspectiveFar = val; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar); }
 
-		void RecalculateProjection();//for now it is orthographic projection
+		float GetPerspectiveNear() override { return m_PerspectiveNear; };
+		float GetPerspectiveFar() override { return m_PerspectiveFar; };
+		virtual glm::mat4 GetProjectionView() override;
+		virtual inline glm::mat4 GetViewMatrix() override;
+		virtual inline glm::mat4 GetProjectionMatrix() override;
+		virtual inline glm::vec3 GetCameraPosition() override;
+		virtual inline glm::vec3 GetViewDirection() override;
+		virtual inline float GetAspectRatio() override;
+		virtual inline float GetVerticalFOV() override;
+
+		virtual void OnEvent(Event& e) override;
+		virtual void OnUpdate(TimeStep ts) override;
+		virtual void RotateCamera(float yaw, float pitch) override;
+
 	public:
-		ProjectionTypes m_projection_type = ProjectionTypes::Orhtographic;
+		ProjectionTypes m_projection_type = ProjectionTypes::perspective;
 	private:
-		float m_verticalFOV = 45.0f;
+		void RecalculateProjection();//for now it is orthographic projection
+		void RecalculateProjectionView();
+	private:
+		glm::mat4 m_View;
+		glm::mat4 m_Projection;
+		glm::mat4 m_ProjectionView;
+
+		glm::vec3 m_Position = { 0,0,0 }, m_ViewDirection = { 0,0,1 };
+		//m_Viewdirection is the location we are looking at (it is the vector multiplied with rotation matrix)
+		glm::vec3 Up = { 0,1,0 }, RightVector;//we get right vector by getting the cross product of m_ViewDirection and Up vectors
+
+		float m_verticalFOV = 90.f;
 		float m_PerspectiveNear = 0.01;
 		float m_PerspectiveFar = 1000;
 
+		float m_AspectRatio = 1.0;
+
 		float m_OrthographicSize = 10.f;
 		float m_OrthographicFar = 1.f, m_OrthographicNear = -1.f;
-		float m_AspectRatio=1.0f;
 	};
 }

@@ -152,7 +152,7 @@ namespace Hazel {
 	void Renderer2D::BeginScene(Camera& camera)
 	{
 		m_data->shader->Bind();//bind the textureShader
-		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjection());
+		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionMatrix());
 
 		StartBatch();
 	}

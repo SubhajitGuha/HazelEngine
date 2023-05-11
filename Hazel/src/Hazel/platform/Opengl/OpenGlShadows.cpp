@@ -18,7 +18,7 @@ namespace Hazel {
 	OpenGlShadows::~OpenGlShadows()
 	{
 	}
-	void OpenGlShadows::RenderShadows(Scene& scene,const glm::vec3& LightPosition ,EditorCamera& cam)
+	void OpenGlShadows::RenderShadows(Scene& scene,const glm::vec3& LightPosition ,Camera& cam)
 	{
 		GLint OFb;
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &OFb);
@@ -78,7 +78,7 @@ namespace Hazel {
 		m_width = width;
 	}
 
-	void OpenGlShadows::PassShadowUniforms(EditorCamera& cam, ref<Shader> rendering_shader)
+	void OpenGlShadows::PassShadowUniforms(Camera& cam, ref<Shader> rendering_shader)
 	{
 		//this function passes the uniforms required for shadow rendering to the rendering shader
 		rendering_shader->Bind();
@@ -121,7 +121,7 @@ namespace Hazel {
 		glBindTextureUnit(SHDOW_MAP3, depth_id[2]);
 		glBindTextureUnit(SHDOW_MAP4, depth_id[3]);
 	}
-	void OpenGlShadows::PrepareShadowProjectionMatrix(EditorCamera& camera,const glm::vec3& LightPosition)
+	void OpenGlShadows::PrepareShadowProjectionMatrix(Camera& camera,const glm::vec3& LightPosition)
 	{
 		m_ShadowProjection.clear();
 

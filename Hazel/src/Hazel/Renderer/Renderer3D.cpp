@@ -10,7 +10,7 @@
 #include "Hazel/platform/Opengl/OpenGlSSAO.h"//temporary testing purpose
 
 namespace Hazel {
-	EditorCamera m_camera;
+	//Camera* m_camera;
 	GLsync syncObj;
 	glm::vec3 Renderer3D::m_SunLightDir = { 0,-2,0 };//initial light position
 	unsigned int Renderer3D::depth_id = 0;
@@ -83,25 +83,25 @@ namespace Hazel {
 		m_data->shader->SetFloat3("EyePosition", camera.GetPosition());
 	}
 
-	void Renderer3D::BeginScene(Camera& camera)
-	{
-		m_data->shader->Bind();//bind the textureShader
-		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjection());
-		//dont calculate specular lighting on scene camera
-	}
+	//void Renderer3D::BeginScene(Camera& camera)
+	//{
+	//	m_data->shader->Bind();//bind the textureShader
+	//	m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionMatrix());
+	//	//dont calculate specular lighting on scene camera
+	//}
 
-	void Renderer3D::BeginScene(EditorCamera& camera)
+	void Renderer3D::BeginScene(Camera& camera)
 	{
 		//Init();
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
 		m_data->shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
-		m_camera = camera;
+		//m_camera = camera;
 		m_data->m_VertexCounter = 0;
 		//Renderer2D::LineBeginScene(camera);
 	}
 
-	void Renderer3D::BeginSceneFoliage(EditorCamera& camera)
+	void Renderer3D::BeginSceneFoliage(Camera& camera)
 	{
 		m_data->foliage_shader->Bind();//bind the textureShader
 		m_data->foliage_shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
@@ -194,14 +194,14 @@ namespace Hazel {
 		m_data->foliage_shader->SetInt("specular_env", ENV_SLOT);//for now assign to 18 :)
 	}
 
-	void Renderer3D::RenderShadows(Scene& scene, EditorCamera& camera)
+	void Renderer3D::RenderShadows(Scene& scene, Camera& camera)
 	{
 		m_data->shadow_map->RenderShadows(scene, m_SunLightDir, camera);//Light position is the light direction used for directional light
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->shader);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->foliage_shader);
 	}
 
-	void Renderer3D::AmbiantOcclusion(Scene& scene, EditorCamera& camera)
+	void Renderer3D::AmbiantOcclusion(Scene& scene, Camera& camera)
 	{
 		m_data->ssao->CaptureScene(scene, camera);
 		//m_data->shader->Bind();

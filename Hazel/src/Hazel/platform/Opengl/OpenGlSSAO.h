@@ -9,7 +9,7 @@ namespace Hazel {
 		~OpenGlSSAO();
 		void Init();
 		inline void SetSSAO_TextureDimension(int width, int height) { m_width = width, m_height = height; }
-		void CaptureScene(Scene& scene , EditorCamera& cam);
+		void CaptureScene(Scene& scene , Camera& cam);
 		unsigned int GetSSAOid() { return SSAOblur_id; }
 	private:
 		void CreateSSAOTexture();
@@ -20,6 +20,6 @@ namespace Hazel {
 		ref<Shader> SSAOShader,GbufferPosition, SSAOblurShader;//temporary
 		ref<FrameBuffer> framebuffer;
 		glm::vec3 samples[RANDOM_SAMPLES_SIZE];
-		//EditorCamera cam;
+		//Camera cam;
 	};
 }

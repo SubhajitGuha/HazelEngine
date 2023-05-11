@@ -4,6 +4,7 @@
 #include"Hazel/Renderer/FrameBuffer.h"
 #include "Hazel/Events/Event.h"
 #include "Hazel/Core/TimeSteps.h"
+#include "Hazel/Renderer/Camareas/Camera.h"
 #include "Hazel/Core.h"
 
 namespace Hazel {
@@ -35,6 +36,7 @@ namespace Hazel {
 		static unsigned int m_Scene_depth_id;
 		ref<FrameBuffer> framebuffer;
 		std::unordered_map<size_t, ScriptableEntity*> m_scriptsMap;
+
 	private:
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
