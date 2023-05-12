@@ -1,5 +1,8 @@
 #include "hzpch.h"
 #include "Scene.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform.hpp"
+#include "glm/gtx/quaternion.hpp"
 #include "Entity.h"
 #include "Component.h"
 #include "Hazel/Renderer/Renderer2D.h"
@@ -59,11 +62,34 @@ namespace Hazel {
 	{
 		MainCamera = nullptr;//if there is no main camera Then dont render
 		
+		//update camera , Mesh Forward vectors....
 		auto view = m_registry.view<CameraComponent>();
 		for (auto entt : view) {
 			auto& camera = m_registry.get<CameraComponent>(entt);
-			if (camera.camera.bIsMainCamera)
+			if (camera.camera.bIsMainCamera) {
 				MainCamera = (&camera.camera);
+				auto& tc = m_registry.get<TransformComponent>(entt);
+				auto& transform = tc.GetTransform();
+				if (camera.bApplyPlayerLocation) {
+					glm::vec3 position = glm::vec3(transform[3][0], transform[3][1], transform[3][2]) - camera.camera_dist;
+					MainCamera->SetCameraPosition(position);
+				}
+				if (camera.bApplyPlayerRotation)
+				{
+					auto& rotation = tc.Rotation;
+					auto& cam_pos = MainCamera->GetCameraPosition();
+
+					//update mesh forward vector
+					tc.RightVector = glm::cross(tc.ForwardVector, tc.UpVector);
+					tc.ForwardVector = glm::mat3(glm::rotate(glm::radians(rotation.y), tc.UpVector)) * glm::mat3(glm::rotate(glm::radians(rotation.x), tc.RightVector)) * glm::vec3(0, 0, 1);
+					MainCamera->SetViewDirection(tc.ForwardVector);// Make the view direction of the camera same as the mesh forward direction
+					
+					tc.ForwardVector = -glm::normalize(tc.ForwardVector);
+					float dist = glm::length(camera.camera_dist);//scale the -forward vector with the radius of the circle
+					MainCamera->SetCameraPosition(cam_pos + tc.ForwardVector * dist);//align the camera with the mesh view vector
+				}
+				break;
+			}
 		}
 
 		if (!MainCamera)
@@ -106,6 +132,8 @@ namespace Hazel {
 						auto physics_cmp = Entity.GetComponent<PhysicsComponent>();
 						Physics3D::UpdateTransform(Entity.GetComponent<TransformComponent>(), physics_cmp);
 					}
+					//MainCamera->SetCameraPosition({ transform[0][3], transform[1][3], transform[2][3] });
+
 					if (Entity.HasComponent<SpriteRenderer>()) {
 						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
 						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
@@ -129,9 +157,7 @@ namespace Hazel {
 				}
 			});
 			Renderer3D::EndScene();
-			
-			//physics->OnUpdate(ts, MainCamera, *Cube);
-			
+
 			Renderer3D::RenderShadows(*this, *MainCamera);//shadows should be computed at last
 			Renderer3D::AmbiantOcclusion(*this, *MainCamera);
 
@@ -145,9 +171,9 @@ namespace Hazel {
 		for (auto entity : view) {
 			auto camera = m_registry.get<CameraComponent>(entity).camera;
 			if(camera.IsResiziable && camera.IsResiziable)
-				m_registry.get<CameraComponent>(entity).camera.SetViewportSize(Width,Height);
+				m_registry.get<CameraComponent>(entity).camera.SetViewportSize(Width/Height);
 		}
-		MainCamera->SetViewportSize(Width, Height);//resize the editor camera
+		MainCamera->SetViewportSize(Width/ Height);//resize the editor camera
 	}
 	void Scene::OnEvent(Event& e)
 	{

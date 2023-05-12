@@ -34,7 +34,11 @@ namespace Hazel {
 		glm::vec3 Translation = { 0,0,0 };
 		glm::vec3 Rotation = { 0,0,0 };//in degrees
 		glm::vec3 Scale = { 1,1,1 };
+		glm::vec3 ForwardVector = { 0,0,1 };
+		glm::vec3 UpVector = { 0,1,0 };
+		glm::vec3 RightVector = glm::cross(ForwardVector, UpVector);
 		glm::mat4 m_transform = glm::mat4(1.0f); // can be set to the physx_transform
+
 		TransformComponent() = default;
 		TransformComponent(const glm::vec3& translation,const glm::vec3& rotatation=glm::vec3(0),const glm::vec3& scale=glm::vec3(1))
 			:Translation(translation),Rotation(rotatation),Scale(scale)
@@ -52,6 +56,9 @@ namespace Hazel {
 
 	struct CameraComponent {
 		SceneCamera camera;
+		glm::vec3 camera_dist = { 0,2,2 };
+		bool bApplyPlayerLocation = true;
+		bool bApplyPlayerRotation = false;
 		CameraComponent() 
 			:camera() 
 		{}

@@ -8,11 +8,12 @@
 namespace Hazel {
 	SceneCamera::SceneCamera(float Width, float Height)
 	{
-		SetViewportSize(Width, Height);
+		SetViewportSize(Width/Height);
 	}
 	SceneCamera::SceneCamera()
 	{
 		RecalculateProjection();
+		RecalculateProjectionView();
 	}
 	void SceneCamera::SetPerspctive(float v_FOV, float Near, float Far)
 	{
@@ -35,9 +36,9 @@ namespace Hazel {
 	{
 		Up = up; RecalculateProjectionView();
 	}
-	void SceneCamera::SetViewportSize(float width, float height)
+	void SceneCamera::SetViewportSize(float aspectratio)
 	{
-		m_AspectRatio = width / height;
+		m_AspectRatio = aspectratio;
 		RecalculateProjection();
 		RecalculateProjectionView();
 	}
@@ -79,14 +80,14 @@ namespace Hazel {
 		CubeMapEnvironment::RenderCubeMap(m_View, m_Projection);
 
 		RightVector = glm::cross(m_ViewDirection, Up);//we get the right vector (as it is always perpendicular to up and m_ViewDirection)
-		
-		RecalculateProjectionView();
+
+		//RecalculateProjectionView();
 	}
 
-	void SceneCamera::RotateCamera(float yaw, float pitch)
+	void SceneCamera::RotateCamera(float pitch , float yaw, float roll)
 	{
 		//pitch = glm::clamp(pitch, -89.0f, 89.0f);
-		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::vec3(0, 0, 1);
+		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::mat3(glm::rotate(glm::radians(roll), m_ViewDirection)) * glm::vec3(0, 0, 1);
 		RecalculateProjectionView();
 	}
 

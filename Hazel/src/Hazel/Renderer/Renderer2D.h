@@ -1,7 +1,7 @@
 #pragma once
 #include "Hazel/Core.h"
 #include "OrthographicCamera.h"
-#include "Hazel/Renderer/Camareas/EditorCamera.h"
+#include "Hazel/Renderer/Camareas/Camera.h"
 #include "glm/glm.hpp"
 #include "Shader.h"
 #include "Texture.h"
@@ -9,7 +9,7 @@
 
 
 namespace Hazel {
-	class EditorCamera;
+	class Camera;
 	class Renderer2D {
 	private:
 		static void StartBatch();
@@ -19,11 +19,11 @@ namespace Hazel {
 	public:
 		static void Init();
 		static void BeginScene(OrthographicCamera& camera);
-		static void BeginScene(Camera& camera);
-		static void BeginScene(EditorCamera&);
+		//static void BeginScene(Camera& camera);
+		static void BeginScene(Camera&);
 		static void EndScene();
 		static void LineBeginScene(OrthographicCamera& camera);
-		static void LineBeginScene(EditorCamera& camera);
+		static void LineBeginScene(Camera& camera);
 		static void LineEndScene();
 
 	public:

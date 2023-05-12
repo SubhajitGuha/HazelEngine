@@ -278,7 +278,8 @@ namespace Hazel {
 				delete_component = true;
 			ImGui::EndPopup();
 		}
-		auto& camera = m_selected_entity->GetComponent<CameraComponent>().camera;
+		auto& camera_comp = m_selected_entity->GetComponent<CameraComponent>();
+		auto& camera = camera_comp.camera;
 		const char* Items[] = { "Orthographic","Perspective" };
 		const char* Selected_Item = Items[(int)camera.m_projection_type];
 		if (open)
@@ -345,6 +346,10 @@ namespace Hazel {
 				if (ImGui::DragFloat("Perspective Far", &PersFar, 0.2))
 					camera.SetPerspectiveFar(PersFar);
 			}
+
+			ImGui::Checkbox("Follow Actor location", &camera_comp.bApplyPlayerLocation);
+			ImGui::Checkbox("Follow Actor Rotation", &camera_comp.bApplyPlayerRotation);
+			DrawVec3Control("Camera Distance", camera_comp.camera_dist);
 			ImGui::TreePop();
 		}
 		if (delete_component)

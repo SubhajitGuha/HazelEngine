@@ -20,10 +20,11 @@ namespace Hazel {
 		virtual void SetCameraPosition(const glm::vec3& pos) = 0;
 		virtual void SetViewDirection(const glm::vec3& dir) = 0;
 		virtual void SetUPVector(const glm::vec3& up) = 0;
-		virtual void SetViewportSize(float width, float Height) = 0;
+		virtual void SetViewportSize(float aspectratio) = 0;
 		virtual void SetVerticalFOV(float fov) = 0;
 		virtual void SetPerspectiveNear(float val) = 0;
 		virtual void SetPerspectiveFar(float val) = 0;
+		virtual void SetViewMatrix(const glm::mat4&) {}
 
 		virtual float GetPerspectiveNear() = 0;
 		virtual float GetPerspectiveFar() = 0;
@@ -37,7 +38,7 @@ namespace Hazel {
 
 		virtual void OnEvent(Event& e) = 0;
 		virtual void OnUpdate(TimeStep ts) = 0;
-		virtual void RotateCamera(float yaw, float pitch) = 0;
+		virtual void RotateCamera(float pitch = 0, float yaw = 0, float roll = 0) = 0;
 
 		static ref<Camera> GetCamera(CameraType type);
 	public:

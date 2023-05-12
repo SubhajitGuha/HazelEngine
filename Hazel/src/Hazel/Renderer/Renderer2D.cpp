@@ -149,15 +149,15 @@ namespace Hazel {
 		StartBatch();
 	}
 
+	//void Renderer2D::BeginScene(Camera& camera)
+	//{
+	//	m_data->shader->Bind();//bind the textureShader
+	//	m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionMatrix());
+	//
+	//	StartBatch();
+	//}
+
 	void Renderer2D::BeginScene(Camera& camera)
-	{
-		m_data->shader->Bind();//bind the textureShader
-		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionMatrix());
-
-		StartBatch();
-	}
-
-	void Renderer2D::BeginScene(EditorCamera& camera)
 	{
 		m_data->shader->Bind();//bind the textureShader
 		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
@@ -178,7 +178,7 @@ namespace Hazel {
 		StartBatch();
 	}
 
-	void Renderer2D::LineBeginScene(EditorCamera& camera)
+	void Renderer2D::LineBeginScene(Camera& camera)
 	{
 		m_data->Lineshader->Bind();
 		m_data->Lineshader->SetMat4("u_ProjectionView", camera.GetProjectionView());

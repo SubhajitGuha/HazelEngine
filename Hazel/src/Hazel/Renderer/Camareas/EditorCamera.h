@@ -17,7 +17,7 @@ namespace Hazel {
 		void SetCameraPosition(const glm::vec3& pos) override { m_Position = pos; RecalculateProjectionView();}
 		void SetViewDirection(const glm::vec3& dir) override { m_ViewDirection = dir; RecalculateProjectionView(); }
 		void SetUPVector(const glm::vec3& up) override {	Up = up; RecalculateProjectionView();}
-		void SetViewportSize(float width,float Height) override;
+		void SetViewportSize(float aspectratio) override;
 		void SetVerticalFOV(float fov) override { m_verticalFOV = fov; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar); }
 		void SetPerspectiveNear(float val) override { m_PerspectiveNear = val; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar);}
 		void SetPerspectiveFar(float val) override { m_PerspectiveFar = val; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar);}
@@ -34,7 +34,7 @@ namespace Hazel {
 
 		void OnEvent(Event& e) override;
 		void OnUpdate(TimeStep ts) override;
-		void RotateCamera(float yaw, float pitch) override;
+		void RotateCamera(float pitch = 0, float yaw = 0, float roll = 0) override;
 	private:
 		void RecalculateProjection();
 		void RecalculateProjectionView();

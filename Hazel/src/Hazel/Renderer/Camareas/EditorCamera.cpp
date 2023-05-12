@@ -18,20 +18,20 @@ namespace Hazel {
 	{
 		bIsMainCamera = true;
 		RightVector = glm::cross(m_ViewDirection, Up);
-		SetViewportSize(width, Height);
+		SetViewportSize(width/Height);
 	}
 
-	void EditorCamera::SetViewportSize(float width, float height)
+	void EditorCamera::SetViewportSize(float aspectratio)
 	{
-		m_AspectRatio = width / height;
+		m_AspectRatio = aspectratio;
 		RecalculateProjection();
 		RecalculateProjectionView();
 	}
 
-	void EditorCamera::RotateCamera(float yaw, float pitch)
+	void EditorCamera::RotateCamera(float pitch, float yaw, float roll)
 	{
 		//pitch = glm::clamp(pitch, -89.0f, 89.0f);
-		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::vec3(0, 0, 1);
+		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::mat3(glm::rotate(glm::radians(roll), m_ViewDirection)) * glm::vec3(0, 0, 1);
 		RecalculateProjectionView();
 	}
 
