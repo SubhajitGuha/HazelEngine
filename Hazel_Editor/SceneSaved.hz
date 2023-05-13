@@ -86,7 +86,7 @@ Entities:
       tag: cube
     TransformComponent:
       Translation: [0, -87.4000015, 26.8999996]
-      Rotation: [14.1000004, -40.7000008, 0]
+      Rotation: [-50, 0, 0]
       Scale: [2, 2, 2]
       Transform:
         - [1, 0, 0, 0]
@@ -94,14 +94,13 @@ Entities:
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
     CameraComponent:
-      Camera Distance: [0, 2, 15.3999996]
-      Follow Actor Location: 1
-      Follow Actor Rotation: 1
+      Camera Distance: [0, 2, 10.5]
+      Follow Player: 1
       FOV: 90
       Aspect Ratio: 1.13233078
       Near: 0.00999999978
       Far: 1000
-      View Direction: [0, 0, 1]
+      View Direction: [-1.40129846e-45, 0.766044438, 0.642787635]
       Is Main Camera: 1
     StaticMeshComponent:
       MeshPath: Assets/Meshes/Cube.fbx
@@ -114,9 +113,9 @@ Entities:
       Height: 1
       HalfExtent: [0, 0, 0]
       Transform:
-        - [2, 0, 0, 0]
-        - [0, 2, 0, 0]
-        - [0, 0, 2, 0]
+        - [1.51626861, -0.317721933, 1.26490402, 0]
+        - [0, 1.939744, 0.487230033, 0]
+        - [-1.30419683, -0.369385809, 1.47058642, 0]
         - [0, -87.4000015, 26.8999996, 1]
       isStatic: 0
       isKinematic: 0
@@ -134,7 +133,7 @@ Entities:
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
     SpriteRenderer:
-      Color: [1.65818705e-07, 0.322491229, 6.97197902e-05, 1]
+      Color: [0, 0.810810804, 0, 1]
       Roughness: 1
       Metallic: 0
     StaticMeshComponent:
@@ -168,7 +167,7 @@ Entities:
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
     SpriteRenderer:
-      Color: [0, 2.70636883e-06, 1, 1]
+      Color: [0, 1.12915058e-27, 1, 1]
       Roughness: 1
       Metallic: 0
     StaticMeshComponent:
@@ -184,9 +183,9 @@ Entities:
       Height: 1
       HalfExtent: [0, 0, 0]
       Transform:
-        - [-0.939692616, 0, -0.342020154, 0]
+        - [1, 0, 0, 0]
         - [0, 1, 0, 0]
-        - [0.342020154, 0, -0.939692616, 0]
+        - [0, 0, 1, 0]
         - [0, 0, 0, 1]
       isStatic: 0
       isKinematic: 0

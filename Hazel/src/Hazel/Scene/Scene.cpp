@@ -21,6 +21,7 @@ namespace Hazel {
 	EditorCamera editor_cam;
 	 LoadMesh* Scene::Sphere=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza;
 	 bool capture = false;
+	 glm::vec3 camloc = { 0,0,0 }, camrot = {0,0,0};
 	Scene::Scene()
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
@@ -70,23 +71,20 @@ namespace Hazel {
 				MainCamera = (&camera.camera);
 				auto& tc = m_registry.get<TransformComponent>(entt);
 				auto& transform = tc.GetTransform();
-				if (camera.bApplyPlayerLocation) {
-					glm::vec3 position = glm::vec3(transform[3][0], transform[3][1], transform[3][2]) - camera.camera_dist;
-					MainCamera->SetCameraPosition(position);
-				}
-				if (camera.bApplyPlayerRotation)
+
+				if (camera.bFollowPlayer)
 				{
 					auto& rotation = tc.Rotation;
 					auto& cam_pos = MainCamera->GetCameraPosition();
 
-					//update mesh forward vector
 					tc.RightVector = glm::cross(tc.ForwardVector, tc.UpVector);
 					tc.ForwardVector = glm::mat3(glm::rotate(glm::radians(rotation.y), tc.UpVector)) * glm::mat3(glm::rotate(glm::radians(rotation.x), tc.RightVector)) * glm::vec3(0, 0, 1);
 					MainCamera->SetViewDirection(tc.ForwardVector);// Make the view direction of the camera same as the mesh forward direction
-					
-					tc.ForwardVector = -glm::normalize(tc.ForwardVector);
+
 					float dist = glm::length(camera.camera_dist);//scale the -forward vector with the radius of the circle
-					MainCamera->SetCameraPosition(cam_pos + tc.ForwardVector * dist);//align the camera with the mesh view vector
+					auto& object_pos = glm::vec3(transform[3][0], transform[3][1], transform[3][2]);
+					tc.ForwardVector = -glm::normalize(tc.ForwardVector);
+					MainCamera->SetCameraPosition(tc.ForwardVector * dist + object_pos-camera.camera_dist);//align the camera with the mesh view vector
 				}
 				break;
 			}

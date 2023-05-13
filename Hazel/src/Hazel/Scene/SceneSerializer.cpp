@@ -126,8 +126,7 @@ namespace Hazel {
 			auto& cc = entity.GetComponent<CameraComponent>();
 			auto& camera = cc.camera;
 			out << YAML::Key << "Camera Distance" << YAML::Value << cc.camera_dist;
-			out << YAML::Key << "Follow Actor Location" << YAML::Value << (int)cc.bApplyPlayerLocation;
-			out << YAML::Key << "Follow Actor Rotation" << YAML::Value << (int)cc.bApplyPlayerRotation;
+			out << YAML::Key << "Follow Player" << YAML::Value << (int)cc.bFollowPlayer;
 			out << YAML::Key << "FOV" << YAML::Value << camera.GetVerticalFOV();
 			out << YAML::Key << "Aspect Ratio" << YAML::Value << camera.GetAspectRatio();
 			out << YAML::Key << "Near" << YAML::Value << camera.GetPerspectiveNear();
@@ -302,10 +301,8 @@ namespace Hazel {
 					auto& cc = DeserializedEntity->AddComponent<CameraComponent>();
 					if (CameraComp["Camera Distance"])
 						cc.camera_dist = CameraComp["Camera Distance"].as<glm::vec3>();
-					if (CameraComp["Follow Actor Location"])
-						cc.bApplyPlayerLocation = (bool)CameraComp["Follow Actor Location"].as<int>();
-					if (CameraComp["Follow Actor Rotation"])
-						cc.bApplyPlayerRotation = (bool)CameraComp["Follow Actor Rotation"].as<int>();
+					if (CameraComp["Follow Player"])
+						cc.bFollowPlayer= (bool)CameraComp["Follow Player"].as<int>();
 					if (CameraComp["FOV"])
 						cc.camera.SetVerticalFOV(CameraComp["FOV"].as<float>());
 					if (CameraComp["Aspect Ratio"])

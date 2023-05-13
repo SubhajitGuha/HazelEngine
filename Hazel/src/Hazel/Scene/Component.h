@@ -57,8 +57,7 @@ namespace Hazel {
 	struct CameraComponent {
 		SceneCamera camera;
 		glm::vec3 camera_dist = { 0,2,2 };
-		bool bApplyPlayerLocation = true;
-		bool bApplyPlayerRotation = false;
+		bool bFollowPlayer = true;
 		CameraComponent() 
 			:camera() 
 		{}

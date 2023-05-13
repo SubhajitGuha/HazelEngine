@@ -347,8 +347,7 @@ namespace Hazel {
 					camera.SetPerspectiveFar(PersFar);
 			}
 
-			ImGui::Checkbox("Follow Actor location", &camera_comp.bApplyPlayerLocation);
-			ImGui::Checkbox("Follow Actor Rotation", &camera_comp.bApplyPlayerRotation);
+			ImGui::Checkbox("Follow Player", &camera_comp.bFollowPlayer);
 			DrawVec3Control("Camera Distance", camera_comp.camera_dist);
 			ImGui::TreePop();
 		}
