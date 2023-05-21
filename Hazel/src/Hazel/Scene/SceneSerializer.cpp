@@ -270,6 +270,7 @@ namespace Hazel {
 				{
 					std::string mesh_path = StaticMeshComp["MeshPath"].as<std::string>();
 					LoadMesh* mesh = new LoadMesh(mesh_path);
+					//m_future.push_back(std::async(std::launch::async, LoadMeshes, mesh_path, mesh));
 
 					if (DeserializedEntity->HasComponent<StaticMeshComponent>())
 						DeserializedEntity->ReplaceComponent<StaticMeshComponent>(mesh);
@@ -320,8 +321,7 @@ namespace Hazel {
 				auto PhysicsComp = entity["PhysicsComponent"];
 				if (PhysicsComp)
 				{
-					DeserializedEntity->AddComponent<PhysicsComponent>();
-					auto& physics_component = DeserializedEntity->GetComponent<PhysicsComponent>();
+					auto& physics_component = DeserializedEntity->AddComponent<PhysicsComponent>();
 					
 					if (PhysicsComp["Mass"])
 						physics_component.m_mass = PhysicsComp["Mass"].as<float>();
@@ -377,5 +377,10 @@ namespace Hazel {
 	}
 	void SceneSerializer::DeSerializeRuntime(const std::string& filepath)
 	{
+	}
+
+	static void LoadMeshes(const std::string& path, LoadMesh* mesh)
+	{
+		mesh = new LoadMesh(path);
 	}
 }

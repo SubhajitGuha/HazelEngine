@@ -28,6 +28,7 @@ namespace Hazel {
 		static void AmbiantOcclusion(Scene& scene, Camera& camera);
 
 		static unsigned int depth_id;
+		static unsigned int ssao_id;
 	private:
 		static glm::vec3 m_SunLightDir;
 		friend class LoadMesh;

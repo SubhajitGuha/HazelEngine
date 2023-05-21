@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include <future>
 
 namespace Hazel {
 	class SceneSerializer {
@@ -15,5 +16,6 @@ namespace Hazel {
 		//void SerializeEntity(YAML::Emitter& out, Entity& entity);
 	private:
 		ref<Scene> m_scene;
+		std::vector<std::future<void>> m_future;
 	};
 }

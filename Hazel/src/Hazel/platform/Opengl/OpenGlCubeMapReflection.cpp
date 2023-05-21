@@ -27,7 +27,7 @@ namespace Hazel {
 		glBindRenderbuffer(GL_RENDERBUFFER, depth_id);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, cubemap_width, cubemap_height);
 
-		std::string filename = "Assets/Textures/Interior-Cube-map/";
+		std::string filename = "Assets/Textures/Outdoor-Cube-map/";
 
 		for (int i = 0; i < 6; i++)//iterate over 6 images each representing the side of a cube
 		{

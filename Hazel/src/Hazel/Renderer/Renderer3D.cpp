@@ -14,6 +14,7 @@ namespace Hazel {
 	GLsync syncObj;
 	glm::vec3 Renderer3D::m_SunLightDir = { 0,-2,0 };//initial light position
 	unsigned int Renderer3D::depth_id = 0;
+	unsigned int Renderer3D::ssao_id = 0;
 	struct VertexAttributes {
 		//glm::vec3 Position;
 		glm::vec4 Position;
@@ -66,6 +67,7 @@ namespace Hazel {
 		m_data->ssao = std::make_shared<OpenGlSSAO>();
 		m_data->shadow_map = Shadows::Create(4096, 4096);//create a 2048x2048 shadow map
 		depth_id = m_data->shadow_map->GetDepth_ID();
+		ssao_id = m_data->ssao->GetSSAOid();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		m_data->WhiteTex = Texture2D::Create(1, 1, 0xffffffff);//create a default white texture

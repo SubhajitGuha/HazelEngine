@@ -510,7 +510,8 @@ namespace Hazel {
 				{
 					auto& mesh = m_selected_entity->GetComponent<StaticMeshComponent>();
 					physics_component.m_transform = transform.GetTransform();
-					Physics3D::AddMeshCollider(mesh.static_mesh->Vertices, mesh.static_mesh->Vertex_Indices, transform.Scale, physics_component);
+					std::thread t([&]() {Physics3D::AddMeshCollider(mesh.static_mesh->Vertices, mesh.static_mesh->Vertex_Indices, transform.Scale, physics_component); });
+					t.detach();
 					physics_component.m_shapes = MESH_COLLIDER;
 				}
 			}

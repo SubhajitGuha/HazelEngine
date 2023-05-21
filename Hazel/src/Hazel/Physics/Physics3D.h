@@ -2,8 +2,9 @@
 #include "Hazel.h"
 
 namespace physx {
-	static class PxFoundation;
+	class PxFoundation;
 	class PxPhysics;
+	class PxCudaContextManager;
 	class PxScene;
 	class PxDefaultCpuDispatcher;
 	class PxMaterial;
@@ -12,6 +13,15 @@ namespace physx {
 	class PxCooking;
 	class PxPvd;
 }
+struct HitResult {
+	glm::vec3 Position = { 0,0,0 };
+	glm::vec3 Normal = { 0,0,0 };
+	float Distance = 0;
+	uint32_t FaceIndex;
+	bool isHit = false;
+	float u = 0, v = 0;
+};
+
 namespace Hazel {
 	class LoadMesh;
 	class Physics3D {
@@ -29,6 +39,7 @@ namespace Hazel {
 		static void AddMeshCollider(const std::vector<glm::vec3>& Vertices, const std::vector<unsigned int>& indices, const glm::vec3& scaling,PhysicsComponent& physics_component);
 		static void AddForce(PhysicsComponent& physics_component);// physicsComponent has all the parameters required for physics simulation
 		static void RemoveActor(PhysicsComponent& physics_component);
+		void Raycast(const glm::vec3& origin, const glm::vec3& dir, const float& dist=100);
 		static uint32_t GetNbActors();
 		//void AddCollider();
 		static void CleanUpPhysics();
@@ -36,9 +47,11 @@ namespace Hazel {
 	public:
 		static bool SimulatePhysics;
 		glm::mat4 physics_transform;
+		HitResult Hit;
 	private:
 		static physx::PxFoundation* m_foundation;
 		static physx::PxPhysics* m_physics ;
+		static physx::PxCudaContextManager* gCudaContextManager;
 		static physx::PxScene* m_scene;
 		static physx::PxDefaultCpuDispatcher* m_dispatcher ;
 		static physx::PxMaterial* m_defaultMaterial ;

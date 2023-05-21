@@ -16,6 +16,8 @@
 
 namespace Hazel {
 	
+	bool Scene::TOGGLE_SHADOWS = true;
+	bool Scene::TOGGLE_SSAO = true;
 	//std::vector<PointLight*> Scene::m_PointLights;
 	Camera* MainCamera = nullptr;//if there is no main camera Then dont render
 	EditorCamera editor_cam;
@@ -71,7 +73,6 @@ namespace Hazel {
 				MainCamera = (&camera.camera);
 				auto& tc = m_registry.get<TransformComponent>(entt);
 				auto& transform = tc.GetTransform();
-
 				if (camera.bFollowPlayer)
 				{
 					auto& rotation = tc.Rotation;

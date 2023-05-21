@@ -2,9 +2,11 @@
 #include "Physics3D.h"
 #include "PxPhysicsAPI.h"
 
+
 namespace Hazel {
 	physx::PxFoundation* Physics3D::m_foundation = nullptr;
 	physx::PxPhysics* Physics3D::m_physics = nullptr;
+	physx::PxCudaContextManager* Physics3D::gCudaContextManager = nullptr;
 	physx::PxScene* Physics3D::m_scene = nullptr;
 	physx::PxDefaultCpuDispatcher* Physics3D::m_dispatcher = nullptr;
 	physx::PxMaterial* Physics3D::m_defaultMaterial = nullptr;
@@ -157,22 +159,32 @@ namespace Hazel {
 		{
 			physx::PxTriangleMeshDesc TriMeshDesc;
 			TriMeshDesc.points.count = vertices.size();
-			TriMeshDesc.points.data = &vertices[0];
+			TriMeshDesc.points.data = &vertices[0].x;
 			TriMeshDesc.points.stride = sizeof(glm::vec3);
 			TriMeshDesc.triangles.count = indices.size();
 			TriMeshDesc.triangles.data = &indices[0];
 			TriMeshDesc.triangles.stride = 3 * sizeof(unsigned int);
+			HZ_ASSERT(!TriMeshDesc.isValid());
+			//TriMeshDesc.flags = physx::PxMeshFlag::e16_BIT_INDICES;
 
+			//physx::PxTolerancesScale scale;
+			////scale.length = 10000;
+			////scale.speed = 980;
 			//physx::PxCookingParams params = m_cooking->getParams();
+			//params.buildGPUData = true;
 			//params.midphaseDesc = physx::PxMeshMidPhase::eBVH34;
 			//params.suppressTriangleMeshRemapTable = false;
 			//params.midphaseDesc.mBVH33Desc.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
-			//params.midphaseDesc.mBVH33Desc.meshSizePerformanceTradeOff = 0.55f;
+			////params.scale = scale;
+			//params.midphaseDesc.mBVH33Desc.meshSizePerformanceTradeOff = 1.0f;
 			//m_cooking->setParams(params);
 
 			//cook the triangle mesh
 			physx::PxDefaultMemoryOutputStream outBuffer;
+			
 			physx::PxTriangleMeshCookingResult::Enum cookingResult;
+			bool validate = m_cooking->validateTriangleMesh(TriMeshDesc);
+			HZ_ASSERT(!validate);
 			if (!m_cooking->cookTriangleMesh(TriMeshDesc, outBuffer, &cookingResult))
 				HAZEL_CORE_ERROR("Cannot cook the triangle mesh!!");
 
@@ -192,7 +204,7 @@ namespace Hazel {
 			convexMeshdesc.points.data = &vertices[0];
 			convexMeshdesc.points.count = vertices.size();
 			convexMeshdesc.points.stride = sizeof(glm::vec3);
-			convexMeshdesc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
+			convexMeshdesc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX | physx::PxConvexFlag::eGPU_COMPATIBLE;
 
 			physx::PxDefaultMemoryOutputStream cookedMeshOutput;
 			physx::PxConvexMeshCookingResult::Enum cookingResult;
@@ -238,6 +250,20 @@ namespace Hazel {
 			physics_component.m_StaticActor = nullptr;
 		}
 	}
+	void Physics3D::Raycast(const glm::vec3& origin,const glm::vec3& dir,const float& dist)
+	{
+		physx::PxRaycastBuffer hit;
+		//hit.block.position;
+		m_scene->raycast(*(physx::PxVec3*)&origin, *(physx::PxVec3*)&dir, dist, hit);
+		
+		Hit.isHit = hit.hasAnyHits();
+		Hit.Distance = hit.block.distance;
+		Hit.FaceIndex = hit.block.faceIndex;
+		Hit.Normal = *(glm::vec3*)&hit.block.normal;
+		Hit.Position = *(glm::vec3*)&hit.block.position;
+		Hit.u = hit.block.u;
+		Hit.v = hit.block.v;
+	}
 	uint32_t Physics3D::GetNbActors()
 	{
 		return m_scene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC);
@@ -260,7 +286,7 @@ namespace Hazel {
 	physx::PxU32 x;
 	void Physics3D::StepPhysics()
 	{
-		float ts = 1.0f / 120.0f;
+		float ts = 1.0f / 240.0f;
 		m_scene->simulate(ts);
 		m_scene->fetchResults(true);
 		//std::cout << "Simulating" <<x<< std::endl;
@@ -268,12 +294,13 @@ namespace Hazel {
 	}
 	void Physics3D::SetUpPhysics()
 	{
+		physx::PxCudaContextManagerDesc cudaContextManagerDesc;
 		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
 		physx::PxDefaultErrorCallback  mDefaultErrorCallback;
 		m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
+		gCudaContextManager = PxCreateCudaContextManager(*m_foundation, cudaContextManagerDesc);
 		physx::PxTolerancesScale TollarenceScale;
-		TollarenceScale.length = 100;
-		TollarenceScale.speed = 981;
+
 		m_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_foundation, physx::PxCookingParams(TollarenceScale));
 		m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, TollarenceScale);
 
@@ -281,11 +308,15 @@ namespace Hazel {
 			HAZEL_CORE_ERROR("Error in creating physics object");
 
 		physx::PxSceneDesc sceneDesc(m_physics->getTolerancesScale());
-		sceneDesc.flags.set(physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS);
-		sceneDesc.gravity = physx::PxVec3(0.0f, 9.81f, 0.0f);
-		m_dispatcher = physx::PxDefaultCpuDispatcherCreate(8);
+		//sceneDesc.flags.set(physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS);
+		sceneDesc.gravity = physx::PxVec3(0.0f, 981.f, 0.0f);
+		m_dispatcher = physx::PxDefaultCpuDispatcherCreate(4);
 		sceneDesc.cpuDispatcher = m_dispatcher;
 		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+		sceneDesc.cudaContextManager = gCudaContextManager;
+
+		sceneDesc.flags |= physx::PxSceneFlag::eENABLE_GPU_DYNAMICS;
+		sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eGPU;
 		m_scene = m_physics->createScene(sceneDesc);
 
 		while (1) {

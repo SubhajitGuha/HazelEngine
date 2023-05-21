@@ -16,6 +16,9 @@ namespace Hazel {
 	class Scene
 	{
 	public:
+		static bool TOGGLE_SHADOWS;//universal switch to enable or disable shadows
+		static bool TOGGLE_SSAO;////universal switch to enable or disable ssao
+	public:
 		Scene();
 		~Scene();
 		entt::registry& getRegistry() { return m_registry; }
