@@ -253,7 +253,7 @@ namespace Hazel {
 	void Physics3D::Raycast(const glm::vec3& origin,const glm::vec3& dir,const float& dist)
 	{
 		physx::PxRaycastBuffer hit;
-		//hit.block.position;
+		//ray casting using origin , ray direction and distance travelled by the ray
 		m_scene->raycast(*(physx::PxVec3*)&origin, *(physx::PxVec3*)&dir, dist, hit);
 		
 		Hit.isHit = hit.hasAnyHits();

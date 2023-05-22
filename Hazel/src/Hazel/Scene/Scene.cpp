@@ -177,6 +177,11 @@ namespace Hazel {
 	void Scene::OnEvent(Event& e)
 	{
 		MainCamera->OnEvent(e);
+
+		for (auto s : m_scriptsMap)
+		{
+			s.second->OnEvent(e);
+		}
 	}
 
 	void Scene::AddPointLight(PointLight* light)

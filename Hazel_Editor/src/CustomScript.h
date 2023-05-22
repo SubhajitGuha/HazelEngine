@@ -49,9 +49,16 @@ namespace Hazel {
 					physics_obj.Raycast(m_Entity->GetComponent<TransformComponent>().Translation, camera.GetViewDirection(), 10000);
 				}
 				if (physics_obj.Hit.isHit) {
+					//drawing the traced ray
 					Renderer2D::LineBeginScene(camera);
-					Renderer2D::DrawLine(m_Entity->GetComponent<TransformComponent>().Translation, physics_obj.Hit.Position, { 1,0.6,1,1 });
+					Renderer2D::DrawLine(m_Entity->GetComponent<TransformComponent>().Translation, physics_obj.Hit.Position, { 1,0,0,1 });
 					Renderer2D::LineEndScene();
+
+					//drawing the hit normal
+					Renderer2D::LineBeginScene(camera);
+					Renderer2D::DrawLine(physics_obj.Hit.Position, physics_obj.Hit.Position + physics_obj.Hit.Normal, { 0,0,1,1 });
+					Renderer2D::LineEndScene();
+
 					//HAZEL_CORE_INFO("Ray cast result: {}",physics_obj.Hit.isHit);
 				}
 			}
@@ -78,7 +85,25 @@ namespace Hazel {
 			m_Entity->ReplaceComponent<TransformComponent>(position, rotate);//controlling transform
 			//m_Entity->GetComponent<CameraComponent>().camera.SetOrthographic(size);//controlling camera
 		}
-		virtual void OnCreate() override {}
-		virtual void OnDestroy() override {}
+		void OnCreate() override {}
+		void OnDestroy() override {}
+		void OnEvent(Event& e) override
+		{
+			EventDispatcher dispatch(e);
+			dispatch.Dispatch<MouseButtonPressed>([&](MouseButtonPressed e) {
+				s_entity = m_Entity->GetScene()->CreateEntity("Spwanned");
+				auto wp = m_Entity->GetComponent<TransformComponent>();
+				s_entity->AddComponent<TransformComponent>().m_transform = wp.GetTransform();
+				auto& physics_comp = s_entity->AddComponent<PhysicsComponent>();
+				physics_comp.m_mass = 1000.0f;
+				physics_comp.m_halfextent = glm::vec3(0.5);
+				physics_comp.m_transform = s_entity->GetComponent<TransformComponent>().GetTransform();
+				physics_comp.m_ForceDirection = m_Entity->GetComponent<CameraComponent>().camera.GetViewDirection()*glm::vec3(1000);
+				Physics3D::AddBoxCollider(physics_comp);
+				Physics3D::AddForce(physics_comp);
+				return true;
+				});
+
+		}
 	};
 }

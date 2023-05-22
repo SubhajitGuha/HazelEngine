@@ -1,5 +1,9 @@
 #pragma once
 #include "Entity.h"
+#include "Hazel/Events/ApplicationEvent.h"
+#include "Hazel/Events/KeyEvent.h"
+#include "Hazel/Events/MouseEvent.h"
+
 namespace Hazel 
 {
 	//Script class Which must be inherited to write custom scripts
@@ -19,6 +23,7 @@ namespace Hazel
 
 		//overridable methods
 		virtual void OnUpdate(TimeStep ts){}
+		virtual void OnEvent(Event& e) {}
 		virtual void OnCreate(){}
 		virtual void OnDestroy(){}
 
