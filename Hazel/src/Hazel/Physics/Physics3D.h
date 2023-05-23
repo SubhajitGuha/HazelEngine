@@ -18,7 +18,7 @@ struct HitResult {
 	glm::vec3 Normal = { 0,0,0 };
 	float Distance = 0;
 	uint32_t FaceIndex;
-	bool isHit = false;
+	//bool isHit = false;
 	float u = 0, v = 0;
 };
 
@@ -39,7 +39,7 @@ namespace Hazel {
 		static void AddMeshCollider(const std::vector<glm::vec3>& Vertices, const std::vector<unsigned int>& indices, const glm::vec3& scaling,PhysicsComponent& physics_component);
 		static void AddForce(PhysicsComponent& physics_component);// physicsComponent has all the parameters required for physics simulation
 		static void RemoveActor(PhysicsComponent& physics_component);
-		void Raycast(const glm::vec3& origin, const glm::vec3& dir, const float& dist=100);
+		bool static Raycast(const glm::vec3& origin, const glm::vec3& dir, const float& dist,HitResult& hit);
 		static uint32_t GetNbActors();
 		//void AddCollider();
 		static void CleanUpPhysics();

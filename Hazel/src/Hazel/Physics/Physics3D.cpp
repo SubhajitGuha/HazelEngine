@@ -250,19 +250,19 @@ namespace Hazel {
 			physics_component.m_StaticActor = nullptr;
 		}
 	}
-	void Physics3D::Raycast(const glm::vec3& origin,const glm::vec3& dir,const float& dist)
+	bool Physics3D::Raycast(const glm::vec3& origin,const glm::vec3& dir,const float& dist, HitResult& Hit)
 	{
 		physx::PxRaycastBuffer hit;
 		//ray casting using origin , ray direction and distance travelled by the ray
-		m_scene->raycast(*(physx::PxVec3*)&origin, *(physx::PxVec3*)&dir, dist, hit);
+		bool isSuccess = m_scene->raycast(*(physx::PxVec3*)&origin, *(physx::PxVec3*)&dir, dist, hit);
 		
-		Hit.isHit = hit.hasAnyHits();
 		Hit.Distance = hit.block.distance;
 		Hit.FaceIndex = hit.block.faceIndex;
 		Hit.Normal = *(glm::vec3*)&hit.block.normal;
 		Hit.Position = *(glm::vec3*)&hit.block.position;
 		Hit.u = hit.block.u;
 		Hit.v = hit.block.v;
+		return isSuccess;
 	}
 	uint32_t Physics3D::GetNbActors()
 	{

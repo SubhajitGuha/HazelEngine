@@ -8,7 +8,7 @@ namespace Hazel {
 		glm::vec3 position = { 0,0,0 }, rotate = { 0,0,0 };
 		glm::vec2 OldMousePos = { 0,0 };
 
-		Physics3D physics_obj;
+		HitResult hit;
 		Entity* s_entity;
 		// float rotate = 0.0;
 		float ObjSpeed = 10;
@@ -41,25 +41,26 @@ namespace Hazel {
 			if (Input::IsKeyPressed(HZ_KEY_PAGE_DOWN))
 				scale -= 0.01;
 
-			if (m_Entity->HasComponent<CameraComponent>()) {
+			if (m_Entity->HasComponent<CameraComponent>())
+			{
 				auto camera = m_Entity->GetComponent<CameraComponent>().camera;
 				if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_1))
 				{
-					
-					physics_obj.Raycast(m_Entity->GetComponent<TransformComponent>().Translation, camera.GetViewDirection(), 10000);
-				}
-				if (physics_obj.Hit.isHit) {
-					//drawing the traced ray
-					Renderer2D::LineBeginScene(camera);
-					Renderer2D::DrawLine(m_Entity->GetComponent<TransformComponent>().Translation, physics_obj.Hit.Position, { 1,0,0,1 });
-					Renderer2D::LineEndScene();
+					if (Physics3D::Raycast(m_Entity->GetComponent<TransformComponent>().Translation, camera.GetViewDirection(), 10000, hit))
+					{
+						//drawing the traced ray
+						Renderer2D::LineBeginScene(camera);
+						Renderer2D::DrawLine(m_Entity->GetComponent<TransformComponent>().Translation, hit.Position, { 1,0,0,1 });
+						Renderer2D::LineEndScene();
 
-					//drawing the hit normal
-					Renderer2D::LineBeginScene(camera);
-					Renderer2D::DrawLine(physics_obj.Hit.Position, physics_obj.Hit.Position + physics_obj.Hit.Normal, { 0,0,1,1 });
-					Renderer2D::LineEndScene();
+						//drawing the hit normal
+						Renderer2D::LineBeginScene(camera);
+						Renderer2D::DrawLine(hit.Position, hit.Position + hit.Normal, { 0,0,1,1 });
+						Renderer2D::LineEndScene();
 
-					//HAZEL_CORE_INFO("Ray cast result: {}",physics_obj.Hit.isHit);
+						//HAZEL_CORE_INFO("Ray cast result: {}",physics_obj.Hit.isHit);
+
+					}
 				}
 			}
 
@@ -89,6 +90,8 @@ namespace Hazel {
 		void OnDestroy() override {}
 		void OnEvent(Event& e) override
 		{
+			if (!m_Entity)
+				return;
 			EventDispatcher dispatch(e);
 			dispatch.Dispatch<MouseButtonPressed>([&](MouseButtonPressed e) {
 				s_entity = m_Entity->GetScene()->CreateEntity("Spwanned");

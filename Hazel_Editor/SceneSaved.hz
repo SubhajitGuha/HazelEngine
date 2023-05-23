@@ -6,50 +6,18 @@ Entities:
     TagComponent:
       tag: Entity
     TransformComponent:
-      Translation: [-24.8999996, -4.0999999, 0]
+      Translation: [0, -10.1999998, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [3, 3, 3]
       Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    SpriteRenderer:
-      Color: [0.911196709, 0, 1, 1]
-      Roughness: 1
-      Metallic: 0
+        - [2.64509702, 1.11758471, 0.868599653, 0]
+        - [0.135343194, 1.63285089, -2.51306152, 0]
+        - [-1.40895104, 2.25495052, 1.38926387, 0]
+        - [-360.611664, 141177, 7859.23779, 1]
     StaticMeshComponent:
       MeshPath: Assets/Meshes/Cube.fbx
-  - Entity: 13212514564232
-    TagComponent:
-      tag: Entity
-    TransformComponent:
-      Translation: [26.5, -41.7000008, 0]
-      Rotation: [0, 47.7000008, 90]
-      Scale: [0.5, 0.300000012, 0.100000001]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/Windmill.fbx
-  - Entity: 13212514564232
-    TagComponent:
-      tag: plant2
-    TransformComponent:
-      Translation: [-15.1999998, -7, 0]
-      Rotation: [90, 0, 0]
-      Scale: [1, 1, 1]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/ZombiePlant.fbx
     PhysicsComponent:
-      Mass: 1
+      Mass: 1000
       StaticFriction: 0.5
       DynamicFriction: 0.5
       Restitution: 0.600000024
@@ -57,145 +25,40 @@ Entities:
       Height: 1
       HalfExtent: [0, 0, 0]
       Transform:
-        - [0.99999994, 0, 0, 0]
-        - [0, -4.37113883e-08, 1, 0]
-        - [0, -1, -4.37113883e-08, 0]
-        - [-15.1999998, -7, 0, 1]
+        - [3, 0, 0, 0]
+        - [0, 3, 0, 0]
+        - [0, 0, 3, 0]
+        - [0, -10.1999998, 0, 1]
       isStatic: 0
       isKinematic: 0
       Shape: 4
   - Entity: 13212514564232
     TagComponent:
-      tag: plant
+      tag: sphere2
     TransformComponent:
-      Translation: [-2.9000001, -20.7000008, 0]
-      Rotation: [20.6000004, 0, 0]
+      Translation: [-27.2000008, -31.1000004, 14.8000002]
+      Rotation: [0, 0, 0]
       Scale: [2, 2, 2]
       Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/ZombiePlant.fbx
-    PhysicsComponent:
-      Mass: 1000
-      StaticFriction: 0.5
-      DynamicFriction: 0.5
-      Restitution: 0.100000001
-      Radius: 1
-      Height: 1
-      HalfExtent: [0, 0, 0]
-      Transform:
-        - [2, 0, 0, 0]
-        - [0, 1.87211907, 0.703683317, 0]
-        - [0, -0.703683317, 1.87211907, 0]
-        - [-2.9000001, -20.7000008, 0, 1]
-      isStatic: 0
-      isKinematic: 0
-      Shape: 4
-  - Entity: 13212514564232
-    TagComponent:
-      tag: plane
-    TransformComponent:
-      Translation: [0, 0.400000006, 0]
-      Rotation: [0, 0, 0]
-      Scale: [100, 1, 100]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    SpriteRenderer:
-      Color: [0.547163308, 0.938223958, 0.503525555, 1]
-      Roughness: 1
-      Metallic: 0
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/Cube.fbx
-    PhysicsComponent:
-      Mass: 1000
-      StaticFriction: 0.5
-      DynamicFriction: 0.5
-      Restitution: 0.600000024
-      Radius: 1
-      Height: 1
-      HalfExtent: [0, 0, 0]
-      Transform:
-        - [100, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 100, 0]
-        - [0, 0.400000006, 0, 1]
-      isStatic: 1
-      isKinematic: 0
-      Shape: 4
-  - Entity: 13212514564232
-    TagComponent:
-      tag: cube
-    TransformComponent:
-      Translation: [3.09890747, 0, -8.85635376]
-      Rotation: [0, 18, 0]
-      Scale: [1, 1, 1]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    CameraComponent:
-      Camera Distance: [0, 6.69999981, 6]
-      Follow Player: 1
-      FOV: 90
-      Aspect Ratio: 1.08012486
-      Near: 0.00999999978
-      Far: 1000
-      View Direction: [-0.898794055, 0, 0.438371152]
-      Is Main Camera: 0
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/Cube.fbx
-    ScriptComponent:
-      id: 6685720988103015343
-    PhysicsComponent:
-      Mass: 100
-      StaticFriction: 0.600000024
-      DynamicFriction: 0.699999988
-      Restitution: 0.600000024
-      Radius: 1
-      Height: 1
-      HalfExtent: [0.5, 0.5, 0.5]
-      Transform:
-        - [0.945518553, 0, 0.32556814, 0]
-        - [0, 1, 0, 0]
-        - [-0.32556814, 0, 0.945518553, 0]
-        - [-0.505371094, 0, -6.16394043, 1]
-      isStatic: 0
-      isKinematic: 1
-      Shape: 0
-  - Entity: 13212514564232
-    TagComponent:
-      tag: sphere
-    TransformComponent:
-      Translation: [4.69999981, -15, -14.6999998]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
+        - [1.68294287, 0.764112473, 0.764091194, 0]
+        - [0.357343823, -1.72816253, 0.941146493, 0]
+        - [1.01980805, -0.655426145, -1.59072471, 0]
+        - [1031.75378, 69053.2266, -3781.1311, 1]
     StaticMeshComponent:
       MeshPath: Assets/Meshes/Sphere.fbx
     PhysicsComponent:
       Mass: 1000
-      StaticFriction: 3.4000001
-      DynamicFriction: 12.3999996
-      Restitution: 0.300000012
-      Radius: 1
+      StaticFriction: 0.5
+      DynamicFriction: 0.5
+      Restitution: 0.600000024
+      Radius: 2
       Height: 1
       HalfExtent: [0, 0, 0]
       Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [4.69999981, -15, -14.6999998, 1]
+        - [2, 0, 0, 0]
+        - [0, 2, 0, 0]
+        - [0, 0, 2, 0]
+        - [-27.2000008, -31.1000004, 14.8000002, 1]
       isStatic: 0
       isKinematic: 0
       Shape: 1
@@ -231,46 +94,91 @@ Entities:
       Shape: 4
   - Entity: 13212514564232
     TagComponent:
-      tag: sphere2
+      tag: sphere
     TransformComponent:
-      Translation: [-27.2000008, -31.1000004, 14.8000002]
+      Translation: [4.69999981, -15, -14.6999998]
       Rotation: [0, 0, 0]
-      Scale: [2, 2, 2]
+      Scale: [1, 1, 1]
       Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
+        - [0.393101275, -0.560957491, -0.728558958, 0]
+        - [-0.669123113, 0.368942618, -0.645101249, 0]
+        - [0.630670846, 0.741085708, -0.230317831, 0]
+        - [67.0162888, 114070.148, 783.928894, 1]
     StaticMeshComponent:
       MeshPath: Assets/Meshes/Sphere.fbx
     PhysicsComponent:
       Mass: 1000
-      StaticFriction: 0.5
-      DynamicFriction: 0.5
-      Restitution: 0.600000024
-      Radius: 2
+      StaticFriction: 3.4000001
+      DynamicFriction: 12.3999996
+      Restitution: 0.300000012
+      Radius: 1
       Height: 1
       HalfExtent: [0, 0, 0]
       Transform:
-        - [2, 0, 0, 0]
-        - [0, 2, 0, 0]
-        - [0, 0, 2, 0]
-        - [-27.2000008, -31.1000004, 14.8000002, 1]
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [4.69999981, -15, -14.6999998, 1]
       isStatic: 0
       isKinematic: 0
       Shape: 1
   - Entity: 13212514564232
     TagComponent:
-      tag: Entity
+      tag: cube
     TransformComponent:
-      Translation: [0, -10.1999998, 0]
-      Rotation: [0, 0, 0]
-      Scale: [3, 3, 3]
+      Translation: [-27.3736954, -6.86077118, -32.3765945]
+      Rotation: [0, 388, 0]
+      Scale: [1, 1, 1]
       Transform:
         - [1, 0, 0, 0]
         - [0, 1, 0, 0]
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
+    CameraComponent:
+      Camera Distance: [0, 2.79999995, 2.9000001]
+      Follow Player: 1
+      FOV: 90
+      Aspect Ratio: 1.02406013
+      Near: 0.00999999978
+      Far: 1000
+      View Direction: [0.469471365, 0, 0.882947683]
+      Is Main Camera: 1
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/Cube.fbx
+    ScriptComponent:
+      id: 6685720988103015343
+    PhysicsComponent:
+      Mass: 100
+      StaticFriction: 0.600000024
+      DynamicFriction: 0.699999988
+      Restitution: 0.600000024
+      Radius: 1
+      Height: 1
+      HalfExtent: [0.5, 0.5, 0.5]
+      Transform:
+        - [0.95105654, 0, -0.309017003, 0]
+        - [0, 1, 0, 0]
+        - [0.309017003, 0, 0.95105654, 0]
+        - [3.09890747, 0, -8.85635376, 1]
+      isStatic: 0
+      isKinematic: 1
+      Shape: 0
+  - Entity: 13212514564232
+    TagComponent:
+      tag: plane
+    TransformComponent:
+      Translation: [0, 0.400000006, 0]
+      Rotation: [0, 0, 0]
+      Scale: [100, 1, 100]
+      Transform:
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, 0, 0, 1]
+    SpriteRenderer:
+      Color: [0.265373349, 0.869109213, 0.221028015, 1]
+      Roughness: 1
+      Metallic: 0
     StaticMeshComponent:
       MeshPath: Assets/Meshes/Cube.fbx
     PhysicsComponent:
@@ -282,10 +190,102 @@ Entities:
       Height: 1
       HalfExtent: [0, 0, 0]
       Transform:
-        - [3, 0, 0, 0]
-        - [0, 3, 0, 0]
-        - [0, 0, 3, 0]
-        - [0, -10.1999998, 0, 1]
+        - [100, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 100, 0]
+        - [0, 0.400000006, 0, 1]
+      isStatic: 1
+      isKinematic: 0
+      Shape: 4
+  - Entity: 13212514564232
+    TagComponent:
+      tag: plant
+    TransformComponent:
+      Translation: [-2.9000001, -20.7000008, 0]
+      Rotation: [20.6000004, 0, 0]
+      Scale: [2, 2, 2]
+      Transform:
+        - [-0.570995569, 0.404365271, 1.87362051, 0]
+        - [-0.72101748, -1.85671234, 0.180982351, 0]
+        - [1.77597833, -0.623786509, 0.675863981, 0]
+        - [27.7796211, -1.03497839, 87.8520126, 1]
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/ZombiePlant.fbx
+    PhysicsComponent:
+      Mass: 1000
+      StaticFriction: 0.5
+      DynamicFriction: 0.5
+      Restitution: 0.100000001
+      Radius: 1
+      Height: 1
+      HalfExtent: [0, 0, 0]
+      Transform:
+        - [2, 0, 0, 0]
+        - [0, 1.87211907, 0.703683317, 0]
+        - [0, -0.703683317, 1.87211907, 0]
+        - [-2.9000001, -20.7000008, 0, 1]
       isStatic: 0
       isKinematic: 0
       Shape: 4
+  - Entity: 13212514564232
+    TagComponent:
+      tag: plant2
+    TransformComponent:
+      Translation: [-15.1999998, -7, 0]
+      Rotation: [90, 0, 0]
+      Scale: [1, 1, 1]
+      Transform:
+        - [0.566736639, -0.767738283, -0.298977405, 0]
+        - [-0.822686374, -0.507646799, -0.255894452, 0]
+        - [0.0446850657, 0.390989393, -0.919309855, 0]
+        - [-565.779053, 155391.922, 5013.93506, 1]
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/ZombiePlant.fbx
+    PhysicsComponent:
+      Mass: 1
+      StaticFriction: 0.5
+      DynamicFriction: 0.5
+      Restitution: 0.600000024
+      Radius: 1
+      Height: 1
+      HalfExtent: [0, 0, 0]
+      Transform:
+        - [0.99999994, 0, 0, 0]
+        - [0, -4.37113883e-08, 1, 0]
+        - [0, -1, -4.37113883e-08, 0]
+        - [-15.1999998, -7, 0, 1]
+      isStatic: 0
+      isKinematic: 0
+      Shape: 4
+  - Entity: 13212514564232
+    TagComponent:
+      tag: Entity
+    TransformComponent:
+      Translation: [26.5, -41.7000008, 0]
+      Rotation: [0, 47.7000008, 90]
+      Scale: [0.5, 0.300000012, 0.100000001]
+      Transform:
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, 0, 0, 1]
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/Windmill.fbx
+  - Entity: 13212514564232
+    TagComponent:
+      tag: Entity
+    TransformComponent:
+      Translation: [-24.8999996, -4.0999999, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+      Transform:
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, 0, 0, 1]
+    SpriteRenderer:
+      Color: [0.814979553, 0, 1, 1]
+      Roughness: 1
+      Metallic: 0
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/Cube.fbx

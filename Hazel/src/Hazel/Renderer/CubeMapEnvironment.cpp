@@ -158,10 +158,10 @@ namespace Hazel {
 
 		auto inv = glm::inverse(proj * glm::mat4(glm::mat3(view)));//get inverse of projection view to convert cannonical view to world space
 		glm::vec4 data[] = {
-		glm::vec4(-1,1,0,1),inv * glm::vec4(-1,1,0,1),
-		glm::vec4(1,1,0,1),	inv * glm::vec4(1,1,0,1),
-		glm::vec4(1,-1,0,1),inv * glm::vec4(1,-1,0,1),
 		glm::vec4(-1,-1,0,1),inv * glm::vec4(-1,-1,0,1),
+		glm::vec4(1,-1,0,1),inv * glm::vec4(1,-1,0,1),
+		glm::vec4(1,1,0,1),	inv * glm::vec4(1,1,0,1),
+		glm::vec4(-1,1,0,1),inv * glm::vec4(-1,1,0,1),
 		};
 
 		ref<VertexArray> vao = VertexArray::Create();
