@@ -32,4 +32,12 @@ Normal Mapping:
 Screenshot of 2D rendering project (Trading Application)
 ![Screenshot (1935)](https://user-images.githubusercontent.com/102531274/230634976-bc39813d-5806-45e6-8643-19c42bc9f730.png)
 
-to run this application just build/run the sandbox project and from the bin folder of root dir run the application.
+Trading application needs to be build before running (how to build : first generate project files using the .bat file, then build the sandbox project and from the bin folder of root dir run the application).
+
+But if you want the executable then go to the following repo:
+Trading Application executable:
+
+https://github.com/SubhajitGuha/Trading_Application
+
+Contained in Application/Sandbox.zip
+
