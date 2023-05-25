@@ -7,7 +7,13 @@ First run "GenerateProjectFiles.bat" then the appropriate project files will be 
 then launch the .sln file and then build and run the application using vs2019.
 
 Youtube showcases.
+Engine showcase.
 https://www.youtube.com/watch?v=v013iI91Nms&t=268s
+
+3D Physics , SSAO, Cameras, Scripting, Serialization showcase.
+https://www.youtube.com/watch?v=XeJhNew3RL4&t=397s
+
+Physics using Nvidia PhysX showcase.
 https://www.youtube.com/watch?v=cyJuWrRfjhA&t=5s
 
 Some Screen shots of PBR rendering in my engine.
