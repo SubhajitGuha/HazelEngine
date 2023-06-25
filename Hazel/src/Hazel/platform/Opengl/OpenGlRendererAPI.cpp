@@ -27,6 +27,11 @@ namespace Hazel {
 		vertexarray.Bind();
 		glDrawArrays(GL_TRIANGLES, first, count);
 	}
+	void OpenGlRendererAPI::DrawInstancedArrays(VertexArray& vertexarray, size_t count, size_t instance_count, int first)
+	{
+		vertexarray.Bind();
+		glDrawArraysInstanced(GL_TRIANGLES, first, count, instance_count);
+	}
 	void OpenGlRendererAPI::DrawLine(VertexArray& vertexarray,uint32_t count)
 	{
 		vertexarray.Bind();
@@ -37,6 +42,7 @@ namespace Hazel {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 		//glEnable(GL_STENCIL_TEST);
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_CULL_FACE);

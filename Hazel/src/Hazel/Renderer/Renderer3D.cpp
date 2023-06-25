@@ -12,7 +12,10 @@
 namespace Hazel {
 	//Camera* m_camera;
 	GLsync syncObj;
-	glm::vec3 Renderer3D::m_SunLightDir = { 0,-2,0 };//initial light position
+	glm::vec3 Renderer3D::m_SunLightDir = { 0,1,0.60 };//initial light position
+	glm::vec3 Renderer3D::m_SunColor = { 1,1,1 };
+	float Renderer3D::m_SunIntensity = 1.0f;
+
 	unsigned int Renderer3D::depth_id = 0;
 	unsigned int Renderer3D::ssao_id = 0;
 	struct VertexAttributes {
@@ -42,7 +45,7 @@ namespace Hazel {
 		ref<OpenGlSSAO> ssao;
 		ref<Shadows> shadow_map;
 		ref<CubeMapReflection> reflection;
-		ref<Shader> shader, foliage_shader;
+		ref<Shader> shader, foliage_shader, foliageShader_instanced;
 		ref<Texture2D> WhiteTex,tex;
 		ref<BufferLayout> bl;
 		ref<VertexBuffer> vb;
@@ -61,6 +64,9 @@ namespace Hazel {
 		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);
 		m_data->foliage_shader = Shader::Create("Assets/Shaders/FoliageShader.glsl");//foliage shader
 		m_data->foliage_shader->SetInt("SSAO", SSAO_BLUR_SLOT);
+		m_data->foliageShader_instanced = Shader::Create("Assets/Shaders/FoliageShader_Instanced.glsl");//this is not ideal!! I just cannot handle shaders like this in a long run
+		m_data->foliageShader_instanced->SetInt("SSAO", SSAO_BLUR_SLOT);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		m_data->reflection = CubeMapReflection::Create();
@@ -108,6 +114,10 @@ namespace Hazel {
 		m_data->foliage_shader->Bind();//bind the textureShader
 		m_data->foliage_shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
 		m_data->foliage_shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
+		
+		m_data->foliageShader_instanced->Bind();//bind the textureShader
+		m_data->foliageShader_instanced->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+		m_data->foliageShader_instanced->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
 	}
 
 	void Renderer3D::EndScene()
@@ -122,6 +132,26 @@ namespace Hazel {
 
 		m_data->foliage_shader->Bind();
 		m_data->foliage_shader->SetFloat3("DirectionalLight_Direction", pos);
+
+		m_data->foliageShader_instanced->Bind(); //this is not ideal!! I just cannot handle shaders like this in a long run
+		m_data->foliageShader_instanced->SetFloat3("DirectionalLight_Direction", pos);
+	}
+
+	void Renderer3D::SetSunLightColorAndIntensity(const glm::vec3& color, float Intensity)
+	{
+		m_data->shader->Bind();
+		m_data->shader->SetFloat3("SunLight_Color", color);
+		m_data->shader->SetFloat("SunLight_Intensity", Intensity);
+
+		//do foliage shader
+		m_data->foliage_shader->Bind();
+		m_data->foliage_shader->SetFloat3("SunLight_Color", color);
+		m_data->foliage_shader->SetFloat("SunLight_Intensity", Intensity);
+
+		//do foliage instanced shader
+		m_data->foliageShader_instanced->Bind();
+		m_data->foliageShader_instanced->SetFloat3("SunLight_Color", color);
+		m_data->foliageShader_instanced->SetFloat("SunLight_Intensity", Intensity);
 	}
 
 	void Renderer3D::SetPointLightPosition(const std::vector<PointLight*>& Lights)
@@ -146,6 +176,11 @@ namespace Hazel {
 		m_data->foliage_shader->SetFloat3Array("PointLight_Position", &pos[0].x, Lights.size());
 		m_data->foliage_shader->SetFloat3Array("PointLight_Color", &col[0].x, Lights.size());
 		m_data->foliage_shader->SetInt("Num_PointLights", pos.size());
+
+		m_data->foliageShader_instanced->Bind();
+		m_data->foliageShader_instanced->SetFloat3Array("PointLight_Position", &pos[0].x, Lights.size());
+		m_data->foliageShader_instanced->SetFloat3Array("PointLight_Color", &col[0].x, Lights.size());
+		m_data->foliageShader_instanced->SetInt("Num_PointLights", pos.size());
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color, const float& material_Roughness , const float& material_metallic)
@@ -168,6 +203,10 @@ namespace Hazel {
 
 	void Renderer3D::DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
 	{
+		//glDisable(GL_CULL_FACE);
+		//this is not ideal!! I just cannot handle shaders like this in a long run
+		m_data->foliage_shader->Bind();//bind the textureShader
+
 		m_data->foliage_shader->SetFloat("Roughness", material_Roughness); //send the roughness value
 		m_data->foliage_shader->SetFloat("Metallic", material_metallic); //send the metallic value
 
@@ -182,6 +221,52 @@ namespace Hazel {
 		m_data->foliage_shader->SetFloat4("m_color", color);
 
 		RenderCommand::DrawArrays(*mesh.VertexArray, mesh.Vertices.size());
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);
+	}
+
+	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, const std::vector<glm::mat4>& Instanced_ModelMatrix, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
+	{
+		//glDisable(GL_CULL_FACE);
+		m_data->foliageShader_instanced->Bind();
+
+		m_data->foliageShader_instanced->SetFloat("Roughness", material_Roughness); //send the roughness value
+		m_data->foliageShader_instanced->SetFloat("Metallic", material_metallic); //send the metallic value
+
+		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
+		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
+		mesh.Normal_Texture->Bind(NORMAL_SLOT);
+
+		m_data->foliageShader_instanced->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+		m_data->foliageShader_instanced->SetInt("u_Roughness", ROUGHNESS_SLOT);
+		m_data->foliageShader_instanced->SetInt("u_NormalMap", NORMAL_SLOT);
+		m_data->foliageShader_instanced->SetMat4("u_Model", transform);
+		m_data->foliageShader_instanced->SetFloat4("m_color", color);
+
+		{//needs to be refactored!!
+			unsigned int vb;
+			glGenBuffers(1, &vb);
+			glBindBuffer(GL_ARRAY_BUFFER, vb);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4)*Instanced_ModelMatrix.size(), &Instanced_ModelMatrix[0], GL_STATIC_DRAW);
+
+			mesh.VertexArray->Bind();
+			glEnableVertexAttribArray(6);
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
+			glEnableVertexAttribArray(7);
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(1 * sizeof(glm::vec4)));
+			glEnableVertexAttribArray(8);
+			glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(2 * sizeof(glm::vec4)));
+			glEnableVertexAttribArray(9);
+			glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(3 * sizeof(glm::vec4)));
+
+			glVertexAttribDivisor(6, 1);//repeat 1ce per instance
+			glVertexAttribDivisor(7, 1);
+			glVertexAttribDivisor(8, 1);
+			glVertexAttribDivisor(9, 1);
+		}
+		RenderCommand::DrawInstancedArrays(*mesh.VertexArray, mesh.Vertices.size(), Instanced_ModelMatrix.size());
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);
 	}
 	
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)

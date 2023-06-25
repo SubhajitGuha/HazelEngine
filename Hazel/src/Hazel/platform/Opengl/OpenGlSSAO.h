@@ -15,7 +15,7 @@ namespace Hazel {
 		void CreateSSAOTexture();
 		void RenderScene(Scene& scene , ref<Shader>& current_shader);// This will be changed later
 		int m_width=2048, m_height=2048;
-		unsigned int SSAOframebuffer_id,SSAOtexture_id,GBufferPos_id , SSAOdepth_id , SSAOblur_id;
+		unsigned int SSAOframebuffer_id,SSAOtexture_id,GBufferPos_id , SSAOdepth_id , SSAOblur_id, depth_id;
 		unsigned int noisetex_id;
 		ref<Shader> SSAOShader,GbufferPosition, SSAOblurShader;//temporary
 		ref<FrameBuffer> framebuffer;

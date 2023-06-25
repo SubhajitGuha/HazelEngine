@@ -13,15 +13,17 @@
 #include "PointLight.h"
 #include "Hazel/Physics/Physics3D.h"
 #include "Hazel/Scene/SceneSerializer.h"
+#include "Hazel/Renderer/Atmosphere.h"
 
 namespace Hazel {
 	
 	bool Scene::TOGGLE_SHADOWS = true;
 	bool Scene::TOGGLE_SSAO = true;
+	float Scene::foliage_dist = 3000;
+	float Scene::num_foliage = 10000;
 	//std::vector<PointLight*> Scene::m_PointLights;
-	Camera* MainCamera = nullptr;//if there is no main camera Then dont render
 	EditorCamera editor_cam;
-	 LoadMesh* Scene::Sphere=nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza;
+	 LoadMesh* Scene::Sphere=nullptr, *Scene::Sphere_simple = nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza;
 	 bool capture = false;
 	 glm::vec3 camloc = { 0,0,0 }, camrot = {0,0,0};
 	Scene::Scene()
@@ -29,6 +31,7 @@ namespace Hazel {
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
 
 		Sphere = new LoadMesh("Assets/Meshes/Sphere.fbx");
+		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
 		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
 		Fern = new LoadMesh("Assets/Meshes/shrub.fbx");
@@ -39,6 +42,12 @@ namespace Hazel {
 		//editor_cam = (EditorCamera*)Camera::GetCamera(EDITOR_CAMERA).get();
 		Renderer3D::SetUpCubeMapReflections(*this);
 		Physics3D::Initilize();
+		Atmosphere::InitilizeAtmosphere();
+
+		//initilize Bloom
+		m_Bloom = Bloom::Create();
+		m_Bloom->GetFinalImage(0, { 1920,1080 });
+		m_Bloom->InitBloom();
 	}
 	Scene::~Scene()
 	{
@@ -94,6 +103,7 @@ namespace Hazel {
 		if (!MainCamera)
 		{
 			MainCamera = &editor_cam;
+			//editcam = editor_cam;
 		}
 
 		MainCamera->OnUpdate(ts);
@@ -116,6 +126,13 @@ namespace Hazel {
 		if (m_PointLights.size() > 0)
 			Renderer3D::SetPointLightPosition(m_PointLights);
 
+		Renderer3D::SetSunLightDirection(Renderer3D::m_SunLightDir);
+		Renderer3D::SetSunLightColorAndIntensity(Renderer3D::m_SunColor, Renderer3D::m_SunIntensity);
+
+		std::uniform_real_distribution<float> Randdist(1.0f, foliage_dist);
+		std::default_random_engine engine;
+		//Renderer3D::BeginSceneFoliage(*MainCamera);
+
 		m_registry.each([&](auto m_entity)
 			{
 				Entity Entity(this, m_entity);
@@ -135,7 +152,7 @@ namespace Hazel {
 
 					if (Entity.HasComponent<SpriteRenderer>()) {
 						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
+						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color * SpriteRendererComponent.Emission_Scale, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
 					}
 					else
 						Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
@@ -149,7 +166,14 @@ namespace Hazel {
 					auto mesh = Entity.GetComponent<StaticMeshComponent>();
 					if (Entity.HasComponent<SpriteRenderer>()) {
 						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-						Renderer3D::DrawFoliage(*mesh, transform, SpriteRendererComponent.Color, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
+						std::vector<glm::mat4> InstancedArr;
+						glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0,0,0 }) * glm::rotate(glm::mat4(1.0), glm::radians(180.0f), { 1,0,0 }) * glm::scale(glm::mat4(1.0f), { 0.1f,0.1f,0.1f });
+						for (int i = 0; i < num_foliage; i++)
+						{
+							glm::mat4 Instanced_mm = glm::translate(glm::mat4(1.0f), { Randdist(engine),0,Randdist(engine) }) * glm::rotate(glm::mat4(1.0), glm::radians(Randdist(engine)), { 0,1,0 }) * glm::scale(glm::mat4(1.0f), glm::vec3((Randdist(engine)-1)/(foliage_dist-1)));
+							InstancedArr.push_back(Instanced_mm);
+						}
+						Renderer3D::DrawFoliageInstanced(*Scene::Fern, transform, InstancedArr);
 					}
 					else
 						Renderer3D::DrawFoliage(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
@@ -159,7 +183,6 @@ namespace Hazel {
 
 			Renderer3D::RenderShadows(*this, *MainCamera);//shadows should be computed at last
 			Renderer3D::AmbiantOcclusion(*this, *MainCamera);
-
 	}
 	void Scene::OnCreate()
 	{
@@ -182,6 +205,11 @@ namespace Hazel {
 		{
 			s.second->OnEvent(e);
 		}
+	}
+
+	void Scene::PostProcess()
+	{
+		Atmosphere::RenderAtmosphere(*MainCamera, 200.0f);
 	}
 
 	void Scene::AddPointLight(PointLight* light)

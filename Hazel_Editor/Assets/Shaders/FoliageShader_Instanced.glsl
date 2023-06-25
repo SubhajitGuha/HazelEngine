@@ -6,6 +6,7 @@ layout (location = 2) in vec3 Normal;
 layout (location = 3) in vec3 Tangent;
 layout (location = 4) in vec3 BiTangent;
 layout (location = 5) in float materialindex;
+layout (location = 6) in mat4 instance_mm;
 
 out vec2 tcord;
 out vec4 m_pos;
@@ -19,14 +20,14 @@ uniform mat4 u_Model;
 
 void main()
 {
-	gl_Position = u_ProjectionView * u_Model * pos;
+	gl_Position = u_ProjectionView * u_Model * instance_mm * pos;
 
 	m_materialindex = materialindex;
 	tcord = cord;
-	m_Normal = normalize(mat3(u_Model ) * Normal);
-	m_Tangent = normalize(mat3(u_Model ) * Tangent);
-	m_BiTangent = normalize(mat3(u_Model ) * BiTangent);
-	m_pos = u_Model * pos;
+	m_Normal = normalize(mat3(u_Model * instance_mm) * Normal);
+	m_Tangent = normalize(mat3(u_Model * instance_mm) * Tangent);
+	m_BiTangent = normalize(mat3(u_Model * instance_mm) * BiTangent);
+	m_pos = u_Model * instance_mm * pos;
 }
 
 #shader fragment

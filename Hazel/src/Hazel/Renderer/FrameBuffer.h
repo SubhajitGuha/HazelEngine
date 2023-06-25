@@ -16,5 +16,8 @@ namespace Hazel {
 		virtual unsigned int GetDepthTextureID() = 0;
 		virtual void Resize(unsigned int width, unsigned int height) = 0;
 		virtual void ClearFrameBuffer() = 0;
+		virtual void BindFramebufferTexture(int slot) = 0;
+		virtual void BindFramebufferDepthTexture(int slot) = 0;
+
 	};
 }

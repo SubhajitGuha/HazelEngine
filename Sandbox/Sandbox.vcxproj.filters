@@ -43,7 +43,7 @@
     <Image Include="Assets\Textures\Test.png">
       <Filter>Assets\Textures</Filter>
     </Image>
-    <Image Include="Assets\Textures\img_0.png">
+    <Image Include="Assets\Textures\img_1.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\img_2.png">

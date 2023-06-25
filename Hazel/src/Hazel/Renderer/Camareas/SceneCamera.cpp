@@ -1,3 +1,5 @@
+#include "..\..\..\..\..\CameraProperties\src\SceneCamera.h"
+#include "..\..\..\..\..\CameraProperties\src\SceneCamera.h"
 #include "hzpch.h"
 #include "SceneCamera.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -32,6 +34,7 @@ namespace Hazel {
 	{
 		m_ViewDirection = dir; RecalculateProjectionView();
 	}
+
 	void SceneCamera::SetUPVector(const glm::vec3& up)
 	{
 		Up = up; RecalculateProjectionView();

@@ -198,6 +198,9 @@
     <ClInclude Include="src\Hazel\Physics\Physics3D.h">
       <Filter>src\Hazel\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\Atmosphere.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\Buffer.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
@@ -1179,6 +1182,8 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\Bloom.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBloom.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1207,6 +1212,9 @@
     </ClCompile>
     <ClCompile Include="src\Hazel\Physics\Physics3D.cpp">
       <Filter>src\Hazel\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\Atmosphere.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp">
       <Filter>src\Hazel\Renderer</Filter>
@@ -1328,5 +1336,7 @@
     <ClCompile Include="vendor\stb_image\stb_image_resize.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\Bloom.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBloom.cpp" />
   </ItemGroup>
 </Project>

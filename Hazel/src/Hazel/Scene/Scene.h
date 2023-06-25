@@ -11,8 +11,10 @@ namespace Hazel {
 	class Entity;
 	class LoadMesh;
 	class ScriptableEntity;
-	//class EditorCamera;
+	class EditorCamera;
+	class Camera;
 	class PointLight;
+	class Bloom;
 	class Scene
 	{
 	public:
@@ -31,14 +33,17 @@ namespace Hazel {
 		void OnEvent(Event& e);
 		void AddPointLight(PointLight* light);
 		static ref<Scene> Create();
-		void PreProcessScene() {}
+		void PostProcess();
 	public:
 		std::vector<PointLight*> m_PointLights;
-		static LoadMesh* Sphere, *Cube , *Plane,*plant,*House,* Windmill ,*Fern, *Sponza;
+		static LoadMesh* Sphere, *Sphere_simple, *Cube , *Plane,*plant,*House,* Windmill ,*Fern, *Sponza;
 		static unsigned int m_Scene_tex_id;
 		static unsigned int m_Scene_depth_id;
 		ref<FrameBuffer> framebuffer;
 		std::unordered_map<size_t, ScriptableEntity*> m_scriptsMap;
+		static float foliage_dist, num_foliage;
+		Camera* MainCamera = nullptr;//if there is no main camera Then dont render
+		ref<Bloom> m_Bloom;
 
 	private:
 		entt::registry m_registry;

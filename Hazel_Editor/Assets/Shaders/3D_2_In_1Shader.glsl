@@ -66,6 +66,8 @@ uniform vec4 m_color;
 
 //Lights
 uniform vec3 DirectionalLight_Direction; //sun light world position
+uniform vec3 SunLight_Color;
+uniform float SunLight_Intensity;
 uniform vec3 PointLight_Position[MAX_LIGHTS];
 uniform vec3 PointLight_Color[MAX_LIGHTS];
 uniform int Num_PointLights;
@@ -91,12 +93,12 @@ int level = 3; // cascade levels
 vec3 NormalMapping(int index) // index implies which material index normal map to use
 {
 	vec3 normal = texture(u_NormalMap , vec3(tcord,index)).rgb;
-	normal = normal*2.0 - 1.0;
+	normal = normal*2.0 - 1.0; //convert to -1 to 1
 	mat3 TBN = mat3(m_Tangent , m_BiTangent , m_Normal);
 	if(normal == vec3(1.0)) // if normal map is a White Texture then Lighting Calculation will be done by vertex Normal
 		return m_Normal;
 	else
-		return normalize(TBN * normal);
+		return normalize(TBN * normal);// to world space
 }
 
 float CalculateShadow(int cascade_level)
@@ -105,7 +107,7 @@ float CalculateShadow(int cascade_level)
 	vec3 p = VertexPosition_LightSpace.xyz/VertexPosition_LightSpace.w;
 	p = p * 0.5 + 0.5;//convert -1 to +1 to 0 to 1 this is needed for getting the location in the texture
 	float bias = 0.00001;//bias to resolve the artifact
-	float TexelSize = 1.0/textureSize(ShadowMap[cascade_level],0).x; // 4k texture
+	float TexelSize = 1.0/textureSize(ShadowMap[cascade_level],0).x;
 
 	for(int i=-1; i <=1; i++)
 	{
@@ -125,7 +127,7 @@ float CalculateShadow(int cascade_level)
 float NormalDistribution_GGX(float NdotH)
 {
 	float alpha2 =  pow(alpha,4); // alpha is actually the Roughness
-	return alpha2 / (PI * pow( (pow(NdotH,2) * (alpha2 - 1.0) + 1.0) ,2) ) ;
+	return alpha2 / (PI * pow( (pow(NdotH,2) * (alpha2 - 1.0) + 1.0) ,4) ) ;// making the power value = 4 as higher = greater lobe
 }
 
 float Geometry_GGX(float dp) //dp = Dot Product
@@ -142,10 +144,9 @@ vec3 Fresnel(float VdotH)
 		f0 = vec3(0.04); // for non metallic
 	else
 		f0 = vec3(0.4); // for metallic
-	f0 = mix(f0,m_color.xyz,Metallic);
-	//return f0 + (1.0 - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+	return f0 + (1.0 - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
 	//greater roughness = lesser fresnel value
-	return f0 + (max(vec3(1.0- alpha),f0) - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+	//return f0 + (max(vec3(1.0- alpha),f0) - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
 }
 
 vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
@@ -172,8 +173,7 @@ void main()
 	int index = int (m_slotindex);
 
 	vec3 Modified_Normal = NormalMapping(index);
-	
-	//color = vec4(Modified_Normal,1.0);
+
 	alpha = texture(u_Roughness , vec3(tcord,index)).r * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
 	//ao = texture(u_Roughness , vec3(tcord,index)).b;
 	//to do metallic in Green channel
@@ -219,7 +219,7 @@ void main()
 	//ambiance
 		vec3 ambiant = (IBL_diffuse + IBL_specular)* texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * texture(SSAO,coordinate.xy).r;
 
-	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
+	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 
 	//color=vec4(PointLight_Position[0],1.0);
 	for(int i=0 ; i< Num_PointLights ; i++)

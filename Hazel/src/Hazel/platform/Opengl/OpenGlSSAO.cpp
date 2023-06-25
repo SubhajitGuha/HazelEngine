@@ -137,6 +137,7 @@ namespace Hazel {
 		glGenRenderbuffers(1, &SSAOdepth_id);
 		glBindRenderbuffer(GL_RENDERBUFFER, SSAOdepth_id);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
+
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		glGenTextures(1, &GBufferPos_id);//GBuffer view space position texture

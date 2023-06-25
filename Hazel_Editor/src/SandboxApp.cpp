@@ -2,7 +2,7 @@
 #include <Hazel/EntryPoint.h>
 #include "HazelEditor.h"
 
-using namespace Hazel;
+//using namespace Hazel;
 
 class Sandbox :public Hazel::Application
 {

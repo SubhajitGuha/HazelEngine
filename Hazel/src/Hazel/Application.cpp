@@ -46,7 +46,7 @@ namespace Hazel {
 		{
 			if (e.m_Handeled)
 				break;
-			(*--it)->OnEvent(e);	//decrement the iterator here or it will lead to a resticted memory address
+			(*--it)->OnEvent(e);
 		}
 	}
 

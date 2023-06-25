@@ -37,6 +37,14 @@ namespace Hazel {
         glClearBufferfv(GL_COLOR, 0, clearColor);
         glFlush();
     }
+    void OpenGlFrameBuffer::BindFramebufferTexture(int slot)
+    {
+        glBindTextureUnit(slot, m_SceneTexture);
+    }
+    void OpenGlFrameBuffer::BindFramebufferDepthTexture(int slot)
+    {
+        glBindTextureUnit(slot, m_DepthTexture);
+    }
     void OpenGlFrameBuffer::invalidate(const FrameBufferSpecification& spec)
     {
         if (m_RenderID)
@@ -55,6 +63,7 @@ namespace Hazel {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, spec.Width, spec.Height, 0, GL_RGBA, GL_FLOAT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //glBindTextureUnit(SCENE_TEXTURE_SLOT, m_SceneTexture);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_SceneTexture, 0);

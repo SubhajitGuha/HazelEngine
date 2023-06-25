@@ -394,8 +394,8 @@ namespace Hazel {
 		if(open)
 		{
 			auto& Sprite_Renderer = m_selected_entity->GetComponent<SpriteRenderer>();
-			ImGui::ColorEdit4("##Sprite", (float*)(&Sprite_Renderer.Color));
-
+			ImGui::DragFloat4("##Sprite", (float*)(&Sprite_Renderer.Color),0.1);
+			ImGui::DragFloat("Emissive Strength", &Sprite_Renderer.Emission_Scale, 1);
 			char buf[200];
 			strcpy_s(buf,sizeof(buf), texture_path.c_str());
 			if (ImGui::InputText("Texture Path", buf, 200))
@@ -407,8 +407,8 @@ namespace Hazel {
 			{
 				Sprite_Renderer.texture = Texture2D::Create(buf);
 			}
-			ImGui::DragFloat("Roughness", &Sprite_Renderer.m_Roughness, 0.1, 0.0, 1.0);
-			ImGui::DragFloat("Metallic", &Sprite_Renderer.m_Metallic, 0.1, 0.0, 1.0);
+			ImGui::DragFloat("Roughness", &Sprite_Renderer.m_Roughness, 0.001, 0.0, 1.0);
+			ImGui::DragFloat("Metallic", &Sprite_Renderer.m_Metallic, 0.001, 0.0, 1.0);
 
 			ImGui::TreePop();
 		}
@@ -426,6 +426,10 @@ namespace Hazel {
 			if (ImGui::Button("Sphere", { 100,30 }))
 			{
 				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Sphere);
+			}
+			if (ImGui::Button("Sphere_Simple", { 100,30 }))
+			{
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Sphere_simple);
 			}
 			if (ImGui::Button("Plane", { 100,30 }))
 			{

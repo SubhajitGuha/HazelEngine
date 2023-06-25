@@ -48,6 +48,9 @@
 #define SSAO_BLUR_SLOT 11
 #define DEPTH_SLOT 12
 #define NOISE_SLOT 13
+#define SCENE_TEXTURE_SLOT 14
+#define SCENE_DEPTH_SLOT 15
+#define ORIGINAL_SCENE_TEXTURE_SLOT 16
 
 namespace Hazel {
 

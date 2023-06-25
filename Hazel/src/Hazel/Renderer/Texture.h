@@ -5,6 +5,8 @@ namespace Hazel {
 	class Texture
 	{
 	public:
+		Texture() = default;
+		virtual ~Texture()=default;
 		virtual unsigned int GetWidth() = 0;
 		virtual unsigned int GetHeight() = 0;
 		virtual unsigned int GetID() = 0;

@@ -255,3 +255,56 @@ project "Hazel_Editor"
 		defines "HZ_DIST"
 		runtime "Release"
 		optimize "On"
+
+		project "CameraProperties"
+
+	location "CameraProperties"
+	kind "ConsoleApp"
+	language "c++"
+	staticruntime "off"
+	cppdialect "c++17"
+
+	targetdir ("bin/"..outputdir.."/%{prj.name}")
+	objdir ("bin-int/"..outputdir.."/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/Assets/**.png"
+	}
+	includedirs
+	{
+		"Hazel/vendor/spdlog/include",
+		"%{IncludeDir.imgui}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.curl}",
+		"%{IncludeDir.json}",
+		"Hazel/src"
+	}
+	links "Hazel"
+
+	filter "system:windows"
+		
+		systemversion "latest"
+
+		defines
+		{
+			"HZ_PLATFORM_WINDOWS"
+		}
+		
+	filter "configurations:Debug"
+		defines "HZ_DEBUG"
+		runtime "Debug"
+		symbols "On"
+
+	filter "configurations:Release"
+		defines "HZ_RELEASE"
+		runtime "Release"
+		optimize "On"
+
+	filter "configurations:Dist"
+		defines "HZ_DIST"
+		runtime "Release"
+		optimize "On"

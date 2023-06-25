@@ -42,6 +42,8 @@
 #include "Hazel/Renderer/FrameBuffer.h"
 #include "Hazel/Renderer/Camareas/SceneCamera.h"
 #include "Hazel/Renderer/Camareas/EditorCamera.h"
+#include "Hazel/Renderer/Bloom.h"
+
 // -----------------------------------
 // 
 //----------features------------------

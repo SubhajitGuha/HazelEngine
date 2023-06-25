@@ -139,17 +139,13 @@ namespace Hazel {
 		std::vector<VertexAttributes> buffer(Vertices.size());
 		VertexArray = VertexArray::Create();
 
-		std::vector<int> n_meshes;
 		for (int i = 0; i < Vertices.size(); i++)
-			n_meshes.push_back(i);
-
-		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
-			{
-				glm::vec3 transformed_normals = (Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-				glm::vec3 transformed_tangents = (Tangent[i]);
-				glm::vec3 transformed_binormals = (BiTangent[i]);
-				buffer[i] = (VertexAttributes(glm::vec4(Vertices[i], 1.0), TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals, Material_Index[i]));
-			});
+		{
+			glm::vec3 transformed_normals = (Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
+			glm::vec3 transformed_tangents = (Tangent[i]);
+			glm::vec3 transformed_binormals = (BiTangent[i]);
+			buffer[i] = (VertexAttributes(glm::vec4(Vertices[i], 1.0), TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals, Material_Index[i]));
+		}
 		//select MUTABLE buffer storage for mapping into a static buffer
 		vb = VertexBuffer::Create(&buffer[0].Position.x,sizeof(VertexAttributes) * Vertices.size());
 
@@ -161,6 +157,7 @@ namespace Hazel {
 		bl->push("Tangent", DataType::Float3);
 		bl->push("BiTangent", DataType::Float3);
 		bl->push("Material_Index", DataType::Int);
+		
 
 		VertexArray->AddBuffer(bl, vb);
 	}

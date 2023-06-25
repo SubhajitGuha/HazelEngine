@@ -14,6 +14,8 @@ namespace Hazel {
 		virtual void UnBind() override;
 		virtual void Resize(unsigned int width, unsigned int height) override;
 		virtual void ClearFrameBuffer()override;
+		virtual void BindFramebufferTexture(int slot) override;
+		virtual void BindFramebufferDepthTexture(int slot) override;
 	private:
 		unsigned int m_RenderID=0,m_SceneTexture=0,m_DepthTexture=0;
 		FrameBufferSpecification Specification;

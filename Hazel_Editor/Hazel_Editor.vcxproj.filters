@@ -21,13 +21,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CustomScript.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\HazelEditor.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Pannels\SceneHierarchy.h">
       <Filter>src\Pannels</Filter>
     </ClInclude>
-    <ClInclude Include="src\CustomScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HazelEditor.cpp">
@@ -98,5 +100,11 @@
     <Image Include="Assets\Textures\rickshaw.png">
       <Filter>Assets\Textures</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\DownsampleBloom_Shader.glsl" />
+    <None Include="Assets\Shaders\UpSampleBloom_Shader.glsl" />
+    <None Include="Assets\Shaders\BloomToneMapping_Shader.glsl" />
+    <None Include="Assets\Shaders\ExtractHighFrequencyParts_Shader.glsl" />
   </ItemGroup>
 </Project>

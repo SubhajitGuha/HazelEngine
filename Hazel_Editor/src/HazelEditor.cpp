@@ -49,7 +49,7 @@ LoadMesh* mesh;
 	asset_map['m'] = mud;
 
 	m_FrameBuffer = FrameBuffer::Create({1920,1080});//create a frame buffer object
-
+	m_FrameBuffer2 = FrameBuffer::Create({ 1920,1080 });
 	CubeMapEnvironment::Init();
 	Renderer3D::Init();
 	Renderer2D::Init();
@@ -98,7 +98,7 @@ void  HazelEditor::OnUpdate(float deltatime )
 	frame_time = deltatime;
 	HZ_PROFILE_SCOPE(" HazelEditor::OnUpdate");
 	{
-		m_FrameBuffer->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
+		m_FrameBuffer2->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 
 		RenderCommand::ClearColor({0,0,0,1});
 		RenderCommand::Clear();
@@ -154,11 +154,23 @@ void  HazelEditor::OnUpdate(float deltatime )
 		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
 		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
 		//Renderer2D::EndScene();
-	
 
 	m_scene->OnUpdate(deltatime);
-	m_scene->Resize(m_ViewportSize.x,m_ViewportSize.y);
+	m_scene->Resize(m_ViewportSize.x, m_ViewportSize.y);
+	m_FrameBuffer2->UnBind();
 
+	m_FrameBuffer2->BindFramebufferTexture(ORIGINAL_SCENE_TEXTURE_SLOT);
+	m_FrameBuffer2->BindFramebufferTexture(SCENE_TEXTURE_SLOT);
+	m_FrameBuffer2->BindFramebufferDepthTexture(SCENE_DEPTH_SLOT);
+	m_scene->m_Bloom->GetFinalImage(m_FrameBuffer2->GetSceneTextureID(), RenderCommand::GetViewportSize());
+	
+	m_scene->m_Bloom->RenderBloomTexture();
+	
+	m_FrameBuffer->Bind();
+	RenderCommand::ClearColor({ 1,0,0,1 });
+	RenderCommand::Clear();
+	//m_scene->PostProcess();
+	m_scene->m_Bloom->Update(deltatime);
 	m_FrameBuffer->UnBind();
 }
 
@@ -174,6 +186,7 @@ void  HazelEditor::OnImGuiRender()
 	if (m_ViewportSize != *(glm::vec2*)&Size)
 	{
 		m_ViewportSize = { Size.x,Size.y };
+		m_FrameBuffer2->Resize(m_ViewportSize.x, m_ViewportSize.y);
 		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 		m_camera.onResize(Size.x, Size.y);
 	}
@@ -182,8 +195,16 @@ void  HazelEditor::OnImGuiRender()
 
 
 	ImGui::Begin("Light controller");
-	ImGui::DragFloat3("Sun Direction", (float*)&SunDirection);
-	Renderer3D::SetSunLightDirection(SunDirection);
+	ImGui::DragFloat3("Sun Direction", (float*)&Renderer3D::m_SunLightDir,0.01);
+	ImGui::ColorEdit3("Sun Light Color", glm::value_ptr(Renderer3D::m_SunColor));
+	ImGui::DragFloat("Sun Intensity", &Renderer3D::m_SunIntensity, 0.01);
+
+	ImGui::DragInt("Number Of Mips", &Bloom::NUMBER_OF_MIPS);
+	ImGui::DragInt("Filter Radius", &Bloom::FILTER_RADIUS);
+	ImGui::DragFloat("Exposure", &Bloom::m_Exposure,0.01);
+	ImGui::DragFloat("Bloom Amount", &Bloom::m_BloomAmount, 0.01);
+	ImGui::DragFloat("Brightness Threshold", &Bloom::m_BrightnessThreshold, 0.001);
+
 	ImGui::End();
 
 	ImGui::Begin("Shadow Map and SSAO map");
@@ -204,6 +225,8 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::SameLine();
 	ImGui::TextColored({ 0,1,0,1 }, std::to_string(frame_time).c_str());
 	ImGui::Checkbox("Simulate Physics", &Physics3D::SimulatePhysics);
+	ImGui::DragFloat("Foliage Coverage", &Scene::foliage_dist, 100, 0, 100000, "%8f");
+	ImGui::DragFloat("Foliage Density", &Scene::num_foliage, 100, 0, 100000, "%8f");
 	ImGui::End();
 	m_Pannel.OnImGuiRender();
 }

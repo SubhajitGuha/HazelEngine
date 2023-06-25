@@ -57,50 +57,51 @@ const float Threshold_dist = 1000.0;
 void main()
 {
 	if(abs(length(u_CamPos - m_pos.xyz))>Threshold_dist) // SSAO rendering threshold beyond this the ambiant color will be pure white 
-		color =  vec4(1.0);
-	else
 	{
-		// For foliage ^_^
-		int index = int (m_materialindex);
-		vec3 alpha = texture(alpha_texture , vec3(tcord,index)).xyz;
-		if(isFoliage == 1 && alpha.r <= 0.06)
-			discard;
-
-		vec4 coordinate = u_ProjectionView * m_pos;
-		coordinate.xyz /= coordinate.w;
-		coordinate.xyz = coordinate.xyz*0.5 + 0.5;
-
-		vec4 position = texture(GPosition,coordinate.xy);
-
-		vec2 noiseScale = vec2(ScreenWidth/4.0 , ScreenHeight/4.0);
-		float occlusion = 0.0;
-		vec3 FragPos = position.xyz;
-		vec3 RandomVec = texture(noisetex , coordinate.xy*noiseScale).xyz;
-		vec3 normal = m_Normal;
-
-		vec3 tangent = normalize(RandomVec - normal*dot(RandomVec , normal));
-		vec3 bitangent = cross(normal , tangent);
-		mat3 TBN = mat3(tangent , bitangent, normal);
-		for(int i=0; i<RANDOM_SAMPLES_SIZE; i++)
-		{
-			 //view space
-			vec4 SamplePoint = vec4(FragPos + TBN * Samples[i] * vec3(radius),1.0);
-
-			//vec4 offset = SamplePoint;
-			vec4 offset = u_projection * SamplePoint;
-			offset.xyz = offset.xyz/offset.w;
-			offset.xyz = offset.xyz*0.5 + vec3(0.5); // 0 - 1 range
-
-			vec3 depth = texture(GPosition,offset.xy).rgb;
-
-			float RangeCheck = smoothstep(0.0,1.0 , radius/abs(FragPos.z - depth.z));
-				occlusion += (depth.z >= SamplePoint.z + bias ? 1.0:0.0) * RangeCheck;
-		}
-		occlusion = 1.0 - occlusion/RANDOM_SAMPLES_SIZE;
-		vec3 output = vec3(pow(occlusion,4.0));
-
-		//output = vec3(1.0) - exp(-output * 2);//exposure
-		//output = pow(output, vec3(1.0/2.2)); //Gamma correction
-		color =  vec4(output,1.0);
+		color =  vec4(1.0);
+		return;
 	}
+	
+	// For foliage ^_^
+	int index = int (m_materialindex);
+	vec3 alpha = texture(alpha_texture , vec3(tcord,index)).xyz;
+	if(isFoliage == 1 && alpha.r <= 0.06)
+		discard;
+
+	vec4 coordinate = u_ProjectionView * m_pos;
+	coordinate.xyz /= coordinate.w;
+	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
+
+	vec4 position = texture(GPosition,coordinate.xy);// sample the position map
+
+	vec2 noiseScale = vec2(ScreenWidth/4.0 , ScreenHeight/4.0);
+	float occlusion = 0.0;
+	vec3 FragPos = position.xyz;
+	vec3 RandomVec = texture(noisetex , coordinate.xy*noiseScale).xyz;
+	vec3 normal = m_Normal;
+
+	vec3 tangent = normalize(RandomVec - normal*dot(RandomVec , normal));
+	vec3 bitangent = cross(normal , tangent);
+	mat3 TBN = mat3(tangent , bitangent, normal);
+	for(int i=0; i<RANDOM_SAMPLES_SIZE; i++)
+	{
+		 //view space
+		vec4 SamplePoint = vec4(FragPos + TBN * Samples[i] * vec3(radius),1.0);
+
+		vec4 offset = u_projection * SamplePoint;
+		offset.xyz = offset.xyz/offset.w;
+		offset.xyz = offset.xyz*0.5 + vec3(0.5); // 0 - 1 range
+
+		vec3 depth = texture(GPosition,offset.xy).rgb;
+
+		float RangeCheck = smoothstep(0.0,1.0 , radius/abs(FragPos.z - depth.z)); //calc occlusion if depth val is within the radius
+			occlusion += (depth.z >= SamplePoint.z + bias ? 1.0:0.0) * RangeCheck;
+	}
+	occlusion = 1.0 - occlusion/RANDOM_SAMPLES_SIZE;
+	vec3 output = vec3(pow(occlusion,4.0));
+
+	//output = vec3(1.0) - exp(-output * 2);//exposure
+	//output = pow(output, vec3(1.0/2.2)); //Gamma correction
+	color =  vec4(output,1.0);
+	
 }

@@ -159,6 +159,9 @@
     <ClInclude Include="src\Hazel\Log.h" />
     <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
     <ClInclude Include="src\Hazel\Physics\Physics3D.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBloom.h" />
+    <ClInclude Include="src\Hazel\Renderer\Atmosphere.h" />
+    <ClInclude Include="src\Hazel\Renderer\Bloom.h" />
     <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
     <ClInclude Include="src\Hazel\Renderer\Camareas\Camera.h" />
     <ClInclude Include="src\Hazel\Renderer\Camareas\EditorCamera.h" />
@@ -497,6 +500,9 @@
     <ClCompile Include="src\Hazel\Log.cpp" />
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Physics\Physics3D.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBloom.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Atmosphere.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Bloom.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Camareas\Camera.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Camareas\EditorCamera.cpp" />
