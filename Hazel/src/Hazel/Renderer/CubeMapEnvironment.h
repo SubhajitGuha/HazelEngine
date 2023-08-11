@@ -7,7 +7,7 @@ namespace Hazel {
 	class CubeMapEnvironment {
 	public:
 		static void Init();
-		static void RenderCubeMap(const glm::mat4& view, const glm::mat4& proj);
+		static void RenderCubeMap(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& view_dir);
 		static void ConstructIrradianceMap();
 		static void RenderQuad(const glm::mat4& view, const glm::mat4& proj);
 	private:
@@ -15,5 +15,6 @@ namespace Hazel {
 		static unsigned int framebuffer_id;
 	private:
 		static void SwitchToFace(int n, float& pitch, float& yaw);
+		static ref<Shader> Cube_Shader;
 	};
 }

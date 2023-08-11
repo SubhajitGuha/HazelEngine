@@ -75,6 +75,7 @@ uniform int Num_PointLights;
 //PBR properties
 uniform float Roughness;
 uniform float Metallic;
+uniform float Transperancy;
 float ao = 1.0;
 
 vec3 PBR_Color = vec3(0.0);
@@ -170,6 +171,11 @@ vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
 
 void main()
 {
+	if(m_color.x > 1.0 || m_color.y > 1.0 || m_color.z > 1.0)
+	{
+		color = vec4(m_color.xyz , 1.0);
+		return;
+	}
 	int index = int (m_slotindex);
 
 	vec3 Modified_Normal = NormalMapping(index);
@@ -248,5 +254,5 @@ void main()
 	PBR_Color = vec3(1.0) - exp(-PBR_Color * 2);//exposure
 	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
 
-	color = vec4(PBR_Color,1.0);
+	color = vec4(PBR_Color,Transperancy);
 }

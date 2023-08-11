@@ -28,7 +28,8 @@ namespace Hazel {
 		static void SetUpCubeMapReflections(Scene& scene);
 		static void RenderShadows(Scene& scene, Camera& camera);
 		static void AmbiantOcclusion(Scene& scene, Camera& camera);
-
+		static void SetTransperancy(float val);
+	public:
 		static unsigned int depth_id;
 		static unsigned int ssao_id;
 		static glm::vec3 m_SunLightDir;

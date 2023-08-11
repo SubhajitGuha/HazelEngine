@@ -96,12 +96,12 @@ namespace Hazel {
 		float m_Roughness = 1.0f;
 		float m_Metallic = 0.0f;
 		float Emission_Scale = 1.0;
+		float Transperancy = 1.0f;
 		ref<Texture2D> texture = nullptr;
 		SpriteRenderer() = default;
 		SpriteRenderer(const glm::vec4& color, float roughness = 1.0f, float metallic = 0.0f, const ref<Texture2D> tex = nullptr)
 			:Color(pow(color * Emission_Scale,glm::vec4(GAMMA))),texture(tex),m_Metallic(metallic),m_Roughness(roughness)//Gamma correction in color
 		{}
-		void UpdateColor() { Color*= Emission_Scale; }
 	};
 
 	struct StaticMeshComponent

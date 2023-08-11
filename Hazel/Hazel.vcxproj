@@ -178,7 +178,9 @@
     <ClInclude Include="src\Hazel\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Hazel\Renderer\Shader.h" />
     <ClInclude Include="src\Hazel\Renderer\Shadows.h" />
+    <ClInclude Include="src\Hazel\Renderer\SkyRenderer.h" />
     <ClInclude Include="src\Hazel\Renderer\SubTexture.h" />
+    <ClInclude Include="src\Hazel\Renderer\Terrain.h" />
     <ClInclude Include="src\Hazel\Renderer\Texture.h" />
     <ClInclude Include="src\Hazel\Scene\Component.h" />
     <ClInclude Include="src\Hazel\Scene\Entity.h" />
@@ -519,7 +521,9 @@
     <ClCompile Include="src\Hazel\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Shader.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Shadows.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\SkyRenderer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Terrain.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp" />
     <ClCompile Include="src\Hazel\Scene\Entity.cpp" />
     <ClCompile Include="src\Hazel\Scene\PointLight.cpp" />

@@ -14,6 +14,8 @@
 #include "Hazel/Physics/Physics3D.h"
 #include "Hazel/Scene/SceneSerializer.h"
 #include "Hazel/Renderer/Atmosphere.h"
+#include "Hazel/Renderer/SkyRenderer.h"
+#include "Hazel/Renderer/Terrain.h"
 
 namespace Hazel {
 	
@@ -29,6 +31,9 @@ namespace Hazel {
 	Scene::Scene()
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
+		SkyRenderer::Initilize();
+		Renderer3D::Init();
+		Renderer2D::Init();
 
 		Sphere = new LoadMesh("Assets/Meshes/Sphere.fbx");
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
@@ -39,11 +44,10 @@ namespace Hazel {
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
-		//editor_cam = (EditorCamera*)Camera::GetCamera(EDITOR_CAMERA).get();
-		Renderer3D::SetUpCubeMapReflections(*this);
 		Physics3D::Initilize();
-		Atmosphere::InitilizeAtmosphere();
+		Renderer3D::SetUpCubeMapReflections(*this);
 
+		m_Terrain = std::make_shared<Terrain>(2048,2048);
 		//initilize Bloom
 		m_Bloom = Bloom::Create();
 		m_Bloom->GetFinalImage(0, { 1920,1080 });
@@ -106,6 +110,8 @@ namespace Hazel {
 			//editcam = editor_cam;
 		}
 
+		SkyRenderer::RenderSky(*MainCamera);
+		
 		MainCamera->OnUpdate(ts);
 		//run scripts
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
@@ -131,10 +137,11 @@ namespace Hazel {
 
 		std::uniform_real_distribution<float> Randdist(1.0f, foliage_dist);
 		std::default_random_engine engine;
-		//Renderer3D::BeginSceneFoliage(*MainCamera);
 
 		m_registry.each([&](auto m_entity)
 			{
+				m_Terrain->RenderTerrain(*MainCamera);
+
 				Entity Entity(this, m_entity);
 				if (Entity.GetComponent<StaticMeshComponent>().isFoliage == false)
 				{
@@ -152,10 +159,13 @@ namespace Hazel {
 
 					if (Entity.HasComponent<SpriteRenderer>()) {
 						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+						Renderer3D::SetTransperancy(SpriteRendererComponent.Transperancy);
 						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color * SpriteRendererComponent.Emission_Scale, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
 					}
-					else
+					else {
+						Renderer3D::SetTransperancy(1.0f);
 						Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
+					}
 				}
 				else
 				{

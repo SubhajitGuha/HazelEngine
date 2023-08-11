@@ -4,22 +4,22 @@ PointLight:
 Entities:
   - Entity: 13212514564232
     TagComponent:
-      tag: Entity
+      tag: plane
     TransformComponent:
-      Translation: [0, -16.2999992, 0]
-      Rotation: [0, 0, 0]
-      Scale: [10, 10, 10]
+      Translation: [0, 0, 0]
+      Rotation: [90, 0, 0]
+      Scale: [1, 1, 1]
       Transform:
         - [1, 0, 0, 0]
         - [0, 1, 0, 0]
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
     SpriteRenderer:
-      Color: [1, 1, 1, 1]
-      Roughness: 0.273999989
+      Color: [0.610038638, 1, 0, 1]
+      Roughness: 0.699999988
       Metallic: 0
     StaticMeshComponent:
-      MeshPath: Assets/Meshes/sphere_simple.fbx
+      MeshPath: Assets/Meshes/Plane.fbx
   - Entity: 13212514564232
     TagComponent:
       tag: Entity
@@ -36,19 +36,19 @@ Entities:
       MeshPath: Assets/Meshes/cityHouse_Unreal.fbx
   - Entity: 13212514564232
     TagComponent:
-      tag: plane
+      tag: Entity
     TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [90, 0, 0]
-      Scale: [1, 1, 1]
+      Translation: [0, -16.2999992, 0]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 10]
       Transform:
         - [1, 0, 0, 0]
         - [0, 1, 0, 0]
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
     SpriteRenderer:
-      Color: [1, 1, 1, 1]
-      Roughness: 0.200000003
+      Color: [0.795366287, 0, 1, 0]
+      Roughness: 0.626999974
       Metallic: 0
     StaticMeshComponent:
-      MeshPath: Assets/Meshes/Plane.fbx
+      MeshPath: Assets/Meshes/sphere_simple.fbx

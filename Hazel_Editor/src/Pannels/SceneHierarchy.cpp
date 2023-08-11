@@ -394,8 +394,9 @@ namespace Hazel {
 		if(open)
 		{
 			auto& Sprite_Renderer = m_selected_entity->GetComponent<SpriteRenderer>();
-			ImGui::DragFloat4("##Sprite", (float*)(&Sprite_Renderer.Color),0.1);
+			ImGui::ColorEdit4("##Sprite", (float*)(&Sprite_Renderer.Color));
 			ImGui::DragFloat("Emissive Strength", &Sprite_Renderer.Emission_Scale, 1);
+			ImGui::DragFloat("Transperancy", &Sprite_Renderer.Transperancy, 0.01);
 			char buf[200];
 			strcpy_s(buf,sizeof(buf), texture_path.c_str());
 			if (ImGui::InputText("Texture Path", buf, 200))

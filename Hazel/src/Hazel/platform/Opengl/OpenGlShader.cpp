@@ -4,7 +4,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 namespace Hazel {
-
+	//not adding geometry shader feature here as this different shader technique is not used for now
 	OpenGlShader::OpenGlShader(std::string& vertexshader, std::string& fragmentshader)
 	{
 
@@ -59,6 +59,24 @@ namespace Hazel {
 		program = glCreateProgram();
 		glAttachShader(program, vs);
 		glAttachShader(program, fs);
+		if (m_shaders.GeometryShader != "")// all optional shaders must be done in this manner
+		{
+			unsigned int gs = CompileShader(m_shaders.GeometryShader, GL_GEOMETRY_SHADER);
+			glAttachShader(program, gs);
+		}
+		
+		if (m_shaders.TessellationControlShader != "")
+		{
+			unsigned int tcs = CompileShader(m_shaders.TessellationControlShader, GL_TESS_CONTROL_SHADER);
+			glAttachShader(program, tcs);
+		}
+
+		if (m_shaders.TessellationExecutionShader != "")
+		{
+			unsigned int tes = CompileShader(m_shaders.TessellationExecutionShader, GL_TESS_EVALUATION_SHADER);
+			glAttachShader(program, tes);
+		}
+
 		glLinkProgram(program);
 		glValidateProgram(program);
 
@@ -94,31 +112,48 @@ namespace Hazel {
 	Shaders OpenGlShader::ParseFile(const std::string& path)
 	{
 		enum type {
-			VERTEX_SHADER=0, FRAGMENT_SHADER=1
+			VERTEX_SHADER, FRAGMENT_SHADER, GEOMETRY_SHADER, TESS_CONTROL_SHADER, TESS_EXECUTION_SHADER
 		};
 
 		std::ifstream stream(path);
 		if (&stream == nullptr)
 			HAZEL_CORE_ERROR("Shader File Not Found!!");
 		std::string ShaderCode;
-		std::string Shader[2];
+		std::string Shader[5];//as for now we have 5 shaders
 		int index;
 		while (std::getline(stream, ShaderCode))
 		{
 			if (ShaderCode.find("#shader vertex") != std::string::npos)
 			{
-				index = VERTEX_SHADER;
+				index = type::VERTEX_SHADER;
 				continue;
 			}
 			if (ShaderCode.find("#shader fragment") != std::string::npos)
 			{
-				index = FRAGMENT_SHADER;
+				index = type::FRAGMENT_SHADER;
+				continue;
+			}
+			if (ShaderCode.find("#shader geometry") != std::string::npos)
+			{
+				index = type::GEOMETRY_SHADER;
+				continue;
+			}
+
+			if (ShaderCode.find("#shader tessellation control") != std::string::npos)
+			{
+				index = type::TESS_CONTROL_SHADER;
+				continue;
+			}
+
+			if (ShaderCode.find("#shader tessellation execution") != std::string::npos)
+			{
+				index = type::TESS_EXECUTION_SHADER;
 				continue;
 			}
 
 			Shader[index].append(ShaderCode + "\n");
 		}
-		return { Shader[0],Shader[1] };
+		return { Shader[0],Shader[1],Shader[2],Shader[3],Shader[4] };
 	}
 
 	void OpenGlShader::Bind()

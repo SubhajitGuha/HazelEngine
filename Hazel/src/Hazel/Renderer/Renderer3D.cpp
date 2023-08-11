@@ -91,13 +91,6 @@ namespace Hazel {
 		m_data->shader->SetFloat3("EyePosition", camera.GetPosition());
 	}
 
-	//void Renderer3D::BeginScene(Camera& camera)
-	//{
-	//	m_data->shader->Bind();//bind the textureShader
-	//	m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionMatrix());
-	//	//dont calculate specular lighting on scene camera
-	//}
-
 	void Renderer3D::BeginScene(Camera& camera)
 	{
 		//Init();
@@ -292,6 +285,13 @@ namespace Hazel {
 	{
 		m_data->ssao->CaptureScene(scene, camera);
 		//m_data->shader->Bind();
+	}
+
+	void Renderer3D::SetTransperancy(float val)
+	{
+		m_data->shader->Bind();//you need to bind this other wise nothing will be rendererd
+		m_data->shader->SetFloat("Transperancy", val);//for now assign to 10 :)
+
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)

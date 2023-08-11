@@ -60,7 +60,6 @@ namespace Hazel {
 		glDrawBuffers(1, attachments);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	}
 	void OpenGlBloom::DownSample()
 	{
@@ -123,22 +122,14 @@ namespace Hazel {
 	}
 	void OpenGlBloom::Update(TimeStep ts)
 	{
-		//DownSample();
-		//UpSample();
-		
 		BloomToneMapShader->Bind();
 		BloomToneMapShader->SetInt("inputImage", SCENE_TEXTURE_SLOT);
 		BloomToneMapShader->SetInt("OriginalImage", ORIGINAL_SCENE_TEXTURE_SLOT);
 		BloomToneMapShader->SetFloat("exposure", Bloom::m_Exposure);
 		BloomToneMapShader->SetFloat("BloomAmount", Bloom::m_BloomAmount);
 
-		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_FBO);
 		glViewport(0, 0, m_Dimension.x, m_Dimension.y);
-		//glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_InputImage,0);
 		RenderQuad();
-		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		
-		//glBindTextureUnit(SCENE_TEXTURE_SLOT, m_InputImage);
 	}
 
 	void OpenGlBloom::RenderQuad()

@@ -80,8 +80,6 @@ namespace Hazel {
 
 	void SceneCamera::OnUpdate(TimeStep ts)
 	{
-		CubeMapEnvironment::RenderCubeMap(m_View, m_Projection);
-
 		RightVector = glm::cross(m_ViewDirection, Up);//we get the right vector (as it is always perpendicular to up and m_ViewDirection)
 
 		//RecalculateProjectionView();

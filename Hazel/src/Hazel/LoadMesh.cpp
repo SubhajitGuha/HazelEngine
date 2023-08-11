@@ -146,7 +146,7 @@ namespace Hazel {
 			glm::vec3 transformed_binormals = (BiTangent[i]);
 			buffer[i] = (VertexAttributes(glm::vec4(Vertices[i], 1.0), TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals, Material_Index[i]));
 		}
-		//select MUTABLE buffer storage for mapping into a static buffer
+
 		vb = VertexBuffer::Create(&buffer[0].Position.x,sizeof(VertexAttributes) * Vertices.size());
 
 		bl = std::make_shared<BufferLayout>(); //buffer layout

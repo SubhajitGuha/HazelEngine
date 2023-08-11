@@ -2,6 +2,7 @@
 #include "HazelEditor.h"
 #include "Hazel//Renderer/Shadows.h"
 #include "Hazel/Physics/Physics3D.h"
+#include "Hazel/Renderer/Terrain.h"
 
 //#include "Hazel/Profiling.h"
 
@@ -50,9 +51,6 @@ LoadMesh* mesh;
 
 	m_FrameBuffer = FrameBuffer::Create({1920,1080});//create a frame buffer object
 	m_FrameBuffer2 = FrameBuffer::Create({ 1920,1080 });
-	CubeMapEnvironment::Init();
-	Renderer3D::Init();
-	Renderer2D::Init();
 }
 
  void  HazelEditor::OnAttach()

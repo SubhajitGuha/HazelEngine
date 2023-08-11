@@ -15,6 +15,7 @@ namespace Hazel {
 	class Camera;
 	class PointLight;
 	class Bloom;
+	class Terrain;
 	class Scene
 	{
 	public:
@@ -44,7 +45,7 @@ namespace Hazel {
 		static float foliage_dist, num_foliage;
 		Camera* MainCamera = nullptr;//if there is no main camera Then dont render
 		ref<Bloom> m_Bloom;
-
+		ref<Terrain> m_Terrain;
 	private:
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};

@@ -6,7 +6,7 @@
 #include "stb_image_resize.h"
 
 namespace Hazel {
-	ref<Shader> Cube_Shader;
+	ref<Shader> CubeMapEnvironment::Cube_Shader;
 	ref<Shader> irradiance_shader = nullptr;
 	unsigned int CubeMapEnvironment::irradiance_map_id = 0, CubeMapEnvironment::framebuffer_id = 0;
 	void CubeMapEnvironment::Init()
@@ -51,7 +51,7 @@ namespace Hazel {
 		//glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 
-	void CubeMapEnvironment::RenderCubeMap(const glm::mat4& view, const glm::mat4& proj)
+	void CubeMapEnvironment::RenderCubeMap(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& view_dir)
 	{
 		Cube_Shader->Bind();
 		RenderQuad(view, proj);
@@ -167,6 +167,7 @@ namespace Hazel {
 		ref<VertexArray> vao = VertexArray::Create();
 		ref<VertexBuffer> vb = VertexBuffer::Create(&data[0].x, sizeof(data));
 		unsigned int i_data[] = { 0,1,2,0,2,3 };
+		//unsigned int i_data[] = { 2,1,0,3,2,0};
 		ref<IndexBuffer> ib = IndexBuffer::Create(i_data, sizeof(i_data));
 
 		ref<BufferLayout> bl = std::make_shared<BufferLayout>(); //buffer layout

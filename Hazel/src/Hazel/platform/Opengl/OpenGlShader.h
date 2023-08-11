@@ -7,6 +7,10 @@ namespace Hazel {
 	struct Shaders {
 		std::string VertexShader;
 		std::string Fragmentshader;
+		std::string GeometryShader;
+		std::string TessellationControlShader;
+		std::string TessellationExecutionShader;
+		//compute shader, tess shader....
 	};
 
 	class OpenGlShader : public Shader {
