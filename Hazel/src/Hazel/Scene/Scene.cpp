@@ -46,6 +46,7 @@ namespace Hazel {
 		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
 		Physics3D::Initilize();
 		Renderer3D::SetUpCubeMapReflections(*this);
+		editor_cam.SetPerspectiveFar(10000);
 
 		m_Terrain = std::make_shared<Terrain>(2048,2048);
 		//initilize Bloom

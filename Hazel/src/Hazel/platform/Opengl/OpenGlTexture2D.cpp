@@ -10,7 +10,8 @@ namespace Hazel {
 		:m_Height(0),m_Width(0)
 	{
 		stbi_set_flip_vertically_on_load(1);
-		pixel_data = stbi_load(path.c_str(), &m_Width, &m_Height, &channels,0);
+
+		pixel_data = stbi_load_16(path.c_str(), &m_Width, &m_Height, &channels,0);
 
 		if (pixel_data == nullptr)
 			HAZEL_CORE_ERROR("Image not found!!");
@@ -19,19 +20,29 @@ namespace Hazel {
 		GLenum InternalFormat = 0,Format = 0;
 		if (channels == 4)
 		{
-			InternalFormat = GL_RGBA8;
+			InternalFormat = GL_RGBA16;
 			Format = GL_RGBA;
 		}
 		else if (channels == 3)
 		{
-			InternalFormat = GL_RGB8;
+			InternalFormat = GL_RGB16;
 			Format = GL_RGB;
+		}
+		else if (channels == 2)
+		{
+			InternalFormat = GL_RG16;
+			Format = GL_RG;
+		}
+		else if (channels == 1)
+		{
+			InternalFormat = GL_R16;
+			Format = GL_RED;
 		}
 		else
 			HAZEL_CORE_ERROR("Invalid Texture format");
 		
 
-		Resize_Image(2048, 2048);//resize the image if width,height > 100 (for the #trading application this is necessary)
+		//Resize_Image(2048, 2048);//resize the image if width,height > 100 (for the #trading application this is necessary)
 							//otherwise not needed (i might resize the image if img dimension < 1080p or it will crash)
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
@@ -46,11 +57,11 @@ namespace Hazel {
 
 		if (resized_image)
 		{
-			glTextureSubImage2D(m_Renderid, 0, 0, 0, m_Width, m_Height, Format, GL_UNSIGNED_BYTE, resized_image);
+			glTextureSubImage2D(m_Renderid, 0, 0, 0, m_Width, m_Height, Format, GL_UNSIGNED_SHORT, resized_image);
 			stbi_image_free(resized_image);
 		}
 		else if (pixel_data) {
-			glTextureSubImage2D(m_Renderid, 0, 0, 0, m_Width, m_Height, Format, GL_UNSIGNED_BYTE, pixel_data);
+			glTextureSubImage2D(m_Renderid, 0, 0, 0, m_Width, m_Height, Format, GL_UNSIGNED_SHORT, pixel_data);
 			stbi_image_free(pixel_data);
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -85,15 +96,16 @@ namespace Hazel {
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-	void OpenGlTexture2D::Resize_Image(const float& width, const float& height)
-	{
-		if (m_Height > width && m_Width > height)//resize the 
-		{
-			//float ar = m_Width / m_Height;
-			resized_image = new unsigned char[width * height * channels];
-			stbir_resize_uint8(pixel_data, m_Width, m_Height, 0, resized_image, width, height, 0, channels);
-			m_Height = height;
-			m_Width = width;
-		}
-	}
+	//void OpenGlTexture2D::Resize_Image(const float& width, const float& height)
+	//{
+	//	if (m_Height > width && m_Width > height)//resize the 
+	//	{
+	//		//float ar = m_Width / m_Height;
+	//		resized_image = new unsigned short[width * height * channels];
+	//		stbir_resize
+	//		stbir_resize_uint8(pixel_data, m_Width, m_Height, 0, resized_image, width, height, 0, channels);
+	//		m_Height = height;
+	//		m_Width = width;
+	//	}
+	//}
 }

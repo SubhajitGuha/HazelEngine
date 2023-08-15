@@ -171,6 +171,7 @@
     <None Include="Assets\Shaders\DownsampleBloom_Shader.glsl" />
     <None Include="Assets\Shaders\ExtractHighFrequencyParts_Shader.glsl" />
     <None Include="Assets\Shaders\TerrainShader.glsl" />
+    <None Include="Assets\Shaders\TerrainWireframeShader.glsl" />
     <None Include="Assets\Shaders\UpSampleBloom_Shader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

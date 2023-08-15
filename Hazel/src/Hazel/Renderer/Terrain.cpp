@@ -5,12 +5,15 @@
 #include "stb_image.h"
 namespace Hazel
 {
+	float Terrain::WaterLevel = 0.1, Terrain::HillLevel = 0.5, Terrain::MountainLevel = 1.0, Terrain::HeightScale = 1000;
 	Terrain::Terrain(float width, float height)
 	{
+		StartTime = std::chrono::high_resolution_clock::now();
 		m_dimension.x = width;
 		m_dimension.y = height;
 		m_maxTerrainHeight = std::numeric_limits<float>::min();
 		m_terrainShader = Shader::Create("Assets/Shaders/TerrainShader.glsl");
+		m_terrainWireframeShader = Shader::Create("Assets/Shaders/TerrainWireframeShader.glsl");
 		InitilizeTerrain();
 	}
 	Terrain::~Terrain()
@@ -19,69 +22,47 @@ namespace Hazel
 	}
 	void Terrain::InitilizeTerrain()
 	{
-		unsigned char* data = stbi_load("Assets/Textures/Terrain_Height_Map.png",&m_Width,&m_Height,&m_Channels,0);
-		
-		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map.png");
+		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map2.png");
+
 		m_terrainShader->Bind();
 		m_HeightMap->Bind(HEIGHT_MAP_TEXTURE_SLOT);
 		m_terrainShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
+		m_terrainShader->SetInt("randFloat", NOISE_SLOT);
+		m_terrainWireframeShader->Bind();
+		m_terrainWireframeShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
 
 		m_terrainVertexArray = VertexArray::Create();
 
-		for (int j = 0; j < m_dimension.x; j++) {
-			for (int i = 0; i < m_dimension.y * m_Channels; i += m_Channels)
-			{
-				int y = data[j * m_Width + i];//R channel of 1st vertex
-
-				if (m_maxTerrainHeight < y)
-					m_maxTerrainHeight = y;
-			}
-		}
-		//m_dimension is <= m_width,m_height
-		for (int j = 0; j < m_dimension.x ; j++) {
-			for (int i = 0; i < m_dimension.y ; i++) 
-			{
-				int y = data[(j * m_Width + i)*m_Channels];//R channel vertex
-
-				glm::vec3 pos = { i ,(y/m_maxTerrainHeight)*500,j};
-				glm::vec2 tcoord = { i / m_dimension.y,j / m_dimension.x };
-				glm::vec3 normal = { 0,0,0 };
-				terrainData.push_back({ pos,tcoord,normal });
-			}
-		}
-
-		std::vector<unsigned int> index_buf(m_dimension.x * m_dimension.y);
-		int offset = 0;
-		for (int i = 0; i <= m_dimension.x * m_dimension.y; i += 6)
+		//divide the landscape in 'n' number of patches
+		float res = 32.0f;
+		for (int i = 0; i < m_dimension.y / res; i++)
 		{
-			//do normal calculation here
-			index_buf[i + 0] = offset;
-			index_buf[i + 1] = (offset + m_dimension.x);
-			index_buf[i + 2] = (offset + m_dimension.x + 1);
-			index_buf[i + 3] = offset;
-			index_buf[i + 4] = offset + m_dimension.x + 1;
-			index_buf[i + 5] = offset + 1;
+			for (int j = 0; j < m_dimension.y / res; j++)
+			{
+				TerrainData v1;
+				v1.Position = glm::vec3(-m_dimension.x / 2 + j*res, 0, -m_dimension.y / 2 + i*res);
+				v1.TexCoord = glm::vec2(j*res/m_dimension.x,i*res/m_dimension.y);
+				v1.Normal = glm::vec3(0, 0, 0);
+				terrainData.push_back(v1);
 
-			auto& v1 = terrainData[index_buf[i]];
-			auto& v2 = terrainData[index_buf[i + 1]];
-			auto& v3 = terrainData[index_buf[i + 2]];
-			auto& v4 = terrainData[index_buf[i + 3]];
-			auto& v5 = terrainData[index_buf[i + 4]];
-			auto& v6 = terrainData[index_buf[i + 5]];
+				TerrainData v2;
+				v2.Position = glm::vec3(-m_dimension.x / 2 + j*res + res, 0, -m_dimension.y / 2 + i*res);
+				v2.TexCoord = glm::vec2(j*res/m_dimension.x + res/m_dimension.x, i*res/m_dimension.y);
+				v2.Normal = glm::vec3(0, 0, 0);
+				terrainData.push_back(v2);
 
-			//normal for v1
-			v1.Normal = glm::cross(v2.Position - v1.Position, v3.Position- v1.Position);
-			//normal for v2
-			v2.Normal = glm::cross(v1.Position - v2.Position, v3.Position - v2.Position);
-			//normal for v3
-			v3.Normal = glm::cross(v2.Position - v3.Position, v1.Position - v3.Position);
-			//normal for v4
-			v3.Normal = glm::cross(v5.Position - v4.Position, v6.Position - v4.Position);
-			//normal for v5
-			v3.Normal = glm::cross(v4.Position - v5.Position, v6.Position - v5.Position);
-			//normal for v6
-			v3.Normal = glm::cross(v5.Position - v6.Position, v4.Position - v6.Position);
-			offset += 1;
+				TerrainData v3;
+				v3.Position = glm::vec3(-m_dimension.x / 2 + j*res, 0, -m_dimension.y / 2 + i*res + res);
+				v3.TexCoord = glm::vec2(j*res/m_dimension.x, i*res/m_dimension.y + res/m_dimension.y);
+				v3.Normal = glm::vec3(0, 0, 0);
+				terrainData.push_back(v3);
+
+				TerrainData v4;
+				v4.Position = glm::vec3(-m_dimension.x / 2 + j * res + res, 0, -m_dimension.y / 2 + i * res + res);
+				v4.TexCoord = glm::vec2(j * res / m_dimension.x + res / m_dimension.x, i * res / m_dimension.y + res / m_dimension.y);
+				v4.Normal = glm::vec3(0, 0, 0);
+				terrainData.push_back(v4);
+			}
 		}
 
 		ref<VertexBuffer> vb = VertexBuffer::Create(&terrainData[0].Position.x, sizeof(TerrainData)*terrainData.size());
@@ -89,24 +70,43 @@ namespace Hazel
 		bl->push("Position", DataType::Float3);
 		bl->push("coord", DataType::Float2);
 		bl->push("normal", DataType::Float3);
-		ref<IndexBuffer> ib = IndexBuffer::Create(&index_buf[0], sizeof(unsigned int) * index_buf.size());
 		m_terrainVertexArray->AddBuffer(bl, vb);
-		m_terrainVertexArray->SetIndexBuffer(ib);
-
-		stbi_image_free(data);
+		glPatchParameteri(GL_PATCH_VERTICES, 4);//will be present after al vertex array operations
 	}
 	void Terrain::RenderTerrain(Camera& cam)
 	{
+		glDisable(GL_CULL_FACE);
+		//glCullFace(GL_FRONT);
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0,1,0 }) * glm::rotate(glm::mat4(1.0), glm::radians(180.0f), {0,0,1});
 		m_terrainShader->Bind();
+		m_terrainShader->SetFloat("HEIGHT_SCALE", HeightScale);
+		m_terrainShader->SetFloat3("u_LightDir", Renderer3D::m_SunLightDir);
+		m_terrainShader->SetFloat("u_Intensity", Renderer3D::m_SunIntensity);
 		m_terrainShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
 		m_terrainShader->SetMat4("u_Model", transform);
-		m_terrainShader->SetFloat("u_maxTerrainHeight", m_maxTerrainHeight);
-		//m_terrainShader->SetMat4("u_Model", transform);
+		m_terrainShader->SetMat4("u_View", cam.GetViewMatrix());
+		m_terrainShader->SetFloat3("camPos", cam.GetCameraPosition());
+		m_terrainShader->SetFloat("WaterLevel", WaterLevel);
+		m_terrainShader->SetFloat("HillLevel", HillLevel);
+		m_terrainShader->SetFloat("MountainLevel", MountainLevel);
+		float time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - StartTime).count();
+		m_terrainShader->SetFloat("Time", time);
+		//HAZEL_CORE_ERROR(time);
+		//RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 
-		//m_terrainVertexArray->Bind();
-		//glDrawArrays(GL_LINES, 0, terrainData.size());
-		//RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size());
-		RenderCommand::DrawIndex(*m_terrainVertexArray);
+		m_terrainWireframeShader->Bind();
+		m_terrainShader->SetFloat("HEIGHT_SCALE", HeightScale);
+		m_terrainWireframeShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
+		m_terrainWireframeShader->SetMat4("u_Model", transform);
+		m_terrainWireframeShader->SetMat4("u_View", cam.GetViewMatrix());
+		m_terrainWireframeShader->SetFloat3("camPos", cam.GetCameraPosition());
+		m_terrainWireframeShader->SetFloat("WaterLevel", WaterLevel);
+		m_terrainWireframeShader->SetFloat("HillLevel", HillLevel);
+		m_terrainWireframeShader->SetFloat("MountainLevel", MountainLevel);
+
+		RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
+
 	}
 }

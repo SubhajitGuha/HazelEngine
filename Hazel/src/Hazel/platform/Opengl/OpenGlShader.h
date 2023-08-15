@@ -9,7 +9,7 @@ namespace Hazel {
 		std::string Fragmentshader;
 		std::string GeometryShader;
 		std::string TessellationControlShader;
-		std::string TessellationExecutionShader;
+		std::string TessellationEvaluationShader;
 		//compute shader, tess shader....
 	};
 

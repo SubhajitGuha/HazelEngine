@@ -71,9 +71,9 @@ namespace Hazel {
 			glAttachShader(program, tcs);
 		}
 
-		if (m_shaders.TessellationExecutionShader != "")
+		if (m_shaders.TessellationEvaluationShader != "")
 		{
-			unsigned int tes = CompileShader(m_shaders.TessellationExecutionShader, GL_TESS_EVALUATION_SHADER);
+			unsigned int tes = CompileShader(m_shaders.TessellationEvaluationShader, GL_TESS_EVALUATION_SHADER);
 			glAttachShader(program, tes);
 		}
 
@@ -112,7 +112,7 @@ namespace Hazel {
 	Shaders OpenGlShader::ParseFile(const std::string& path)
 	{
 		enum type {
-			VERTEX_SHADER, FRAGMENT_SHADER, GEOMETRY_SHADER, TESS_CONTROL_SHADER, TESS_EXECUTION_SHADER
+			VERTEX_SHADER, FRAGMENT_SHADER, GEOMETRY_SHADER, TESS_CONTROL_SHADER, TESS_EVALUATION_SHADER
 		};
 
 		std::ifstream stream(path);
@@ -145,9 +145,9 @@ namespace Hazel {
 				continue;
 			}
 
-			if (ShaderCode.find("#shader tessellation execution") != std::string::npos)
+			if (ShaderCode.find("#shader tessellation evaluation") != std::string::npos)
 			{
-				index = type::TESS_EXECUTION_SHADER;
+				index = type::TESS_EVALUATION_SHADER;
 				continue;
 			}
 

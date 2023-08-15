@@ -202,7 +202,13 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::DragFloat("Exposure", &Bloom::m_Exposure,0.01);
 	ImGui::DragFloat("Bloom Amount", &Bloom::m_BloomAmount, 0.01);
 	ImGui::DragFloat("Brightness Threshold", &Bloom::m_BrightnessThreshold, 0.001);
+	ImGui::End();
 
+	ImGui::Begin("Terrain Params");
+	ImGui::DragFloat("Water Level", &Terrain::WaterLevel, 0.001);
+	ImGui::DragFloat("Hill Level", &Terrain::HillLevel, 0.001);
+	ImGui::DragFloat("Mountain Level", &Terrain::MountainLevel, 0.001);
+	ImGui::DragFloat("Terrain Scale", &Terrain::HeightScale, 10);
 	ImGui::End();
 
 	ImGui::Begin("Shadow Map and SSAO map");

@@ -22,6 +22,10 @@ namespace Hazel {
 		{
 			m_RendererAPI->DrawArrays(vertexarray,count,first);
 		}
+		inline static void DrawArrays(VertexArray& vertexarray, size_t count,unsigned int renderingMode, int first = 0)
+		{
+			m_RendererAPI->DrawArrays(vertexarray, count, renderingMode, first);
+		}
 		inline static void DrawInstancedArrays(VertexArray& vertexarray, size_t count, size_t instance_count, int first = 0)
 		{
 			m_RendererAPI->DrawInstancedArrays(vertexarray, count,instance_count, first);
