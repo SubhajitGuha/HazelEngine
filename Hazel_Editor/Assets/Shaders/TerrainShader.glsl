@@ -124,8 +124,10 @@ uniform mat4 u_ProjectionView;
 uniform mat4 u_Model;
 uniform float HEIGHT_SCALE;
 uniform float HillLevel;
-uniform sampler2D randFloat;
+uniform sampler2D u_perlinNoise;
+uniform float FoliageHeight;
 uniform float Time;
+
 in GS_Data
 {
 	vec2 TexCoord;
@@ -188,34 +190,26 @@ void main()
 	fs_data.TexCoord = gs_data[2].TexCoord;
 	grass_data.Pos = vec3(0.0);
 	EmitVertex();
-
-	EndPrimitive();
 	
 	float y = gl_in[1].gl_Position.y/HEIGHT_SCALE;
 	if(y>HillLevel)
 		return;
 
 	//Render Grass	
-	vec3 n1 = cross((gl_in[0].gl_Position.xyz - gl_in[1].gl_Position.xyz), (gl_in[2].gl_Position.xyz - gl_in[1].gl_Position.xyz));
-	//vec3 n2 = cross((gl_in[0].gl_Position.xyz - gl_in[2].gl_Position.xyz), (gl_in[1].gl_Position.xyz - gl_in[2].gl_Position.xyz));
-	
+	vec3 normal = normalize(cross((gl_in[0].gl_Position.xyz - gl_in[1].gl_Position.xyz), (gl_in[2].gl_Position.xyz - gl_in[1].gl_Position.xyz)));
+	vec3 tangent = normalize(cross(normal, (gl_in[2].gl_Position.xyz - gl_in[1].gl_Position.xyz)));
+	vec3 bitangent = normalize(cross(tangent,normal));
+
 	float seed = gs_data[1].TexCoord.x + gs_data[1].TexCoord.y;
-	float angleX = gs_data[1].TexCoord.x * 2048.0;
-	float angleY = gs_data[1].TexCoord.y * 2048.0;
-	vec4 position = VertexPos1_ws + vec4(normalize(mat3(u_Model) * n1)*5.0 * random(seed),0.0) ;//+ vec4(sin(Time*angleX),0,sin(Time*angleY),0.0) * 10.0;
+	float noiseValue = texture(u_perlinNoise, gs_data[1].TexCoord).r; //sample the perlin noise texture
+
+	vec4 position = VertexPos1_ws + vec4(normalize(mat3(u_Model) * normal)* FoliageHeight * (random(seed)+noiseValue),0.0) + vec4(normalize(mat3(u_Model) * tangent)*2.0 * noiseValue,0.0)
+		+ vec4(normalize(mat3(u_Model) * bitangent)*3.0 * noiseValue,0.0) +
+		+ vec4(normalize(mat3(u_Model) * tangent)*2.0 * sin(Time),0.0) * noiseValue + vec4(normalize(mat3(u_Model) * bitangent)*2.0 * cos(Time),0.0)* noiseValue;
+
 	gl_Position = u_ProjectionView * position;
 	grass_data.Pos = gl_Position.xyz;
 	fs_data.TexCoord = gs_data[1].TexCoord;
-	EmitVertex();
-
-	gl_Position = u_ProjectionView * VertexPos1_ws;
-	fs_data.TexCoord = gs_data[1].TexCoord;
-	grass_data.Pos = gl_Position.xyz;
-	EmitVertex();
-
-	gl_Position = u_ProjectionView * VertexPos2_ws;
-	fs_data.TexCoord = gs_data[2].TexCoord;
-	grass_data.Pos = gl_Position.xyz;
 	EmitVertex();
 }
 

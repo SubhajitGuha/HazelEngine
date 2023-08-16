@@ -19,9 +19,9 @@ void main()
 #version 410 core
 layout (vertices = 4) out;
 const float MAX_TESS_LEVEL = 32;
-const float MIN_TESS_LEVEL = 2;
-const float MAX_CAM_DIST = 50;
-const float MIN_CAM_DIST = 50;
+const float MIN_TESS_LEVEL = 1;
+const float MAX_CAM_DIST = 100;
+const float MIN_CAM_DIST = 0;
 
 in vec2 TexCoord[];
 out TCS_Data
@@ -29,21 +29,31 @@ out TCS_Data
 	vec2 TexCoord_TCS;
 } tcs_data[];
 
+uniform float HEIGHT_SCALE;
 uniform vec3 camPos; //in ws
 uniform mat4 u_Model;
 uniform mat4 u_View;
+uniform sampler2D u_HeightMap;
+
 void main()
 {
-	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-	tcs_data[gl_InvocationID].TexCoord_TCS = TexCoord[gl_InvocationID];
-
 	if(gl_InvocationID == 0)
 	{
-		vec4 p1 = u_View * u_Model * gl_in[0].gl_Position;
-		vec4 p2 = u_View * u_Model * gl_in[1].gl_Position;
-		vec4 p3 = u_View * u_Model * gl_in[2].gl_Position;
-		vec4 p4 = u_View * u_Model * gl_in[3].gl_Position;
+		//float Height1 = texture(u_HeightMap,tcs_data[0].TexCoord_TCS).r * HEIGHT_SCALE;
+		//vec4 newPos1 = vec4(0,Height1,0,0);
+		//float Height2 = texture(u_HeightMap,tcs_data[1].TexCoord_TCS).r * HEIGHT_SCALE;
+		//vec4 newPos2 = vec4(0,Height2,0,0);
+		//float Height3 = texture(u_HeightMap,tcs_data[2].TexCoord_TCS).r * HEIGHT_SCALE;
+		//vec4 newPos3 = vec4(0,Height3,0,0);
+		//float Height4 = texture(u_HeightMap,tcs_data[3].TexCoord_TCS).r * HEIGHT_SCALE;
+		//vec4 newPos4 = vec4(0,Height4,0,0);
 
+
+		vec4 p1 = u_View * u_Model * (gl_in[0].gl_Position);// + newPos1);
+		vec4 p2 = u_View * u_Model * (gl_in[1].gl_Position);// + newPos2);
+		vec4 p3 = u_View * u_Model * (gl_in[2].gl_Position);// + newPos3);
+		vec4 p4 = u_View * u_Model * (gl_in[3].gl_Position);// + newPos4);
+		
 		float dist01 = clamp( (abs(p1.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
 		float dist02 = clamp( (abs(p2.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
 		float dist03 = clamp( (abs(p3.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
@@ -63,6 +73,8 @@ void main()
 		gl_TessLevelInner[1] = max(TessValue01,TessValue03);
 	}
 
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	tcs_data[gl_InvocationID].TexCoord_TCS = TexCoord[gl_InvocationID];
 }
 
 
@@ -76,10 +88,17 @@ in TCS_Data
 	vec2 TexCoord_TCS;
 } tcs_data[];
 
+out GS_Data
+{
+	vec2 TexCoord;
+}gs_data;
+
 uniform sampler2D u_HeightMap;
 uniform mat4 u_ProjectionView;
 uniform mat4 u_Model;
 uniform float HEIGHT_SCALE;
+
+vec2 texture_size;
 
 vec4 Interpolate(vec4 v0, vec4 v1, vec4 v2, vec4 v3)
 {
@@ -97,29 +116,46 @@ vec2 Interpolate(vec2 v0, vec2 v1, vec2 v2, vec2 v3)
 
 void main()
 {
-	vec4 oldPos = u_ProjectionView * u_Model * Interpolate(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position, gl_in[3].gl_Position);
+	//in object space
+	vec4 oldPos = Interpolate(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position, gl_in[3].gl_Position);
 	vec2 texCoord = Interpolate(tcs_data[0].TexCoord_TCS, tcs_data[1].TexCoord_TCS, tcs_data[2].TexCoord_TCS, tcs_data[3].TexCoord_TCS);
-
-	vec4 newPos = u_ProjectionView * u_Model * vec4(0,texture(u_HeightMap,texCoord).r*HEIGHT_SCALE,0,1); //as proj_view and model matrix is same for all vertex
+	gs_data.TexCoord = texCoord;
+	float Height = texture(u_HeightMap,texCoord).r * HEIGHT_SCALE;
+	vec4 newPos = vec4(0,Height,0,1); //as proj_view and model matrix is same for all vertex
+	
 	gl_Position = oldPos + newPos;
 }
-
 
 
 #shader geometry
 #version 410 core
 layout (triangles) in;
-layout (line_strip,max_vertices = 3) out;
+layout (line_strip,max_vertices = 6) out;
+
+uniform mat4 u_ProjectionView;
+uniform mat4 u_Model;
+uniform float HEIGHT_SCALE;
+uniform float HillLevel;
+uniform sampler2D u_perlinNoise;
+
+in GS_Data
+{
+	vec2 TexCoord;
+}gs_data[];
 
 void main()
 {
-	gl_Position = gl_in[0].gl_Position;
+	vec4 VertexPos0_ws = u_Model * gl_in[0].gl_Position;
+	vec4 VertexPos1_ws = u_Model * gl_in[1].gl_Position;
+	vec4 VertexPos2_ws = u_Model * gl_in[2].gl_Position;
+
+	gl_Position = u_ProjectionView * VertexPos0_ws;
 	EmitVertex();
 
-	gl_Position = gl_in[1].gl_Position;
+	gl_Position = u_ProjectionView * VertexPos1_ws;
 	EmitVertex();
 
-	gl_Position = gl_in[2].gl_Position;
+	gl_Position = u_ProjectionView * VertexPos2_ws;
 	EmitVertex();
 }
 
@@ -131,5 +167,5 @@ layout (location = 0) out vec4 color;
 
 void main()
 {
-	color = vec4(1.0,1.0,1.0,1.0);
+	color = vec4(1.0);
 }

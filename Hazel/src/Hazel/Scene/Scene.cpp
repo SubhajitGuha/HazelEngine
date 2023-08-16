@@ -32,6 +32,8 @@ namespace Hazel {
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
 		SkyRenderer::Initilize();
+		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
+
 		Renderer3D::Init();
 		Renderer2D::Init();
 

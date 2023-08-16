@@ -208,7 +208,10 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::DragFloat("Water Level", &Terrain::WaterLevel, 0.001);
 	ImGui::DragFloat("Hill Level", &Terrain::HillLevel, 0.001);
 	ImGui::DragFloat("Mountain Level", &Terrain::MountainLevel, 0.001);
+	ImGui::DragFloat("FoliageHeight", &Terrain::FoliageHeight, 0.1);
 	ImGui::DragFloat("Terrain Scale", &Terrain::HeightScale, 10);
+	ImGui::Checkbox("Show Terrain", &Terrain::bShowTerrain);
+	ImGui::Checkbox("Show Wireframe", &Terrain::bShowWireframeTerrain);
 	ImGui::End();
 
 	ImGui::Begin("Shadow Map and SSAO map");

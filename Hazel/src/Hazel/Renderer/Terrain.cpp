@@ -5,7 +5,11 @@
 #include "stb_image.h"
 namespace Hazel
 {
-	float Terrain::WaterLevel = 0.1, Terrain::HillLevel = 0.5, Terrain::MountainLevel = 1.0, Terrain::HeightScale = 1000;
+	float Terrain::WaterLevel = 0.1, Terrain::HillLevel = 0.5, Terrain::MountainLevel = 1.0
+		, Terrain::HeightScale = 1000, Terrain::FoliageHeight = 6.0f;
+
+	bool Terrain::bShowTerrain = true, Terrain::bShowWireframeTerrain = false;
+
 	Terrain::Terrain(float width, float height)
 	{
 		StartTime = std::chrono::high_resolution_clock::now();
@@ -23,11 +27,13 @@ namespace Hazel
 	void Terrain::InitilizeTerrain()
 	{
 		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map2.png");
+		m_perlinNoise = Texture2D::Create("Assets/Textures/PerlinTexture.png");
 
 		m_terrainShader->Bind();
 		m_HeightMap->Bind(HEIGHT_MAP_TEXTURE_SLOT);
+		m_perlinNoise->Bind(PERLIN_NOISE_TEXTURE_SLOT);
 		m_terrainShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
-		m_terrainShader->SetInt("randFloat", NOISE_SLOT);
+		m_terrainShader->SetInt("u_perlinNoise", PERLIN_NOISE_TEXTURE_SLOT);
 		m_terrainWireframeShader->Bind();
 		m_terrainWireframeShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
 
@@ -80,6 +86,7 @@ namespace Hazel
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0,1,0 }) * glm::rotate(glm::mat4(1.0), glm::radians(180.0f), {0,0,1});
 		m_terrainShader->Bind();
 		m_terrainShader->SetFloat("HEIGHT_SCALE", HeightScale);
+		m_terrainShader->SetFloat("FoliageHeight", FoliageHeight);
 		m_terrainShader->SetFloat3("u_LightDir", Renderer3D::m_SunLightDir);
 		m_terrainShader->SetFloat("u_Intensity", Renderer3D::m_SunIntensity);
 		m_terrainShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
@@ -89,15 +96,16 @@ namespace Hazel
 		m_terrainShader->SetFloat("WaterLevel", WaterLevel);
 		m_terrainShader->SetFloat("HillLevel", HillLevel);
 		m_terrainShader->SetFloat("MountainLevel", MountainLevel);
-		float time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - StartTime).count();
+		float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - StartTime).count()/1000.0;
 		m_terrainShader->SetFloat("Time", time);
 		//HAZEL_CORE_ERROR(time);
-		//RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
+		if (bShowTerrain)
+			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 
 		m_terrainWireframeShader->Bind();
-		m_terrainShader->SetFloat("HEIGHT_SCALE", HeightScale);
+		m_terrainWireframeShader->SetFloat("HEIGHT_SCALE", HeightScale);
 		m_terrainWireframeShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
 		m_terrainWireframeShader->SetMat4("u_Model", transform);
 		m_terrainWireframeShader->SetMat4("u_View", cam.GetViewMatrix());
@@ -106,7 +114,8 @@ namespace Hazel
 		m_terrainWireframeShader->SetFloat("HillLevel", HillLevel);
 		m_terrainWireframeShader->SetFloat("MountainLevel", MountainLevel);
 
-		RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
+		if (bShowWireframeTerrain)
+			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
 
 	}
 }
