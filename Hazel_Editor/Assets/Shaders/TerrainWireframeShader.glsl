@@ -49,10 +49,10 @@ void main()
 		//vec4 newPos4 = vec4(0,Height4,0,0);
 
 
-		vec4 p1 = u_View * u_Model * (gl_in[0].gl_Position);// + newPos1);
-		vec4 p2 = u_View * u_Model * (gl_in[1].gl_Position);// + newPos2);
-		vec4 p3 = u_View * u_Model * (gl_in[2].gl_Position);// + newPos3);
-		vec4 p4 = u_View * u_Model * (gl_in[3].gl_Position);// + newPos4);
+		vec4 p1 = u_View * u_Model * gl_in[0].gl_Position;
+		vec4 p2 = u_View * u_Model * gl_in[1].gl_Position;
+		vec4 p3 = u_View * u_Model * gl_in[2].gl_Position;
+		vec4 p4 = u_View * u_Model * gl_in[3].gl_Position;
 		
 		float dist01 = clamp( (abs(p1.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
 		float dist02 = clamp( (abs(p2.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
@@ -121,7 +121,7 @@ void main()
 	vec2 texCoord = Interpolate(tcs_data[0].TexCoord_TCS, tcs_data[1].TexCoord_TCS, tcs_data[2].TexCoord_TCS, tcs_data[3].TexCoord_TCS);
 	gs_data.TexCoord = texCoord;
 	float Height = texture(u_HeightMap,texCoord).r * HEIGHT_SCALE;
-	vec4 newPos = vec4(0,Height,0,1); //as proj_view and model matrix is same for all vertex
+	vec4 newPos = vec4(0,Height,0,0); //as proj_view and model matrix is same for all vertex
 	
 	gl_Position = oldPos + newPos;
 }

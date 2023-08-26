@@ -23,6 +23,12 @@ struct HitResult {
 };
 
 namespace Hazel {
+	struct PhysicsDebug
+	{
+		glm::vec3 pos0;
+		glm::vec3 pos1;
+		glm::vec3 color;
+	};
 	class LoadMesh;
 	class Physics3D {
 	public:
@@ -37,6 +43,8 @@ namespace Hazel {
 		static void AddCapsuleCollider(PhysicsComponent& physics_component);
 		static void AddPlaneCollider(PhysicsComponent& physics_component);
 		static void AddMeshCollider(const std::vector<glm::vec3>& Vertices, const std::vector<unsigned int>& indices, const glm::vec3& scaling,PhysicsComponent& physics_component);
+		static void AddHeightFieldCollider(const std::vector<int>& HeightValues, int width, int height, float spacing,const glm::mat4& transform);
+		static void DebugPhysicsColliders();
 		static void AddForce(PhysicsComponent& physics_component);// physicsComponent has all the parameters required for physics simulation
 		static void RemoveActor(PhysicsComponent& physics_component);
 		bool static Raycast(const glm::vec3& origin, const glm::vec3& dir, const float& dist,HitResult& hit);
@@ -48,6 +56,7 @@ namespace Hazel {
 		static bool SimulatePhysics;
 		glm::mat4 physics_transform;
 		HitResult Hit;
+		static std::vector<PhysicsDebug> DebugPoints;
 	private:
 		static physx::PxFoundation* m_foundation;
 		static physx::PxPhysics* m_physics ;

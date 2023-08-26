@@ -17,6 +17,8 @@ namespace Hazel {
 	physx::PxCooking* Physics3D::m_cooking = nullptr;
 	physx::PxPvd* Physics3D::gPvd = nullptr;
 	bool Physics3D::SimulatePhysics = false;
+	std::vector<PhysicsDebug> Physics3D::DebugPoints;
+
 	Physics3D::Physics3D()
 	{
 		//cube = new LoadMesh("Assets/Meshes/Cube.fbx");
@@ -230,6 +232,54 @@ namespace Hazel {
 			convexMesh->release();
 		}
 	}
+	void Physics3D::AddHeightFieldCollider(const std::vector<int>& HeightValues,int width,int height, float spacing, const glm::mat4& transform)
+	{
+		m_defaultMaterial = m_physics->createMaterial(0.6, 0.6, 0.7);
+
+		physx::PxTransform localTm(*(physx::PxMat44*)glm::value_ptr(transform));
+		physx::PxHeightFieldSample* samples = new physx::PxHeightFieldSample[HeightValues.size()];
+		for (int i = 0; i < HeightValues.size(); i++)
+		{
+			samples[i].height = HeightValues[i];
+			samples[i].materialIndex0 = 2;
+			samples[i].materialIndex1 = 3;
+		}
+
+		physx::PxHeightFieldDesc hfDesc;
+		hfDesc.format = physx::PxHeightFieldFormat::eS16_TM;
+		hfDesc.nbColumns = width/ spacing;
+		hfDesc.nbRows = height/ spacing;
+		hfDesc.samples.data = samples;
+		hfDesc.samples.stride = sizeof(physx::PxHeightFieldSample);
+
+		physx::PxHeightField* aHeightField = m_cooking->createHeightField(hfDesc,
+			m_physics->getPhysicsInsertionCallback());
+		// flags = physx::PxMeshGeometryFlags::PxFlags::;
+		physx::PxHeightFieldGeometry hfGeom(aHeightField, physx::PxMeshGeometryFlags(), 1, spacing,
+			spacing);
+		//physx::PxRigidActorExt::createExclusiveShape()
+		physx::PxShape* aHeightFieldShape = m_physics->createShape(hfGeom, *m_defaultMaterial);
+		auto StaticHf = physx::PxCreateStatic(*m_physics, localTm, *aHeightFieldShape);
+		StaticHf->setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+		m_scene->addActor(*StaticHf);
+		aHeightFieldShape->release();
+
+	}
+	void Physics3D::DebugPhysicsColliders()
+	{
+		m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
+		m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 2.0f);
+		const physx::PxRenderBuffer& rb = m_scene->getRenderBuffer();
+		DebugPoints.resize(rb.getNbLines());
+
+		for (int i = 0; i < rb.getNbLines(); i++)
+		{
+			const physx::PxDebugLine& line = rb.getLines()[i];
+			DebugPoints[i].pos0 = *(glm::vec3*)&line.pos0;
+			DebugPoints[i].pos1 = *(glm::vec3*)&line.pos1;
+			DebugPoints[i].color = *(glm::vec3*)&line.color0;
+		}
+	}
 	void Physics3D::AddForce(PhysicsComponent& physics_component)
 	{
 		if (physics_component.m_DynamicActor)
@@ -291,6 +341,8 @@ namespace Hazel {
 		m_scene->fetchResults(true);
 		//std::cout << "Simulating" <<x<< std::endl;
 		std::this_thread::sleep_for(std::chrono::milliseconds(int(ts * 1000)));
+
+		DebugPhysicsColliders();
 	}
 	void Physics3D::SetUpPhysics()
 	{
@@ -303,6 +355,7 @@ namespace Hazel {
 
 		m_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_foundation, physx::PxCookingParams(TollarenceScale));
 		m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, TollarenceScale);
+		PxRegisterHeightFields(*m_physics);
 
 		if (!m_physics)
 			HAZEL_CORE_ERROR("Error in creating physics object");

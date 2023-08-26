@@ -109,7 +109,7 @@ void main()
 	vec2 texCoord = Interpolate(tcs_data[0].TexCoord_TCS, tcs_data[1].TexCoord_TCS, tcs_data[2].TexCoord_TCS, tcs_data[3].TexCoord_TCS);
 	gs_data.TexCoord = texCoord;
 	float Height = texture(u_HeightMap,texCoord).r * HEIGHT_SCALE;
-	vec4 newPos = vec4(0,Height,0,1); //as proj_view and model matrix is same for all vertex
+	vec4 newPos = vec4(0,Height,0,0); //as proj_view and model matrix is same for all vertex
 	
 	gl_Position = oldPos + newPos;
 }
@@ -118,7 +118,7 @@ void main()
 #shader geometry
 #version 410 core
 layout (triangles) in;
-layout (triangle_strip,max_vertices = 6) out;
+layout (triangle_strip,max_vertices = 4) out;
 
 uniform mat4 u_ProjectionView;
 uniform mat4 u_Model;

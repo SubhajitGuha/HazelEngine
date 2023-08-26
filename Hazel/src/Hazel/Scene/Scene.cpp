@@ -32,7 +32,7 @@ namespace Hazel {
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
 		SkyRenderer::Initilize();
-		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
+		SkyRenderer::SetSkyType(SkyType::CUBE_MAP_SKY);
 
 		Renderer3D::Init();
 		Renderer2D::Init();
@@ -41,7 +41,7 @@ namespace Hazel {
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
 		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
-		Fern = new LoadMesh("Assets/Meshes/shrub.fbx");
+		Fern = new LoadMesh("Assets/Meshes/grass.fbx");
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
@@ -135,6 +135,13 @@ namespace Hazel {
 		if (m_PointLights.size() > 0)
 			Renderer3D::SetPointLightPosition(m_PointLights);
 
+		//debug physics
+		Renderer2D::BeginScene(*MainCamera);
+		for (int i = 0; i < Physics3D::DebugPoints.size(); i++)
+		{
+			Renderer2D::DrawLine(Physics3D::DebugPoints[i].pos0, Physics3D::DebugPoints[i].pos1, glm::vec4(0.0, 1.0, 0.6, 1.0));
+		}
+
 		Renderer3D::SetSunLightDirection(Renderer3D::m_SunLightDir);
 		Renderer3D::SetSunLightColorAndIntensity(Renderer3D::m_SunColor, Renderer3D::m_SunIntensity);
 
@@ -142,7 +149,7 @@ namespace Hazel {
 		std::default_random_engine engine;
 
 		m_registry.each([&](auto m_entity)
-			{
+			{			
 				m_Terrain->RenderTerrain(*MainCamera);
 
 				Entity Entity(this, m_entity);

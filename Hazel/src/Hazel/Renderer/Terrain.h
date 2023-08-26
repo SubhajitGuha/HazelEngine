@@ -26,5 +26,6 @@ namespace Hazel
 		int m_Height, m_Width, m_Channels;
 		float m_maxTerrainHeight;
 		std::chrono::steady_clock::time_point StartTime;
+		std::vector<glm::mat4> Grass_modelMat;
 	};
 }

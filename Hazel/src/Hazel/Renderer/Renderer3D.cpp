@@ -196,7 +196,7 @@ namespace Hazel {
 
 	void Renderer3D::DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
 	{
-		//glDisable(GL_CULL_FACE);
+		glDisable(GL_CULL_FACE);
 		//this is not ideal!! I just cannot handle shaders like this in a long run
 		m_data->foliage_shader->Bind();//bind the textureShader
 
@@ -214,13 +214,13 @@ namespace Hazel {
 		m_data->foliage_shader->SetFloat4("m_color", color);
 
 		RenderCommand::DrawArrays(*mesh.VertexArray, mesh.Vertices.size());
-		//glEnable(GL_CULL_FACE);
-		//glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	}
 
 	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, const std::vector<glm::mat4>& Instanced_ModelMatrix, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
 	{
-		//glDisable(GL_CULL_FACE);
+		glDisable(GL_CULL_FACE);
 		m_data->foliageShader_instanced->Bind();
 
 		m_data->foliageShader_instanced->SetFloat("Roughness", material_Roughness); //send the roughness value
@@ -258,8 +258,8 @@ namespace Hazel {
 			glVertexAttribDivisor(9, 1);
 		}
 		RenderCommand::DrawInstancedArrays(*mesh.VertexArray, mesh.Vertices.size(), Instanced_ModelMatrix.size());
-		//glEnable(GL_CULL_FACE);
-		//glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	}
 	
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)

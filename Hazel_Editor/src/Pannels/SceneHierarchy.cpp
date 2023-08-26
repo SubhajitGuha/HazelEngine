@@ -457,6 +457,10 @@ namespace Hazel {
 			{
 				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Sponza);
 			}
+			if (ImGui::Checkbox("Is Foliage?", &m_selected_entity->GetComponent<StaticMeshComponent>().isFoliage))
+			{
+				//m_selected_entity->GetComponent<StaticMeshComponent>().isFoliage
+			}
 			ImGui::TreePop();
 		}
 	}

@@ -9,7 +9,7 @@ namespace Hazel {
 	EditorCamera::EditorCamera()
 		:m_View(1.0)
 	{
-		RightVector = glm::cross(m_ViewDirection, Up);
+		RightVector = glm::normalize(glm::cross(m_ViewDirection, Up));
 		m_Projection = glm::perspective(m_verticalFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		m_ProjectionView = m_Projection * m_View;
 		
@@ -94,6 +94,7 @@ namespace Hazel {
 
 			m_ViewDirection = glm::mat3(glm::rotate(glm::radians(-delta.x) * 0.1f, Up)) * m_ViewDirection;//invert it
 			m_ViewDirection = glm::mat3(glm::rotate(glm::radians(delta.y) * 0.1f, RightVector)) * m_ViewDirection;//rotate along right vector
+			m_ViewDirection = glm::normalize(m_ViewDirection);
 		}
 		OldMousePos = NewMousePos;
 
@@ -103,6 +104,7 @@ namespace Hazel {
 	void EditorCamera::RecalculateProjectionView()
 	{
 		//moving the camera is nothing but transforming the world
+		//glm::vec3 up = glm::normalize(glm::cross(RightVector, glm::normalize(m_ViewDirection)));
 		m_View = glm::lookAt(m_Position, glm::normalize(m_ViewDirection) + m_Position, Up);//this gives the view matrix
 		m_ProjectionView = m_Projection * m_View;
 	}

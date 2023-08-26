@@ -17,6 +17,8 @@ namespace Hazel {
 
 		static bool ValidateTexture(const std::string& path);
 		virtual void UnBind()const = 0;
+		virtual unsigned short* GetTexture() = 0;
+		virtual unsigned int GetChannels() = 0;
 		static ref<Texture2D> Create(const std::string& path);
 		static ref<Texture2D> Create(const unsigned int Width,const unsigned int Height, unsigned int);
 	};
