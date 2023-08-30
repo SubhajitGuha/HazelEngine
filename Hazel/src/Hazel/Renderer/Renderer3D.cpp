@@ -218,7 +218,7 @@ namespace Hazel {
 		glCullFace(GL_BACK);
 	}
 
-	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, const std::vector<glm::mat4>& Instanced_ModelMatrix, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
+	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, size_t instance_count, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
 	{
 		glDisable(GL_CULL_FACE);
 		m_data->foliageShader_instanced->Bind();
@@ -236,30 +236,34 @@ namespace Hazel {
 		m_data->foliageShader_instanced->SetMat4("u_Model", transform);
 		m_data->foliageShader_instanced->SetFloat4("m_color", color);
 
-		{//needs to be refactored!!
-			unsigned int vb;
-			glGenBuffers(1, &vb);
-			glBindBuffer(GL_ARRAY_BUFFER, vb);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4)*Instanced_ModelMatrix.size(), &Instanced_ModelMatrix[0], GL_STATIC_DRAW);
-
-			mesh.VertexArray->Bind();
-			glEnableVertexAttribArray(6);
-			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
-			glEnableVertexAttribArray(7);
-			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(1 * sizeof(glm::vec4)));
-			glEnableVertexAttribArray(8);
-			glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(2 * sizeof(glm::vec4)));
-			glEnableVertexAttribArray(9);
-			glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(3 * sizeof(glm::vec4)));
-
-			glVertexAttribDivisor(6, 1);//repeat 1ce per instance
-			glVertexAttribDivisor(7, 1);
-			glVertexAttribDivisor(8, 1);
-			glVertexAttribDivisor(9, 1);
-		}
-		RenderCommand::DrawInstancedArrays(*mesh.VertexArray, mesh.Vertices.size(), Instanced_ModelMatrix.size());
+		
+		RenderCommand::DrawInstancedArrays(*mesh.VertexArray, mesh.Vertices.size(), instance_count);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+	}
+
+	void Renderer3D::InstancedFoliageData(LoadMesh& mesh, const std::vector<glm::mat4>& Instanced_ModelMatrix)
+	{
+		//needs to be refactored!!
+		unsigned int vb;
+		glGenBuffers(1, &vb);
+		glBindBuffer(GL_ARRAY_BUFFER, vb);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * Instanced_ModelMatrix.size(), &Instanced_ModelMatrix[0], GL_STATIC_DRAW);
+
+		mesh.VertexArray->Bind();
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
+		glEnableVertexAttribArray(7);
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(1 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(8);
+		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(2 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(9);
+		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(3 * sizeof(glm::vec4)));
+
+		glVertexAttribDivisor(6, 1);//repeat 1ce per instance
+		glVertexAttribDivisor(7, 1);
+		glVertexAttribDivisor(8, 1);
+		glVertexAttribDivisor(9, 1);
 	}
 	
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)

@@ -25,12 +25,14 @@ namespace Hazel {
 	float Scene::num_foliage = 10000;
 	//std::vector<PointLight*> Scene::m_PointLights;
 	EditorCamera editor_cam;
-	 LoadMesh* Scene::Sphere=nullptr, *Scene::Sphere_simple = nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr, *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza;
+	 LoadMesh* Scene::Sphere=nullptr, *Scene::Sphere_simple = nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr
+		 , *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza, *Scene::Grass, *Scene::Flower;
 	 bool capture = false;
 	 glm::vec3 camloc = { 0,0,0 }, camrot = {0,0,0};
 	Scene::Scene()
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
+		Physics3D::Initilize();
 		SkyRenderer::Initilize();
 		SkyRenderer::SetSkyType(SkyType::CUBE_MAP_SKY);
 
@@ -41,12 +43,13 @@ namespace Hazel {
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
 		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
-		Fern = new LoadMesh("Assets/Meshes/grass.fbx");
+		Fern = new LoadMesh("Assets/Meshes/shrub.fbx");
+		Grass = new LoadMesh("Assets/Meshes/grass.fbx");
+		Flower = new LoadMesh("Assets/Meshes/flower.fbx");
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
 		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
-		Physics3D::Initilize();
 		Renderer3D::SetUpCubeMapReflections(*this);
 		editor_cam.SetPerspectiveFar(10000);
 
@@ -148,9 +151,9 @@ namespace Hazel {
 		std::uniform_real_distribution<float> Randdist(1.0f, foliage_dist);
 		std::default_random_engine engine;
 
+		m_Terrain->RenderTerrain(*MainCamera);
 		m_registry.each([&](auto m_entity)
 			{			
-				m_Terrain->RenderTerrain(*MainCamera);
 
 				Entity Entity(this, m_entity);
 				if (Entity.GetComponent<StaticMeshComponent>().isFoliage == false)
@@ -193,7 +196,7 @@ namespace Hazel {
 							glm::mat4 Instanced_mm = glm::translate(glm::mat4(1.0f), { Randdist(engine),0,Randdist(engine) }) * glm::rotate(glm::mat4(1.0), glm::radians(Randdist(engine)), { 0,1,0 }) * glm::scale(glm::mat4(1.0f), glm::vec3((Randdist(engine)-1)/(foliage_dist-1)));
 							InstancedArr.push_back(Instanced_mm);
 						}
-						Renderer3D::DrawFoliageInstanced(*Scene::Fern, transform, InstancedArr);
+						Renderer3D::DrawFoliage(*mesh, transform, SpriteRendererComponent.Color,SpriteRendererComponent.m_Roughness,SpriteRendererComponent.m_Metallic);
 					}
 					else
 						Renderer3D::DrawFoliage(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value

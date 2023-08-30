@@ -212,6 +212,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::DragFloat("Terrain Scale", &Terrain::HeightScale, 10);
 	ImGui::Checkbox("Show Terrain", &Terrain::bShowTerrain);
 	ImGui::Checkbox("Show Wireframe", &Terrain::bShowWireframeTerrain);
+	ImGui::Text(std::to_string(Terrain::ChunkIndex).c_str());
 	ImGui::End();
 
 	ImGui::Begin("Shadow Map and SSAO map");

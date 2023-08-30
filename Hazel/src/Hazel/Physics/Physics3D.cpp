@@ -234,6 +234,8 @@ namespace Hazel {
 	}
 	void Physics3D::AddHeightFieldCollider(const std::vector<int>& HeightValues,int width,int height, float spacing, const glm::mat4& transform)
 	{
+		if (m_physics == nullptr)
+			return;
 		m_defaultMaterial = m_physics->createMaterial(0.6, 0.6, 0.7);
 
 		physx::PxTransform localTm(*(physx::PxMat44*)glm::value_ptr(transform));

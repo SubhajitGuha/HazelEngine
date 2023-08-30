@@ -173,12 +173,12 @@ void main()
 {
 	int index = int (m_materialindex);
 	
-	float opacity = texture(u_Roughness , vec3(tcord,index)).r;// Opacity on R-Channel
+	//float opacity = texture(u_Roughness , vec3(tcord,index)).r;// Opacity on R-Channel
 	//color = vec4(vec3(opacity),1.0);
-	if(opacity <= 0.1)
-		discard; // if the texture value is less than a certain threshold then discard that pixel
+	//if(opacity <= 0.1)
+		//discard; // if the texture value is less than a certain threshold then discard that pixel
 
-	vec3 Modified_Normal = NormalMapping(index);
+	vec3 Modified_Normal = m_Normal;
 
 	alpha = texture(u_Roughness , vec3(tcord,index)).g * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
 	ao = texture(u_Roughness , vec3(tcord,index)).b; // Ambient occlusion on B-Channel
@@ -202,8 +202,8 @@ void main()
 	vec3 EyeDirection = normalize(EyePosition - m_pos.xyz/m_pos.w);
 
 	//shadows
-	float shadow;
-	shadow = CalculateShadow(level);
+	float shadow=1.0;
+	//shadow = CalculateShadow(level);
 
 	//diffuse_environment reflections
 	vec3 Light_dir_i = reflect(-EyeDirection,Modified_Normal);
@@ -218,41 +218,19 @@ void main()
 	vec3 BRDFintegration =  ks*alpha + max(dot(Modified_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
-	vec4 coordinate = u_ProjectionView * m_pos;
-	coordinate.xyz /= coordinate.w;
-	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
+	//vec4 coordinate = u_ProjectionView * m_pos;
+	//coordinate.xyz /= coordinate.w;
+	//coordinate.xyz = coordinate.xyz*0.5 + 0.5;
 	//ambiance
 		vec3 ambiant = (IBL_diffuse + IBL_specular) * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz;// * pow(texture(SSAO,coordinate.xy).r,2);
 
 
 
-	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
-
-	//color=vec4(PointLight_Position[0],1.0);
-	for(int i=0 ; i< Num_PointLights ; i++)
-	{
-		vec3 LightDirection = normalize(PointLight_Position[i] - m_pos.xyz/m_pos.w); //for point light
-
-		//specular
-		vec3 specular = SpecularBRDF(LightDirection , EyeDirection , Modified_Normal) ;
-		ks = Fresnel(vdoth);
-
-		//diffuse
-		kd = vec3(1.0) - ks;
-		kd *= (1.0 - Metallic);
-		vec3 diffuse = kd * texture(u_Albedo,vec3(tcord , index)).xyz * m_color.xyz / PI; // no alpha channel is being used
-
-		float dist = length(PointLight_Position[i] - m_pos.xyz/m_pos.w);
-		float attenuation = 1 / ( 0.01 * dist * dist ); //attenuation is for point and spot light
-		radiance = PointLight_Color[i] * attenuation;
-		
-		float NdotL = max(dot(Modified_Normal,LightDirection), 0.00001);
-		PBR_Color += (diffuse + specular)  * radiance * NdotL ; //for Point light (attenuation)
-	}
+	PBR_Color += ( ((kd * texture(u_Albedo, vec3(tcord , index)).xyz + m_color.xyz) / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 
 	PBR_Color += ambiant;
 	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
-	PBR_Color = vec3(1.0) - exp(-PBR_Color * 2);//exposure
+	PBR_Color = vec3(1.0) - exp(-PBR_Color * 5);//exposure
 	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
 
 	color = vec4(PBR_Color,1.0);

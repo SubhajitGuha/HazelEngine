@@ -37,7 +37,7 @@ namespace Hazel {
 		void PostProcess();
 	public:
 		std::vector<PointLight*> m_PointLights;
-		static LoadMesh* Sphere, *Sphere_simple, *Cube , *Plane,*plant,*House,* Windmill ,*Fern, *Sponza;
+		static LoadMesh* Sphere, *Sphere_simple, *Cube , *Plane,*plant,*House,* Windmill ,*Fern, *Sponza,*Grass,*Flower;
 		static unsigned int m_Scene_tex_id;
 		static unsigned int m_Scene_depth_id;
 		ref<FrameBuffer> framebuffer;
