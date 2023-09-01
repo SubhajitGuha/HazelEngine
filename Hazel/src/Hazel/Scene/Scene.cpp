@@ -39,17 +39,17 @@ namespace Hazel {
 		Renderer3D::Init();
 		Renderer2D::Init();
 
+		Flower = new LoadMesh("Assets/Meshes/flower.fbx");
 		Sphere = new LoadMesh("Assets/Meshes/Sphere.fbx");
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
 		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
 		Fern = new LoadMesh("Assets/Meshes/shrub.fbx");
 		Grass = new LoadMesh("Assets/Meshes/grass.fbx");
-		Flower = new LoadMesh("Assets/Meshes/flower.fbx");
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
-		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
-		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
+		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
+		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
 		Renderer3D::SetUpCubeMapReflections(*this);
 		editor_cam.SetPerspectiveFar(10000);
 

@@ -17,17 +17,53 @@ flat out float m_materialindex;
 
 uniform mat4 u_ProjectionView;
 uniform mat4 u_Model;
+uniform float u_Time;
 
+int amplitude = 100;
+mat4 CreateRotationMat(float x, float y, float z)
+{
+	x= radians(x);
+	y= radians(y);
+	z= radians(z);
+
+	mat4 aroundX = mat4(
+	1,0,0,0,
+	0,cos(x),sin(x),0,
+	0,-sin(x),cos(x),0,
+	0,0,0,1);
+
+	mat4 aroundY = mat4(
+	cos(y),0,-sin(y),0,
+	0,1,0,0,
+	sin(y),0,cos(y),0,
+	0,0,0,1);
+
+	mat4 aroundZ = mat4(
+	cos(z),sin(z),0,0,
+	-sin(z),cos(z),0,0,
+	0,0,1,0,
+	0,0,0,1);
+
+	return aroundX * aroundY * aroundZ;
+}
 void main()
 {
-	gl_Position = u_ProjectionView * u_Model * instance_mm * pos;
+	vec4 wsVertexPos = u_Model * instance_mm * pos;
+	mat4 wsGrass = u_Model * instance_mm;
+	vec3 origin = vec3(wsGrass[3][0],wsGrass[3][1],wsGrass[3][2]);
+	float factor = distance(wsVertexPos.xyz , origin)/10;
+	
+	if(factor<0)
+		factor = 0;
+	mat4 rot = CreateRotationMat(0,sin(u_Time)*factor*amplitude,0);
+	gl_Position = u_ProjectionView * wsGrass * rot * pos;
 
 	m_materialindex = materialindex;
 	tcord = cord;
-	m_Normal = normalize(mat3(u_Model * instance_mm) * Normal);
-	m_Tangent = normalize(mat3(u_Model * instance_mm) * Tangent);
-	m_BiTangent = normalize(mat3(u_Model * instance_mm) * BiTangent);
-	m_pos = u_Model * instance_mm * pos;
+	m_Normal = normalize(mat3(wsGrass ) * Normal );
+	m_Tangent = normalize(mat3(wsGrass ) * Tangent );
+	m_BiTangent = normalize(mat3(wsGrass ) * BiTangent );
+	m_pos = wsVertexPos;
 }
 
 #shader fragment
@@ -173,6 +209,7 @@ void main()
 {
 	int index = int (m_materialindex);
 	
+	float Transparency =  texture(u_Albedo, vec3(tcord , index)).a;
 	//float opacity = texture(u_Roughness , vec3(tcord,index)).r;// Opacity on R-Channel
 	//color = vec4(vec3(opacity),1.0);
 	//if(opacity <= 0.1)
@@ -180,7 +217,8 @@ void main()
 
 	vec3 Modified_Normal = m_Normal;
 
-	alpha = texture(u_Roughness , vec3(tcord,index)).g * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
+	//alpha = texture(u_Roughness , vec3(tcord,index)).g * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
+	alpha = Roughness;
 	ao = texture(u_Roughness , vec3(tcord,index)).b; // Ambient occlusion on B-Channel
 
 	vec4 vert_pos = view * m_pos; //get depth value(z value) in the camera-view space
@@ -233,5 +271,5 @@ void main()
 	PBR_Color = vec3(1.0) - exp(-PBR_Color * 5);//exposure
 	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
 
-	color = vec4(PBR_Color,1.0);
+	color = vec4(PBR_Color,Transparency);
 }

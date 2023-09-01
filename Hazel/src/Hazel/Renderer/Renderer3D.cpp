@@ -218,7 +218,7 @@ namespace Hazel {
 		glCullFace(GL_BACK);
 	}
 
-	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, size_t instance_count, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
+	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, size_t instance_count, const glm::vec4& color, float TimeElapsed, const float& material_Roughness, const float& material_metallic)
 	{
 		glDisable(GL_CULL_FACE);
 		m_data->foliageShader_instanced->Bind();
@@ -235,8 +235,8 @@ namespace Hazel {
 		m_data->foliageShader_instanced->SetInt("u_NormalMap", NORMAL_SLOT);
 		m_data->foliageShader_instanced->SetMat4("u_Model", transform);
 		m_data->foliageShader_instanced->SetFloat4("m_color", color);
+		m_data->foliageShader_instanced->SetFloat("u_Time", TimeElapsed);
 
-		
 		RenderCommand::DrawInstancedArrays(*mesh.VertexArray, mesh.Vertices.size(), instance_count);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);

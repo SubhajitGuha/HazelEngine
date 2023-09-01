@@ -17,8 +17,8 @@ namespace Hazel {
 		int m_Height;
 		int channels;
 		unsigned int m_Renderid;
-		unsigned char* resized_image = nullptr;
-		unsigned char* pixel_data = nullptr;
+		unsigned short* resized_image = nullptr;
+		unsigned short* pixel_data = nullptr;
 	private:
 		void Resize_Image(const float& width, const float& height);
 		void CreateWhiteTextureArray(int numMat);

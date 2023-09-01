@@ -11,7 +11,7 @@ namespace Hazel
 		, Terrain::HeightScale = 600, Terrain::FoliageHeight = 6.0f;
 
 	bool Terrain::bShowTerrain = true, Terrain::bShowWireframeTerrain = false;
-	int Terrain::maxGrassAmount = 0, Terrain::ChunkIndex = 0, Terrain::RadiusOfSpawn = 2;
+	int Terrain::maxGrassAmount = 0, Terrain::ChunkIndex = 0, Terrain::RadiusOfSpawn = 1, Terrain::GrassDensity=5;
 	Terrain::Terrain(float width, float height)
 	{
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2*RadiusOfSpawn+1,2));//radius of spawn defines how many tiles to cover from the centre
@@ -21,7 +21,7 @@ namespace Hazel
 		m_maxTerrainHeight = std::numeric_limits<float>::min();
 		m_terrainShader = Shader::Create("Assets/Shaders/TerrainShader.glsl");
 		m_terrainWireframeShader = Shader::Create("Assets/Shaders/TerrainWireframeShader.glsl");
-		Grass_modelMat.resize(maxGrassAmount);
+		Grass_modelMat.resize(maxGrassAmount * GrassDensity);
 		InitilizeTerrain();
 	}
 	Terrain::~Terrain()
@@ -32,6 +32,8 @@ namespace Hazel
 	{
 		stbi_set_flip_vertically_on_load(1);//need to abstract
 		Height_data = stbi_load_16("Assets/Textures/Terrain_Height_Map.png", &m_Width, &m_Height, &m_Channels, 0);
+		//needs to have different width,height,channels
+		GrassSpawnArea = stbi_load_16("Assets/Textures/grass_mask.png", &m_Width, &m_Height, &m_Channels1, 0);
 
 		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map.png");
 		m_perlinNoise = Texture2D::Create("Assets/Textures/PerlinTexture.png");
@@ -106,16 +108,24 @@ namespace Hazel
 		//grass spawn
 		for (int j = 0; j < m_Width; j+=1) {
 			for (int i = 0; i < m_Height; i+=1)
-			{
+			{					
+					if (GrassSpawnArea[j * m_Width + i + m_Channels1] < 1500)
+						continue;
+
 					float y = (Height_data[j * m_Width + i + m_Channels] - min_height) / (max_height - min_height);//R channel of 1st vertex
 					y *= HeightScale;
-					//if (y > 200)
-						//break;
-					TerrainGrassData data;
-					data.position = { i + RandomFloat(generator) * 2.0,y + 2.0f, j + RandomFloat(generator) * 2.0 };
-					data.rotation = { RandomFloat(generator) * 20.0f,RandomFloat(generator) * 90.0f,RandomFloat(generator) * 20.0f };//in degrees
-					data.scale = glm::vec3((RandomFloat(generator) + 1) / 2.0 + 1.0f);
-					m_GrassData.push_back(data);
+
+					GrassSpawnData data;
+					//Store the child grass data of the current cell position
+					for (int k = 0; k < GrassDensity; k++)//grass per unit
+					{
+						TerrainGrassData child_data;
+						child_data.position = { i + RandomFloat(generator) * k / GrassDensity * 2.0,y + 2.0f, j + RandomFloat(generator) * k / GrassDensity * 2.0 };
+						child_data.rotation = { RandomFloat(generator) * 20.0f,RandomFloat(generator) * 90.0f,RandomFloat(generator) * 20.0f };//in degrees
+						child_data.scale = glm::vec3((RandomFloat(generator) + 1) / 2.0 + 1.0f);
+						data.m_ChildGrassData.push_back(child_data);
+					}
+					m_GrassSpawnData[j * m_Width + i]=data;
 			}
 		}
 
@@ -186,7 +196,7 @@ namespace Hazel
 				SpawnGrassOnChunks(CamX, CamZ, RadiusOfSpawn);
 
 			Renderer3D::BeginSceneFoliage(cam);
-			Renderer3D::DrawFoliageInstanced(*Scene::Grass, transform, Grass_modelMat.size(), { 0,0.0,0.0,1 }, 0.7);
+			Renderer3D::DrawFoliageInstanced(*Scene::Grass, transform, Grass_modelMat.size(), { 0,0.0,0.0,1 },time, 0.4);
 		}
 	}
 
@@ -204,7 +214,7 @@ namespace Hazel
 	{
 		CurrentChunkIndex = GetChunkIndex(PosX, PosZ);
 		std::vector<int> NeighbourChunkIndices;
-		NeighbourChunkIndices.push_back(CurrentChunkIndex);//as grass will also be spawnned here
+		NeighbourChunkIndices.push_back(CurrentChunkIndex);//as grass will also be spawnned on the current index
 		int numberOfChunksX = m_Width / floor(ChunkSize); //number of chunks horizontally (horizontal=vertical)
 
 		//Get the neighbouring Chunks
@@ -239,21 +249,26 @@ namespace Hazel
 			{
 				for (int j = minX; j < maxX; j++)
 				{
-					int coord = abs(i) * m_Width + abs(j);
-					//coord /= 2;
+					int coord = abs(i) * m_Width  + abs(j);//get index of the arrray that stores the grass
 					if (coord > m_Width * m_Height)
 						break;
-					glm::mat4 grass_transform = glm::translate(glm::mat4(1.0), m_GrassData[coord].position) *
-						glm::rotate(glm::mat4(1.0), glm::radians(m_GrassData[coord].rotation.x), { 1,0,0 }) *
-						glm::rotate(glm::mat4(1.0), glm::radians(m_GrassData[coord].rotation.y), { 0,1,0 }) *
-						glm::rotate(glm::mat4(1.0), glm::radians(-90.0f), { 0,0,1 }) *
-						glm::scale(glm::mat4(1.0), m_GrassData[coord].scale);
-					Grass_modelMat[count] = grass_transform;
-					count++;
+					if (m_GrassSpawnData.find(coord) == m_GrassSpawnData.end())//if key is not found dont spawn the grass
+						continue;
+
+					std::vector<TerrainGrassData> grass_data = m_GrassSpawnData[coord].m_ChildGrassData;
+					for (int k = 0; k < GrassDensity; k++)
+					{
+						glm::mat4 grass_transform = glm::translate(glm::mat4(1.0), grass_data[k].position) *
+							glm::rotate(glm::mat4(1.0), glm::radians(-90.0f), { 0,0,1 }) *
+							//glm::rotate(glm::mat4(1.0), glm::radians(m_GrassData[coord].rotation.x), { 1,0,0 }) *
+							glm::rotate(glm::mat4(1.0), glm::radians(grass_data[k].rotation.y), { 0,1,0 }) *
+							glm::scale(glm::mat4(1.0), grass_data[k].scale);
+						Grass_modelMat[count] = grass_transform;
+						count++;
+					}
 				}
 			}
 		}
-		ChunkIndex = count;
 		//std::reverse(Grass_modelMat.begin(), Grass_modelMat.end());
 		Renderer3D::InstancedFoliageData(*Scene::Grass, Grass_modelMat);
 	}
