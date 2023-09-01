@@ -33,7 +33,7 @@ namespace Hazel
 		ref<VertexArray> m_terrainVertexArray;
 		std::vector<TerrainData> terrainData;
 		ref<BufferLayout> bl;
-		ref<Texture2D> m_HeightMap, m_perlinNoise;
+		ref<Texture2D> m_HeightMap, m_perlinNoise, TerrainTex_Albedo, TerrainTex_Roughness, TerratinTex_Normal;
 		int m_Height, m_Width, m_Channels,m_Channels1;
 		float m_maxTerrainHeight;
 		float max_height;

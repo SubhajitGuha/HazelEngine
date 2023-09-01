@@ -110,7 +110,9 @@ namespace Hazel {
 		
 		m_data->foliageShader_instanced->Bind();//bind the textureShader
 		m_data->foliageShader_instanced->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+		m_data->foliageShader_instanced->SetMat4("u_Projection", camera.GetProjectionMatrix());
 		m_data->foliageShader_instanced->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
+		
 	}
 
 	void Renderer3D::EndScene()
@@ -236,7 +238,7 @@ namespace Hazel {
 		m_data->foliageShader_instanced->SetMat4("u_Model", transform);
 		m_data->foliageShader_instanced->SetFloat4("m_color", color);
 		m_data->foliageShader_instanced->SetFloat("u_Time", TimeElapsed);
-
+		m_data->foliageShader_instanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
 		RenderCommand::DrawInstancedArrays(*mesh.VertexArray, mesh.Vertices.size(), instance_count);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -276,6 +278,10 @@ namespace Hazel {
 		m_data->foliage_shader->Bind();//you need to bind this other wise nothing will be rendererd
 		m_data->foliage_shader->SetInt("diffuse_env", IRR_ENV_SLOT);//for now assign to 10 :)
 		m_data->foliage_shader->SetInt("specular_env", ENV_SLOT);//for now assign to 18 :)
+
+		m_data->foliageShader_instanced->Bind();//you need to bind this other wise nothing will be rendererd
+		m_data->foliageShader_instanced->SetInt("diffuse_env", IRR_ENV_SLOT);//for now assign to 10 :)
+		m_data->foliageShader_instanced->SetInt("specular_env", ENV_SLOT);//for now assign to 18 :)
 	}
 
 	void Renderer3D::RenderShadows(Scene& scene, Camera& camera)

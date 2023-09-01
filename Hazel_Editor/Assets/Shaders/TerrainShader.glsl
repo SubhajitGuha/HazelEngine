@@ -19,9 +19,9 @@ void main()
 #version 410 core
 layout (vertices = 4) out;
 const float MAX_TESS_LEVEL = 64;
-const float MIN_TESS_LEVEL = 2;
-const float MAX_CAM_DIST = 200;
-const float MIN_CAM_DIST = 10;
+const float MIN_TESS_LEVEL = 4;
+const float MAX_CAM_DIST = 1000;
+const float MIN_CAM_DIST = 0;
 
 in vec2 TexCoord[];
 out TCS_Data
@@ -118,7 +118,7 @@ void main()
 #shader geometry
 #version 410 core
 layout (triangles) in;
-layout (triangle_strip,max_vertices = 4) out;
+layout (triangle_strip,max_vertices = 3) out;
 
 uniform mat4 u_ProjectionView;
 uniform mat4 u_Model;
@@ -176,41 +176,22 @@ void main()
 	vec4 VertexPos1_ws = u_Model * gl_in[1].gl_Position;
 	vec4 VertexPos2_ws = u_Model * gl_in[2].gl_Position;
 
+
 	gl_Position = u_ProjectionView * VertexPos0_ws;
 	fs_data.TexCoord = gs_data[0].TexCoord;
-	grass_data.Pos = vec3(0.0);
+	grass_data.Pos = VertexPos0_ws.xyz;
 	EmitVertex();
 
 	gl_Position = u_ProjectionView * VertexPos1_ws;
 	fs_data.TexCoord = gs_data[1].TexCoord;
-	grass_data.Pos = vec3(0.0);
+	grass_data.Pos = VertexPos1_ws.xyz;
 	EmitVertex();
 
 	gl_Position = u_ProjectionView * VertexPos2_ws;
 	fs_data.TexCoord = gs_data[2].TexCoord;
-	grass_data.Pos = vec3(0.0);
+	grass_data.Pos = VertexPos1_ws.xyz;
 	EmitVertex();
 	
-	float y = gl_in[1].gl_Position.y/HEIGHT_SCALE;
-	if(y>HillLevel)
-		return;
-
-	//Render Grass	
-	vec3 normal = normalize(cross((gl_in[0].gl_Position.xyz - gl_in[1].gl_Position.xyz), (gl_in[2].gl_Position.xyz - gl_in[1].gl_Position.xyz)));
-	vec3 tangent = normalize(cross(normal, (gl_in[2].gl_Position.xyz - gl_in[1].gl_Position.xyz)));
-	vec3 bitangent = normalize(cross(tangent,normal));
-
-	float seed = gs_data[1].TexCoord.x + gs_data[1].TexCoord.y;
-	float noiseValue = texture(u_perlinNoise, gs_data[1].TexCoord).r; //sample the perlin noise texture
-
-	vec4 position = VertexPos1_ws + vec4(normalize(mat3(u_Model) * normal)* FoliageHeight * (random(seed)+noiseValue),0.0) + vec4(normalize(mat3(u_Model) * tangent)*2.0 * noiseValue,0.0)
-		+ vec4(normalize(mat3(u_Model) * bitangent)*3.0 * noiseValue,0.0) +
-		+ vec4(normalize(mat3(u_Model) * tangent)*2.0 * sin(Time),0.0) * noiseValue + vec4(normalize(mat3(u_Model) * bitangent)*2.0 * cos(Time),0.0)* noiseValue;
-
-	gl_Position = u_ProjectionView * position;
-	grass_data.Pos = gl_Position.xyz;
-	fs_data.TexCoord = gs_data[1].TexCoord;
-	EmitVertex();
 }
 
 
@@ -233,11 +214,31 @@ in Grass
 uniform float WaterLevel;
 uniform float HillLevel;
 uniform float MountainLevel;
-uniform vec3 u_CameraPos;
-uniform vec3 u_LightDir;
 uniform float u_Intensity;
-uniform sampler2D u_HeightMap;
 uniform float HEIGHT_SCALE = 1000;
+uniform float u_Tiling;
+uniform float SunLight_Intensity;
+
+uniform vec3 u_CameraPos;
+uniform vec3 DirectionalLight_Direction;
+uniform vec3 SunLight_Color;
+
+uniform sampler2D u_HeightMap;
+uniform sampler2D u_Albedo;
+uniform sampler2D u_Roughness;
+uniform sampler2D u_Normal;
+uniform samplerCube diffuse_env;
+uniform samplerCube specular_env;
+
+vec3 PBR_Color = vec3(0.0);
+vec3 radiance;
+float vdoth;
+vec3 ks;
+vec3 kd;
+float alpha = 1.0;
+const float PI = 3.14159265359;
+float Metallic = 0.0;
+#define MAX_MIP_LEVEL 28
 
 vec3 CalculateNormal(vec2 texCoord , vec2 texelSize)
 {
@@ -249,41 +250,134 @@ vec3 CalculateNormal(vec2 texCoord , vec2 texelSize)
 	return normalize(vec3(down-up,2.0,left-right));
 }
 
+vec3 CalculateTangent(vec2 texCoord , vec2 texelSize)
+{
+	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * HEIGHT_SCALE  *2.0 - HEIGHT_SCALE;
+	float right = texture(u_HeightMap,texCoord + vec2(texelSize.x,0.0)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
+	float up = texture(u_HeightMap,texCoord + vec2(0.0 , texelSize.y)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
+	float down = texture(u_HeightMap,texCoord + vec2(0.0 , -texelSize.y)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
+
+	return normalize(vec3(2.0,0.0,left-right));
+}
+
+mat3 TBN(vec2 texCoord , vec2 texelSize)
+{
+	vec3 N = CalculateNormal(texCoord , texelSize);
+	vec3 T = CalculateTangent(texCoord , texelSize);
+	vec3 B = cross(T,N);
+
+	return mat3(T,B,N);
+}
+
+float NormalDistribution_GGX(float NdotH)
+{
+	float alpha2 =  pow(alpha,4); // alpha is actually the Roughness
+	return alpha2 / (PI * pow( (pow(NdotH,2) * (alpha2 - 1.0) + 1.0) ,2) ) ;// making the power value = 4 as higher = greater lobe
+}
+
+float Geometry_GGX(float dp) //dp = Dot Product
+{
+	float k = pow(alpha+1,2) / 8.0;
+	return dp/(dp * (1-k) + k);
+}
+
+vec3 Fresnel(float VdotH)
+{
+	vec3 f0;
+
+	if(Metallic == 0.0)
+		f0 = vec3(0.04); // for non metallic
+	else
+		f0 = vec3(0.4); // for metallic
+	//return f0 + (1.0 - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+	//greater roughness = lesser fresnel value
+	return f0 + (max(vec3(1.0- alpha),f0) - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+}
+
+vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
+{
+	vec3 Half = normalize( ViewDir + LightDir);
+	float NdotH = max(dot(Normal,Half) , 0.0);
+	float NdotV = max(dot(Normal,ViewDir) , 0.000001);
+	float NdotL = max(dot(Normal,LightDir) , 0.000001);
+	float VdotH = max(dot(ViewDir,Half) , 0.0);
+
+	vdoth = VdotH;
+
+	float Dggx = NormalDistribution_GGX(NdotH);
+	float Gggx = Geometry_GGX(NdotV) * Geometry_GGX(NdotL);
+	vec3 fresnel = Fresnel(VdotH);
+
+	float denominator = 4.0 * NdotL * NdotV + 0.0001;
+	vec3 specular = (Dggx * Gggx * fresnel) / denominator;
+	return specular;
+}
+
 void main()
 {
+	vec3 m_color = vec3(1);// need to change it as it will be the terrain color tint
+
 	vec2 texture_size = textureSize(u_HeightMap,0);	//get texture dimension
-	vec3 Normal = CalculateNormal(fs_data.TexCoord , vec2(1/2048.0));
+	vec3 Normal = TBN(fs_data.TexCoord , vec2(1/2048.0)) * texture(u_Normal , fs_data.TexCoord * u_Tiling).rgb;
+	//vec3 Normal = CalculateNormal(fs_data.TexCoord , vec2(1/2048.0));
 	float Height = texture(u_HeightMap,fs_data.TexCoord).r * HEIGHT_SCALE;
 	float y = (Height)/HEIGHT_SCALE;
-	vec4 grey = vec4(1,1,1,1);
-	vec4 green = vec4(0.2,1,0,1);
-	vec4 mud = vec4(0.8,0.6,0.02,1);
-	vec4 Fcolor = vec4(0);
 
-	if(y<WaterLevel)
-	{
-		Fcolor = vec4(0.6,1,0,1);
-	}
-	else if(y>WaterLevel && y<HillLevel)
-	{
-		float value = (y-WaterLevel)/(HillLevel-WaterLevel);
-		Fcolor = vec4(mix(green,mud,value).rgb,1.0);
-	}
-	else if(y>HillLevel && y<MountainLevel)
-	{
-		float value = (y-HillLevel)/(MountainLevel - HillLevel);
-		Fcolor = vec4(mix(mud,grey,value).rgb,1.0);
-	}
-	else if(y>MountainLevel)
-	{
-		Fcolor = grey;
-	}
+	alpha = texture(u_Roughness , fs_data.TexCoord * u_Tiling).r ; 
+	vec3 DirectionalLight_Direction = normalize(DirectionalLight_Direction );//for directional light as it has no concept of position
+	vec3 EyeDirection = normalize(u_CameraPos - grass_data.Pos);
+
+
+	//shadows
+	//float shadow = CalculateShadow(level);
+	float shadow = 1.0;
+
+	//diffuse_environment reflections
+	vec3 Light_dir_i = reflect(-EyeDirection,Normal);
+	//vec3 diffuse_environmentCol = texture(diffuse_env,Light_dir_i).xyz * (1.0 - alpha) ;
+
+	vdoth = max(dot( EyeDirection, normalize( EyeDirection + DirectionalLight_Direction)) ,0.0);//for directional light
+	ks = Fresnel(vdoth);
+	kd = vec3(1.0) - ks;
+	kd *= (1.0 - Metallic);
+
+	vec3 IBL_diffuse =  texture(diffuse_env,Normal).rgb * kd; //sampling the irradiance map
+	vec3 BRDFintegration =  ks*alpha + max(dot(Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
+	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
-	Fcolor = vec4(Fcolor.rgb * dot(Normal,normalize(u_LightDir)) * u_Intensity ,1.0);
-	Fcolor += vec4(0.3);
-	Fcolor = vec4(1.0) - exp(-Fcolor * 2);//exposure
-	Fcolor = pow(Fcolor, vec4(1.0/2.2)); //Gamma correction
-	color = vec4(Fcolor.rgb,1.0);
+	//vec4 coordinate = u_ProjectionView * m_pos;
+	//coordinate.xyz /= coordinate.w;
+	//coordinate.xyz = coordinate.xyz*0.5 + 0.5;
+	//ambiance
+		vec3 ambiant = (IBL_diffuse + IBL_specular)* texture(u_Albedo, fs_data.TexCoord * u_Tiling).xyz * m_color.xyz;
+
+	PBR_Color += ( (kd * texture(u_Albedo, fs_data.TexCoord * u_Tiling).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
+
+	
+	//if(y<WaterLevel)
+	//{
+	//	Fcolor = vec4(0.6,1,0,1);
+	//}
+	//else if(y>WaterLevel && y<HillLevel)
+	//{
+	//	float value = (y-WaterLevel)/(HillLevel-WaterLevel);
+	//	Fcolor = vec4(mix(green,mud,value).rgb,1.0);
+	//}
+	//else if(y>HillLevel && y<MountainLevel)
+	//{
+	//	float value = (y-HillLevel)/(MountainLevel - HillLevel);
+	//	Fcolor = vec4(mix(mud,grey,value).rgb,1.0);
+	//}
+	//else if(y>MountainLevel)
+	//{
+	//	Fcolor = grey;
+	//}
+	
+	PBR_Color += ambiant;
+	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
+	PBR_Color = vec3(1.0) - exp(-PBR_Color * 2);//exposure
+	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
+
+	color = vec4(PBR_Color,1.0);
 	//color = vec4(Normal,1.0);
-	//color = vec4(vec3(nextFloat(int(Height) + nextInt(int(Height)) + int(fs_data.TexCoord.x*2048.0) +int(fs_data.TexCoord.y*2048.0))),1.0);
 }

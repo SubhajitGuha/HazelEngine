@@ -18,9 +18,9 @@ void main()
 #shader tessellation control
 #version 410 core
 layout (vertices = 4) out;
-const float MAX_TESS_LEVEL = 32;
-const float MIN_TESS_LEVEL = 1;
-const float MAX_CAM_DIST = 100;
+const float MAX_TESS_LEVEL = 64;
+const float MIN_TESS_LEVEL = 4;
+const float MAX_CAM_DIST = 1000;
 const float MIN_CAM_DIST = 0;
 
 in vec2 TexCoord[];

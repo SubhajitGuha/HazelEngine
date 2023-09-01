@@ -8,10 +8,10 @@
 namespace Hazel
 {
 	float Terrain::WaterLevel = 0.1, Terrain::HillLevel = 0.5, Terrain::MountainLevel = 1.0
-		, Terrain::HeightScale = 600, Terrain::FoliageHeight = 6.0f;
+		, Terrain::HeightScale = 300, Terrain::FoliageHeight = 6.0f;
 
 	bool Terrain::bShowTerrain = true, Terrain::bShowWireframeTerrain = false;
-	int Terrain::maxGrassAmount = 0, Terrain::ChunkIndex = 0, Terrain::RadiusOfSpawn = 1, Terrain::GrassDensity=5;
+	int Terrain::maxGrassAmount = 0, Terrain::ChunkIndex = 0, Terrain::RadiusOfSpawn = 1, Terrain::GrassDensity=2;
 	Terrain::Terrain(float width, float height)
 	{
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2*RadiusOfSpawn+1,2));//radius of spawn defines how many tiles to cover from the centre
@@ -21,7 +21,7 @@ namespace Hazel
 		m_maxTerrainHeight = std::numeric_limits<float>::min();
 		m_terrainShader = Shader::Create("Assets/Shaders/TerrainShader.glsl");
 		m_terrainWireframeShader = Shader::Create("Assets/Shaders/TerrainWireframeShader.glsl");
-		Grass_modelMat.resize(maxGrassAmount * GrassDensity);
+		//Grass_modelMat.resize(maxGrassAmount * GrassDensity);
 		InitilizeTerrain();
 	}
 	Terrain::~Terrain()
@@ -37,12 +37,21 @@ namespace Hazel
 
 		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map.png");
 		m_perlinNoise = Texture2D::Create("Assets/Textures/PerlinTexture.png");
+		TerrainTex_Albedo = Texture2D::Create("Assets/Textures/forest_leaves_02_diffuse_4k.jpg");
+		TerrainTex_Roughness = Texture2D::Create("Assets/Textures/forest_leaves_02_rough_4k.jpg");
+		TerratinTex_Normal = Texture2D::Create("Assets/Textures/forest_leaves_02_nor_gl_4k.jpg");
 
 		m_terrainShader->Bind();
 		m_HeightMap->Bind(HEIGHT_MAP_TEXTURE_SLOT);
 		m_perlinNoise->Bind(PERLIN_NOISE_TEXTURE_SLOT);
 		m_terrainShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
+		m_terrainShader->SetInt("u_Albedo", ALBEDO_SLOT);
+		m_terrainShader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+		m_terrainShader->SetInt("u_Normal", NORMAL_SLOT);
 		m_terrainShader->SetInt("u_perlinNoise", PERLIN_NOISE_TEXTURE_SLOT);
+		m_terrainShader->SetInt("diffuse_env", IRR_ENV_SLOT);
+		m_terrainShader->SetInt("specular_env", ENV_SLOT);
+
 		m_terrainWireframeShader->Bind();
 		m_terrainWireframeShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
 
@@ -121,7 +130,7 @@ namespace Hazel
 					{
 						TerrainGrassData child_data;
 						child_data.position = { i + RandomFloat(generator) * k / GrassDensity * 2.0,y + 2.0f, j + RandomFloat(generator) * k / GrassDensity * 2.0 };
-						child_data.rotation = { RandomFloat(generator) * 20.0f,RandomFloat(generator) * 90.0f,RandomFloat(generator) * 20.0f };//in degrees
+						child_data.rotation = { RandomFloat(generator) * 10.0f,RandomFloat(generator) * 90.0f,RandomFloat(generator) * 10.0f };//in degrees
 						child_data.scale = glm::vec3((RandomFloat(generator) + 1) / 2.0 + 1.0f);
 						data.m_ChildGrassData.push_back(child_data);
 					}
@@ -153,14 +162,20 @@ namespace Hazel
 		int CamX = cam.GetCameraPosition().x;
 		int CamZ = cam.GetCameraPosition().z;
 		
-
-		glDisable(GL_CULL_FACE);
-		//glCullFace(GL_FRONT);
+		//glDisable(GL_CULL_FACE)
+		glCullFace(GL_FRONT);
 		glm::mat4 transform = glm::rotate(glm::mat4(1.0), glm::radians(180.0f), {0,0,1});
+		TerrainTex_Albedo->Bind(ALBEDO_SLOT);
+		TerrainTex_Roughness->Bind(ROUGHNESS_SLOT);
+		TerratinTex_Normal->Bind(NORMAL_SLOT);
+
 		m_terrainShader->Bind();
+		m_terrainShader->SetFloat("u_Tiling", 40);//Tiling factor for all terrain textures (not for height map)
 		m_terrainShader->SetFloat("HEIGHT_SCALE", HeightScale);
 		m_terrainShader->SetFloat("FoliageHeight", FoliageHeight);
-		m_terrainShader->SetFloat3("u_LightDir", Renderer3D::m_SunLightDir);
+		m_terrainShader->SetFloat3("DirectionalLight_Direction", Renderer3D::m_SunLightDir);
+		m_terrainShader->SetFloat3("SunLight_Color", Renderer3D::m_SunColor);
+		m_terrainShader->SetFloat("SunLight_Intensity", Renderer3D::m_SunIntensity);
 		m_terrainShader->SetFloat("u_Intensity", Renderer3D::m_SunIntensity);
 		m_terrainShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
 		m_terrainShader->SetMat4("u_Model", transform);
@@ -235,8 +250,9 @@ namespace Hazel
 			}
 		}
 
-		int count = 0;
 		//Now get vertices for each chunk
+		int count = 0;
+		Grass_modelMat.clear();
 		for (int ChunkID : NeighbourChunkIndices)//iterate through all neighbouring chunks
 		{
 			int minX = (ChunkID % numberOfChunksX) * floor(ChunkSize);
@@ -256,15 +272,18 @@ namespace Hazel
 						continue;
 
 					std::vector<TerrainGrassData> grass_data = m_GrassSpawnData[coord].m_ChildGrassData;
+
 					for (int k = 0; k < GrassDensity; k++)
 					{
 						glm::mat4 grass_transform = glm::translate(glm::mat4(1.0), grass_data[k].position) *
-							glm::rotate(glm::mat4(1.0), glm::radians(-90.0f), { 0,0,1 }) *
 							//glm::rotate(glm::mat4(1.0), glm::radians(m_GrassData[coord].rotation.x), { 1,0,0 }) *
 							glm::rotate(glm::mat4(1.0), glm::radians(grass_data[k].rotation.y), { 0,1,0 }) *
+							glm::rotate(glm::mat4(1.0), glm::radians(grass_data[k].rotation.x), { 1,0,0 }) *
+							glm::rotate(glm::mat4(1.0), glm::radians(-90.0f), { 0,0,1 }) *
 							glm::scale(glm::mat4(1.0), grass_data[k].scale);
-						Grass_modelMat[count] = grass_transform;
-						count++;
+						//Grass_modelMat[count] = grass_transform;
+						Grass_modelMat.push_back(grass_transform);
+						//count++;
 					}
 				}
 			}

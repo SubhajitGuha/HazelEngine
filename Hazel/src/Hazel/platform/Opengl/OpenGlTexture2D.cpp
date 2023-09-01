@@ -52,8 +52,8 @@ namespace Hazel {
 		glGenerateTextureMipmap(m_Renderid);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_R, GL_CLAMP);
+		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_R, GL_REPEAT);
 
 		if (resized_image)
 		{

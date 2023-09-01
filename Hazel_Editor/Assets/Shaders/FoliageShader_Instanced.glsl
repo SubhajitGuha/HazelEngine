@@ -16,8 +16,10 @@ out vec3 m_BiTangent;
 flat out float m_materialindex;
 
 uniform mat4 u_ProjectionView;
+uniform mat4 u_Projection;
 uniform mat4 u_Model;
 uniform float u_Time;
+uniform sampler2D Noise;
 
 int amplitude = 100;
 mat4 CreateRotationMat(float x, float y, float z)
@@ -46,17 +48,31 @@ mat4 CreateRotationMat(float x, float y, float z)
 
 	return aroundX * aroundY * aroundZ;
 }
+
+mat4 CreateScaleMatrix(float scale)
+{
+	return mat4(
+	scale,0,0,0,
+	0,scale,0,0,
+	0,0,scale,0,
+	0,0,0,1
+	);
+}
 void main()
 {
-	vec4 wsVertexPos = u_Model * instance_mm * pos;
 	mat4 wsGrass = u_Model * instance_mm;
+	vec4 wsVertexPos = wsGrass * pos;
 	vec3 origin = vec3(wsGrass[3][0],wsGrass[3][1],wsGrass[3][2]);
-	float factor = distance(wsVertexPos.xyz , origin)/10;
-	
+	float factor = distance(wsVertexPos.xyz , origin)/10;	
 	if(factor<0)
 		factor = 0;
+
 	mat4 rot = CreateRotationMat(0,sin(u_Time)*factor*amplitude,0);
-	gl_Position = u_ProjectionView * wsGrass * rot * pos;
+	vec4 clipSpaceCoord = u_Projection * wsVertexPos;
+	clipSpaceCoord.xyz/=clipSpaceCoord.w;
+	clipSpaceCoord.xyz=clipSpaceCoord.xyz*0.5+0.5;
+	float val = texture(Noise,clipSpaceCoord.xy).r;
+	gl_Position = u_ProjectionView * wsGrass * rot * CreateScaleMatrix(val*2)* pos;
 
 	m_materialindex = materialindex;
 	tcord = cord;
@@ -107,6 +123,8 @@ uniform vec3 DirectionalLight_Direction; //sun light world position
 uniform vec3 PointLight_Position[MAX_LIGHTS];
 uniform vec3 PointLight_Color[MAX_LIGHTS];
 uniform int Num_PointLights;
+uniform float SunLight_Intensity;
+uniform vec3 SunLight_Color;
 
 //PBR properties
 uniform float Roughness;
@@ -264,11 +282,11 @@ void main()
 
 
 
-	PBR_Color += ( ((kd * texture(u_Albedo, vec3(tcord , index)).xyz + m_color.xyz) / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * shadow * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
+	PBR_Color += ( ((kd * texture(u_Albedo, vec3(tcord , index)).xyz + m_color.xyz) / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 
 	PBR_Color += ambiant;
 	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
-	PBR_Color = vec3(1.0) - exp(-PBR_Color * 5);//exposure
+	PBR_Color = vec3(1.0) - exp(-PBR_Color * 3);//exposure
 	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
 
 	color = vec4(PBR_Color,Transparency);
