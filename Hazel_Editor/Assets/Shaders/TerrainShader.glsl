@@ -2,7 +2,6 @@
 #version 410 core
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec2 cord;
-layout (location = 2) in vec3 normal;
 
 out vec2 TexCoord;
 
@@ -140,7 +139,7 @@ out FS_Data
 
 out Grass
 {
-	vec3 Pos;
+	vec4 Pos;
 	vec3 Normal;
 }grass_data;
 
@@ -179,17 +178,17 @@ void main()
 
 	gl_Position = u_ProjectionView * VertexPos0_ws;
 	fs_data.TexCoord = gs_data[0].TexCoord;
-	grass_data.Pos = VertexPos0_ws.xyz;
+	grass_data.Pos = VertexPos0_ws;
 	EmitVertex();
 
 	gl_Position = u_ProjectionView * VertexPos1_ws;
 	fs_data.TexCoord = gs_data[1].TexCoord;
-	grass_data.Pos = VertexPos1_ws.xyz;
+	grass_data.Pos = VertexPos1_ws;
 	EmitVertex();
 
 	gl_Position = u_ProjectionView * VertexPos2_ws;
 	fs_data.TexCoord = gs_data[2].TexCoord;
-	grass_data.Pos = VertexPos1_ws.xyz;
+	grass_data.Pos = VertexPos2_ws;
 	EmitVertex();
 	
 }
@@ -207,9 +206,16 @@ in FS_Data
 
 in Grass
 {
-	vec3 Pos;
+	vec4 Pos;
 	vec3 Normal;
 }grass_data;
+
+//shadow uniforms
+uniform mat4 MatrixShadow[4];
+uniform sampler2D ShadowMap[4];
+uniform float Ranges[5];
+uniform mat4 view;
+uniform mat4 u_ProjectionView;
 
 uniform float WaterLevel;
 uniform float HillLevel;
@@ -230,6 +236,7 @@ uniform sampler2D u_Normal;
 uniform samplerCube diffuse_env;
 uniform samplerCube specular_env;
 
+vec4 VertexPosition_LightSpace;
 vec3 PBR_Color = vec3(0.0);
 vec3 radiance;
 float vdoth;
@@ -239,6 +246,8 @@ float alpha = 1.0;
 const float PI = 3.14159265359;
 float Metallic = 0.0;
 #define MAX_MIP_LEVEL 28
+int level = 3; // cascade levels
+float NdotL = 1.0;
 
 vec3 CalculateNormal(vec2 texCoord , vec2 texelSize)
 {
@@ -267,6 +276,29 @@ mat3 TBN(vec2 texCoord , vec2 texelSize)
 	vec3 B = cross(T,N);
 
 	return mat3(T,B,N);
+}
+
+float CalculateShadow(int cascade_level)
+{
+	float ShadowSum = 0.0;
+	vec3 p = VertexPosition_LightSpace.xyz/VertexPosition_LightSpace.w;
+	p = p * 0.5 + 0.5;//convert -1 to +1 to 0 to 1 this is needed for getting the location in the texture
+	float bias = 0.0001*tan(acos(NdotL));//bias to resolve the artifact
+	float TexelSize = 1.0/textureSize(ShadowMap[cascade_level],0).x;
+
+	for(int i=-1; i <=1; i++)
+	{
+		for(int j=-1; j<=1; j++)
+		{
+			vec2 offset = vec2(i,j) * TexelSize; 
+			float depth = texture(ShadowMap[cascade_level],p.xy + offset).r;
+			if(depth + bias > p.z)
+				ShadowSum+=1;
+		}
+	}
+	//depth < p.z - bias? 0:1;// sample the depth map and check the p.xy coordinate of depth map with the p.z value
+	
+	return ShadowSum/9.0;
 }
 
 float NormalDistribution_GGX(float NdotH)
@@ -319,18 +351,34 @@ void main()
 
 	vec2 texture_size = textureSize(u_HeightMap,0);	//get texture dimension
 	vec3 Normal = TBN(fs_data.TexCoord , vec2(1/2048.0)) * texture(u_Normal , fs_data.TexCoord * u_Tiling).rgb;
+	Normal = normalize(Normal);
 	//vec3 Normal = CalculateNormal(fs_data.TexCoord , vec2(1/2048.0));
 	float Height = texture(u_HeightMap,fs_data.TexCoord).r * HEIGHT_SCALE;
 	float y = (Height)/HEIGHT_SCALE;
 
-	alpha = texture(u_Roughness , fs_data.TexCoord * u_Tiling).r ; 
+	alpha = texture(u_Roughness , fs_data.TexCoord * u_Tiling).r ;
 	vec3 DirectionalLight_Direction = normalize(DirectionalLight_Direction );//for directional light as it has no concept of position
-	vec3 EyeDirection = normalize(u_CameraPos - grass_data.Pos);
+	NdotL = max(dot(Normal,DirectionalLight_Direction),0.0001);
+	vec3 EyeDirection = normalize(u_CameraPos - grass_data.Pos.xyz);
 
+	vec4 vert_pos = view * grass_data.Pos; //get depth value(z value) in the camera-view space
+	vec3 v_position = vert_pos.xyz/vert_pos.w;
+	float depth = abs(v_position.z);
+
+	for(int i=0;i<4;i++)
+	{
+		if(depth<Ranges[i])
+		{
+			level = i;
+			break;
+		}
+	}
+
+	VertexPosition_LightSpace = MatrixShadow[level] * grass_data.Pos;
 
 	//shadows
-	//float shadow = CalculateShadow(level);
-	float shadow = 1.0;
+	float shadow = CalculateShadow(level);
+
 
 	//diffuse_environment reflections
 	vec3 Light_dir_i = reflect(-EyeDirection,Normal);
@@ -375,7 +423,7 @@ void main()
 	
 	PBR_Color += ambiant;
 	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
-	PBR_Color = vec3(1.0) - exp(-PBR_Color * 2);//exposure
+	PBR_Color = vec3(1.0) - exp(-PBR_Color * 3);//exposure
 	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
 
 	color = vec4(PBR_Color,1.0);

@@ -1,6 +1,7 @@
 #include "hzpch.h"
 #include "OpenGlShadows.h"
 #include "glad/glad.h"
+#include "Hazel/Renderer/Terrain.h"
 
 namespace Hazel {
 	int Shadows::Cascade_level = 0;
@@ -12,7 +13,8 @@ namespace Hazel {
 	OpenGlShadows::OpenGlShadows(const float& width, const float& height)
 		:m_width(width),m_height(height)
 	{
-		shadow_shader = Shader::Create("Assets/Shaders/ShadowShader.glsl");//texture shader
+		shadow_shader = Shader::Create("Assets/Shaders/ShadowShader.glsl");//shadow shader
+		terrain_shadowShader = Shader::Create("Assets/Shaders/TerrainShadowShader.glsl");
 		CreateShdowMap();
 	}
 	OpenGlShadows::~OpenGlShadows()
@@ -44,6 +46,7 @@ namespace Hazel {
 					HAZEL_CORE_INFO("shadow map FrameBuffer compleate!!");
 
 				glClear(GL_DEPTH_BUFFER_BIT);
+				//glCullFace(GL_FRONT);
 				scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
 					{
 						Entity Entity(&scene, m_entity);
@@ -65,12 +68,53 @@ namespace Hazel {
 						else
 							Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
 					});
-				
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_BACK);
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 				glViewport(0, 0, size.x, size.y);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			}
-		//glBindTextureUnit(7, depth_id);
+	}
+	void OpenGlShadows::RenderTerrainShadows(Scene& scene, const glm::vec3& LightPosition, Camera& cam)
+	{
+		GLint OFb;
+		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &OFb);
+		auto size = RenderCommand::GetViewportSize();
+
+		PrepareShadowProjectionMatrix(cam, LightPosition);//CREATE THE orthographic projection matrix
+
+		terrain_shadowShader->Bind();
+		for (int i = 0; i < MAX_CASCADES; i++)
+		{
+			glm::mat4 LightProjection = m_ShadowProjection[i] * LightView[i]; //placing a orthographic camera on the light position(i.e position at centroid of each frustum)
+
+			terrain_shadowShader->SetMat4("LightProjection", LightProjection);
+			terrain_shadowShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
+			terrain_shadowShader->SetFloat("HEIGHT_SCALE", Terrain::HeightScale);
+			terrain_shadowShader->SetMat4("u_Model", Terrain::m_terrainModelMat);
+			terrain_shadowShader->SetMat4("u_View", cam.GetViewMatrix());
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
+			glViewport(0, 0, m_width, m_height);
+			//glClear(GL_DEPTH_BUFFER_BIT);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_id[i], 0);
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+				HAZEL_CORE_INFO("shadow map FrameBuffer compleate!!");
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			//render terrain
+			//Needs change as I cannot just make terrain vertex array and terrain data public static
+			glDisable(GL_CULL_FACE);
+			RenderCommand::DrawArrays(*Terrain::m_terrainVertexArray, Terrain::terrainData.size(), GL_PATCHES, 0);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glViewport(0, 0, size.x, size.y);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
 	}
 	void OpenGlShadows::SetShadowMapResolution(const float& width, float height)
 	{
@@ -104,10 +148,10 @@ namespace Hazel {
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 			glDrawBuffer(GL_NONE);
 			glReadBuffer(GL_NONE);
@@ -126,7 +170,7 @@ namespace Hazel {
 		m_ShadowProjection.clear();
 
 		float NearPlane = 1.0f;
-		float FarPlane = 100.0f;
+		float FarPlane = 1000.0f;
 		Ranges.resize(MAX_CASCADES+1);//send this in the fragment shader for determining which cascade to use
 		Ranges[0] = NearPlane;
 		Ranges[MAX_CASCADES] = FarPlane;
@@ -138,6 +182,7 @@ namespace Hazel {
 			float practical = m_lamda * uniform_split + (1 - m_lamda) * log_split;
 			Ranges[i] = practical;
 		}
+
 		//iterate through all the cascade levels
 		for (int i = 1; i <= MAX_CASCADES; i++)
 		{
@@ -145,7 +190,7 @@ namespace Hazel {
 			float m_FarPlane = Ranges[i];
 
 			// create the view camera projection matrix based on the near and far plane
-			m_Camera_Projection = glm::perspective(glm::radians(90.0f), camera.GetAspectRatio(), m_NearPlane - 20.f, m_FarPlane );
+			m_Camera_Projection = glm::perspective(glm::radians(camera.GetVerticalFOV()), camera.GetAspectRatio(), NearPlane, m_FarPlane );
 			
 			glm::vec3 centre = glm::vec3(0.0f);
 			glm::vec4 frustum_corners[8] = //cube coordinate in cannonical view volume
@@ -161,7 +206,7 @@ namespace Hazel {
 			};
 
 			auto camera_view = camera.GetViewMatrix();
-			glm::mat4 pv_inverse = glm::inverse(m_Camera_Projection * camera_view);
+			glm::mat4 pv_inverse = glm::inverse(camera_view) * glm::inverse(m_Camera_Projection);
 			for (int j = 0; j < 8; j++)
 			{
 				glm::vec4 p = pv_inverse * frustum_corners[j];//get the world space coordinate of frustum cube from cannonical-view-volume

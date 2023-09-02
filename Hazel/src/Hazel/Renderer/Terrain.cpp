@@ -12,6 +12,10 @@ namespace Hazel
 
 	bool Terrain::bShowTerrain = true, Terrain::bShowWireframeTerrain = false;
 	int Terrain::maxGrassAmount = 0, Terrain::ChunkIndex = 0, Terrain::RadiusOfSpawn = 1, Terrain::GrassDensity=2;
+	glm::mat4 Terrain::m_terrainModelMat;
+	std::vector<TerrainData> Terrain::terrainData;
+	ref<VertexArray> Terrain::m_terrainVertexArray;
+
 	Terrain::Terrain(float width, float height)
 	{
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2*RadiusOfSpawn+1,2));//radius of spawn defines how many tiles to cover from the centre
@@ -37,9 +41,9 @@ namespace Hazel
 
 		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map.png");
 		m_perlinNoise = Texture2D::Create("Assets/Textures/PerlinTexture.png");
-		TerrainTex_Albedo = Texture2D::Create("Assets/Textures/forest_leaves_02_diffuse_4k.jpg");
-		TerrainTex_Roughness = Texture2D::Create("Assets/Textures/forest_leaves_02_rough_4k.jpg");
-		TerratinTex_Normal = Texture2D::Create("Assets/Textures/forest_leaves_02_nor_gl_4k.jpg");
+		TerrainTex_Albedo = Texture2D::Create("Assets/Textures/forrest_ground_01_diff_2k.jpg");
+		TerrainTex_Roughness = Texture2D::Create("Assets/Textures/forrest_ground_01_rough_2k.jpg");
+		TerratinTex_Normal = Texture2D::Create("Assets/Textures/forrest_ground_01_nor_gl_2k.jpg");
 
 		m_terrainShader->Bind();
 		m_HeightMap->Bind(HEIGHT_MAP_TEXTURE_SLOT);
@@ -66,25 +70,21 @@ namespace Hazel
 				TerrainData v1;
 				v1.Position = glm::vec3( j, 0, i);
 				v1.TexCoord = glm::vec2(j/m_dimension.x,i/m_dimension.y);
-				v1.Normal = glm::vec3(0, 0, 0);
 				terrainData.push_back(v1);
 
 				TerrainData v2;
 				v2.Position = glm::vec3(j + res, 0, i);
-				v2.TexCoord = glm::vec2(j/m_dimension.x + res/m_dimension.x, i/m_dimension.y);
-				v2.Normal = glm::vec3(0, 0, 0);
+				v2.TexCoord = glm::vec2(j/m_dimension.x + res/m_dimension.x, i/m_dimension.y);				
 				terrainData.push_back(v2);
 
 				TerrainData v3;
 				v3.Position = glm::vec3( j, 0, i + res);
-				v3.TexCoord = glm::vec2(j/m_dimension.x, i/m_dimension.y + res/m_dimension.y);
-				v3.Normal = glm::vec3(0, 0, 0);
+				v3.TexCoord = glm::vec2(j/m_dimension.x, i/m_dimension.y + res/m_dimension.y);				
 				terrainData.push_back(v3);
 
 				TerrainData v4;
 				v4.Position = glm::vec3(j + res, 0, i  + res);
 				v4.TexCoord = glm::vec2(j/ m_dimension.x + res / m_dimension.x, i / m_dimension.y + res / m_dimension.y);
-				v4.Normal = glm::vec3(0, 0, 0);
 				terrainData.push_back(v4);
 			}
 		}
@@ -93,7 +93,6 @@ namespace Hazel
 		bl = std::make_shared<BufferLayout>();
 		bl->push("Position", DataType::Float3);
 		bl->push("coord", DataType::Float2);
-		bl->push("normal", DataType::Float3);
 		m_terrainVertexArray->AddBuffer(bl, vb);
 		glPatchParameteri(GL_PATCH_VERTICES, 4);//will be present after al vertex array operations
 
@@ -129,7 +128,7 @@ namespace Hazel
 					for (int k = 0; k < GrassDensity; k++)//grass per unit
 					{
 						TerrainGrassData child_data;
-						child_data.position = { i + RandomFloat(generator) * k / GrassDensity * 2.0,y + 2.0f, j + RandomFloat(generator) * k / GrassDensity * 2.0 };
+						child_data.position = { i + RandomFloat(generator) * k / GrassDensity * 2.0,y - 2.0f, j + RandomFloat(generator) * k / GrassDensity * 2.0 };
 						child_data.rotation = { RandomFloat(generator) * 10.0f,RandomFloat(generator) * 90.0f,RandomFloat(generator) * 10.0f };//in degrees
 						child_data.scale = glm::vec3((RandomFloat(generator) + 1) / 2.0 + 1.0f);
 						data.m_ChildGrassData.push_back(child_data);
@@ -163,8 +162,9 @@ namespace Hazel
 		int CamZ = cam.GetCameraPosition().z;
 		
 		//glDisable(GL_CULL_FACE)
-		glCullFace(GL_FRONT);
-		glm::mat4 transform = glm::rotate(glm::mat4(1.0), glm::radians(180.0f), {0,0,1});
+		//glCullFace(GL_FRONT);
+		m_terrainModelMat = glm::rotate(glm::mat4(1.0), glm::radians(0.0f), {0,0,1});
+
 		TerrainTex_Albedo->Bind(ALBEDO_SLOT);
 		TerrainTex_Roughness->Bind(ROUGHNESS_SLOT);
 		TerratinTex_Normal->Bind(NORMAL_SLOT);
@@ -178,7 +178,7 @@ namespace Hazel
 		m_terrainShader->SetFloat("SunLight_Intensity", Renderer3D::m_SunIntensity);
 		m_terrainShader->SetFloat("u_Intensity", Renderer3D::m_SunIntensity);
 		m_terrainShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
-		m_terrainShader->SetMat4("u_Model", transform);
+		m_terrainShader->SetMat4("u_Model", m_terrainModelMat);
 		m_terrainShader->SetMat4("u_View", cam.GetViewMatrix());
 		m_terrainShader->SetFloat3("camPos", cam.GetCameraPosition());
 		m_terrainShader->SetFloat("WaterLevel", WaterLevel);
@@ -189,13 +189,13 @@ namespace Hazel
 		//HAZEL_CORE_ERROR(time);
 		if (bShowTerrain)
 			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);
 
 		m_terrainWireframeShader->Bind();
 		m_terrainWireframeShader->SetFloat("HEIGHT_SCALE", HeightScale);
 		m_terrainWireframeShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
-		m_terrainWireframeShader->SetMat4("u_Model", transform);
+		m_terrainWireframeShader->SetMat4("u_Model", m_terrainModelMat);
 		m_terrainWireframeShader->SetMat4("u_View", cam.GetViewMatrix());
 		m_terrainWireframeShader->SetFloat3("camPos", cam.GetCameraPosition());
 		m_terrainWireframeShader->SetFloat("WaterLevel", WaterLevel);
@@ -204,14 +204,14 @@ namespace Hazel
 
 		if (bShowWireframeTerrain)
 			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
-		if (CamX < 0 && CamZ>0) 
+		if (CamX > 0 && CamZ>0) 
 		{
 			//ChunkIndex = GetChunkIndex(CamX, CamZ);
 			if (HasPlayerMovedFromChunk(CamX, CamZ))
 				SpawnGrassOnChunks(CamX, CamZ, RadiusOfSpawn);
 
 			Renderer3D::BeginSceneFoliage(cam);
-			Renderer3D::DrawFoliageInstanced(*Scene::Grass, transform, Grass_modelMat.size(), { 0,0.0,0.0,1 },time, 0.4);
+			Renderer3D::DrawFoliageInstanced(*Scene::Grass, m_terrainModelMat, Grass_modelMat.size(), { 0,0.0,0.0,1 },time, 0.4);
 		}
 	}
 
@@ -277,9 +277,9 @@ namespace Hazel
 					{
 						glm::mat4 grass_transform = glm::translate(glm::mat4(1.0), grass_data[k].position) *
 							//glm::rotate(glm::mat4(1.0), glm::radians(m_GrassData[coord].rotation.x), { 1,0,0 }) *
+							glm::rotate(glm::mat4(1.0), glm::radians(90.0f), { 0,0,1 }) *
 							glm::rotate(glm::mat4(1.0), glm::radians(grass_data[k].rotation.y), { 0,1,0 }) *
-							glm::rotate(glm::mat4(1.0), glm::radians(grass_data[k].rotation.x), { 1,0,0 }) *
-							glm::rotate(glm::mat4(1.0), glm::radians(-90.0f), { 0,0,1 }) *
+							//glm::rotate(glm::mat4(1.0), glm::radians(grass_data[k].rotation.x), { 1,0,0 }) *
 							glm::scale(glm::mat4(1.0), grass_data[k].scale);
 						//Grass_modelMat[count] = grass_transform;
 						Grass_modelMat.push_back(grass_transform);

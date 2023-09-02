@@ -6,7 +6,6 @@ namespace Hazel
 	{
 		glm::vec3 Position;
 		glm::vec2 TexCoord;
-		glm::vec3 Normal;
 	};
 	class Terrain {
 		struct TerrainGrassData
@@ -27,11 +26,12 @@ namespace Hazel
 		static float WaterLevel, HillLevel, MountainLevel ,HeightScale , FoliageHeight;
 		static bool bShowTerrain, bShowWireframeTerrain;
 		static int maxGrassAmount, ChunkIndex, RadiusOfSpawn, GrassDensity;
+		static glm::mat4 m_terrainModelMat;
+		static std::vector<TerrainData> terrainData;
+		static ref<VertexArray> m_terrainVertexArray;
+		ref<Shader> m_terrainShader,m_terrainWireframeShader;
 	private:
 		glm::vec2 m_dimension;
-		ref<Shader> m_terrainShader,m_terrainWireframeShader;
-		ref<VertexArray> m_terrainVertexArray;
-		std::vector<TerrainData> terrainData;
 		ref<BufferLayout> bl;
 		ref<Texture2D> m_HeightMap, m_perlinNoise, TerrainTex_Albedo, TerrainTex_Roughness, TerratinTex_Normal;
 		int m_Height, m_Width, m_Channels,m_Channels1;

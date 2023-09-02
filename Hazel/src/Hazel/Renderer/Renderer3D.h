@@ -31,7 +31,8 @@ namespace Hazel {
 		static void AmbiantOcclusion(Scene& scene, Camera& camera);
 		static void SetTransperancy(float val);
 	public:
-		static unsigned int depth_id;
+		static unsigned int depth_id[4];
+		static int index;
 		static unsigned int ssao_id;
 		static glm::vec3 m_SunLightDir;
 		static glm::vec3 m_SunColor;

@@ -217,7 +217,8 @@ void  HazelEditor::OnImGuiRender()
 
 	ImGui::Begin("Shadow Map and SSAO map");
 	ImGui::Text("SHADOW MAP");
-	ImGui::Image((void*)Renderer3D::depth_id, ImVec2(512, 512));
+	ImGui::DragInt("Index", &Renderer3D::index, 1.0, 0, 3);
+	ImGui::Image((void*)Renderer3D::depth_id[Renderer3D::index], ImVec2(512, 512));
 	ImGui::DragInt("Cascade Level", &Shadows::Cascade_level, 1, 0, 100);
 	ImGui::DragFloat("lamda", &Shadows::m_lamda, 0.00001, 0, 1,"%8f");
 	ImGui::Text("SSAO MAP");

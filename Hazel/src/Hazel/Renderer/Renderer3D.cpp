@@ -8,6 +8,7 @@
 #include "glad/glad.h"
 #include "Hazel/Scene/PointLight.h"
 #include "Hazel/platform/Opengl/OpenGlSSAO.h"//temporary testing purpose
+#include "Hazel/Renderer/Terrain.h"
 
 namespace Hazel {
 	//Camera* m_camera;
@@ -16,7 +17,8 @@ namespace Hazel {
 	glm::vec3 Renderer3D::m_SunColor = { 1,1,1 };
 	float Renderer3D::m_SunIntensity = 1.0f;
 
-	unsigned int Renderer3D::depth_id = 0;
+	unsigned int Renderer3D::depth_id[4];
+	int Renderer3D::index = 0;
 	unsigned int Renderer3D::ssao_id = 0;
 	struct VertexAttributes {
 		//glm::vec3 Position;
@@ -72,7 +74,8 @@ namespace Hazel {
 		m_data->reflection = CubeMapReflection::Create();
 		m_data->ssao = std::make_shared<OpenGlSSAO>();
 		m_data->shadow_map = Shadows::Create(4096, 4096);//create a 2048x2048 shadow map
-		depth_id = m_data->shadow_map->GetDepth_ID();
+		for (int i = 0; i < 4; i++)
+			depth_id[i] = m_data->shadow_map->GetDepth_ID(i);
 		ssao_id = m_data->ssao->GetSSAOid();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -287,8 +290,11 @@ namespace Hazel {
 	void Renderer3D::RenderShadows(Scene& scene, Camera& camera)
 	{
 		m_data->shadow_map->RenderShadows(scene, m_SunLightDir, camera);//Light position is the light direction used for directional light
+		m_data->shadow_map->RenderTerrainShadows(scene, m_SunLightDir, camera);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->shader);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->foliage_shader);
+		m_data->shadow_map->PassShadowUniforms(camera, m_data->foliageShader_instanced);
+		m_data->shadow_map->PassShadowUniforms(camera, scene.m_Terrain->m_terrainShader);
 	}
 
 	void Renderer3D::AmbiantOcclusion(Scene& scene, Camera& camera)

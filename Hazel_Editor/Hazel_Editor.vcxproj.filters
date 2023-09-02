@@ -108,5 +108,6 @@
     <None Include="Assets\Shaders\ExtractHighFrequencyParts_Shader.glsl" />
     <None Include="Assets\Shaders\TerrainShader.glsl" />
     <None Include="Assets\Shaders\TerrainWireframeShader.glsl" />
+    <None Include="Assets\Shaders\TerrainShadowShader.glsl" />
   </ItemGroup>
 </Project>

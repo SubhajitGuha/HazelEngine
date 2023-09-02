@@ -233,7 +233,7 @@ void main()
 	//if(opacity <= 0.1)
 		//discard; // if the texture value is less than a certain threshold then discard that pixel
 
-	vec3 Modified_Normal = m_Normal;
+	vec3 Modified_Normal = normalize(m_Normal);
 
 	//alpha = texture(u_Roughness , vec3(tcord,index)).g * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
 	alpha = Roughness;
@@ -259,7 +259,7 @@ void main()
 
 	//shadows
 	float shadow=1.0;
-	//shadow = CalculateShadow(level);
+	shadow = CalculateShadow(level);
 
 	//diffuse_environment reflections
 	vec3 Light_dir_i = reflect(-EyeDirection,Modified_Normal);

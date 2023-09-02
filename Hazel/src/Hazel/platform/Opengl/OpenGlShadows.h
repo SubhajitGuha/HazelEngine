@@ -10,9 +10,10 @@ namespace Hazel{
 		OpenGlShadows(const float& width, const float& height);
 		~OpenGlShadows();
 		void RenderShadows(Scene& scene, const glm::vec3& LightPosition, Camera& cam) override;
+		void RenderTerrainShadows(Scene& scene, const glm::vec3& LightPosition, Camera& cam) override;
 		void SetShadowMapResolution(const float& width, float height) override;
 		void PassShadowUniforms(Camera& cam, ref<Shader> rendering_shader) override;
-		virtual unsigned int GetDepth_ID() override { return depth_id[0]; }
+		virtual unsigned int GetDepth_ID(int index) override { return depth_id[index]; }
 		void CreateShdowMap();
 		
 	private:
@@ -21,7 +22,7 @@ namespace Hazel{
 	private:
 		unsigned int depth_id[MAX_CASCADES],framebuffer_id;//max 4 cascades
 		float m_width, m_height;
-		ref<Shader> shadow_shader;
+		ref<Shader> shadow_shader, terrain_shadowShader;
 		std::vector<glm::mat4> m_ShadowProjection;
 		std::vector<float> Ranges;
 		glm::mat4 m_Camera_Projection;

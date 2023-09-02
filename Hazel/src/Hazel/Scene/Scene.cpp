@@ -34,7 +34,7 @@ namespace Hazel {
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
 		Physics3D::Initilize();
 		SkyRenderer::Initilize();
-		SkyRenderer::SetSkyType(SkyType::CUBE_MAP_SKY);
+		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
 
 		Renderer3D::Init();
 		Renderer2D::Init();
@@ -52,7 +52,7 @@ namespace Hazel {
 		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
 		Renderer3D::SetUpCubeMapReflections(*this);
 		editor_cam.SetPerspectiveFar(10000);
-
+		
 		m_Terrain = std::make_shared<Terrain>(2048,2048);
 		//initilize Bloom
 		m_Bloom = Bloom::Create();
