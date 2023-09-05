@@ -3,6 +3,8 @@
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec2 cord;
 
+flat out float m_materialindex;
+
 out vec2 TexCoord;
 
 void main()
@@ -72,7 +74,13 @@ in TCS_Data
 	vec2 TexCoord_TCS;
 } tcs_data[];
 
-uniform mat4 LightProjection; //matrixshadow is the model light projection but converted to 0-1 range
+out Frag_Data
+{
+	vec4 pos;
+}frag_data;
+
+uniform mat4 u_View;
+uniform mat4 u_Projection;
 uniform sampler2D u_HeightMap;
 uniform mat4 u_Model;
 uniform float HEIGHT_SCALE;
@@ -96,17 +104,26 @@ vec2 Interpolate(vec2 v0, vec2 v1, vec2 v2, vec2 v3)
 void main()
 {
 	//in Light space
-	vec4 oldPos = LightProjection * u_Model * Interpolate(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position, gl_in[3].gl_Position);
+	vec4 oldPos = u_View * u_Model * Interpolate(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position, gl_in[3].gl_Position);
 	vec2 texCoord = Interpolate(tcs_data[0].TexCoord_TCS, tcs_data[1].TexCoord_TCS, tcs_data[2].TexCoord_TCS, tcs_data[3].TexCoord_TCS);
 	float Height = texture(u_HeightMap,texCoord).r * HEIGHT_SCALE;
-	vec4 newPos = LightProjection * u_Model * vec4(0,Height,0,0); //as proj_view and model matrix is same for all vertex
+	vec4 newPos = u_View * u_Model * vec4(0,Height,0,0); //as proj_view and model matrix is same for all vertex
 	
-	gl_Position = oldPos + newPos;
+	frag_data.pos = oldPos + newPos;
+	gl_Position = u_Projection * (oldPos + newPos);
 }
 
 #shader fragment
 #version 410 core
+layout (location = 0) out vec4 color;
+
+in Frag_Data
+{
+	vec4 pos;
+}frag_data;
+
 
 void main()
 {
+	color = frag_data.pos;
 }

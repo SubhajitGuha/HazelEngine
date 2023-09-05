@@ -26,7 +26,7 @@ namespace Hazel {
 	//std::vector<PointLight*> Scene::m_PointLights;
 	EditorCamera editor_cam;
 	 LoadMesh* Scene::Sphere=nullptr, *Scene::Sphere_simple = nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr
-		 , *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza, *Scene::Grass, *Scene::Flower;
+		 , *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza, *Scene::Grass, *Scene::Flower, *Scene::Tree;
 	 bool capture = false;
 	 glm::vec3 camloc = { 0,0,0 }, camrot = {0,0,0};
 	Scene::Scene()
@@ -48,6 +48,7 @@ namespace Hazel {
 		Grass = new LoadMesh("Assets/Meshes/grass.fbx");
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
+		Tree = new LoadMesh("Assets/Meshes/Tree.fbx");
 		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
 		Renderer3D::SetUpCubeMapReflections(*this);

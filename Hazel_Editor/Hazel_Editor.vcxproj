@@ -170,6 +170,11 @@
     <None Include="Assets\Shaders\BloomToneMapping_Shader.glsl" />
     <None Include="Assets\Shaders\DownsampleBloom_Shader.glsl" />
     <None Include="Assets\Shaders\ExtractHighFrequencyParts_Shader.glsl" />
+    <None Include="Assets\Shaders\gBufferShaderInstanced.glsl" />
+    <None Include="Assets\Shaders\gBufferShader_Terrain.glsl" />
+    <None Include="Assets\Shaders\ShadowShaderInstanced.glsl" />
+    <None Include="Assets\Shaders\SSAOShader_Instanced.glsl" />
+    <None Include="Assets\Shaders\SSAOShader_Terrain.glsl" />
     <None Include="Assets\Shaders\TerrainShader.glsl" />
     <None Include="Assets\Shaders\TerrainShadowShader.glsl" />
     <None Include="Assets\Shaders\TerrainWireframeShader.glsl" />

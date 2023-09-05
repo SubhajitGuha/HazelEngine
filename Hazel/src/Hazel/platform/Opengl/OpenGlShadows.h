@@ -22,9 +22,8 @@ namespace Hazel{
 	private:
 		unsigned int depth_id[MAX_CASCADES],framebuffer_id;//max 4 cascades
 		float m_width, m_height;
-		ref<Shader> shadow_shader, terrain_shadowShader;
+		ref<Shader> shadow_shader, terrain_shadowShader, shadow_shaderInstanced;
 		std::vector<glm::mat4> m_ShadowProjection;
-		std::vector<float> Ranges;
 		glm::mat4 m_Camera_Projection;
 		float m_ShadowAspectRatio = 1.0f;
 		glm::mat4 LightView[MAX_CASCADES] = { glm::mat4(1.0f) };

@@ -226,7 +226,7 @@ namespace Hazel {
 	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, size_t instance_count, const glm::vec4& color, float TimeElapsed, const float& material_Roughness, const float& material_metallic)
 	{
 		glDisable(GL_CULL_FACE);
-		m_data->foliageShader_instanced->Bind();
+		//m_data->foliageShader_instanced->Bind();
 
 		m_data->foliageShader_instanced->SetFloat("Roughness", material_Roughness); //send the roughness value
 		m_data->foliageShader_instanced->SetFloat("Metallic", material_metallic); //send the metallic value
@@ -289,7 +289,7 @@ namespace Hazel {
 
 	void Renderer3D::RenderShadows(Scene& scene, Camera& camera)
 	{
-		m_data->shadow_map->RenderShadows(scene, m_SunLightDir, camera);//Light position is the light direction used for directional light
+		//m_data->shadow_map->RenderShadows(scene, m_SunLightDir, camera);//Light position is the light direction used for directional light
 		m_data->shadow_map->RenderTerrainShadows(scene, m_SunLightDir, camera);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->shader);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->foliage_shader);

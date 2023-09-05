@@ -272,7 +272,7 @@ void main()
         normalize(-m_pos.xyz),           // normalized ray direction
         vec3(0,6372e3,0),               // ray origin
         normalize(sun_direction),                        // position of the sun
-        90.0,                           // intensity of the sun
+        200.0,                           // intensity of the sun
         6371e3,                         // radius of the planet in meters
         6671e3,                         // radius of the atmosphere in meters
         vec3(5.5e-6, 13.0e-6, 22.4e-6), // Rayleigh scattering coefficient

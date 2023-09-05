@@ -166,12 +166,29 @@ vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir , vec3 Normal)
 	return specular;
 }
 
+vec3 ColorCorrection(vec3 color)
+{
+	color = clamp(color,0,1);
+	color = pow(color, vec3(1.0/2.2)); //Gamma correction
+
+	color = clamp(color,0,1);
+	color = vec3(1.0) - exp(-color * 2);//exposure
+
+	//color = clamp(color,0,1);
+	//color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,2);//saturation
+
+	color = clamp(color,0,1);
+	color = 1.3*(color-0.5) + 0.5 ; //contrast
+
+	return color;
+}
 
 float ao = 1.0;
 void main()
 {
 	int index = int (m_materialindex);
 	
+	//float Transparency =  texture(u_Albedo, vec3(tcord , index)).a;
 	float opacity = texture(u_Roughness , vec3(tcord,index)).r;// Opacity on R-Channel
 	//color = vec4(vec3(opacity),1.0);
 	if(opacity <= 0.1)
@@ -251,8 +268,7 @@ void main()
 
 	PBR_Color += ambiant;
 	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
-	PBR_Color = vec3(1.0) - exp(-PBR_Color * 2);//exposure
-	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
+	PBR_Color = clamp(ColorCorrection(PBR_Color),0.0,1.0);
 
 	color = vec4(PBR_Color,1.0);
 }

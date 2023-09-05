@@ -4,38 +4,10 @@ PointLight:
 Entities:
   - Entity: 13212514564232
     TagComponent:
-      tag: Entity
+      tag: shrub3
     TransformComponent:
-      Translation: [-22.1000004, 0, 7.30000019]
+      Translation: [86.5, 60.0999985, 85]
       Rotation: [90, 0, 0]
-      Scale: [1, 1, 1]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/cityHouse_Unreal.fbx
-  - Entity: 13212514564232
-    TagComponent:
-      tag: Entity
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [90, 0, 0]
-      Scale: [1, 1, 1]
-      Transform:
-        - [1, 0, 0, 0]
-        - [0, 1, 0, 0]
-        - [0, 0, 1, 0]
-        - [0, 0, 0, 1]
-    StaticMeshComponent:
-      MeshPath: Assets/Meshes/Plane.fbx
-  - Entity: 13212514564232
-    TagComponent:
-      tag: Entity
-    TransformComponent:
-      Translation: [-46, -15.8999996, 0]
-      Rotation: [0, 0, 0]
       Scale: [10, 10, 10]
       Transform:
         - [1, 0, 0, 0]
@@ -43,4 +15,50 @@ Entities:
         - [0, 0, 1, 0]
         - [0, 0, 0, 1]
     StaticMeshComponent:
-      MeshPath: Assets/Meshes/sphere_simple.fbx
+      MeshPath: Assets/Meshes/Tree.fbx
+  - Entity: 13212514564232
+    TagComponent:
+      tag: shrub2
+    TransformComponent:
+      Translation: [200, 53.2999992, 165.399994]
+      Rotation: [104.300003, -2.29999995, -172.600006]
+      Scale: [12, 12, 12]
+      Transform:
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, 0, 0, 1]
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/Tree.fbx
+  - Entity: 13212514564232
+    TagComponent:
+      tag: shrub1
+    TransformComponent:
+      Translation: [45, 65, 85]
+      Rotation: [90, 0, 0]
+      Scale: [12, 12, 12]
+      Transform:
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, 0, 0, 1]
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/Tree.fbx
+  - Entity: 13212514564232
+    TagComponent:
+      tag: Entity
+    TransformComponent:
+      Translation: [247.699997, 42.9000015, 60.9000015]
+      Rotation: [90, 0, 111.800003]
+      Scale: [4, 4, 4]
+      Transform:
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, 0, 0, 1]
+    SpriteRenderer:
+      Color: [1, 1, 1, 1]
+      Roughness: 0.100000001
+      Metallic: 0
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/cityHouse_Unreal.fbx

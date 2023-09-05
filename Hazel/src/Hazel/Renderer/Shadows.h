@@ -16,6 +16,7 @@ namespace Hazel {
 		static ref<Shadows> Create(float width, float height);
 		static ref<Shadows> Create();//creates a texture map of 2048x2048 resolution
 	public:
+		std::vector<float> Ranges;
 		static int Cascade_level;
 		static float m_lamda;
 	};

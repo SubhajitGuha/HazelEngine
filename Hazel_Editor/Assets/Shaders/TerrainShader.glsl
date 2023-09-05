@@ -229,6 +229,7 @@ uniform vec3 u_CameraPos;
 uniform vec3 DirectionalLight_Direction;
 uniform vec3 SunLight_Color;
 
+uniform sampler2D SSAO;
 uniform sampler2D u_HeightMap;
 uniform sampler2D u_Albedo;
 uniform sampler2D u_Roughness;
@@ -283,7 +284,7 @@ float CalculateShadow(int cascade_level)
 	float ShadowSum = 0.0;
 	vec3 p = VertexPosition_LightSpace.xyz/VertexPosition_LightSpace.w;
 	p = p * 0.5 + 0.5;//convert -1 to +1 to 0 to 1 this is needed for getting the location in the texture
-	float bias = 0.0001*tan(acos(NdotL));//bias to resolve the artifact
+	float bias = 0.00001*tan(acos(NdotL));//bias to resolve the artifact
 	float TexelSize = 1.0/textureSize(ShadowMap[cascade_level],0).x;
 
 	for(int i=-1; i <=1; i++)
@@ -345,12 +346,30 @@ vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
 	return specular;
 }
 
+vec3 ColorCorrection(vec3 color)
+{
+	color = clamp(color,0,1);
+	color = pow(color, vec3(1.0/2.2)); //Gamma correction
+
+	color = clamp(color,0,1);
+	color = vec3(1.0) - exp(-color * 3);//exposure
+
+	color = clamp(color,0,1);
+	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,2);//saturation
+
+	color = clamp(color,0,1);
+	color = 1.1*(color-0.5) + 0.5 ; //contrast
+
+	return color;
+}
+
 void main()
 {
 	vec3 m_color = vec3(1);// need to change it as it will be the terrain color tint
 
 	vec2 texture_size = textureSize(u_HeightMap,0);	//get texture dimension
-	vec3 Normal = TBN(fs_data.TexCoord , vec2(1/2048.0)) * texture(u_Normal , fs_data.TexCoord * u_Tiling).rgb;
+	vec3 Normal = TBN(fs_data.TexCoord , vec2(1/texture_size.x)) * texture(u_Normal , fs_data.TexCoord * u_Tiling).rgb;
+	//vec3 Normal = CalculateNormal(fs_data.TexCoord , vec2(1/texture_size.x));
 	Normal = normalize(Normal);
 	//vec3 Normal = CalculateNormal(fs_data.TexCoord , vec2(1/2048.0));
 	float Height = texture(u_HeightMap,fs_data.TexCoord).r * HEIGHT_SCALE;
@@ -393,11 +412,11 @@ void main()
 	vec3 BRDFintegration =  ks*alpha + max(dot(Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
-	//vec4 coordinate = u_ProjectionView * m_pos;
-	//coordinate.xyz /= coordinate.w;
-	//coordinate.xyz = coordinate.xyz*0.5 + 0.5;
+	vec4 coordinate = u_ProjectionView * grass_data.Pos;
+	coordinate.xyz /= coordinate.w;
+	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
 	//ambiance
-		vec3 ambiant = (IBL_diffuse + IBL_specular)* texture(u_Albedo, fs_data.TexCoord * u_Tiling).xyz * m_color.xyz;
+		vec3 ambiant = (IBL_diffuse + IBL_specular)* texture(u_Albedo, fs_data.TexCoord * u_Tiling).xyz * m_color.xyz;// *  texture(SSAO,coordinate.xy).r;
 
 	PBR_Color += ( (kd * texture(u_Albedo, fs_data.TexCoord * u_Tiling).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 
@@ -422,9 +441,8 @@ void main()
 	//}
 	
 	PBR_Color += ambiant;
-	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
-	PBR_Color = vec3(1.0) - exp(-PBR_Color * 3);//exposure
-	PBR_Color = pow(PBR_Color, vec3(1.0/2.2)); //Gamma correction
+	
+	PBR_Color = ColorCorrection(PBR_Color);
 
 	color = vec4(PBR_Color,1.0);
 	//color = vec4(Normal,1.0);

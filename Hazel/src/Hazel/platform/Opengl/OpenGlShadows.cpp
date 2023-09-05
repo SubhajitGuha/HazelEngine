@@ -15,6 +15,8 @@ namespace Hazel {
 	{
 		shadow_shader = Shader::Create("Assets/Shaders/ShadowShader.glsl");//shadow shader
 		terrain_shadowShader = Shader::Create("Assets/Shaders/TerrainShadowShader.glsl");
+		shadow_shaderInstanced = Shader::Create("Assets/Shaders/ShadowShaderInstanced.glsl");
+
 		CreateShdowMap();
 	}
 	OpenGlShadows::~OpenGlShadows()
@@ -105,12 +107,49 @@ namespace Hazel {
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			//render terrain
-			//Needs change as I cannot just make terrain vertex array and terrain data public static
-			glDisable(GL_CULL_FACE);
+			//Needs change as I cannot just make terrain vertex array and terrain data public static		
 			RenderCommand::DrawArrays(*Terrain::m_terrainVertexArray, Terrain::terrainData.size(), GL_PATCHES, 0);
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+			
+			//shadow_shaderInstanced->Bind();
+			//shadow_shaderInstanced->SetMat4("LightProjection", LightProjection);
+			////Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
+			//shadow_shaderInstanced->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
+			//shadow_shaderInstanced->SetMat4("u_Model", Terrain::m_terrainModelMat);
+			//shadow_shaderInstanced->SetMat4("u_Projection", cam.GetProjectionMatrix());
+			//shadow_shaderInstanced->SetFloat("u_Time", Terrain::time);
+			//shadow_shaderInstanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
+			//glDisable(GL_CULL_FACE);
+			////render terrain grass
+			//scene.m_Terrain->RenderTerrainGrass();
+			//glEnable(GL_CULL_FACE);
+			//glCullFace(GL_BACK);
 
+			shadow_shader->Bind();
+			shadow_shader->SetMat4("LightProjection", LightProjection);
+			//Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
+			shadow_shader->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
+
+			scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
+				{
+					Entity Entity(&scene, m_entity);
+					if (Entity.GetComponent<StaticMeshComponent>().isFoliage == true)
+						shadow_shader->SetInt("isFoliage", 1); //if the mesh is a foliage then in shader set it to true
+					else
+						shadow_shader->SetInt("isFoliage", 0);
+
+					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
+
+					shadow_shader->SetMat4("u_Model", transform);
+
+					auto mesh = Entity.GetComponent<StaticMeshComponent>();
+					//if (camera.camera.bIsMainCamera) {
+					if (Entity.HasComponent<SpriteRenderer>()) {
+						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
+						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color);
+					}
+					else
+						Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
+				});
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glViewport(0, 0, size.x, size.y);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -170,7 +209,7 @@ namespace Hazel {
 		m_ShadowProjection.clear();
 
 		float NearPlane = 1.0f;
-		float FarPlane = 1000.0f;
+		float FarPlane = 800.0f;
 		Ranges.resize(MAX_CASCADES+1);//send this in the fragment shader for determining which cascade to use
 		Ranges[0] = NearPlane;
 		Ranges[MAX_CASCADES] = FarPlane;
