@@ -7,7 +7,8 @@ First run "GenerateProjectFiles.bat" then the appropriate project files will be 
 then launch the .sln file and then build and run the application using vs2019.
 
 Youtube showcases.
-Terrain Rendering with foliage:
+
+TERRAIN Rendering with FOLIAGE:
 https://www.youtube.com/watch?v=xJrxz_6Rx-s&t=15s
 
 Engine showcase.
