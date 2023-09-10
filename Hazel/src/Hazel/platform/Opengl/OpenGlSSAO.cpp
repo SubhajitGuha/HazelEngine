@@ -79,21 +79,8 @@ namespace Hazel {
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 			HAZEL_CORE_TRACE("SSAO Framebuffer compleate -_- ");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//SSAOShader_Terrain->Bind();//needs change and refactoring
-		//SSAOShader_Terrain->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
-		//SSAOShader_Terrain->SetFloat("HEIGHT_SCALE", Terrain::HeightScale);
-		//SSAOShader_Terrain->SetMat4("u_Model", Terrain::m_terrainModelMat);
-		//SSAOShader_Terrain->SetFloat("ScreenWidth", viewport_size.x);
-		//SSAOShader_Terrain->SetFloat("ScreenHeight", viewport_size.y);
-		//SSAOShader_Terrain->SetMat4("u_ProjectionView", cam.GetProjectionView());
-		//SSAOShader_Terrain->SetMat4("u_View", cam.GetViewMatrix());
-		//SSAOShader_Terrain->SetFloat3Array("Samples", &samples[0].x, RANDOM_SAMPLES_SIZE);
-		//SSAOShader_Terrain->SetMat4("u_projection", cam.GetProjectionMatrix());
-		//SSAOShader_Terrain->SetInt("noisetex", NOISE_SLOT);
-		//SSAOShader_Terrain->SetInt("GPosition", DEPTH_SLOT);
-		//SSAOShader_Terrain->SetFloat3("u_CamPos", cam.GetCameraPosition());
-		//RenderCommand::DrawArrays(*Terrain::m_terrainVertexArray, Terrain::terrainData.size(), GL_PATCHES, 0);
-
+		
+		//terrain foliage
 		SSAOShader_Instanced->Bind();
 		SSAOShader_Instanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
 		SSAOShader_Instanced->SetFloat("u_Time", Terrain::time);
@@ -284,15 +271,15 @@ namespace Hazel {
 		//current_shader1->SetMat4("u_View", scene.MainCamera->GetViewMatrix());
 		//current_shader1->SetMat4("u_Projection", scene.MainCamera->GetProjectionMatrix());
 		//RenderCommand::DrawArrays(*Terrain::m_terrainVertexArray, Terrain::terrainData.size(), GL_PATCHES, 0);
-
-		current_shader2->Bind();
+		
+		GbufferPositionInstanced->Bind();
 		//Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
-		current_shader2->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
-		current_shader2->SetMat4("u_Model", Terrain::m_terrainModelMat);
-		current_shader2->SetMat4("u_View", scene.MainCamera->GetViewMatrix());
-		current_shader2->SetMat4("u_Projection", scene.MainCamera->GetProjectionMatrix());
-		current_shader2->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
-		current_shader2->SetFloat("u_Time", Terrain::time);
+		GbufferPositionInstanced->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
+		GbufferPositionInstanced->SetMat4("u_Model", Terrain::m_terrainModelMat);
+		GbufferPositionInstanced->SetMat4("u_View", scene.MainCamera->GetViewMatrix());
+		GbufferPositionInstanced->SetMat4("u_Projection", scene.MainCamera->GetProjectionMatrix());
+		GbufferPositionInstanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
+		GbufferPositionInstanced->SetFloat("u_Time", Terrain::time);
 		glDisable(GL_CULL_FACE);
 		//render terrain grass
 		scene.m_Terrain->RenderTerrainGrass();

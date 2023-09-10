@@ -19,8 +19,8 @@ uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform sampler2D Noise;
 uniform float u_Time;
-float amplitude = 40;
-float wsAmplitude = 0.6;
+float amplitude=40;
+float wsAmplitude=0.6;
 
 mat4 CreateScaleMatrix(float scale)
 {
@@ -126,7 +126,7 @@ void main()
 	
 	// For foliage ^_^
 	int index = int (m_materialindex);
-	//vec3 alpha = texture(alpha_texture , vec3(tcord,index)).xyz;
+	vec3 alpha = texture(alpha_texture , vec3(tcord,index)).xyz;
 	//if(alpha.r <= 0.06)
 		//discard;
 

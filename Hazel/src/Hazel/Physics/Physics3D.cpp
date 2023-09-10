@@ -135,6 +135,9 @@ namespace Hazel {
 			else
 				physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, false);
 
+			//physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true);
+			//physics_component.m_DynamicActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eENABLE_CCD_FRICTION, true);
+
 			physx::PxRigidBodyExt::updateMassAndInertia(*physics_component.m_DynamicActor, physics_component.m_mass);
 			m_scene->addActor(*physics_component.m_DynamicActor);
 			shape->release();
@@ -167,20 +170,7 @@ namespace Hazel {
 			TriMeshDesc.triangles.data = &indices[0];
 			TriMeshDesc.triangles.stride = 3 * sizeof(unsigned int);
 			HZ_ASSERT(!TriMeshDesc.isValid());
-			//TriMeshDesc.flags = physx::PxMeshFlag::e16_BIT_INDICES;
-
-			//physx::PxTolerancesScale scale;
-			////scale.length = 10000;
-			////scale.speed = 980;
-			//physx::PxCookingParams params = m_cooking->getParams();
-			//params.buildGPUData = true;
-			//params.midphaseDesc = physx::PxMeshMidPhase::eBVH34;
-			//params.suppressTriangleMeshRemapTable = false;
-			//params.midphaseDesc.mBVH33Desc.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
-			////params.scale = scale;
-			//params.midphaseDesc.mBVH33Desc.meshSizePerformanceTradeOff = 1.0f;
-			//m_cooking->setParams(params);
-
+			
 			//cook the triangle mesh
 			physx::PxDefaultMemoryOutputStream outBuffer;
 			
@@ -234,8 +224,6 @@ namespace Hazel {
 	}
 	void Physics3D::AddHeightFieldCollider(const std::vector<int>& HeightValues,int width,int height, float spacing, const glm::mat4& transform)
 	{
-		if (m_physics == nullptr)
-			return;
 		m_defaultMaterial = m_physics->createMaterial(0.6, 0.6, 0.7);
 
 		physx::PxTransform localTm(*(physx::PxMat44*)glm::value_ptr(transform));
@@ -243,7 +231,7 @@ namespace Hazel {
 		for (int i = 0; i < HeightValues.size(); i++)
 		{
 			samples[i].height = HeightValues[i];
-			samples[i].materialIndex0 = 2;
+			samples[i].materialIndex0 = 3;
 			samples[i].materialIndex1 = 3;
 		}
 
@@ -253,6 +241,7 @@ namespace Hazel {
 		hfDesc.nbRows = height/ spacing;
 		hfDesc.samples.data = samples;
 		hfDesc.samples.stride = sizeof(physx::PxHeightFieldSample);
+		hfDesc.flags = physx::PxHeightFieldFlag::eNO_BOUNDARY_EDGES;
 
 		physx::PxHeightField* aHeightField = m_cooking->createHeightField(hfDesc,
 			m_physics->getPhysicsInsertionCallback());

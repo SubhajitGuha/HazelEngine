@@ -84,7 +84,7 @@ namespace Hazel {
 		{
 			m_Position = { 0,0,-1 };
 			m_ViewDirection = { 0,0,1 };
-			m_verticalFOV = 45.0f;
+			m_verticalFOV = 90.0f;
 		}
 
 		glm::vec2 NewMousePos = { Input::GetCursorPosition().first,Input::GetCursorPosition().second };

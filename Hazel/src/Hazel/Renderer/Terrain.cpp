@@ -5,6 +5,11 @@
 #include "stb_image.h"
 #include "Hazel//Physics/Physics3D.h"
 
+/*
+	terrain class needs its own ui and modelling tools for basic prototyping.
+	and also remove redundant glsl codes.
+*/
+
 namespace Hazel
 {
 	float Terrain::WaterLevel = 0.1, Terrain::HillLevel = 0.5, Terrain::MountainLevel = 1.0
@@ -26,6 +31,7 @@ namespace Hazel
 		m_maxTerrainHeight = std::numeric_limits<float>::min();
 		m_terrainShader = Shader::Create("Assets/Shaders/TerrainShader.glsl");
 		m_terrainWireframeShader = Shader::Create("Assets/Shaders/TerrainWireframeShader.glsl");
+		foliageShader_instanced = Shader::Create("Assets/Shaders/FoliageShader_Instanced.glsl");
 		//Grass_modelMat.resize(maxGrassAmount * GrassDensity);
 		InitilizeTerrain();
 	}
@@ -95,7 +101,7 @@ namespace Hazel
 		bl->push("Position", DataType::Float3);
 		bl->push("coord", DataType::Float2);
 		m_terrainVertexArray->AddBuffer(bl, vb);
-		glPatchParameteri(GL_PATCH_VERTICES, 4);//will be present after al vertex array operations
+		glPatchParameteri(GL_PATCH_VERTICES, 4);//will be present after all vertex array operations for tessellation
 
 		glm::mat4 terrain_transform = glm::translate(glm::mat4(1.0f), { 0,1,0 }) * glm::rotate(glm::mat4(1.0), glm::radians(180.0f), { 0,0,1 });
 		max_height = std::numeric_limits<float>::min();
@@ -128,7 +134,9 @@ namespace Hazel
 					float factor = glm::clamp(RandomFloat(generator)*0.5f+0.5f,0.0f,1.0f);//what to spawn
 					if (GrassSpawnArea[j * m_Width + i + m_Channels1] < 1500)
 					{
-						for (int k = 0; k < 1; k++)//grass per unit
+						if (factor > 0.1)
+							continue;
+						for (int k = 0; k < 3; k++)//grass per unit
 						{
 							TerrainFoliageData child_data;
 							child_data.position = { i + RandomFloat(generator) * k / GrassDensity * 2.0,y - 2.0f, j + RandomFloat(generator) * k / GrassDensity * 2.0 };
@@ -163,7 +171,7 @@ namespace Hazel
 
 		//Terrain collision
 		std::vector<int> HeightValues;
-		int spacing = 16.0f;
+		int spacing = 32.0f;
 		//in physx the data is stored in row-major format
 		for (int j = 0; j < m_Width; j+=spacing) {
 			for (int i = 0; i < m_Height; i+=spacing)
@@ -174,7 +182,7 @@ namespace Hazel
 				HeightValues.push_back(ceil(y));
 			}
 		}
-		Physics3D::AddHeightFieldCollider(HeightValues, m_Width, m_Height, spacing, glm::rotate(glm::mat4(1.0), glm::radians(0.0f), { 0,0,1 }));//transform is hard codded
+		Physics3D::AddHeightFieldCollider(HeightValues, m_Width, m_Height, spacing, glm::mat4(1.0f));//transform is hard codded
 		//stbi_image_free(Height_data);
 }
 	void Terrain::RenderTerrain(Camera& cam)
@@ -231,7 +239,7 @@ namespace Hazel
 			if (HasPlayerMovedFromChunk(CamX, CamZ))
 				SpawnGrassOnChunks(CamX, CamZ, RadiusOfSpawn);
 
-			Renderer3D::BeginSceneFoliage(cam);
+			Renderer3D::BeginSceneFoliage(cam);			
 			RenderTerrainGrass();
 			//Renderer3D::DrawFoliageInstanced(*Scene::Grass, m_terrainModelMat, Grass_modelMat.size(), { 0,0.0,0.0,1 },time, 0.4);
 		}
@@ -313,7 +321,7 @@ namespace Hazel
 				}
 			}
 		}
-		ChunkIndex = NeighbourChunkIndices.size();
+		ChunkIndex = Grass_modelMat.size()+Flower_modelMat.size();
 		//std::reverse(Grass_modelMat.begin(), Grass_modelMat.end());
 		Renderer3D::InstancedFoliageData(*Scene::Grass, Grass_modelMat);
 		Renderer3D::InstancedFoliageData(*Scene::Flower, Flower_modelMat);
@@ -342,8 +350,8 @@ namespace Hazel
 	{
 		glm::mat4 flower_transform = glm::translate(glm::mat4(1.0), flower_data.position) *
 			glm::rotate(glm::mat4(1.0), glm::radians(90.0f), { 1,0,0 }) *
-			glm::rotate(glm::mat4(1.0), glm::radians(flower_data.rotation.y), { 0,1,0 }) *
-			glm::rotate(glm::mat4(1.0), glm::radians(flower_data.rotation.x), { 1,0,0 }) *
+			glm::rotate(glm::mat4(1.0), glm::radians(flower_data.rotation.y), { 0,0,1 }) *
+			//glm::rotate(glm::mat4(1.0), glm::radians(flower_data.rotation.x), { 0,1,0 }) *
 			glm::scale(glm::mat4(1.0), flower_data.scale);
 		//Grass_modelMat[count] = grass_transform;
 		Flower_modelMat.push_back(flower_transform);

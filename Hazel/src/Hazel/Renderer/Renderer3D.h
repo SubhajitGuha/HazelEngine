@@ -30,6 +30,7 @@ namespace Hazel {
 		static void RenderShadows(Scene& scene, Camera& camera);
 		static void AmbiantOcclusion(Scene& scene, Camera& camera);
 		static void SetTransperancy(float val);
+		static ref<Shader>& GetFoliageInstancedShader();
 	public:
 		static unsigned int depth_id[4];
 		static int index;

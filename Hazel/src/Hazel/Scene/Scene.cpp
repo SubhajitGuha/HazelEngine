@@ -139,12 +139,12 @@ namespace Hazel {
 		if (m_PointLights.size() > 0)
 			Renderer3D::SetPointLightPosition(m_PointLights);
 
-		//debug physics
-		Renderer2D::BeginScene(*MainCamera);
-		for (int i = 0; i < Physics3D::DebugPoints.size(); i++)
-		{
-			Renderer2D::DrawLine(Physics3D::DebugPoints[i].pos0, Physics3D::DebugPoints[i].pos1, glm::vec4(0.0, 1.0, 0.6, 1.0));
-		}
+		////debug physics
+		//Renderer2D::BeginScene(*MainCamera);
+		//for (int i = 0; i < Physics3D::DebugPoints.size(); i++)
+		//{
+		//	Renderer2D::DrawLine(Physics3D::DebugPoints[i].pos0, Physics3D::DebugPoints[i].pos1, glm::vec4(0.0, 1.0, 0.6, 1.0));
+		//}
 
 		Renderer3D::SetSunLightDirection(Renderer3D::m_SunLightDir);
 		Renderer3D::SetSunLightColorAndIntensity(Renderer3D::m_SunColor, Renderer3D::m_SunIntensity);

@@ -355,4 +355,8 @@ namespace Hazel {
 		syncObj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	}
 
+	ref<Shader>& Renderer3D::GetFoliageInstancedShader()
+	{
+		return m_data->foliageShader_instanced;
+	}
 }

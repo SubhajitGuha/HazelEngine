@@ -15,7 +15,7 @@ uniform mat4 u_Model;
 uniform mat4 u_Projection;
 uniform sampler2D Noise;
 
-int amplitude = 70;
+float amplitude=70;
 out vec2 m_tcoord;
 
 mat4 CreateScaleMatrix(float scale)

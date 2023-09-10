@@ -13,12 +13,12 @@ uniform mat4 u_Model;
 uniform mat4 u_Projection;
 uniform sampler2D Noise;
 uniform float u_Time;
+float amplitude=40;
+float wsAmplitude=0.6;
 
 out vec4 m_Pos;
 out vec2 tcoord;
-
-float amplitude = 40;
-float wsAmplitude = 0.6;
+flat out float m_materialindex;
 
 mat4 CreateScaleMatrix(float scale)
 {
@@ -81,6 +81,7 @@ void main()
 	gl_Position = u_Projection * u_View * ws_rot * wsGrass * rot * CreateScaleMatrix(val*2) * pos;
 
 	m_Pos = u_View * ws_rot * wsGrass * rot * CreateScaleMatrix(val*2) * pos;
+	m_materialindex = materialindex;
 	tcoord = cord;
 }
 
@@ -90,13 +91,14 @@ layout (location = 0) out vec4 color;
 
 in vec4 m_Pos;
 in vec2 tcoord;
+flat in float m_materialindex;
 
 uniform sampler2DArray u_Alpha; // multiple material slots can be present so a texture array is used
 
 void main()
 {
-	//int index = int (m_materialindex);
-	//vec3 alpha = texture(u_Alpha , vec3(tcoord , index)).rgb;
+	int index = int (m_materialindex);
+	vec3 alpha = texture(u_Alpha , vec3(tcoord , index)).rgb;
 	
 	//if(alpha.r <=0.06 ) // check if the tex value is less than a certain threshold then discard
 		//discard;

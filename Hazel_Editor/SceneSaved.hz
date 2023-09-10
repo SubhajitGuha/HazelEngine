@@ -4,6 +4,40 @@ PointLight:
 Entities:
   - Entity: 13212514564232
     TagComponent:
+      tag: Sphere
+    TransformComponent:
+      Translation: [65, -100.800003, 85]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 10]
+      Transform:
+        - [1, 0, 0, 0]
+        - [0, 1, 0, 0]
+        - [0, 0, 1, 0]
+        - [0, 0, 0, 1]
+    SpriteRenderer:
+      Color: [0, 0.7104249, 1, 1]
+      Roughness: 1
+      Metallic: 0
+    StaticMeshComponent:
+      MeshPath: Assets/Meshes/sphere_simple.fbx
+    PhysicsComponent:
+      Mass: 1
+      StaticFriction: 0.5
+      DynamicFriction: 0.5
+      Restitution: 0.600000024
+      Radius: 10
+      Height: 1
+      HalfExtent: [0, 0, 0]
+      Transform:
+        - [10, 0, 0, 0]
+        - [0, 10, 0, 0]
+        - [0, 0, 10, 0]
+        - [65, -100.800003, 85, 1]
+      isStatic: 0
+      isKinematic: 0
+      Shape: 4
+  - Entity: 13212514564232
+    TagComponent:
       tag: shrub3
     TransformComponent:
       Translation: [86.5, 60.0999985, 85]

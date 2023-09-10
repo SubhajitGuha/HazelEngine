@@ -22,9 +22,9 @@ uniform mat4 u_Model;
 uniform float u_Time;
 uniform vec4 m_color;
 uniform sampler2D Noise;
+float amplitude=40;
+float wsAmplitude=0.6;
 
-float amplitude = 40;
-float wsAmplitude = 0.6;
 mat4 CreateRotationMat(float x, float y, float z)
 {
 	x= radians(x);
