@@ -7,6 +7,10 @@ First run "GenerateProjectFiles.bat" then the appropriate project files will be 
 then launch the .sln file and then build and run the application using vs2019.
 
 Youtube showcases.
+
+TERRAIN Rendering with FOLIAGE:
+https://www.youtube.com/watch?v=xJrxz_6Rx-s&t=15s
+
 Engine showcase.
 https://www.youtube.com/watch?v=v013iI91Nms&t=268s
 
@@ -17,6 +21,9 @@ Physics using Nvidia PhysX showcase.
 https://www.youtube.com/watch?v=cyJuWrRfjhA&t=5s
 
 Some Screen shots of PBR rendering in my engine.
+TERRAIN with FOLIAGE
+![Screenshot (2953)](https://github.com/SubhajitGuha/HazelEngine/assets/102531274/29d2d029-1cbd-4536-918f-2d60ae450c82)
+
 ![Screenshot (2239)](https://user-images.githubusercontent.com/102531274/230664441-498f418d-9bb1-472f-98d7-2b574f9b454b.png)
 With Ambiant occlusion(SSAO) Applied:
 ![Screenshot (2317)](https://user-images.githubusercontent.com/102531274/232682315-b756998f-3cf1-46d1-9556-368a71567b83.png)
