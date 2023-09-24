@@ -53,12 +53,13 @@ namespace Hazel
 		std::vector<glm::mat4> Grass_modelMat, Flower_modelMat;
 		int CurrentChunkIndex = -1;
 		float ChunkSize = 128.0f;
+		uint32_t foliageBufferIndex;
 	private:
 		int GetChunkIndex(int PosX,int PosZ);
 		void SpawnGrassOnChunks(int PosX, int PosZ, int RadiusOfSpawn = 1);
 		bool HasPlayerMovedFromChunk(int PosX, int PosZ);
-		void FillGrassData(const TerrainFoliageData& grass_data);
-		void FillFlowerData(const TerrainFoliageData& flower_data);
+		void FillGrassData(const TerrainFoliageData& grass_data, int index);
+		void FillFlowerData(const TerrainFoliageData& flower_data, int index);
 
 	};
 }

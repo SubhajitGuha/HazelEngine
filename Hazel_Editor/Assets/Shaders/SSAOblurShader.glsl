@@ -4,7 +4,6 @@ layout (location = 0) in vec4 pos;
 layout (location = 1) in vec4 cord;
 
 out vec2 tcord;
-out vec4 m_pos;
 
 uniform mat4 u_ProjectionView;
 uniform mat4 u_Model;
@@ -12,7 +11,6 @@ uniform mat4 u_Model;
 void main()
 {
 	gl_Position =  pos;
-	m_pos = u_Model * pos;
 	tcord = cord.xy;
 }
 
@@ -21,7 +19,6 @@ void main()
 layout (location = 0) out vec4 color;
 
 in vec2 tcord;
-in vec4 m_pos;
 
 uniform sampler2D SSAOtex;
 

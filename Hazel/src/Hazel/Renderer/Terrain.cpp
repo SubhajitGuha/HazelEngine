@@ -32,7 +32,8 @@ namespace Hazel
 		m_terrainShader = Shader::Create("Assets/Shaders/TerrainShader.glsl");
 		m_terrainWireframeShader = Shader::Create("Assets/Shaders/TerrainWireframeShader.glsl");
 		foliageShader_instanced = Shader::Create("Assets/Shaders/FoliageShader_Instanced.glsl");
-		//Grass_modelMat.resize(maxGrassAmount * GrassDensity);
+		Grass_modelMat.resize(maxGrassAmount * GrassDensity);
+		Flower_modelMat.resize(maxGrassAmount * GrassDensity);
 		InitilizeTerrain();
 	}
 	Terrain::~Terrain()
@@ -51,6 +52,8 @@ namespace Hazel
 		TerrainTex_Albedo = Texture2D::Create("Assets/Textures/forrest_ground_01_diff_2k.jpg");
 		TerrainTex_Roughness = Texture2D::Create("Assets/Textures/forrest_ground_01_rough_2k.jpg");
 		TerratinTex_Normal = Texture2D::Create("Assets/Textures/forrest_ground_01_nor_gl_2k.jpg");
+
+		Renderer3D::AllocateInstancedFoliageData(maxGrassAmount * GrassDensity, foliageBufferIndex);
 
 		m_terrainShader->Bind();
 		m_HeightMap->Bind(HEIGHT_MAP_TEXTURE_SLOT);
@@ -152,7 +155,7 @@ namespace Hazel
 						for (int k = 0; k < GrassDensity; k++)//grass per unit
 						{
 							TerrainFoliageData child_data;
-							child_data.position = { i + RandomFloat(generator) * k / GrassDensity * 2.0,y - 2.0f, j + RandomFloat(generator) * k / GrassDensity * 2.0 };
+							child_data.position = { i + RandomFloat(generator) * 2.0,y - 2.0f, j + RandomFloat(generator) * 2.0 };
 							child_data.rotation = { RandomFloat(generator) * 10.0f,RandomFloat(generator) * 90.0f,RandomFloat(generator) * 10.0f };//in degrees
 							child_data.scale = glm::vec3((RandomFloat(generator) + 1) / 2.0 + 1.0f);
 
@@ -248,7 +251,7 @@ namespace Hazel
 	void Terrain::RenderTerrainGrass()
 	{
 		Renderer3D::DrawFoliageInstanced(*Scene::Grass, m_terrainModelMat, Grass_modelMat.size(), { 0.25,0.3,0.05,1 }, time, 0.6);
-		Renderer3D::DrawFoliageInstanced(*Scene::Flower, m_terrainModelMat, Flower_modelMat.size(), { 0.5,.5,.5,1 }, time, 0.6);
+		//Renderer3D::DrawFoliageInstanced(*Scene::Flower, m_terrainModelMat, Flower_modelMat.size(), { 0.5,.5,.5,1 }, time, 0.6);
 	}
 
 	int Terrain::GetChunkIndex(int PosX, int PosZ)
@@ -288,8 +291,8 @@ namespace Hazel
 
 		//Now get vertices for each chunk
 		int count = 0;
-		Grass_modelMat.clear();
-		Flower_modelMat.clear();
+		//Grass_modelMat.clear();
+		//Flower_modelMat.clear();
 		for (int ChunkID : NeighbourChunkIndices)//iterate through all neighbouring chunks
 		{
 			int minX = (ChunkID % numberOfChunksX) * floor(ChunkSize);
@@ -314,17 +317,18 @@ namespace Hazel
 					for (int k = 0; k < foliage_data.size(); k++)
 					{
 						if (foliage_data[k].f_type == FOLIAGE_TYPE::GRASS)
-							FillGrassData(foliage_data[k]);
+							FillGrassData(foliage_data[k], count);
 						else
-							FillFlowerData(foliage_data[k]);
+							FillFlowerData(foliage_data[k], count);
+						count++;
 					}
 				}
 			}
 		}
 		ChunkIndex = Grass_modelMat.size()+Flower_modelMat.size();
 		//std::reverse(Grass_modelMat.begin(), Grass_modelMat.end());
-		Renderer3D::InstancedFoliageData(*Scene::Grass, Grass_modelMat);
-		Renderer3D::InstancedFoliageData(*Scene::Flower, Flower_modelMat);
+		Renderer3D::InstancedFoliageData(*Scene::Grass, Grass_modelMat, foliageBufferIndex);
+		//Renderer3D::InstancedFoliageData(*Scene::Flower, Flower_modelMat, foliageBufferIndex);
 
 	}
 
@@ -334,7 +338,7 @@ namespace Hazel
 		PosZ = abs(PosZ);
 		return CurrentChunkIndex != GetChunkIndex(PosX,PosZ);
 	}
-	void Terrain::FillGrassData(const TerrainFoliageData& grass_data)
+	void Terrain::FillGrassData(const TerrainFoliageData& grass_data, int index)
 	{
 		glm::mat4 grass_transform = glm::translate(glm::mat4(1.0), grass_data.position) *
 			//glm::rotate(glm::mat4(1.0), glm::radians(m_GrassData[coord].rotation.x), { 1,0,0 }) *
@@ -343,10 +347,10 @@ namespace Hazel
 			//glm::rotate(glm::mat4(1.0), glm::radians(grass_data[k].rotation.x), { 1,0,0 }) *
 			glm::scale(glm::mat4(1.0), grass_data.scale);
 		//Grass_modelMat[count] = grass_transform;
-		Grass_modelMat.push_back(grass_transform);
+		Grass_modelMat[index] = (grass_transform);
 	}
 
-	void Terrain::FillFlowerData(const TerrainFoliageData& flower_data)
+	void Terrain::FillFlowerData(const TerrainFoliageData& flower_data, int index)
 	{
 		glm::mat4 flower_transform = glm::translate(glm::mat4(1.0), flower_data.position) *
 			glm::rotate(glm::mat4(1.0), glm::radians(90.0f), { 1,0,0 }) *
@@ -354,6 +358,6 @@ namespace Hazel
 			//glm::rotate(glm::mat4(1.0), glm::radians(flower_data.rotation.x), { 0,1,0 }) *
 			glm::scale(glm::mat4(1.0), flower_data.scale);
 		//Grass_modelMat[count] = grass_transform;
-		Flower_modelMat.push_back(flower_transform);
+		Flower_modelMat[index] = (flower_transform);
 	}
 }

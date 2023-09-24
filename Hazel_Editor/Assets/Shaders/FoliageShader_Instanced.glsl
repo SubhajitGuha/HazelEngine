@@ -66,7 +66,9 @@ void main()
 	mat4 wsGrass = u_Model * instance_mm;
 	vec4 wsVertexPos = wsGrass * pos;
 	vec3 origin = vec3(wsGrass[3][0],wsGrass[3][1],wsGrass[3][2]);
-	float factor = distance(wsVertexPos.xyz , origin)/10;	
+
+	//wind system
+	float factor = distance(wsVertexPos.xyz , origin)/10;	//bottom part of foliage is not affected by wind
 	if(factor<0)
 		factor = 0;
 	

@@ -168,8 +168,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\BloomToneMapping_Shader.glsl" />
+    <None Include="Assets\Shaders\DeferredPassShader.glsl" />
     <None Include="Assets\Shaders\DownsampleBloom_Shader.glsl" />
     <None Include="Assets\Shaders\ExtractHighFrequencyParts_Shader.glsl" />
+    <None Include="Assets\Shaders\ForwardPassShader.glsl" />
     <None Include="Assets\Shaders\gBufferShaderInstanced.glsl" />
     <None Include="Assets\Shaders\gBufferShader_Terrain.glsl" />
     <None Include="Assets\Shaders\ShadowShaderInstanced.glsl" />

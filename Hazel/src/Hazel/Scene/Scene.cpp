@@ -39,6 +39,8 @@ namespace Hazel {
 		Renderer3D::Init();
 		Renderer2D::Init();
 
+		auto viewportSize = RenderCommand::GetViewportSize();
+
 		Flower = new LoadMesh("Assets/Meshes/flower.fbx");
 		Sphere = new LoadMesh("Assets/Meshes/Sphere.fbx");
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
@@ -49,8 +51,8 @@ namespace Hazel {
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
 		Tree = new LoadMesh("Assets/Meshes/Tree.fbx");
-		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
-		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
+		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
+		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
 		Renderer3D::SetUpCubeMapReflections(*this);
 		editor_cam.SetPerspectiveFar(10000);
 		
@@ -149,64 +151,9 @@ namespace Hazel {
 		Renderer3D::SetSunLightDirection(Renderer3D::m_SunLightDir);
 		Renderer3D::SetSunLightColorAndIntensity(Renderer3D::m_SunColor, Renderer3D::m_SunIntensity);
 
-		std::uniform_real_distribution<float> Randdist(1.0f, foliage_dist);
-		std::default_random_engine engine;
-
-		m_Terrain->RenderTerrain(*MainCamera);
-		m_registry.each([&](auto m_entity)
-			{			
-
-				Entity Entity(this, m_entity);
-				if (Entity.GetComponent<StaticMeshComponent>().isFoliage == false)
-				{
-					Renderer3D::BeginScene(*MainCamera);
-					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-					glm::vec4 color;
-
-					auto mesh = Entity.GetComponent<StaticMeshComponent>();
-					if (Entity.HasComponent<PhysicsComponent>())
-					{
-						auto physics_cmp = Entity.GetComponent<PhysicsComponent>();
-						Physics3D::UpdateTransform(Entity.GetComponent<TransformComponent>(), physics_cmp);
-					}
-					//MainCamera->SetCameraPosition({ transform[0][3], transform[1][3], transform[2][3] });
-
-					if (Entity.HasComponent<SpriteRenderer>()) {
-						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-						Renderer3D::SetTransperancy(SpriteRendererComponent.Transperancy);
-						Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color * SpriteRendererComponent.Emission_Scale, SpriteRendererComponent.m_Roughness, SpriteRendererComponent.m_Metallic);
-					}
-					else {
-						Renderer3D::SetTransperancy(1.0f);
-						Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
-					}
-				}
-				else
-				{
-					Renderer3D::BeginSceneFoliage(*MainCamera);
-					auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-					glm::vec4 color;
-
-					auto mesh = Entity.GetComponent<StaticMeshComponent>();
-					if (Entity.HasComponent<SpriteRenderer>()) {
-						auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-						std::vector<glm::mat4> InstancedArr;
-						glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0,0,0 }) * glm::rotate(glm::mat4(1.0), glm::radians(180.0f), { 1,0,0 }) * glm::scale(glm::mat4(1.0f), { 0.1f,0.1f,0.1f });
-						for (int i = 0; i < num_foliage; i++)
-						{
-							glm::mat4 Instanced_mm = glm::translate(glm::mat4(1.0f), { Randdist(engine),0,Randdist(engine) }) * glm::rotate(glm::mat4(1.0), glm::radians(Randdist(engine)), { 0,1,0 }) * glm::scale(glm::mat4(1.0f), glm::vec3((Randdist(engine)-1)/(foliage_dist-1)));
-							InstancedArr.push_back(Instanced_mm);
-						}
-						Renderer3D::DrawFoliage(*mesh, transform, SpriteRendererComponent.Color,SpriteRendererComponent.m_Roughness,SpriteRendererComponent.m_Metallic);
-					}
-					else
-						Renderer3D::DrawFoliage(*mesh, transform, Entity.m_DefaultColor); // default color, roughness, metallic value
-				}
-			});
-			Renderer3D::EndScene();
-
-			Renderer3D::RenderShadows(*this, *MainCamera);//shadows should be computed at last
-			Renderer3D::AmbiantOcclusion(*this, *MainCamera);
+		//m_Terrain->RenderTerrain(*MainCamera);
+		
+		Renderer3D::RenderScene_Deferred(this);
 	}
 	void Scene::OnCreate()
 	{

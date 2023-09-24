@@ -160,6 +160,7 @@
     <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
     <ClInclude Include="src\Hazel\Physics\Physics3D.h" />
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBloom.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.h" />
     <ClInclude Include="src\Hazel\Renderer\Atmosphere.h" />
     <ClInclude Include="src\Hazel\Renderer\Bloom.h" />
     <ClInclude Include="src\Hazel\Renderer\Buffer.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="src\Hazel\Renderer\Camareas\SceneCamera.h" />
     <ClInclude Include="src\Hazel\Renderer\CubeMapEnvironment.h" />
     <ClInclude Include="src\Hazel\Renderer\CubeMapReflection.h" />
+    <ClInclude Include="src\Hazel\Renderer\DeferredRenderer.h" />
     <ClInclude Include="src\Hazel\Renderer\FrameBuffer.h" />
     <ClInclude Include="src\Hazel\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Hazel\Renderer\OrthographicCamera.h" />
@@ -503,6 +505,7 @@
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Physics\Physics3D.cpp" />
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBloom.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Atmosphere.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Bloom.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
@@ -511,6 +514,7 @@
     <ClCompile Include="src\Hazel\Renderer\Camareas\SceneCamera.cpp" />
     <ClCompile Include="src\Hazel\Renderer\CubeMapEnvironment.cpp" />
     <ClCompile Include="src\Hazel\Renderer\CubeMapReflection.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\DeferredRenderer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\GraphicsContext.cpp" />
     <ClCompile Include="src\Hazel\Renderer\OrthographicCamera.cpp" />

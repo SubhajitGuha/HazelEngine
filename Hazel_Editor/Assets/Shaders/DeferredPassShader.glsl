@@ -1,46 +1,26 @@
 #shader vertex
 #version 410 core
-layout (location = 0) in vec4 pos;
-layout (location = 1) in vec2 cord;
-layout (location = 2) in vec3 Normal;
-layout (location = 3) in vec3 Tangent;
-layout (location = 4) in vec3 BiTangent;
-layout (location = 5) in float slotindex;
+layout (location = 0) in vec4 position;
+layout (location = 1) in vec4 cord;
 
 out vec2 tcord;
-out vec4 m_pos;
-out vec3 m_Normal;
-out vec3 m_Tangent;
-out vec3 m_BiTangent;
-flat out float m_slotindex;
-
-uniform mat4 u_ProjectionView;
-uniform mat4 u_Model;
 
 void main()
 {
-	gl_Position = u_ProjectionView * u_Model * pos;
-	m_slotindex = slotindex;
-	tcord = cord;
-	m_Normal = normalize(mat3(u_Model) * Normal);
-	m_Tangent = normalize(mat3(u_Model) * Tangent);
-	m_BiTangent = normalize(mat3(u_Model) * BiTangent);
-	m_pos = u_Model * pos;
+	gl_Position = position;
+	tcord = cord.xy;
 }
 
 #shader fragment
 #version 410 core
 layout (location = 0) out vec4 color;
 
-//pbr mapping
-//the u_Roughness texture contains "Roughness map" on R-channel "Metallic" on G-channel and "Ambient occlusion" on B-channel
-
-in vec4 m_pos;
-in vec3 m_Normal;
-in vec3 m_Tangent;
-in vec3 m_BiTangent;
-flat in float m_slotindex;
 in vec2 tcord;
+
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gColor;
+uniform sampler2D gRoughnessMetallic;
 
 #define MAX_LIGHTS 100
 vec4 VertexPosition_LightSpace;
@@ -51,18 +31,11 @@ uniform sampler2D ShadowMap[4];
 uniform float Ranges[5];
 uniform mat4 view;
 uniform mat4 u_ProjectionView;
-
 uniform samplerCube diffuse_env;
 uniform samplerCube specular_env;
 
 uniform sampler2D SSAO;
-uniform sampler2DArray u_Albedo;
-uniform sampler2DArray u_Roughness;
-uniform sampler2DArray u_NormalMap;
-uniform float u_depth;
-
 uniform vec3 EyePosition;
-uniform vec4 m_color;
 
 //Lights
 uniform vec3 DirectionalLight_Direction; //sun light world position
@@ -72,12 +45,6 @@ uniform vec3 PointLight_Position[MAX_LIGHTS];
 uniform vec3 PointLight_Color[MAX_LIGHTS];
 uniform int Num_PointLights;
 
-//PBR properties
-uniform float Roughness;
-uniform float Metallic;
-uniform float Transperancy;
-float ao = 1.0;
-
 vec3 PBR_Color = vec3(0.0);
 vec3 radiance;
 
@@ -85,22 +52,12 @@ vec3 ks;
 vec3 kd;
 float vdoth;
 
-float alpha = Roughness; //Roughness value
+float alpha = 0; //Roughness value
+float Metallic = 0;
 const float PI = 3.14159265359;
 #define MAX_MIP_LEVEL 28
 
 int level = 3; // cascade levels
-
-vec3 NormalMapping(int index) // index implies which material index normal map to use
-{
-	vec3 normal = texture(u_NormalMap , vec3(tcord,index)).rgb;
-	normal = normal*2.0 - 1.0; //convert to -1 to 1
-	mat3 TBN = mat3(m_Tangent , m_BiTangent , m_Normal);
-	if(normal == vec3(1.0)) // if normal map is a White Texture then Lighting Calculation will be done by vertex Normal
-		return m_Normal;
-	else
-		return normalize(TBN * normal);// to world space
-}
 
 float CalculateShadow(int cascade_level)
 {
@@ -188,16 +145,15 @@ vec3 ColorCorrection(vec3 color)
 
 void main()
 {
-	//if(m_color.x > 1.0 || m_color.y > 1.0 || m_color.z > 1.0)
-	//{
-	//	color = vec4(m_color.xyz , 1.0);
-	//	return;
-	//}
-	int index = int (m_slotindex);
+	vec3 Modified_Normal = mat3(inverse(view)) * texture(gNormal,tcord).xyz; //in ws
+	vec4 m_pos = inverse(view) * vec4(texture(gPosition,tcord).xyz , 1.0); //in ws
+	m_pos = vec4(m_pos.xyz/m_pos.w , 1.0);
 
-	vec3 Modified_Normal = NormalMapping(index);
+	vec4 m_Color = texture(gColor , tcord);
+	vec4 RoughnessMetallic = texture(gRoughnessMetallic , tcord);
 
-	alpha = texture(u_Roughness , vec3(tcord,index)).r * Roughness; //multiplying the texture-Roughness with the float val gives control on how much of the Roughness we need
+	alpha = RoughnessMetallic.r;
+	Metallic = RoughnessMetallic.g;
 	//ao = texture(u_Roughness , vec3(tcord,index)).b;
 	//to do metallic in Green channel
 
@@ -236,15 +192,14 @@ void main()
 	vec3 BRDFintegration =  ks*alpha + max(dot(Modified_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
-	vec4 coordinate = u_ProjectionView * m_pos;
-	coordinate.xyz /= coordinate.w;
-	coordinate.xyz = coordinate.xyz*0.5 + 0.5;
+	//vec4 coordinate = u_ProjectionView * m_pos;
+	//coordinate.xyz /= coordinate.w;
+	//coordinate.xyz = coordinate.xyz*0.5 + 0.5;
 	//ambiance
-		vec3 ambiant = (IBL_diffuse + IBL_specular)* texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz * texture(SSAO,coordinate.xy).r;
+		vec3 ambiant = (IBL_diffuse + IBL_specular)* m_Color.xyz * texture(SSAO,tcord).r;
 
-	PBR_Color += ( (kd * texture(u_Albedo, vec3(tcord , index)).xyz * m_color.xyz  / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
+	PBR_Color += ( (kd * m_Color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
 
-	//color=vec4(PointLight_Position[0],1.0);
 	for(int i=0 ; i< Num_PointLights ; i++)
 	{
 		vec3 LightDirection = normalize(PointLight_Position[i] - m_pos.xyz/m_pos.w); //for point light
@@ -256,7 +211,7 @@ void main()
 		//diffuse
 		kd = vec3(1.0) - ks;
 		kd *= (1.0 - Metallic);
-		vec3 diffuse = kd * texture(u_Albedo,vec3(tcord , index)).xyz * m_color.xyz / PI; // no alpha channel is being used
+		vec3 diffuse = kd * m_Color.xyz / PI; // no alpha channel is being used
 
 		float dist = length(PointLight_Position[i] - m_pos.xyz/m_pos.w);
 		float attenuation = 1 / ( 0.01 * dist * dist ); //attenuation is for point and spot light
@@ -270,5 +225,5 @@ void main()
 	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
 	PBR_Color = clamp(ColorCorrection(PBR_Color),0.0,1.0);
 
-	color = vec4(PBR_Color,Transperancy);
+	color = vec4(PBR_Color,1.0);
 }

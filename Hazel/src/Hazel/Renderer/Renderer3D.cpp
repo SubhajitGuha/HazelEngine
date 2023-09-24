@@ -9,6 +9,7 @@
 #include "Hazel/Scene/PointLight.h"
 #include "Hazel/platform/Opengl/OpenGlSSAO.h"//temporary testing purpose
 #include "Hazel/Renderer/Terrain.h"
+#include "Hazel/Renderer/DeferredRenderer.h"
 
 namespace Hazel {
 	//Camera* m_camera;
@@ -61,6 +62,7 @@ namespace Hazel {
 	void Renderer3D::Init()
 	{
 		m_data = new Renderer3DStorage;
+		DefferedRenderer::Init(1024, 1024);//Initilize the Deferred Renderer
 
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);
@@ -68,6 +70,9 @@ namespace Hazel {
 		m_data->foliage_shader->SetInt("SSAO", SSAO_BLUR_SLOT);
 		m_data->foliageShader_instanced = Shader::Create("Assets/Shaders/FoliageShader_Instanced.glsl");//this is not ideal!! I just cannot handle shaders like this in a long run
 		m_data->foliageShader_instanced->SetInt("SSAO", SSAO_BLUR_SLOT);
+
+		DefferedRenderer::GetDeferredPassShader()->Bind();
+		DefferedRenderer::GetDeferredPassShader()->SetInt("SSAO", SSAO_BLUR_SLOT);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
@@ -84,7 +89,7 @@ namespace Hazel {
 		m_data->tex->Bind(1);
 		m_data->WhiteTex->Bind(0);
 		
-		SetSunLightDirection({ 3,-2,2});
+		SetSunLightDirection({ 3,5,2});
 	}
 
 	void Renderer3D::BeginScene(OrthographicCamera& camera)
@@ -133,6 +138,10 @@ namespace Hazel {
 
 		m_data->foliageShader_instanced->Bind(); //this is not ideal!! I just cannot handle shaders like this in a long run
 		m_data->foliageShader_instanced->SetFloat3("DirectionalLight_Direction", pos);
+
+		DefferedRenderer::GetDeferredPassShader()->Bind();
+		DefferedRenderer::GetDeferredPassShader()->SetFloat3("DirectionalLight_Direction", pos);
+
 	}
 
 	void Renderer3D::SetSunLightColorAndIntensity(const glm::vec3& color, float Intensity)
@@ -150,6 +159,10 @@ namespace Hazel {
 		m_data->foliageShader_instanced->Bind();
 		m_data->foliageShader_instanced->SetFloat3("SunLight_Color", color);
 		m_data->foliageShader_instanced->SetFloat("SunLight_Intensity", Intensity);
+
+		DefferedRenderer::GetDeferredPassShader()->Bind();
+		DefferedRenderer::GetDeferredPassShader()->SetFloat3("SunLight_Color", color);
+		DefferedRenderer::GetDeferredPassShader()->SetFloat("SunLight_Intensity", Intensity);
 	}
 
 	void Renderer3D::SetPointLightPosition(const std::vector<PointLight*>& Lights)
@@ -179,22 +192,39 @@ namespace Hazel {
 		m_data->foliageShader_instanced->SetFloat3Array("PointLight_Position", &pos[0].x, Lights.size());
 		m_data->foliageShader_instanced->SetFloat3Array("PointLight_Color", &col[0].x, Lights.size());
 		m_data->foliageShader_instanced->SetInt("Num_PointLights", pos.size());
+
+		DefferedRenderer::GetDeferredPassShader()->Bind();
+		DefferedRenderer::GetDeferredPassShader()->SetFloat3Array("PointLight_Position", &pos[0].x, Lights.size());
+		DefferedRenderer::GetDeferredPassShader()->SetFloat3Array("PointLight_Color", &col[0].x, Lights.size());
+		DefferedRenderer::GetDeferredPassShader()->SetInt("Num_PointLights", pos.size());
 	}
 
-	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color, const float& material_Roughness , const float& material_metallic)
+	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color, const float& material_Roughness , const float& material_metallic, ref<Shader> otherShader)
 	{
-		m_data->shader->SetFloat("Roughness",material_Roughness); //send the roughness value
-		m_data->shader->SetFloat("Metallic", material_metallic); //send the metallic value
 		
 		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
 		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
 		mesh.Normal_Texture->Bind(NORMAL_SLOT);
 
-		m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
-		m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
-		m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
-		m_data->shader->SetMat4("u_Model", transform);
-		m_data->shader->SetFloat4("m_color", color);
+		if (!otherShader) {
+			m_data->shader->SetFloat("Roughness", material_Roughness); //send the roughness value
+			m_data->shader->SetFloat("Metallic", material_metallic); //send the metallic value
+			m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+			m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+			m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
+			m_data->shader->SetMat4("u_Model", transform);
+			m_data->shader->SetFloat4("m_color", color);
+		}
+		else
+		{
+			otherShader->SetFloat("Roughness", material_Roughness); //send the roughness value
+			otherShader->SetFloat("Metallic", material_metallic); //send the metallic value
+			otherShader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+			otherShader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+			otherShader->SetInt("u_NormalMap", NORMAL_SLOT);
+			otherShader->SetMat4("u_Model", transform);
+			otherShader->SetFloat4("m_color", color);
+		}
 
 		RenderCommand::DrawArrays(*mesh.VertexArray, mesh.Vertices.size());
 	}
@@ -247,13 +277,11 @@ namespace Hazel {
 		glCullFace(GL_BACK);
 	}
 
-	void Renderer3D::InstancedFoliageData(LoadMesh& mesh, const std::vector<glm::mat4>& Instanced_ModelMatrix)
+	void Renderer3D::InstancedFoliageData(LoadMesh& mesh, const std::vector<glm::mat4>& Instanced_ModelMatrix, uint32_t& bufferIndex)
 	{
 		//needs to be refactored!!
-		unsigned int vb;
-		glGenBuffers(1, &vb);
-		glBindBuffer(GL_ARRAY_BUFFER, vb);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * Instanced_ModelMatrix.size(), &Instanced_ModelMatrix[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * Instanced_ModelMatrix.size(), &Instanced_ModelMatrix[0]);
 
 		mesh.VertexArray->Bind();
 		glEnableVertexAttribArray(6);
@@ -271,6 +299,12 @@ namespace Hazel {
 		glVertexAttribDivisor(9, 1);
 	}
 	
+	void Renderer3D::AllocateInstancedFoliageData(const size_t& size, uint32_t& bufferIndex)
+	{
+		glGenBuffers(1, &bufferIndex);
+		glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * size, nullptr, GL_DYNAMIC_DRAW);
+	}
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
 	{
 		//m_data->reflection->RenderToCubeMap(scene);
@@ -282,9 +316,13 @@ namespace Hazel {
 		m_data->foliage_shader->SetInt("diffuse_env", IRR_ENV_SLOT);//for now assign to 10 :)
 		m_data->foliage_shader->SetInt("specular_env", ENV_SLOT);//for now assign to 18 :)
 
-		m_data->foliageShader_instanced->Bind();//you need to bind this other wise nothing will be rendererd
-		m_data->foliageShader_instanced->SetInt("diffuse_env", IRR_ENV_SLOT);//for now assign to 10 :)
-		m_data->foliageShader_instanced->SetInt("specular_env", ENV_SLOT);//for now assign to 18 :)
+		m_data->foliageShader_instanced->Bind();
+		m_data->foliageShader_instanced->SetInt("diffuse_env", IRR_ENV_SLOT);
+		m_data->foliageShader_instanced->SetInt("specular_env", ENV_SLOT);
+
+		DefferedRenderer::GetDeferredPassShader()->Bind();
+		DefferedRenderer::GetDeferredPassShader()->SetInt("diffuse_env", IRR_ENV_SLOT);
+		DefferedRenderer::GetDeferredPassShader()->SetInt("specular_env", ENV_SLOT);
 	}
 
 	void Renderer3D::RenderShadows(Scene& scene, Camera& camera)
@@ -295,6 +333,7 @@ namespace Hazel {
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->foliage_shader);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->foliageShader_instanced);
 		m_data->shadow_map->PassShadowUniforms(camera, scene.m_Terrain->m_terrainShader);
+		m_data->shadow_map->PassShadowUniforms(camera, DefferedRenderer::GetDeferredPassShader());
 	}
 
 	void Renderer3D::AmbiantOcclusion(Scene& scene, Camera& camera)
@@ -358,5 +397,13 @@ namespace Hazel {
 	ref<Shader>& Renderer3D::GetFoliageInstancedShader()
 	{
 		return m_data->foliageShader_instanced;
+	}
+
+	void Renderer3D::RenderScene_Deferred(Scene* scene)
+	{
+		DefferedRenderer::DeferredRenderPass();
+		DefferedRenderer::GenerateGBuffers(scene);
+		RenderShadows(*scene, *scene->GetCamera());
+		AmbiantOcclusion(*scene, *scene->GetCamera());
 	}
 }

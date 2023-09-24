@@ -29,28 +29,6 @@ namespace Hazel {
 	{
 		auto viewport_size = RenderCommand::GetViewportSize();
 
-
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, SSAOframebuffer_id);
-		glViewport(0, 0, m_width, m_height);
-
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, SSAOdepth_id);// LOL this is required for proper capture to framebuffer
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GBufferPos_id, 0);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-			HAZEL_CORE_TRACE("GBuffer Position Framebuffer compleate -_- ");
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		RenderTerrain(scene, GbufferPosition_Terrain,GbufferPositionInstanced);
-
-		GbufferPosition->Bind();
-		GbufferPosition->SetMat4("u_ProjectionView", cam.GetProjectionView());
-		GbufferPosition->SetMat4("u_View", cam.GetViewMatrix());
-		GbufferPosition->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture		
-		RenderScene(scene, GbufferPosition);
-
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glViewport(0, 0, viewport_size.x, viewport_size.y);
-
 		//Generate Random samples
 		std::uniform_real_distribution<float> RandomFloats(0.0, 1.0);//generate random floats between [0.0,1.0)
 		std::default_random_engine generator; // random number generator
@@ -80,26 +58,6 @@ namespace Hazel {
 			HAZEL_CORE_TRACE("SSAO Framebuffer compleate -_- ");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		//terrain foliage
-		SSAOShader_Instanced->Bind();
-		SSAOShader_Instanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
-		SSAOShader_Instanced->SetFloat("u_Time", Terrain::time);
-		SSAOShader_Instanced->SetFloat("ScreenWidth", viewport_size.x);
-		SSAOShader_Instanced->SetFloat("ScreenHeight", viewport_size.y);
-		SSAOShader_Instanced->SetMat4("u_ProjectionView", cam.GetProjectionView());
-		SSAOShader_Instanced->SetMat4("u_View", cam.GetViewMatrix());
-		SSAOShader_Instanced->SetMat4("u_Model", Terrain::m_terrainModelMat);
-		SSAOShader_Instanced->SetFloat3Array("Samples", &samples[0].x, RANDOM_SAMPLES_SIZE);
-		SSAOShader_Instanced->SetMat4("u_projection", cam.GetProjectionMatrix());
-		SSAOShader_Instanced->SetInt("noisetex", NOISE_SLOT);
-		SSAOShader_Instanced->SetInt("GPosition", DEPTH_SLOT);
-		SSAOShader_Instanced->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
-		SSAOShader_Instanced->SetFloat3("u_CamPos", cam.GetCameraPosition());
-		glDisable(GL_CULL_FACE);
-		scene.m_Terrain->RenderTerrainGrass();
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-
 		SSAOShader->Bind();
 		SSAOShader->SetFloat("ScreenWidth", viewport_size.x);
 		SSAOShader->SetFloat("ScreenHeight", viewport_size.y);
@@ -108,18 +66,15 @@ namespace Hazel {
 		SSAOShader->SetFloat3Array("Samples", &samples[0].x, RANDOM_SAMPLES_SIZE);
 		SSAOShader->SetMat4("u_projection", cam.GetProjectionMatrix());
 		SSAOShader->SetInt("noisetex", NOISE_SLOT);
-		SSAOShader->SetInt("GPosition", DEPTH_SLOT);
-		SSAOShader->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
+		SSAOShader->SetInt("gPosition", G_POSITION_TEXTURE_SLOT);
+		SSAOShader->SetInt("gNormal", G_NORMAL_TEXTURE_SLOT);
+		//SSAOShader->SetInt("alpha_texture", G_ROUGHNESS_METALLIC_TEXTURE_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
 		SSAOShader->SetFloat3("u_CamPos", cam.GetCameraPosition());
-		RenderScene(scene, SSAOShader);
+		RenderQuad();
+
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
-
-		SSAOblurShader->Bind();
-		SSAOblurShader->SetInt("SSAOtex", SSAO_SLOT);
-		SSAOblurShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
-		SSAOblurShader->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, SSAOframebuffer_id);
 		glViewport(0, 0, m_width, m_height);
@@ -128,8 +83,13 @@ namespace Hazel {
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 			HAZEL_CORE_TRACE("SSAO blur Framebuffer compleate ^_^ ");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//HAZEL_CORE_WARN(glGetError());
-		RenderQuad(SSAOblurShader);
+		
+		SSAOblurShader->Bind();
+		SSAOblurShader->SetInt("SSAOtex", SSAO_SLOT);
+		SSAOblurShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
+		SSAOblurShader->SetInt("alpha_texture", ROUGHNESS_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
+		RenderQuad();
+
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
@@ -228,9 +188,8 @@ namespace Hazel {
 			});
 	}
 
-	void OpenGlSSAO::RenderQuad(ref<Shader>& current_shader)
+	void OpenGlSSAO::RenderQuad()
 	{
-		current_shader->Bind();
 		//this function renders a quad infront of the camera
 		glDisable(GL_CULL_FACE);
 		glDepthMask(GL_FALSE);//disable depth testing
@@ -276,8 +235,8 @@ namespace Hazel {
 		//Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
 		GbufferPositionInstanced->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
 		GbufferPositionInstanced->SetMat4("u_Model", Terrain::m_terrainModelMat);
-		GbufferPositionInstanced->SetMat4("u_View", scene.MainCamera->GetViewMatrix());
-		GbufferPositionInstanced->SetMat4("u_Projection", scene.MainCamera->GetProjectionMatrix());
+		GbufferPositionInstanced->SetMat4("u_View", scene.GetCamera()->GetViewMatrix());
+		GbufferPositionInstanced->SetMat4("u_Projection", scene.GetCamera()->GetProjectionMatrix());
 		GbufferPositionInstanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
 		GbufferPositionInstanced->SetFloat("u_Time", Terrain::time);
 		glDisable(GL_CULL_FACE);

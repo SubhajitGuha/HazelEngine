@@ -2,6 +2,7 @@
 #include "HazelEditor.h"
 #include "Hazel//Renderer/Shadows.h"
 #include "Hazel/Physics/Physics3D.h"
+#include "Hazel/Renderer/DeferredRenderer.h"
 #include "Hazel/Renderer/Terrain.h"
 
 //#include "Hazel/Profiling.h"
@@ -49,8 +50,9 @@ LoadMesh* mesh;
 	asset_map['t'] = tree;
 	asset_map['m'] = mud;
 
-	m_FrameBuffer = FrameBuffer::Create({1920,1080});//create a frame buffer object
-	m_FrameBuffer2 = FrameBuffer::Create({ 1920,1080 });
+	auto viewportSize = RenderCommand::GetViewportSize();
+	m_FrameBuffer = FrameBuffer::Create({ (unsigned int)viewportSize.x,(unsigned int)viewportSize .y});//create a frame buffer object
+	m_FrameBuffer2 = FrameBuffer::Create({ (unsigned int)viewportSize.x,(unsigned int)viewportSize.y });
 }
 
  void  HazelEditor::OnAttach()
@@ -94,65 +96,9 @@ void  HazelEditor::OnDetach()
 void  HazelEditor::OnUpdate(float deltatime )
 {
 	frame_time = deltatime;
-	HZ_PROFILE_SCOPE(" HazelEditor::OnUpdate");
-	{
-		m_FrameBuffer2->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
-
-		RenderCommand::ClearColor({0,0,0,1});
-		RenderCommand::Clear();
-
-		if (isWindowFocused)//Take inputs only when the window is focused
-		{
-			m_camera.OnUpdate(deltatime);
-
-			if (Input::IsKeyPressed(HZ_KEY_UP))
-				position.y += ObjSpeed * deltatime;
-			if (Input::IsKeyPressed(HZ_KEY_DOWN))
-				position.y -= ObjSpeed * deltatime;
-			if (Input::IsKeyPressed(HZ_KEY_LEFT))
-				position.x -= ObjSpeed * deltatime;
-			if (Input::IsKeyPressed(HZ_KEY_RIGHT))
-				position.x += ObjSpeed * deltatime;
-			if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_4))
-				scale += 0.3;
-			if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_5))
-				scale -= 0.3;
-
-		}
-	}
-		/*
-		Set the model transform. for now there is no scale or rotation
-		just multiply the scale and rotation matrix with position to get the full transform
-		*/
-	
-		//Renderer2D::BeginScene(m_camera.GetCamera());
-		//for (int i = 0; i < level_map.size(); i++) {
-		//
-		//	ref<SubTexture2D> subTexture;
-		//	subTexture = asset_map[level_map[i]];
-		//	if (subTexture)
-		//		Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30,0 }, { 1,1,1 }, subTexture);
-		//}
-		//Renderer2D::EndScene();
-		//
-		//Renderer2D::BeginScene(m_camera.GetCamera());
-		//for (int i = 0; i < tree_map.size(); i++) {
-		//
-		//	ref<SubTexture2D> subTexture;
-		//	subTexture = asset_map[tree_map[i]];
-		//	if (subTexture)
-		//		Renderer2D::DrawSubTexturedQuad({ i % 30,i / 30, 0.1 }, { 1,1,1 }, subTexture);
-		//}
-		//Renderer2D::EndScene();
-
-		//Renderer2D::BeginScene(m_camera.GetCamera());
-		//Renderer2D::DrawQuad(position, glm::vec3(scale), Color1);
-		//Renderer2D::EndScene();
-		//using Entt (entity component system)
-		//Renderer2D::BeginScene(Square_entity->GetComponent<CameraComponent>());
-		//Renderer2D::DrawQuad(Square_entity->GetComponent<TransformComponent>(), { 0,0.6,0.9,1 });
-		//Renderer2D::EndScene();
-
+	m_FrameBuffer2->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
+	RenderCommand::ClearColor({ 0,0,0,1 });
+	RenderCommand::Clear();
 	m_scene->OnUpdate(deltatime);
 	m_scene->Resize(m_ViewportSize.x, m_ViewportSize.y);
 	m_FrameBuffer2->UnBind();
@@ -165,7 +111,7 @@ void  HazelEditor::OnUpdate(float deltatime )
 	m_scene->m_Bloom->RenderBloomTexture();
 	
 	m_FrameBuffer->Bind();
-	RenderCommand::ClearColor({ 1,0,0,1 });
+	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
 	//m_scene->PostProcess();
 	m_scene->m_Bloom->Update(deltatime);
@@ -223,6 +169,14 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::DragFloat("lamda", &Shadows::m_lamda, 0.00001, 0, 1,"%8f");
 	ImGui::Text("SSAO MAP");
 	ImGui::Image((void*)Renderer3D::ssao_id, ImVec2(512, 512));
+	ImGui::Text("World Space Position");
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(0), ImVec2(512, 512));
+	ImGui::Text("Normal map");
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(1), ImVec2(512, 512));
+	ImGui::Text("diffuse");
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(2), ImVec2(512, 512));
+	ImGui::Text("Roughness metallic");
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(3), ImVec2(512, 512));
 	ImGui::End();
 
 	ImGui::Begin("Benchmark");

@@ -35,6 +35,8 @@ namespace Hazel {
 		void AddPointLight(PointLight* light);
 		static ref<Scene> Create();
 		void PostProcess();
+		Camera* GetCamera() { return MainCamera; }
+
 	public:
 		std::vector<PointLight*> m_PointLights;
 		static LoadMesh* Sphere, *Sphere_simple, *Cube , *Plane,*plant,*House,* Windmill ,*Fern, *Sponza,*Grass,*Flower,*Tree;
@@ -43,10 +45,10 @@ namespace Hazel {
 		ref<FrameBuffer> framebuffer;
 		std::unordered_map<size_t, ScriptableEntity*> m_scriptsMap;
 		static float foliage_dist, num_foliage;
-		Camera* MainCamera = nullptr;//if there is no main camera Then dont render
 		ref<Bloom> m_Bloom;
 		ref<Terrain> m_Terrain;
 	private:
+		Camera* MainCamera = nullptr;//if there is no main camera Then dont render
 		entt::registry m_registry;
 		entt::entity m_entity{entt::null};
 		std::thread shadow_thread;

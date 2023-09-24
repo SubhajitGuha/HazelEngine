@@ -114,5 +114,7 @@
     <None Include="Assets\Shaders\gBufferShaderInstanced.glsl" />
     <None Include="Assets\Shaders\SSAOShader_Terrain.glsl" />
     <None Include="Assets\Shaders\SSAOShader_Instanced.glsl" />
+    <None Include="Assets\Shaders\ForwardPassShader.glsl" />
+    <None Include="Assets\Shaders\DeferredPassShader.glsl" />
   </ItemGroup>
 </Project>

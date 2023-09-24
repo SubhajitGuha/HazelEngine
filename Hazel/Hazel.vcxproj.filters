@@ -1186,6 +1186,8 @@
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBloom.h" />
     <ClInclude Include="src\Hazel\Renderer\SkyRenderer.h" />
     <ClInclude Include="src\Hazel\Renderer\Terrain.h" />
+    <ClInclude Include="src\Hazel\Renderer\DeferredRenderer.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1342,5 +1344,7 @@
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBloom.cpp" />
     <ClCompile Include="src\Hazel\Renderer\SkyRenderer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Terrain.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\DeferredRenderer.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.cpp" />
   </ItemGroup>
 </Project>
