@@ -46,7 +46,7 @@ namespace Hazel {
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
 		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
-		Fern = new LoadMesh("Assets/Meshes/shrub.fbx");
+		Fern = new LoadMesh("Assets/Meshes/HZ_Pine1.fbx");
 		Grass = new LoadMesh("Assets/Meshes/grass.fbx");
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");

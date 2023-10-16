@@ -1,5 +1,6 @@
 #include "hzpch.h"
 #include "Hazel/Log.h"
+#include "Hazel/Renderer/FoliageRenderer.h"
 #include "Terrain.h"
 #include "glad/glad.h"
 #include "stb_image.h"
@@ -13,7 +14,7 @@
 namespace Hazel
 {
 	float Terrain::WaterLevel = 0.1, Terrain::HillLevel = 0.5, Terrain::MountainLevel = 1.0
-		, Terrain::HeightScale = 300, Terrain::FoliageHeight = 6.0f;
+		, Terrain::HeightScale = 100, Terrain::FoliageHeight = 6.0f;
 
 	bool Terrain::bShowTerrain = true, Terrain::bShowWireframeTerrain = false;
 	int Terrain::maxGrassAmount = 0, Terrain::ChunkIndex = 0, Terrain::RadiusOfSpawn = 1, Terrain::GrassDensity=3;
@@ -24,6 +25,7 @@ namespace Hazel
 
 	Terrain::Terrain(float width, float height)
 	{
+		grass = std::make_shared<Foliage>(Scene::Fern, 512*512, 1024,1024);
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2*RadiusOfSpawn+1,2));//radius of spawn defines how many tiles to cover from the centre
 		StartTime = std::chrono::high_resolution_clock::now();
 		m_dimension.x = width;
@@ -53,7 +55,7 @@ namespace Hazel
 		TerrainTex_Roughness = Texture2D::Create("Assets/Textures/forrest_ground_01_rough_2k.jpg");
 		TerratinTex_Normal = Texture2D::Create("Assets/Textures/forrest_ground_01_nor_gl_2k.jpg");
 
-		Renderer3D::AllocateInstancedFoliageData(maxGrassAmount * GrassDensity, foliageBufferIndex);
+		//Renderer3D::AllocateInstancedFoliageData(maxGrassAmount * GrassDensity, foliageBufferIndex);
 
 		m_terrainShader->Bind();
 		m_HeightMap->Bind(HEIGHT_MAP_TEXTURE_SLOT);
@@ -125,8 +127,9 @@ namespace Hazel
 		std::default_random_engine generator;
 
 		//grass spawn
-		for (int j = 0; j < m_Width; j+=1) {
-			for (int i = 0; i < m_Height; i+=1)
+		
+		for (int j = 0; j < 1; j+=1) {
+			for (int i = 0; i < 1; i+=1)
 			{				
 
 					float y = (Height_data[j * m_Width + i + m_Channels] - min_height) / (max_height - min_height);//R channel of 1st vertex
@@ -147,7 +150,6 @@ namespace Hazel
 							child_data.scale = glm::vec3((RandomFloat(generator) + 1) / 2.0+5);
 					
 							child_data.f_type = FOLIAGE_TYPE::FLOWER;
-							data.m_ChildGrassData.push_back(child_data);
 						}
 					}
 					else
@@ -161,16 +163,16 @@ namespace Hazel
 
 
 							child_data.f_type = FOLIAGE_TYPE::GRASS;
-							data.m_ChildGrassData.push_back(child_data);
+							grass->addInstance(child_data.position, child_data.rotation, child_data.scale);
 						}
 					}
 					
-					m_GrassSpawnData[j * m_Width + i]=data;
+					//m_GrassSpawnData[j * m_Width + i]=data;
 			}
-		}
+		}		
 
 		CurrentChunkIndex = 0;//Let cam position at start is at 0,0
-		SpawnGrassOnChunks(0, 0, RadiusOfSpawn);
+		//SpawnGrassOnChunks(0, 0, RadiusOfSpawn);
 
 		//Terrain collision
 		std::vector<int> HeightValues;
@@ -192,7 +194,7 @@ namespace Hazel
 	{
 		int CamX = cam.GetCameraPosition().x;
 		int CamZ = cam.GetCameraPosition().z;
-		
+
 		//glDisable(GL_CULL_FACE)
 		//glCullFace(GL_FRONT);
 		m_terrainModelMat = glm::rotate(glm::mat4(1.0), glm::radians(0.0f), {0,0,1});
@@ -236,16 +238,19 @@ namespace Hazel
 
 		if (bShowWireframeTerrain)
 			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
-		if (CamX > 0 && CamZ>0) 
-		{
-			//ChunkIndex = GetChunkIndex(CamX, CamZ);
-			if (HasPlayerMovedFromChunk(CamX, CamZ))
-				SpawnGrassOnChunks(CamX, CamZ, RadiusOfSpawn);
+		
+		grass->RenderFoliage(cam,50);
 
-			Renderer3D::BeginSceneFoliage(cam);			
-			RenderTerrainGrass();
-			//Renderer3D::DrawFoliageInstanced(*Scene::Grass, m_terrainModelMat, Grass_modelMat.size(), { 0,0.0,0.0,1 },time, 0.4);
-		}
+		//if (CamX > 0 && CamZ>0) 
+		//{
+		//	//ChunkIndex = GetChunkIndex(CamX, CamZ);
+		//	if (HasPlayerMovedFromChunk(CamX, CamZ))
+		//		SpawnGrassOnChunks(CamX, CamZ, RadiusOfSpawn);
+		//
+		//	Renderer3D::BeginSceneFoliage(cam);			
+		//	RenderTerrainGrass();
+		//	//Renderer3D::DrawFoliageInstanced(*Scene::Grass, m_terrainModelMat, Grass_modelMat.size(), { 0,0.0,0.0,1 },time, 0.4);
+		//}
 	}
 
 	void Terrain::RenderTerrainGrass()
@@ -327,8 +332,7 @@ namespace Hazel
 		}
 		ChunkIndex = Grass_modelMat.size()+Flower_modelMat.size();
 		//std::reverse(Grass_modelMat.begin(), Grass_modelMat.end());
-		Renderer3D::InstancedFoliageData(*Scene::Grass, Grass_modelMat, foliageBufferIndex);
-		//Renderer3D::InstancedFoliageData(*Scene::Flower, Flower_modelMat, foliageBufferIndex);
+		//Renderer3D::InstancedFoliageData(*Scene::Grass, Grass_modelMat, foliageBufferIndex);
 
 	}
 

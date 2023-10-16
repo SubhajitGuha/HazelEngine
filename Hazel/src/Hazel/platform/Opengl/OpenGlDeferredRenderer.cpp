@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "Hazel/Physics/Physics3D.h"
 #include "OpenGlDeferredRenderer.h"
+#include "Hazel/Renderer/Terrain.h"
 
 namespace Hazel
 {
@@ -76,10 +77,11 @@ namespace Hazel
 		glViewport(0, 0, m_width, m_height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		scene->m_Terrain->RenderTerrain(*scene->GetCamera());
+
 		m_ForwardPassShader->Bind();
 		m_ForwardPassShader->SetMat4("u_ProjectionView", scene->GetCamera()->GetProjectionView());//here the projection is ProjectionView
 		m_ForwardPassShader->SetMat4("u_View", scene->GetCamera()->GetViewMatrix());//here the projection is ProjectionView
-
 		scene->getRegistry().each([&](auto m_entity)
 			{
 				Entity Entity(scene, m_entity);
@@ -107,6 +109,7 @@ namespace Hazel
 				}
 				Renderer3D::EndScene();
 			});
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
 

@@ -25,7 +25,7 @@ namespace Hazel {
 		static void DrawMesh(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = {1,1,1,1} ,const float& material_Roughness=1.0f,const float& material_metallic = 0.0f, ref<Shader> otherShader = nullptr);//take the mesh class reference
 		static void DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = { 1,1,1,1 }, const float& material_Roughness = 1.0f, const float& material_metallic = 0.0f);//take the mesh class reference
 		static void DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform,size_t instance_count, const glm::vec4& color = { 1,1,1,1 }, float TimeElapsed=0, const float& material_Roughness = 1.0f, const float& material_metallic = 0.0f);//take the mesh class reference
-		static void AllocateInstancedFoliageData(const size_t& size, uint32_t& buffIndex);
+		static void AllocateInstancedFoliageData(LoadMesh& mesh, const size_t& size, uint32_t& buffIndex);
 		static void InstancedFoliageData(LoadMesh& mesh, const std::vector<glm::mat4>& Instanced_ModelMatrix, uint32_t& buffIndex);
 		static void SetUpCubeMapReflections(Scene& scene);
 		static void RenderShadows(Scene& scene, Camera& camera);

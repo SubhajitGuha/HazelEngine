@@ -100,10 +100,10 @@ namespace Hazel {
 		//create framebuffer and texture to store Ambiant occlusion texture
 		glCreateFramebuffers(1, &SSAOframebuffer_id);
 
-		glCreateTextures(GL_TEXTURE_2D,1, &SSAOtexture_id);
+		glCreateTextures(GL_TEXTURE_2D, 1, &SSAOtexture_id);
 		glBindTexture(GL_TEXTURE_2D, SSAOtexture_id);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, m_width, m_height, 0, GL_RED, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_width, m_height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
 
 		//glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -115,7 +115,7 @@ namespace Hazel {
 		glCreateTextures(GL_TEXTURE_2D, 1, &SSAOblur_id);
 		glBindTexture(GL_TEXTURE_2D, SSAOblur_id);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, m_width, m_height, 0, GL_RED, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_width, m_height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -125,19 +125,6 @@ namespace Hazel {
 		glGenRenderbuffers(1, &SSAOdepth_id);
 		glBindRenderbuffer(GL_RENDERBUFFER, SSAOdepth_id);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		glGenTextures(1, &GBufferPos_id);//GBuffer view space position texture
-		glBindTexture(GL_TEXTURE_2D, GBufferPos_id);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, m_width, m_height, 0, GL_RGB, GL_FLOAT, nullptr);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
 		glDrawBuffers(1, buffers);
@@ -166,26 +153,7 @@ namespace Hazel {
 	}
 	void OpenGlSSAO::RenderScene(Scene& scene , ref<Shader>& current_shader)
 	{
-		scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
-			{
-				Entity Entity(&scene, m_entity);
-				auto& transform = Entity.GetComponent<TransformComponent>().GetTransform();
-				auto mesh = Entity.GetComponent<StaticMeshComponent>();
-				current_shader->SetMat4("u_Model", transform);
-
-				//for foliage handeling
-				if (mesh.isFoliage == true)
-					current_shader->SetInt("isFoliage", 1);
-				else
-					current_shader->SetInt("isFoliage", 0);
-
-				if (Entity.HasComponent<SpriteRenderer>()) {
-					auto SpriteRendererComponent = Entity.GetComponent<SpriteRenderer>();
-					Renderer3D::DrawMesh(*mesh, transform, SpriteRendererComponent.Color);
-				}
-				else
-					Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
-			});
+		
 	}
 
 	void OpenGlSSAO::RenderQuad()
@@ -222,15 +190,7 @@ namespace Hazel {
 		glCullFace(GL_BACK);
 	}
 	void OpenGlSSAO::RenderTerrain(Scene& scene, ref<Shader>& current_shader1, ref<Shader>& current_shader2)
-	{
-		//current_shader1->Bind();
-		//current_shader1->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
-		//current_shader1->SetFloat("HEIGHT_SCALE", Terrain::HeightScale);
-		//current_shader1->SetMat4("u_Model", Terrain::m_terrainModelMat);
-		//current_shader1->SetMat4("u_View", scene.MainCamera->GetViewMatrix());
-		//current_shader1->SetMat4("u_Projection", scene.MainCamera->GetProjectionMatrix());
-		//RenderCommand::DrawArrays(*Terrain::m_terrainVertexArray, Terrain::terrainData.size(), GL_PATCHES, 0);
-		
+	{			
 		GbufferPositionInstanced->Bind();
 		//Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
 		GbufferPositionInstanced->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now

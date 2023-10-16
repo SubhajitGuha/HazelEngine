@@ -201,6 +201,9 @@
     <ClInclude Include="src\Hazel\Renderer\Atmosphere.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\Bloom.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\Buffer.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
@@ -217,6 +220,12 @@
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\CubeMapReflection.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\DeferredRenderer.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\FoliageRenderer.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\FrameBuffer.h">
@@ -249,7 +258,13 @@
     <ClInclude Include="src\Hazel\Renderer\Shadows.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\SkyRenderer.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\SubTexture.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\Terrain.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\Texture.h">
@@ -276,6 +291,9 @@
     <ClInclude Include="src\Hazel\Window.h">
       <Filter>src\Hazel</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBloom.h">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBuffer.h">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
@@ -283,6 +301,9 @@
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.h">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.h">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.h">
@@ -1182,12 +1203,6 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hazel\Renderer\Bloom.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBloom.h" />
-    <ClInclude Include="src\Hazel\Renderer\SkyRenderer.h" />
-    <ClInclude Include="src\Hazel\Renderer\Terrain.h" />
-    <ClInclude Include="src\Hazel\Renderer\DeferredRenderer.h" />
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1220,6 +1235,9 @@
     <ClCompile Include="src\Hazel\Renderer\Atmosphere.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\Bloom.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
@@ -1236,6 +1254,12 @@
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\CubeMapReflection.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\DeferredRenderer.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\FoliageRenderer.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp">
@@ -1268,7 +1292,13 @@
     <ClCompile Include="src\Hazel\Renderer\Shadows.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\SkyRenderer.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\Terrain.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp">
@@ -1289,6 +1319,9 @@
     <ClCompile Include="src\Hazel\Window.cpp">
       <Filter>src\Hazel</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBloom.cpp">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBuffer.cpp">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
@@ -1296,6 +1329,9 @@
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlCubeMapReflection.cpp">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.cpp">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.cpp">
@@ -1340,11 +1376,5 @@
     <ClCompile Include="vendor\stb_image\stb_image_resize.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hazel\Renderer\Bloom.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBloom.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\SkyRenderer.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\Terrain.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\DeferredRenderer.cpp" />
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.cpp" />
   </ItemGroup>
 </Project>

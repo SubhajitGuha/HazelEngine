@@ -43,11 +43,11 @@ void main()
 {
 	vec4 m_pos = vec4(texture(gPosition,tcord).xyz , 1.0);
 	
-	if(abs(length(u_CamPos - m_pos.xyz))>Threshold_dist) // SSAO rendering threshold beyond this the ambiant color will be pure white 
-	{
-		color =  vec4(1.0);
-		return;
-	}
+	//if(abs(length(u_CamPos - m_pos.xyz))>Threshold_dist) // SSAO rendering threshold beyond this the ambiant color will be pure white 
+	//{
+	//	color =  vec4(1.0);
+	//	return;
+	//}
 	
 	//// For foliage ^_^
 	//int index = int (m_materialindex);

@@ -12,6 +12,7 @@ namespace Hazel {
 	LoadMesh::LoadMesh(const std::string& Path)
 		:Vertices(0),Normal(0),TexCoord(0)
 	{
+		GlobalTransform = glm::mat4(1.0);
 		m_path = Path;
 		LoadObj(Path);
 	}
@@ -21,7 +22,7 @@ namespace Hazel {
 	void LoadMesh::LoadObj(const std::string& Path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(Path,aiProcess_FindDegenerates| aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace);
+		const aiScene* scene = importer.ReadFile(Path,aiProcess_Triangulate | aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace );
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HAZEL_CORE_ERROR("ERROR::ASSIMP::");
@@ -35,8 +36,19 @@ namespace Hazel {
 		CreateStaticBuffers();
 	}
 
+	auto AssimpToGlmMatrix = [&](const aiMatrix4x4& from) {
+		glm::mat4 to;
+		to[0][0] = from.a1; to[0][1] = from.a2; to[0][2] = from.a3; to[0][3] = from.a4;
+		to[1][0] = from.b1; to[1][1] = from.b2; to[1][2] = from.b3; to[1][3] = from.b4;
+		to[2][0] = from.c1; to[2][1] = from.c2; to[2][2] = from.c3; to[2][3] = from.c4;
+		to[3][0] = from.d1; to[3][1] = from.d2; to[3][2] = from.d3; to[3][3] = from.d4;
+
+		return std::move(to);
+	};
+
 	void LoadMesh::ProcessNode(aiNode* Node, const aiScene* scene)
 	{
+		GlobalTransform *= AssimpToGlmMatrix(Node->mTransformation);
 		for (int i = 0; i < Node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[Node->mMeshes[i]];
@@ -53,17 +65,18 @@ namespace Hazel {
 		for (int i = 0; i < m_Mesh.size(); i++)
 		{
 			unsigned int material_ind = m_Mesh[i]->mMaterialIndex;
-
 			for (int k = 0; k < m_Mesh[i]->mNumVertices; k++) 
 			{
 				Material_Index.push_back(material_ind);
 				
 				aiVector3D aivertices = m_Mesh[i]->mVertices[k];
-				Vertices.push_back({ aivertices.x,aivertices.y,aivertices.z });
+				glm::vec4 pos = GlobalTransform * glm::vec4(aivertices.x, aivertices.y, aivertices.z, 1.0);
+				Vertices.push_back({ pos.x,pos.y,pos.z });
 
 				if (m_Mesh[i]->HasNormals()) {
 					aiVector3D ainormal = m_Mesh[i]->mNormals[k];
-					Normal.push_back({ ainormal.x,ainormal.y,ainormal.z });
+					glm::vec4 norm = GlobalTransform * glm::vec4(ainormal.x, ainormal.y, ainormal.z, 0.0);
+					Normal.push_back({ norm.x,norm.y,norm.z });
 				}
 
 				glm::vec2 coord(0.0f);
@@ -81,8 +94,11 @@ namespace Hazel {
 				{
 					aiVector3D tangent = m_Mesh[i]->mTangents[k];
 					aiVector3D bitangent = m_Mesh[i]->mBitangents[k];
-					Tangent.push_back({ tangent.x, tangent.y, tangent.z });
-					BiTangent.push_back({ bitangent.x,bitangent.y,bitangent.z });
+					glm::vec4 tan = GlobalTransform * glm::vec4(tangent.x, tangent.y, tangent.z, 0.0);
+					glm::vec4 bitan = GlobalTransform * glm::vec4(bitangent.x, bitangent.y, bitangent.z, 0.0);
+
+					Tangent.push_back({ tan.x, tan.y, tan.z });
+					BiTangent.push_back({ bitan.x,bitan.y,bitan.z });
 					//m_Mesh[i]->biTange
 				}
 				else

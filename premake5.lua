@@ -25,6 +25,7 @@ IncludeDir["json"]="Hazel/vendor/jsoncpp"
 IncludeDir["assimp"]="Hazel/vendor/assimp/include"
 IncludeDir["Physx"]="Hazel/vendor/physx_x64-windows/include"
 IncludeDir["yaml_cpp"] = "Hazel/vendor/yaml_cpp/include"
+IncludeDir["cyCodeBase"] = "Hazel/vendor/cyCodeBase"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
@@ -66,6 +67,7 @@ project "Hazel"
 		"%{IncludeDir.Physx}/**.h",
 		"%{IncludeDir.Physx}/**.hpp",
 		"%{IncludeDir.Physx}/**.cpp",
+		"%{IncludeDir.cyCodeBase}/**.h"
 	}
 
 	includedirs
@@ -82,7 +84,8 @@ project "Hazel"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.assimp}",
 		"%{IncludeDir.Physx}",
-		"%{IncludeDir.yaml_cpp}"
+		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.cyCodeBase}"
 	}
 
 	links{

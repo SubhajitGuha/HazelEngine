@@ -10,6 +10,9 @@
     <Filter Include="Assets\Textures\Interior-Cube-Map">
       <UniqueIdentifier>{3DA10909-A90F-5F88-F2F8-19885EA65424}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Textures\MeshTextures">
+      <UniqueIdentifier>{4B5330C7-370E-2073-E0C5-98BDCC5F6A03}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Assets\Textures\Outdoor-Cube-Map">
       <UniqueIdentifier>{DDBECBBF-C90F-B701-F273-A5C3DE234A6B}</UniqueIdentifier>
     </Filter>
@@ -61,6 +64,27 @@
     <Image Include="Assets\Textures\Interior-Cube-Map\5.png">
       <Filter>Assets\Textures\Interior-Cube-Map</Filter>
     </Image>
+    <Image Include="Assets\Textures\MeshTextures\BarkAI_Spec.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\Grass 2K.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\GrassUE5_D.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\GrassUE5_N.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\GrassUE5_ORA.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\Grass_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\Grass_ORA.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
     <Image Include="Assets\Textures\Outdoor-Cube-Map\0.png">
       <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
     </Image>
@@ -79,42 +103,26 @@
     <Image Include="Assets\Textures\Outdoor-Cube-Map\5.png">
       <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
     </Image>
+    <Image Include="Assets\Textures\PerlinTexture.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Terrain_Height_Map.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Terrain_Height_Map2.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\Test.png">
       <Filter>Assets\Textures</Filter>
     </Image>
-    <Image Include="Assets\Textures\img_0.png">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\img_1.png">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\img_2.png">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\img_3.png">
+    <Image Include="Assets\Textures\grass_mask.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\rickshaw.png">
       <Filter>Assets\Textures</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\DownsampleBloom_Shader.glsl" />
-    <None Include="Assets\Shaders\UpSampleBloom_Shader.glsl" />
-    <None Include="Assets\Shaders\BloomToneMapping_Shader.glsl" />
-    <None Include="Assets\Shaders\ExtractHighFrequencyParts_Shader.glsl" />
-    <None Include="Assets\Shaders\TerrainShader.glsl" />
-    <None Include="Assets\Shaders\TerrainWireframeShader.glsl" />
-    <None Include="Assets\Shaders\TerrainShadowShader.glsl" />
-    <None Include="Assets\Shaders\ShadowShaderInstanced.glsl" />
-    <None Include="Assets\Shaders\gBufferShader_Terrain.glsl" />
-    <None Include="Assets\Shaders\gBufferShaderInstanced.glsl" />
-    <None Include="Assets\Shaders\SSAOShader_Terrain.glsl" />
-    <None Include="Assets\Shaders\SSAOShader_Instanced.glsl" />
-    <None Include="Assets\Shaders\ForwardPassShader.glsl" />
-    <None Include="Assets\Shaders\DeferredPassShader.glsl" />
   </ItemGroup>
 </Project>

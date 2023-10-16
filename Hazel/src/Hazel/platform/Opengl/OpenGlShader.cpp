@@ -52,13 +52,23 @@ namespace Hazel {
 
 	OpenGlShader::OpenGlShader(const std::string& path)
 	{
-		m_shaders = ParseFile(path);
-		unsigned int vs = CompileShader(m_shaders.VertexShader,GL_VERTEX_SHADER);
-		unsigned int fs = CompileShader(m_shaders.Fragmentshader,GL_FRAGMENT_SHADER);
-
 		program = glCreateProgram();
-		glAttachShader(program, vs);
-		glAttachShader(program, fs);
+
+		m_shaders = ParseFile(path);
+		if (m_shaders.ComputeShader != "") 
+		{
+			unsigned int cs = CompileShader(m_shaders.ComputeShader, GL_COMPUTE_SHADER);
+			glAttachShader(program, cs);
+		}
+		else 
+		{
+			unsigned int vs = CompileShader(m_shaders.VertexShader, GL_VERTEX_SHADER);
+			unsigned int fs = CompileShader(m_shaders.Fragmentshader, GL_FRAGMENT_SHADER);
+
+			glAttachShader(program, vs);
+			glAttachShader(program, fs);
+		}
+
 		if (m_shaders.GeometryShader != "")// all optional shaders must be done in this manner
 		{
 			unsigned int gs = CompileShader(m_shaders.GeometryShader, GL_GEOMETRY_SHADER);
@@ -92,6 +102,7 @@ namespace Hazel {
 	{
 		unsigned int s = glCreateShader(type);
 		const char* chr = Shader.c_str();
+		int length = Shader.size();
 		glShaderSource(s, 1, &chr, nullptr);
 		glCompileShader(s);
 
@@ -112,14 +123,14 @@ namespace Hazel {
 	Shaders OpenGlShader::ParseFile(const std::string& path)
 	{
 		enum type {
-			VERTEX_SHADER, FRAGMENT_SHADER, GEOMETRY_SHADER, TESS_CONTROL_SHADER, TESS_EVALUATION_SHADER
+			VERTEX_SHADER, FRAGMENT_SHADER, GEOMETRY_SHADER, TESS_CONTROL_SHADER, TESS_EVALUATION_SHADER, COMPUTE_SHADER
 		};
 
 		std::ifstream stream(path);
 		if (&stream == nullptr)
 			HAZEL_CORE_ERROR("Shader File Not Found!!");
 		std::string ShaderCode;
-		std::string Shader[5];//as for now we have 5 shaders
+		std::string Shader[6];//as for now we have 6 shaders
 		int index;
 		while (std::getline(stream, ShaderCode))
 		{
@@ -150,10 +161,15 @@ namespace Hazel {
 				index = type::TESS_EVALUATION_SHADER;
 				continue;
 			}
+			if (ShaderCode.find("#shader compute") != std::string::npos)
+			{
+				index = type::COMPUTE_SHADER;
+				continue;
+			}
 
 			Shader[index].append(ShaderCode + "\n");
 		}
-		return { Shader[0],Shader[1],Shader[2],Shader[3],Shader[4] };
+		return { Shader[0],Shader[1],Shader[2],Shader[3],Shader[4], Shader[5] };
 	}
 
 	void OpenGlShader::Bind()

@@ -116,9 +116,13 @@ namespace Hazel {
 		m_data->foliage_shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
 		m_data->foliage_shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
 		
+		glEnable(GL_CLIP_DISTANCE0);
+
 		m_data->foliageShader_instanced->Bind();//bind the textureShader
 		m_data->foliageShader_instanced->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
 		m_data->foliageShader_instanced->SetMat4("u_Projection", camera.GetProjectionMatrix());
+		m_data->foliageShader_instanced->SetMat4("u_View", camera.GetViewMatrix());
+		m_data->foliageShader_instanced->SetFloat3("u_cameraPos", camera.GetCameraPosition());
 		m_data->foliageShader_instanced->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
 		
 	}
@@ -200,8 +204,7 @@ namespace Hazel {
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color, const float& material_Roughness , const float& material_metallic, ref<Shader> otherShader)
-	{
-		
+	{		
 		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
 		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
 		mesh.Normal_Texture->Bind(NORMAL_SLOT);
@@ -281,8 +284,10 @@ namespace Hazel {
 	{
 		//needs to be refactored!!
 		glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * Instanced_ModelMatrix.size(), &Instanced_ModelMatrix[0]);
-
+		//void* ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		//std::memcpy(ptr, &Instanced_ModelMatrix[0], sizeof(glm::mat4) * Instanced_ModelMatrix.size());
+		////glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * Instanced_ModelMatrix.size(), &Instanced_ModelMatrix[0]);
+		//glUnmapBuffer(GL_ARRAY_BUFFER);	
 		mesh.VertexArray->Bind();
 		glEnableVertexAttribArray(6);
 		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
@@ -299,11 +304,27 @@ namespace Hazel {
 		glVertexAttribDivisor(9, 1);
 	}
 	
-	void Renderer3D::AllocateInstancedFoliageData(const size_t& size, uint32_t& bufferIndex)
+	void Renderer3D::AllocateInstancedFoliageData(LoadMesh& mesh,const size_t& size, uint32_t& bufferIndex)
 	{
-		glGenBuffers(1, &bufferIndex);
-		glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * size, nullptr, GL_DYNAMIC_DRAW);
+		//glGenBuffers(1, &bufferIndex);
+		//glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * size, nullptr, GL_DYNAMIC_DRAW);
+
+		mesh.VertexArray->Bind();
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
+		glEnableVertexAttribArray(7);
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(1 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(8);
+		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(2 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(9);
+		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(3 * sizeof(glm::vec4)));
+
+		glVertexAttribDivisor(6, 1);//repeat 1ce per instance
+		glVertexAttribDivisor(7, 1);
+		glVertexAttribDivisor(8, 1);
+		glVertexAttribDivisor(9, 1);
+
 	}
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
 	{

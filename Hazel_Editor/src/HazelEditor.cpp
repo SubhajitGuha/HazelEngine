@@ -4,6 +4,7 @@
 #include "Hazel/Physics/Physics3D.h"
 #include "Hazel/Renderer/DeferredRenderer.h"
 #include "Hazel/Renderer/Terrain.h"
+#include "Hazel/Renderer/FoliageRenderer.h"
 
 //#include "Hazel/Profiling.h"
 
@@ -188,8 +189,11 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::SameLine();
 	ImGui::TextColored({ 0,1,0,1 }, std::to_string(frame_time).c_str());
 	ImGui::Checkbox("Simulate Physics", &Physics3D::SimulatePhysics);
-	ImGui::DragFloat("Foliage Coverage", &Scene::foliage_dist, 100, 0, 100000, "%8f");
-	ImGui::DragFloat("Foliage Density", &Scene::num_foliage, 100, 0, 100000, "%8f");
+	//ImGui::DragFloat("Foliage Coverage", &Scene::foliage_dist, 100, 0, 100000, "%8f");
+	//ImGui::DragFloat("Foliage Density", &Scene::num_foliage, 100, 0, 100000, "%8f");
+	ImGui::DragFloat3("2nd Cam Position", glm::value_ptr(Foliage::Showcase_camPosition), 0.1);
+	ImGui::DragFloat3("2nd Cam Rotation", glm::value_ptr(Foliage::Showcase_camRotation), 0.1);
+
 	ImGui::End();
 	m_Pannel.OnImGuiRender();
 }

@@ -85,7 +85,7 @@ float CalculateShadow(int cascade_level)
 float NormalDistribution_GGX(float NdotH)
 {
 	float alpha2 =  pow(alpha,4); // alpha is actually the Roughness
-	return alpha2 / (PI * pow( (pow(NdotH,2) * (alpha2 - 1.0) + 1.0) ,4) ) ;// making the power value = 4 as higher = greater lobe
+	return alpha2 / (PI * pow( (pow(NdotH,2) * (alpha2 - 1.0) + 1.0) ,2) ) ;// making the power value = 4 as higher = greater lobe
 }
 
 float Geometry_GGX(float dp) //dp = Dot Product
@@ -102,9 +102,9 @@ vec3 Fresnel(float VdotH)
 		f0 = vec3(0.04); // for non metallic
 	else
 		f0 = vec3(0.4); // for metallic
-	return f0 + (1.0 - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+	//return f0 + (1.0 - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
 	//greater roughness = lesser fresnel value
-	//return f0 + (max(vec3(1.0- alpha),f0) - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+	return f0 + (max(vec3(1.0- alpha),f0) - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
 }
 
 vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
@@ -134,20 +134,20 @@ vec3 ColorCorrection(vec3 color)
 	color = clamp(color,0,1);
 	color = vec3(1.0) - exp(-color * 2);//exposure
 
-	//color = clamp(color,0,1);
-	//color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,2);//saturation
+	color = clamp(color,0,1);
+	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.2);//saturation
 
 	color = clamp(color,0,1);
-	color = 1.3*(color-0.5) + 0.5 + 0.08 ; //contrast
+	color = 1.3*(color-0.5) + 0.5 + 0.02 ; //contrast
 
 	return color;
 }
 
 void main()
 {
-	vec3 Modified_Normal = mat3(inverse(view)) * texture(gNormal,tcord).xyz; //in ws
+	vec3 Modified_Normal = normalize(mat3(inverse(view)) * texture(gNormal,tcord).xyz); //in ws
 	vec4 m_pos = inverse(view) * vec4(texture(gPosition,tcord).xyz , 1.0); //in ws
-	m_pos = vec4(m_pos.xyz/m_pos.w , 1.0);
+	m_pos = vec4(m_pos.xyz, 1.0);
 
 	vec4 m_Color = texture(gColor , tcord);
 	vec4 RoughnessMetallic = texture(gRoughnessMetallic , tcord);
@@ -173,7 +173,7 @@ void main()
 	VertexPosition_LightSpace = MatrixShadow[level] * m_pos;
 
 	vec3 DirectionalLight_Direction = normalize(-DirectionalLight_Direction );//for directional light as it has no concept of position
-	vec3 EyeDirection = normalize(EyePosition - m_pos.xyz/m_pos.w);
+	vec3 EyeDirection = normalize( m_pos.xyz - EyePosition);
 
 
 	//shadows
@@ -192,13 +192,10 @@ void main()
 	vec3 BRDFintegration =  ks*alpha + max(dot(Modified_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
 	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
 	
-	//vec4 coordinate = u_ProjectionView * m_pos;
-	//coordinate.xyz /= coordinate.w;
-	//coordinate.xyz = coordinate.xyz*0.5 + 0.5;
 	//ambiance
 		vec3 ambiant = (IBL_diffuse + IBL_specular)* m_Color.xyz * texture(SSAO,tcord).r;
 
-	PBR_Color += ( (kd * m_Color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Modified_Normal,DirectionalLight_Direction), 0.0) ; //for directional light (no attenuation)
+	PBR_Color += ( (kd * m_Color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Modified_Normal,DirectionalLight_Direction), 0.001) ; //for directional light (no attenuation)
 
 	for(int i=0 ; i< Num_PointLights ; i++)
 	{
@@ -217,7 +214,7 @@ void main()
 		float attenuation = 1 / ( 0.01 * dist * dist ); //attenuation is for point and spot light
 		radiance = PointLight_Color[i] * attenuation;
 		
-		float NdotL = max(dot(Modified_Normal,LightDirection), 0.00001);
+		float NdotL = max(dot(Modified_Normal,LightDirection), 0.1);
 		PBR_Color += (diffuse + specular)  * radiance * NdotL ; //for Point light (attenuation)
 	}
 

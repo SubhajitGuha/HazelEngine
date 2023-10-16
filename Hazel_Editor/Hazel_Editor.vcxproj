@@ -147,40 +147,31 @@
     <Image Include="Assets\Textures\Interior-Cube-Map\3.png" />
     <Image Include="Assets\Textures\Interior-Cube-Map\4.png" />
     <Image Include="Assets\Textures\Interior-Cube-Map\5.png" />
+    <Image Include="Assets\Textures\MeshTextures\BarkAI_Spec.png" />
+    <Image Include="Assets\Textures\MeshTextures\Grass 2K.png" />
+    <Image Include="Assets\Textures\MeshTextures\GrassUE5_D.png" />
+    <Image Include="Assets\Textures\MeshTextures\GrassUE5_N.png" />
+    <Image Include="Assets\Textures\MeshTextures\GrassUE5_ORA.png" />
+    <Image Include="Assets\Textures\MeshTextures\Grass_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\Grass_ORA.png" />
     <Image Include="Assets\Textures\Outdoor-Cube-Map\0.png" />
     <Image Include="Assets\Textures\Outdoor-Cube-Map\1.png" />
     <Image Include="Assets\Textures\Outdoor-Cube-Map\2.png" />
     <Image Include="Assets\Textures\Outdoor-Cube-Map\3.png" />
     <Image Include="Assets\Textures\Outdoor-Cube-Map\4.png" />
     <Image Include="Assets\Textures\Outdoor-Cube-Map\5.png" />
+    <Image Include="Assets\Textures\PerlinTexture.png" />
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png" />
+    <Image Include="Assets\Textures\Terrain_Height_Map.png" />
+    <Image Include="Assets\Textures\Terrain_Height_Map2.png" />
     <Image Include="Assets\Textures\Test.png" />
-    <Image Include="Assets\Textures\img_0.png" />
-    <Image Include="Assets\Textures\img_1.png" />
-    <Image Include="Assets\Textures\img_2.png" />
-    <Image Include="Assets\Textures\img_3.png" />
+    <Image Include="Assets\Textures\grass_mask.png" />
     <Image Include="Assets\Textures\rickshaw.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hazel\Hazel.vcxproj">
       <Project>{99294D0D-053E-75BE-CEBF-181E3A9371EF}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\BloomToneMapping_Shader.glsl" />
-    <None Include="Assets\Shaders\DeferredPassShader.glsl" />
-    <None Include="Assets\Shaders\DownsampleBloom_Shader.glsl" />
-    <None Include="Assets\Shaders\ExtractHighFrequencyParts_Shader.glsl" />
-    <None Include="Assets\Shaders\ForwardPassShader.glsl" />
-    <None Include="Assets\Shaders\gBufferShaderInstanced.glsl" />
-    <None Include="Assets\Shaders\gBufferShader_Terrain.glsl" />
-    <None Include="Assets\Shaders\ShadowShaderInstanced.glsl" />
-    <None Include="Assets\Shaders\SSAOShader_Instanced.glsl" />
-    <None Include="Assets\Shaders\SSAOShader_Terrain.glsl" />
-    <None Include="Assets\Shaders\TerrainShader.glsl" />
-    <None Include="Assets\Shaders\TerrainShadowShader.glsl" />
-    <None Include="Assets\Shaders\TerrainWireframeShader.glsl" />
-    <None Include="Assets\Shaders\UpSampleBloom_Shader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

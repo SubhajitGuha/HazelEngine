@@ -2,6 +2,7 @@
 
 namespace Hazel
 {
+	class Foliage;
 	struct TerrainData
 	{
 		glm::vec3 Position;
@@ -55,6 +56,7 @@ namespace Hazel
 		float ChunkSize = 128.0f;
 		uint32_t foliageBufferIndex;
 	private:
+		ref<Foliage> grass;
 		int GetChunkIndex(int PosX,int PosZ);
 		void SpawnGrassOnChunks(int PosX, int PosZ, int RadiusOfSpawn = 1);
 		bool HasPlayerMovedFromChunk(int PosX, int PosZ);

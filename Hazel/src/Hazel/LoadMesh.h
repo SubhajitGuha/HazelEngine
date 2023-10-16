@@ -29,7 +29,7 @@ namespace Hazel {
 		ref<Texture2DArray> Roughness_Texture = nullptr;
 		ref<Texture2DArray> Normal_Texture = nullptr;
 		ref<VertexArray> VertexArray;
-
+		glm::mat4 GlobalTransform;
 	private:
 		ref<BufferLayout> bl;
 		ref<VertexBuffer> vb;
