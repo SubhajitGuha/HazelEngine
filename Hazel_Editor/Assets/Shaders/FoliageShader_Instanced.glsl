@@ -159,10 +159,11 @@ float ao = 1.0;
 void main()
 {
 	int index = int (m_materialindex);
-	if(texture(u_Albedo,vec3(tcord,index)).a < 0.2)
+	vec4 albedo = texture(u_Albedo,vec3(tcord,index));
+	if(albedo.a < 0.1)
 		discard;
 	gPosition = vec4(m_pos.xyz,1.0);
 	gNormal = vec4(NormalMapping(index),1.0);
-	gColor = vec4(texture(u_Albedo,vec3(tcord,index)).rgb * m_VertexColor, 1.0);
+	gColor = vec4(albedo.rgb * m_VertexColor, 1.0);
 	gRoughnessMetallic = vec4(texture(u_Roughness,vec3(tcord,index)).r*Roughness,Metallic,1,1);
 }

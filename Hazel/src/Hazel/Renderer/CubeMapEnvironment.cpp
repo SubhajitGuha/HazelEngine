@@ -154,14 +154,16 @@ namespace Hazel {
 	void CubeMapEnvironment::RenderQuad(const glm::mat4& view, const glm::mat4& proj)
 	{
 		//this function renders a quad infront of the camera
-		glDepthMask(GL_FALSE);//disable depth testing
-
+		//glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glDepthMask(GL_FALSE);//disable writing to depth buffer
+		//glEnable(GL_DEPTH_TEST);
 		auto inv = glm::inverse(proj * glm::mat4(glm::mat3(view)));//get inverse of projection view to convert cannonical view to world space
 		glm::vec4 data[] = {
 		glm::vec4(-1,-1,0,1),inv * glm::vec4(-1,-1,0,1),
 		glm::vec4(1,-1,0,1),inv * glm::vec4(1,-1,0,1),
 		glm::vec4(1,1,0,1),	inv * glm::vec4(1,1,0,1),
-		glm::vec4(-1,1,0,1),inv * glm::vec4(-1,1,0,1),
+		glm::vec4(-1,0,1,1),inv * glm::vec4(-1,1,0,1),
 		};
 
 		ref<VertexArray> vao = VertexArray::Create();
@@ -180,6 +182,9 @@ namespace Hazel {
 
 		RenderCommand::DrawIndex(*vao);
 
-		glDepthMask(GL_TRUE);//again enable depth testing
+		glDepthMask(GL_TRUE);//again enable writing to depth buffer
+		//glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	}
 }

@@ -22,7 +22,7 @@ namespace Hazel {
 	void LoadMesh::LoadObj(const std::string& Path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(Path,aiProcess_Triangulate | aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace );
+		const aiScene* scene = importer.ReadFile(Path,aiProcess_OptimizeGraph | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace );
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HAZEL_CORE_ERROR("ERROR::ASSIMP::");

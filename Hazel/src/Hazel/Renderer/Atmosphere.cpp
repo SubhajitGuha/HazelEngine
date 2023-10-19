@@ -14,6 +14,8 @@ namespace Hazel {
 		atmosphere_shader->SetFloat("ScatteringStrength", 1);
 		atmosphere_shader->SetFloat3("RayOrigin", glm::vec3(0, 6372e3, 0));
 		atmosphere_shader->SetFloat3("view_dir", camera.GetViewDirection());
+		atmosphere_shader->SetInt("u_DepthTexture", SCENE_DEPTH_SLOT); //used as a mask to render only the areas which are valid
+
 		glm::vec3 wavelength = glm::vec3(700, 530, 440);
 		glm::vec3 ScatteringCoeff = glm::vec3(0.00000519673, 0.0000121427, 0.0000296453);//glm::vec3(pow(200 / wavelength.x, 4), pow(200 / wavelength.y, 4), pow(200 / wavelength.z, 4));
 		atmosphere_shader->SetFloat3("ScatteringCoeff", ScatteringCoeff * 1.f);

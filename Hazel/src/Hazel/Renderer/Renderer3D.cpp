@@ -9,8 +9,8 @@
 #include "Hazel/Scene/PointLight.h"
 #include "Hazel/platform/Opengl/OpenGlSSAO.h"//temporary testing purpose
 #include "Hazel/Renderer/Terrain.h"
+#include "Hazel/Renderer/SkyRenderer.h"
 #include "Hazel/Renderer/DeferredRenderer.h"
-
 namespace Hazel {
 	//Camera* m_camera;
 	GLsync syncObj;
@@ -62,7 +62,7 @@ namespace Hazel {
 	void Renderer3D::Init()
 	{
 		m_data = new Renderer3DStorage;
-		DefferedRenderer::Init(1024, 1024);//Initilize the Deferred Renderer
+		DefferedRenderer::Init(1024*2, 1024*2);//Initilize the Deferred Renderer
 
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);
@@ -124,7 +124,6 @@ namespace Hazel {
 		m_data->foliageShader_instanced->SetMat4("u_View", camera.GetViewMatrix());
 		m_data->foliageShader_instanced->SetFloat3("u_cameraPos", camera.GetCameraPosition());
 		m_data->foliageShader_instanced->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
-		
 	}
 
 	void Renderer3D::EndScene()
@@ -422,9 +421,19 @@ namespace Hazel {
 
 	void Renderer3D::RenderScene_Deferred(Scene* scene)
 	{
+		SkyRenderer::RenderSky(*scene->GetCamera());
 		DefferedRenderer::DeferredRenderPass();
+
+		//DefferedRenderer::GenerateGBuffers(scene);
+		//RenderShadows(*scene, *scene->GetCamera());
+		//AmbiantOcclusion(*scene, *scene->GetCamera());
+	}
+
+	void Renderer3D::ForwardRenderPass(Scene* scene)
+	{
 		DefferedRenderer::GenerateGBuffers(scene);
 		RenderShadows(*scene, *scene->GetCamera());
 		AmbiantOcclusion(*scene, *scene->GetCamera());
 	}
+
 }

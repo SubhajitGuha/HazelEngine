@@ -15,6 +15,7 @@ layout (std430, binding = 1) writeonly buffer vote_Buffer
 uniform vec3 camPos;
 uniform mat4 u_ViewProjection;
 uniform int offset; //variable to shift the array index by (1024) as we do multiple dispatches of size 1024
+uniform float u_cullDistance;
 
 void main()
 {
@@ -31,8 +32,8 @@ void main()
 	int inview = clipSpace.x < -0.2f || clipSpace.x > 1.2f || clipSpace.z <= -0.1f ? 0 : 1;
 	voteBuffer.vote[index] = 0;		
 
-	//if(distance(foliage_pos,camPos) <= 200.0)
-	if(inview == 1 )
+	//if(distance(foliage_pos,camPos) <= 50.0)
+	if(inview == 1 && distance(foliage_pos,camPos) <= u_cullDistance)
 	{
 		voteBuffer.vote[index] = 1;		
 	}

@@ -5,6 +5,8 @@
 #include "Hazel/Renderer/DeferredRenderer.h"
 #include "Hazel/Renderer/Terrain.h"
 #include "Hazel/Renderer/FoliageRenderer.h"
+#include "Hazel/Renderer/SkyRenderer.h"
+#include "Hazel/Renderer/Fog.h"
 
 //#include "Hazel/Profiling.h"
 
@@ -97,18 +99,22 @@ void  HazelEditor::OnDetach()
 void  HazelEditor::OnUpdate(float deltatime )
 {
 	frame_time = deltatime;
+	m_scene->OnUpdate(deltatime);
+	Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
+
 	m_FrameBuffer2->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
-	m_scene->OnUpdate(deltatime);
+	Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
 	m_scene->Resize(m_ViewportSize.x, m_ViewportSize.y);
 	m_FrameBuffer2->UnBind();
 
-	m_FrameBuffer2->BindFramebufferTexture(ORIGINAL_SCENE_TEXTURE_SLOT);
+	m_FrameBuffer2->BindFramebufferTexture(ORIGINAL_SCENE_TEXTURE_SLOT); //copy the rendered image to these slots
 	m_FrameBuffer2->BindFramebufferTexture(SCENE_TEXTURE_SLOT);
-	m_FrameBuffer2->BindFramebufferDepthTexture(SCENE_DEPTH_SLOT);
-	m_scene->m_Bloom->GetFinalImage(m_FrameBuffer2->GetSceneTextureID(), RenderCommand::GetViewportSize());
-	
+
+	//do post processing stuff here
+	m_scene->m_Fog->RenderFog(*m_scene->GetCamera(), RenderCommand::GetViewportSize());
+	m_scene->m_Bloom->GetFinalImage(m_FrameBuffer2->GetSceneTextureID(), RenderCommand::GetViewportSize());	
 	m_scene->m_Bloom->RenderBloomTexture();
 	
 	m_FrameBuffer->Bind();
@@ -177,7 +183,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Text("diffuse");
 	ImGui::Image((void*)DefferedRenderer::GetBuffers(2), ImVec2(512, 512));
 	ImGui::Text("Roughness metallic");
-	ImGui::Image((void*)DefferedRenderer::GetBuffers(3), ImVec2(512, 512));
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(4), ImVec2(512, 512));
 	ImGui::End();
 
 	ImGui::Begin("Benchmark");

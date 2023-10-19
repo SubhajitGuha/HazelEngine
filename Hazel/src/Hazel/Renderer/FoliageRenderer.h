@@ -10,10 +10,12 @@ namespace Hazel
 	{
 	public:
 		//Foliage(LoadMesh* mesh);
-		Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t , uint32_t);
+		Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, float cullDistance=100);
 		~Foliage();
 		void addInstance(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale);
-		void RenderFoliage(Camera& cam, float );
+		void RenderFoliage(Camera& cam, float radius);
+		void RenderFoliage(Camera& cam); //this version spawns foliage in everry area(per pixel)
+		inline void SetFoliageSpacing(float spacing) { m_Spacing = spacing; }
 		glm::mat4 getTransform(int index);
 		void update(float ts);
 		//void addWindParam();
@@ -28,16 +30,20 @@ namespace Hazel
 		void Compact(int offset);
 		void initialize();
 		void SpawnFoliage(glm::vec3 playerPos, float);
+		void SpawnFoliage(glm::vec3 playerPos);
 		std::vector<glm::vec2> GeneratePoints(float radius, glm::vec2 sampleRegionSize, int numSamplesBeforeRejection = 30);
 	private:
 		Camera* camera;
+		bool bHasSpawnned = false;
+		float m_Spacing = 1.0;
+		float m_cullDistance;
 		bool bIsComputed = false;
 		int totalSum = 0, instanceCount = 0; //accmulated result of prefix sum for each 1024 dispatch units
 		uint32_t ssbo_inTransforms = -1, ssbo_outTransforms = -1, ssbo_voteIndices = -1, ssbo_PrefixSum=-1, ssbo_totalPrefixSum = -1;//shader storage buffer		
 		uint32_t ssbo_foliagePos = -1;
 		ref<Texture2D> FoliageDensityMap;
-		ref<Shader> cs_FrustumCull, cs_PrefixSum, cs_FrustumCullCompact, cs_FoliageSpawn, cs_FoliageBuffersInit;
-		glm::vec2 oldPlayerPos = {256,256}; //needs refactoring
+		ref<Shader> cs_FrustumCull, cs_PrefixSum, cs_FrustumCullCompact, cs_FoliageSpawn, cs_GrassPlacement, cs_FoliageBuffersInit;
+		glm::vec2 oldPlayerPos = {20000,20000}; //needs refactoring
 		//std::vector<glm::vec2> m_foliagePos;
 		void* gpuData;
 		LoadMesh* m_foliageMesh;

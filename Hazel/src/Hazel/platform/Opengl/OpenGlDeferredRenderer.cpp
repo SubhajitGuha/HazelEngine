@@ -55,10 +55,13 @@ namespace Hazel
 		GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 		glDrawBuffers(4, buffers);
 
-		glGenRenderbuffers(1, &m_RenderBufferID);
-		glBindRenderbuffer(GL_RENDERBUFFER, m_RenderBufferID);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RenderBufferID);
+		//capture the depth of the scene on to a texture this will later be used for render the sky
+		glGenTextures(1, &m_RenderBufferID);
+		glBindTexture(GL_TEXTURE_2D, m_RenderBufferID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_RenderBufferID, 0);
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 			HAZEL_CORE_TRACE("G-Buffer Framebuffer compleate -_- ");
@@ -68,6 +71,7 @@ namespace Hazel
 		glBindTextureUnit(G_NORMAL_TEXTURE_SLOT, m_NormalBufferID);
 		glBindTextureUnit(G_COLOR_TEXTURE_SLOT, m_AlbedoBufferID);
 		glBindTextureUnit(G_ROUGHNESS_METALLIC_TEXTURE_SLOT, m_RoughnessMetallicBufferID);
+		glBindTextureUnit(SCENE_DEPTH_SLOT, m_RenderBufferID);
 	}
 	void OpenGlDeferredRenderer::CreateBuffers(Scene* scene)
 	{
@@ -113,6 +117,9 @@ namespace Hazel
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
 
+		m_DefferedPassShader->Bind();
+		m_DefferedPassShader->SetFloat3("EyePosition", scene->GetCamera()->GetCameraPosition());
+
 	}
 	void OpenGlDeferredRenderer::DeferredPass()
 	{
@@ -121,11 +128,12 @@ namespace Hazel
 		m_DefferedPassShader->SetInt("gNormal", G_NORMAL_TEXTURE_SLOT);
 		m_DefferedPassShader->SetInt("gColor", G_COLOR_TEXTURE_SLOT);
 		m_DefferedPassShader->SetInt("gRoughnessMetallic", G_ROUGHNESS_METALLIC_TEXTURE_SLOT);
+		m_DefferedPassShader->SetInt("u_DepthTexture", SCENE_DEPTH_SLOT);
 		//other uniforms are passed in the Renderer3D.cpp class
 
 		//this function renders a quad infront of the camera
 		glDisable(GL_CULL_FACE);
-		glDepthMask(GL_FALSE);//disable depth testing
+		glDepthMask(GL_FALSE);//disable writing to depth buffer
 
 		glm::vec4 data[] = {
 		glm::vec4(-1,-1,0,1),glm::vec4(0,0,0,0),
@@ -149,7 +157,7 @@ namespace Hazel
 
 		RenderCommand::DrawIndex(*vao);
 
-		glDepthMask(GL_TRUE);//again enable depth testing
+		glDepthMask(GL_TRUE);//again enable writing to depth buffer
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 	}
@@ -163,5 +171,7 @@ namespace Hazel
 			return m_AlbedoBufferID;
 		if (bufferInd == 3)
 			return m_RoughnessMetallicBufferID;
+		if (bufferInd == 4)
+			return m_RenderBufferID;
 	}
 }

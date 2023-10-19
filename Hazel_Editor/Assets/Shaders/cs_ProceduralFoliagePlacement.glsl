@@ -117,7 +117,7 @@ void main()
 		float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
 
 		inBuffer.trans[m_index] = CreateTranslationMatrix(foliagePos.x + randomInRange(1.0,5.0,m_index) , height, foliagePos.y + randomInRange(1.0,5.0,m_index + 1)) 
-		* CreateRotationMatrix(randomInRange(5.0,15.0,m_index + 4),randomInRange(5.0,45.0,m_index + 3),0.0);//* CreateScaleMatrix(randomInRange(1.0,2.0,m_index + 4));
+		* CreateRotationMatrix(randomInRange(5.0,15.0,m_index + 2),randomInRange(5.0,45.0,m_index + 3),0.0) * CreateScaleMatrix(randomInRange(1.0,2.0,m_index + 4));
 	}
 	
 }

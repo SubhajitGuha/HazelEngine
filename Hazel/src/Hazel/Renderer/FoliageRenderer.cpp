@@ -7,8 +7,8 @@ namespace Hazel {
 	glm::vec3 Foliage::Showcase_camPosition = { 300,10,300 };
 	glm::vec3 Foliage::Showcase_camRotation = { 0,0,0 };
 
-	Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY)
-		:m_foliageMesh(mesh), m_instanceCount(numInstances)
+	Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, float cullDistance)
+		:m_foliageMesh(mesh), m_instanceCount(numInstances), m_cullDistance(cullDistance)
 	{
 		m_coverage = glm::ivec2(coverageX, coverageY);
 		camera = new EditorCamera(16, 9);
@@ -20,6 +20,7 @@ namespace Hazel {
 		cs_PrefixSum = Shader::Create("Assets/Shaders/cs_FrustumCullPrefixSum.glsl");
 		cs_FrustumCullCompact = Shader::Create("Assets/Shaders/cs_FrustumCullCompact.glsl");
 		cs_FoliageSpawn = Shader::Create("Assets/Shaders/cs_ProceduralFoliagePlacement.glsl");
+		cs_GrassPlacement = Shader::Create("Assets/Shaders/cs_GrassPlacement.glsl");
 		cs_FoliageBuffersInit = Shader::Create("Assets/Shaders/cs_FoliageBufferInit.glsl");
 		//m_foliageSpawnTransforms.resize(m_instanceCount,glm::mat4(1.0f));
 		//Renderer3D::AllocateInstancedFoliageData(*m_foliageMesh, m_instanceCount, m_bufferID);
@@ -52,7 +53,28 @@ namespace Hazel {
 		//camera->SetCameraPosition(Showcase_camPosition);
 		//camera->RotateCamera(Showcase_camRotation.x, Showcase_camRotation.y, Showcase_camRotation.z);
 		//for(int i=0;i<m_instanceCount*3;i+=m_instanceCount)
-		SpawnFoliage(cam.GetCameraPosition(), radius);
+		if (!bHasSpawnned)
+			SpawnFoliage(cam.GetCameraPosition(), radius);
+
+		//Frustum cull and distance cull 
+		for (int i = 0; i < m_instanceCount; i += 1024)
+		{
+			Vote(cam, i);
+			Scan(i);
+			Compact(i);
+		}
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_totalPrefixSum);
+		void* val = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+		std::cout << *(int*)val << std::endl;
+		Renderer3D::InstancedFoliageData(*m_foliageMesh, m_foliageSpawnTransforms, ssbo_outTransforms);
+
+		Renderer3D::BeginSceneFoliage(cam);
+		Renderer3D::DrawFoliageInstanced(*m_foliageMesh, glm::mat4(1.0), *(int*)val, { 1,1,1,1 }, Terrain::time);
+	}
+	void Foliage::RenderFoliage(Camera& cam)
+	{
+		SpawnFoliage(cam.GetCameraPosition());
 
 		//Frustum cull and distance cull 
 		for (int i = 0; i < m_instanceCount; i += 1024)
@@ -116,6 +138,7 @@ namespace Hazel {
 		cs_FrustumCull->SetFloat3("camPos", cam.GetCameraPosition());
 		cs_FrustumCull->SetMat4("u_ViewProjection", cam.GetProjectionView());
 		cs_FrustumCull->SetInt("offset", offset);
+		cs_FrustumCull->SetFloat("u_cullDistance", m_cullDistance);
 
 		if (ssbo_voteIndices == -1)
 		{
@@ -253,12 +276,7 @@ namespace Hazel {
 	}
 	void Foliage::SpawnFoliage(glm::vec3 playerPos, float radius)
 	{
-		//cy::WeightedSampleElimination<glm::vec2, wse;
-		float dist = glm::distance(glm::vec2(playerPos.x, playerPos.z), oldPlayerPos);
-		HAZEL_CORE_ERROR("{}{}", "Distance is = ", dist);
-		if (dist < 50)
-			return;
-		oldPlayerPos = glm::vec2(playerPos.x, playerPos.z);
+		bHasSpawnned = true;
 		cs_FoliageSpawn->Bind();
 		cs_FoliageSpawn->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
 		cs_FoliageSpawn->SetInt("u_DensityMap", FOLIAGE_DENSITY_TEXTURE_SLOT);
@@ -266,7 +284,7 @@ namespace Hazel {
 		cs_FoliageSpawn->SetFloat("u_HeightMapScale", Terrain::HeightScale);
 
 
-		auto m_foliagePos = GeneratePoints(radius, { 512,512 }, 10);
+		auto m_foliagePos = GeneratePoints(radius, { 2048,2048 }, 10); //use poisson disk distribution to populate
 		cs_FoliageSpawn->SetFloat("u_instanceCount", m_foliagePos.size());
 		m_instanceCount = m_foliagePos.size();
 
@@ -304,6 +322,41 @@ namespace Hazel {
 		////for (int i = 0; i < 512; i++)
 		//	std::cout << (*(int*)data) << " ";
 		//std::cout << std::endl;
+	}
+
+	void Foliage::SpawnFoliage(glm::vec3 playerPos)
+	{
+		float dist = glm::distance(glm::vec2(playerPos.x, playerPos.z), oldPlayerPos);
+		HAZEL_CORE_ERROR("{}{}", "Distance is = ", dist);
+		if (dist < m_coverage.x-100)
+			return;
+		oldPlayerPos = glm::vec2(playerPos.x, playerPos.z);
+		cs_GrassPlacement->Bind();
+		cs_GrassPlacement->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
+		cs_GrassPlacement->SetInt("u_DensityMap", FOLIAGE_DENSITY_TEXTURE_SLOT);
+		cs_GrassPlacement->SetFloat3("u_PlayerPos", playerPos);
+		cs_GrassPlacement->SetFloat("u_HeightMapScale", Terrain::HeightScale);
+		cs_GrassPlacement->SetFloat("u_instanceCount", m_instanceCount);
+		cs_GrassPlacement->SetFloat("u_spacing", m_Spacing);
+
+		if (ssbo_inTransforms == -1)
+		{
+			glGenBuffers(1, &ssbo_inTransforms);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_inTransforms);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::mat4) * m_instanceCount, nullptr, GL_DYNAMIC_DRAW);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		}
+		else
+		{
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_inTransforms);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		}
+
+		glDispatchCompute(m_coverage.x / 32, m_coverage.y / 32, 1);
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	}
 
 	auto IsValid = [&](glm::vec2 candidate, glm::vec2 sampleRegionSize, float cellSize, float radius, std::vector<glm::vec2> points, const std::vector<std::vector<int>>& grid)

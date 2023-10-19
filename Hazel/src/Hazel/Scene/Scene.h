@@ -15,6 +15,7 @@ namespace Hazel {
 	class Camera;
 	class PointLight;
 	class Bloom;
+	class Fog;
 	class Terrain;
 	class Scene
 	{
@@ -46,6 +47,7 @@ namespace Hazel {
 		std::unordered_map<size_t, ScriptableEntity*> m_scriptsMap;
 		static float foliage_dist, num_foliage;
 		ref<Bloom> m_Bloom;
+		ref<Fog> m_Fog;
 		ref<Terrain> m_Terrain;
 	private:
 		Camera* MainCamera = nullptr;//if there is no main camera Then dont render

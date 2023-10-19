@@ -16,6 +16,7 @@
 #include "Hazel/Renderer/Atmosphere.h"
 #include "Hazel/Renderer/SkyRenderer.h"
 #include "Hazel/Renderer/Terrain.h"
+#include "Hazel/Renderer/Fog.h"
 
 namespace Hazel {
 	
@@ -33,8 +34,8 @@ namespace Hazel {
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
 		Physics3D::Initilize();
-		SkyRenderer::Initilize();
 		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
+		SkyRenderer::Initilize();
 
 		Renderer3D::Init();
 		Renderer2D::Init();
@@ -47,7 +48,7 @@ namespace Hazel {
 		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
 		Fern = new LoadMesh("Assets/Meshes/HZ_Pine1.fbx");
-		Grass = new LoadMesh("Assets/Meshes/grass.fbx");
+		Grass = new LoadMesh("Assets/Meshes/grass2.fbx");
 		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
 		Tree = new LoadMesh("Assets/Meshes/Tree.fbx");
@@ -59,8 +60,10 @@ namespace Hazel {
 		m_Terrain = std::make_shared<Terrain>(2048,2048);
 		//initilize Bloom
 		m_Bloom = Bloom::Create();
-		m_Bloom->GetFinalImage(0, { 1920,1080 });
+		m_Bloom->GetFinalImage(0, { 2048,2048 });
 		m_Bloom->InitBloom();
+
+		m_Fog = Fog::Create(0.006, 1.3, 30, 5000);
 	}
 	Scene::~Scene()
 	{
@@ -119,8 +122,6 @@ namespace Hazel {
 			//editcam = editor_cam;
 		}
 
-		SkyRenderer::RenderSky(*MainCamera);
-		
 		MainCamera->OnUpdate(ts);
 		//run scripts
 		m_registry.view<ScriptComponent>().each([=](entt::entity entity, ScriptComponent& nsc) 
@@ -150,10 +151,7 @@ namespace Hazel {
 
 		Renderer3D::SetSunLightDirection(Renderer3D::m_SunLightDir);
 		Renderer3D::SetSunLightColorAndIntensity(Renderer3D::m_SunColor, Renderer3D::m_SunIntensity);
-
-		//m_Terrain->RenderTerrain(*MainCamera);
-		
-		Renderer3D::RenderScene_Deferred(this);
+		//Renderer3D::RenderScene_Deferred(this);
 	}
 	void Scene::OnCreate()
 	{

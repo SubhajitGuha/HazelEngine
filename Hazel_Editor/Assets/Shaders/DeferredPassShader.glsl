@@ -45,6 +45,8 @@ uniform vec3 PointLight_Position[MAX_LIGHTS];
 uniform vec3 PointLight_Color[MAX_LIGHTS];
 uniform int Num_PointLights;
 
+uniform sampler2D u_DepthTexture;
+
 vec3 PBR_Color = vec3(0.0);
 vec3 radiance;
 
@@ -132,19 +134,22 @@ vec3 ColorCorrection(vec3 color)
 	color = pow(color, vec3(1.0/2.2)); //Gamma correction
 
 	color = clamp(color,0,1);
-	color = vec3(1.0) - exp(-color * 2);//exposure
+	color = vec3(1.0) - exp(-color * 3);//exposure
 
 	color = clamp(color,0,1);
-	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.2);//saturation
+	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.3);//saturation
 
 	color = clamp(color,0,1);
-	color = 1.3*(color-0.5) + 0.5 + 0.02 ; //contrast
+	color = 1.0*(color-0.5) + 0.5 + 0.02 ; //contrast
 
 	return color;
 }
 
 void main()
 {
+	if(texture(u_DepthTexture,tcord).r == 1.0 ) //to blend in the sky
+       discard;
+
 	vec3 Modified_Normal = normalize(mat3(inverse(view)) * texture(gNormal,tcord).xyz); //in ws
 	vec4 m_pos = inverse(view) * vec4(texture(gPosition,tcord).xyz , 1.0); //in ws
 	m_pos = vec4(m_pos.xyz, 1.0);
@@ -173,8 +178,11 @@ void main()
 	VertexPosition_LightSpace = MatrixShadow[level] * m_pos;
 
 	vec3 DirectionalLight_Direction = normalize(-DirectionalLight_Direction );//for directional light as it has no concept of position
-	vec3 EyeDirection = normalize( m_pos.xyz - EyePosition);
+	vec3 EyeDirection = normalize( EyePosition - m_pos.xyz);
 
+	float visibility = exp(-pow(distance(EyePosition,m_pos.xyz) * 0.003, 5));
+	visibility = clamp(visibility,0,1);
+	vec3 skyColor = vec3(0.494,0.78431,0.89019);
 
 	//shadows
 	float shadow = CalculateShadow(level);
@@ -219,6 +227,8 @@ void main()
 	}
 
 	PBR_Color += ambiant;
+
+	//PBR_Color = mix(skyColor, PBR_Color, visibility);
 	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
 	PBR_Color = clamp(ColorCorrection(PBR_Color),0.0,1.0);
 

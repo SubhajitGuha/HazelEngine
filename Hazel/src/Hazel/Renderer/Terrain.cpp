@@ -25,7 +25,10 @@ namespace Hazel
 
 	Terrain::Terrain(float width, float height)
 	{
-		grass = std::make_shared<Foliage>(Scene::Fern, 512*512, 1024,1024);
+		grass = std::make_shared<Foliage>(Scene::Grass, 512*512,512,512,50);
+		Tree = std::make_shared<Foliage>(Scene::Fern, 128 * 128, 512, 512, 800);
+		Flower = std::make_shared<Foliage>(Scene::Tree, 128 * 128, 512, 512, 400);
+
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2*RadiusOfSpawn+1,2));//radius of spawn defines how many tiles to cover from the centre
 		StartTime = std::chrono::high_resolution_clock::now();
 		m_dimension.x = width;
@@ -238,8 +241,11 @@ namespace Hazel
 
 		if (bShowWireframeTerrain)
 			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
-		
-		grass->RenderFoliage(cam,50);
+
+		grass->SetFoliageSpacing(2.0);//space between foliages
+		grass->RenderFoliage(cam);
+		Tree->RenderFoliage(cam,50);
+		Flower->RenderFoliage(cam,10);
 
 		//if (CamX > 0 && CamZ>0) 
 		//{

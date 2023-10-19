@@ -125,4 +125,8 @@
       <Filter>Assets\Textures</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\cs_GrassPlacement.glsl" />
+    <None Include="Assets\Shaders\pp_fogShader.glsl" />
+  </ItemGroup>
 </Project>

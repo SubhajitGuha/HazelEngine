@@ -33,6 +33,8 @@ namespace Hazel {
 		static void SetTransperancy(float val);
 		static ref<Shader>& GetFoliageInstancedShader();
 		static void RenderScene_Deferred(Scene* scene);
+		static void ForwardRenderPass(Scene* scene);
+
 	public:
 		static unsigned int depth_id[4];
 		static int index;
