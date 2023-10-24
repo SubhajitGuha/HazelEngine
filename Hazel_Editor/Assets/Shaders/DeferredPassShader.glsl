@@ -137,10 +137,10 @@ vec3 ColorCorrection(vec3 color)
 	color = vec3(1.0) - exp(-color * 3);//exposure
 
 	color = clamp(color,0,1);
-	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.3);//saturation
+	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.0);//saturation
 
 	color = clamp(color,0,1);
-	color = 1.0*(color-0.5) + 0.5 + 0.02 ; //contrast
+	color = 1.0*(color-0.5) + 0.5 + 0.00 ; //contrast
 
 	return color;
 }

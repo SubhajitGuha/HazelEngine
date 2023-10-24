@@ -25,9 +25,9 @@ namespace Hazel
 
 	Terrain::Terrain(float width, float height)
 	{
-		grass = std::make_shared<Foliage>(Scene::Grass, 512*512,512,512,50);
-		Tree = std::make_shared<Foliage>(Scene::Fern, 128 * 128, 512, 512, 800);
-		Flower = std::make_shared<Foliage>(Scene::Tree, 128 * 128, 512, 512, 400);
+		grass = std::make_shared<Foliage>(Scene::Grass, std::ceil(512*512/3.0),512,512,200);
+		Tree = std::make_shared<Foliage>(Scene::Tree, 128 * 128, 2048, 2048, 800,true,100);
+		Flower = std::make_shared<Foliage>(Scene::Flower, 128 * 128, 2048, 2048, 150);
 
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2*RadiusOfSpawn+1,2));//radius of spawn defines how many tiles to cover from the centre
 		StartTime = std::chrono::high_resolution_clock::now();
@@ -166,7 +166,7 @@ namespace Hazel
 
 
 							child_data.f_type = FOLIAGE_TYPE::GRASS;
-							grass->addInstance(child_data.position, child_data.rotation, child_data.scale);
+							//grass->addInstance(child_data.position, child_data.rotation, child_data.scale);
 						}
 					}
 					
@@ -244,19 +244,9 @@ namespace Hazel
 
 		grass->SetFoliageSpacing(2.0);//space between foliages
 		grass->RenderFoliage(cam);
-		Tree->RenderFoliage(cam,50);
-		Flower->RenderFoliage(cam,10);
+		Flower->RenderFoliage(cam,5);
+		Tree->RenderFoliage(cam,30);
 
-		//if (CamX > 0 && CamZ>0) 
-		//{
-		//	//ChunkIndex = GetChunkIndex(CamX, CamZ);
-		//	if (HasPlayerMovedFromChunk(CamX, CamZ))
-		//		SpawnGrassOnChunks(CamX, CamZ, RadiusOfSpawn);
-		//
-		//	Renderer3D::BeginSceneFoliage(cam);			
-		//	RenderTerrainGrass();
-		//	//Renderer3D::DrawFoliageInstanced(*Scene::Grass, m_terrainModelMat, Grass_modelMat.size(), { 0,0.0,0.0,1 },time, 0.4);
-		//}
 	}
 
 	void Terrain::RenderTerrainGrass()

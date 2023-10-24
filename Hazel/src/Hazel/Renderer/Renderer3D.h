@@ -1,12 +1,12 @@
 #pragma once
 #include "Hazel/Core.h"
 #include "Hazel.h"
-#include "Hazel//Renderer/CubeMapReflection.h"
-#include "Hazel/Renderer/Shadows.h"
+#include "Hazel/Renderer/CubeMapReflection.h"
 
 namespace Hazel {
 	class Camera;
 	class LoadMesh;
+	class Shadows;
 	class Renderer3D
 	{
 	public:
@@ -26,12 +26,13 @@ namespace Hazel {
 		static void DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = { 1,1,1,1 }, const float& material_Roughness = 1.0f, const float& material_metallic = 0.0f);//take the mesh class reference
 		static void DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform,size_t instance_count, const glm::vec4& color = { 1,1,1,1 }, float TimeElapsed=0, const float& material_Roughness = 1.0f, const float& material_metallic = 0.0f);//take the mesh class reference
 		static void AllocateInstancedFoliageData(LoadMesh& mesh, const size_t& size, uint32_t& buffIndex);
-		static void InstancedFoliageData(LoadMesh& mesh, const std::vector<glm::mat4>& Instanced_ModelMatrix, uint32_t& buffIndex);
+		static void InstancedFoliageData(LoadMesh& mesh, uint32_t& buffIndex);
 		static void SetUpCubeMapReflections(Scene& scene);
 		static void RenderShadows(Scene& scene, Camera& camera);
 		static void AmbiantOcclusion(Scene& scene, Camera& camera);
 		static void SetTransperancy(float val);
 		static ref<Shader>& GetFoliageInstancedShader();
+		static ref<Shadows>& GetShadowObj();
 		static void RenderScene_Deferred(Scene* scene);
 		static void ForwardRenderPass(Scene* scene);
 

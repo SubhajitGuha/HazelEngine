@@ -16,6 +16,8 @@ namespace Hazel {
 		LoadMesh(const std::string& Path);
 		~LoadMesh();
 		void LoadObj(const std::string& Path);
+		void CreateLOD(const std::string& Path);
+		LoadMesh* GetLOD(int lodIndex);
 	public:
 		std::string m_path;
 		std::vector<glm::vec3> Vertices;
@@ -31,6 +33,7 @@ namespace Hazel {
 		ref<VertexArray> VertexArray;
 		glm::mat4 GlobalTransform;
 	private:
+		std::vector<LoadMesh*> m_LOD;
 		ref<BufferLayout> bl;
 		ref<VertexBuffer> vb;
 		ref<IndexBuffer> ib;

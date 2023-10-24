@@ -10,6 +10,8 @@ namespace Hazel {
 		virtual ~Shadows();
 		virtual void RenderShadows(Scene& scene, const glm::vec3& LightPosition , Camera& cam) = 0;
 		virtual void RenderTerrainShadows(Scene& scene, const glm::vec3& LightPosition, Camera& cam) =0;
+		virtual void RenderFoliageShadows(LoadMesh* mesh, uint32_t bufferID, int numMeshes, const glm::vec3& LightPosition, Camera& cam) = 0;
+
 		virtual void PassShadowUniforms(Camera& cam, ref<Shader> rendering_shader) = 0;
 		virtual void SetShadowMapResolution(const float& width, float height) = 0;
 		virtual unsigned int GetDepth_ID(int index) = 0;

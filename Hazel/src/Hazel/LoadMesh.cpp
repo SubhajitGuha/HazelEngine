@@ -13,7 +13,9 @@ namespace Hazel {
 		:Vertices(0),Normal(0),TexCoord(0)
 	{
 		GlobalTransform = glm::mat4(1.0);
-		m_path = Path;
+		m_path = Path;	
+		if (m_LOD.size() == 0)
+			m_LOD.push_back(this);
 		LoadObj(Path);
 	}
 	LoadMesh::~LoadMesh()
@@ -34,6 +36,19 @@ namespace Hazel {
 		ProcessNode(scene->mRootNode, scene);
 		ProcessMesh();
 		CreateStaticBuffers();
+	}
+
+	void LoadMesh::CreateLOD(const std::string& Path)
+	{
+		m_LOD.push_back(new LoadMesh(Path));
+	}
+
+	LoadMesh* LoadMesh::GetLOD(int lodIndex)
+	{
+		if (lodIndex < m_LOD.size() && lodIndex >=0)
+			return m_LOD[lodIndex];
+		else
+			return m_LOD[m_LOD.size()-1]; //if lod not available give the highest LOD
 	}
 
 	auto AssimpToGlmMatrix = [&](const aiMatrix4x4& from) {

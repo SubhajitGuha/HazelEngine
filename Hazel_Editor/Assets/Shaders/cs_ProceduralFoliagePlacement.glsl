@@ -1,5 +1,5 @@
 #shader compute
-#version 430 core
+#version 460 core
 
 layout (local_size_x = 32, local_size_y = 32 ,local_size_z = 1) in;
 
@@ -117,7 +117,7 @@ void main()
 		float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
 
 		inBuffer.trans[m_index] = CreateTranslationMatrix(foliagePos.x + randomInRange(1.0,5.0,m_index) , height, foliagePos.y + randomInRange(1.0,5.0,m_index + 1)) 
-		* CreateRotationMatrix(randomInRange(5.0,15.0,m_index + 2),randomInRange(5.0,45.0,m_index + 3),0.0) * CreateScaleMatrix(randomInRange(1.0,2.0,m_index + 4));
+		* CreateRotationMatrix(0,randomInRange(5.0,180.0,m_index + 3),0.0) * CreateScaleMatrix(randomInRange(1.0,2.0,m_index + 4));
 	}
 	
 }

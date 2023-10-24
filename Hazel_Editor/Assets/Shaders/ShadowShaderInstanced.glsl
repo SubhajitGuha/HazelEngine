@@ -8,25 +8,25 @@ layout (location = 4) in vec3 BiTangent;
 layout (location = 5) in float materialindex;
 layout (location = 6) in mat4 instance_mm;
 
-uniform mat4 LightProjection; //matrixshadow is the model light projection but converted to 0-1 range
+out vec2 tcord;
+out vec4 m_pos;
+out vec3 m_Normal;
+out vec3 m_Tangent;
+out vec3 m_BiTangent;
+out vec3 m_VertexColor;
 flat out float m_materialindex;
-uniform float u_Time;
-uniform mat4 u_Model;
+
+uniform mat4 LightProjection;
+uniform mat4 u_View;
 uniform mat4 u_Projection;
+uniform mat4 u_Model;
+uniform vec3 u_cameraPos;
+uniform float u_Time;
+uniform vec4 m_color;
 uniform sampler2D Noise;
+float amplitude=40;
+float wsAmplitude=0.6;
 
-float amplitude=70;
-out vec2 m_tcoord;
-
-mat4 CreateScaleMatrix(float scale)
-{
-	return mat4(
-	scale,0,0,0,
-	0,scale,0,0,
-	0,0,scale,0,
-	0,0,0,1
-	);
-}
 mat4 CreateRotationMat(float x, float y, float z)
 {
 	x= radians(x);
@@ -53,40 +53,36 @@ mat4 CreateRotationMat(float x, float y, float z)
 
 	return aroundX * aroundY * aroundZ;
 }
-void main()
+
+mat4 CreateScaleMatrix(float scale)
 {
+	return mat4(
+	scale,0,0,0,
+	0,scale,0,0,
+	0,0,scale,0,
+	0,0,0,1
+	);
+}
+void main()
+{	
 	mat4 wsGrass = u_Model * instance_mm;
-	vec4 wsVertexPos = wsGrass * pos;
-	vec3 origin = vec3(wsGrass[3][0],wsGrass[3][1],wsGrass[3][2]);
-	float factor = distance(wsVertexPos.xyz , origin)/10;	
-	if(factor<0)
-		factor = 0;
-
-	vec3 coord = mod(abs(wsVertexPos.xyz),256);
-	coord/=vec3(256);
-
-	vec3 dir = texture(Noise , coord.xz * u_Time).rgb;
-	vec3 rotVal = (vec3(sin(coord.x + coord.y + u_Time + dir.r)) ) *factor*amplitude;
-	mat4 rot = CreateRotationMat(0, rotVal.y, 0);
-
-	float val = texture(Noise,coord.xz*10).r;
-
-	gl_Position = LightProjection * wsGrass * rot* CreateScaleMatrix(val*2) * pos;
+	gl_Position = LightProjection * wsGrass * pos;
+	m_materialindex = materialindex;
+	tcord = cord;
 }
 
 #shader fragment
 #version 410 core
 
 flat in float m_materialindex;
-in vec2 m_tcoord;
-uniform sampler2DArray u_Alpha; // multiple material slots can be present so a texture array is used
-uniform int isFoliage; // check for foliage
+in vec2 tcord;
+uniform sampler2DArray u_Albedo; // multiple material slots can be present so a texture array is used
 
 void main()
 {
 	int index = int (m_materialindex);
-	vec3 alpha = texture(u_Alpha , vec3(m_tcoord , index)).rgb;
+	float alpha = texture(u_Albedo , vec3(tcord , index)).r;
 	
-	if(isFoliage == 1 && alpha.r <=0.06 ) // check if the tex value is less than a certain threshold then discard
+	if(alpha < 0.4 ) // check if the tex value is less than a certain threshold then discard
 		discard;
 }

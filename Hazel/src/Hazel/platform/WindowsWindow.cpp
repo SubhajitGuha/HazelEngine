@@ -50,7 +50,7 @@ namespace Hazel {
 
 			m_isInitilized = true;
 		}
-
+		glfwWindowHint(GLFW_SAMPLES, 8);
 		m_window = glfwCreateWindow((int)m_Data.width,(int) m_Data.height, m_Data.name.c_str(), nullptr, nullptr);
 		Context = new OpenGlContext((ref<GLFWwindow>)m_window);//context for opengl as this piece of code is abstracted away
 		//glad is initilized in OpenGlContext->Init()

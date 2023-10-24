@@ -6,11 +6,13 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "stb_image.h"
 #include "glad/glad.h"
+#include "Hazel/Renderer/Shadows.h"
 #include "Hazel/Scene/PointLight.h"
 #include "Hazel/platform/Opengl/OpenGlSSAO.h"//temporary testing purpose
 #include "Hazel/Renderer/Terrain.h"
 #include "Hazel/Renderer/SkyRenderer.h"
 #include "Hazel/Renderer/DeferredRenderer.h"
+
 namespace Hazel {
 	//Camera* m_camera;
 	GLsync syncObj;
@@ -62,7 +64,7 @@ namespace Hazel {
 	void Renderer3D::Init()
 	{
 		m_data = new Renderer3DStorage;
-		DefferedRenderer::Init(1024*2, 1024*2);//Initilize the Deferred Renderer
+		DefferedRenderer::Init(1920, 1080);//Initilize the Deferred Renderer
 
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);
@@ -77,8 +79,8 @@ namespace Hazel {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		m_data->reflection = CubeMapReflection::Create();
-		m_data->ssao = std::make_shared<OpenGlSSAO>();
-		m_data->shadow_map = Shadows::Create(4096, 4096);//create a 2048x2048 shadow map
+		m_data->ssao = std::make_shared<OpenGlSSAO>(1024,1024);
+		m_data->shadow_map = Shadows::Create(4096/2, 4096/2);//create a 2048x2048 shadow map
 		for (int i = 0; i < 4; i++)
 			depth_id[i] = m_data->shadow_map->GetDepth_ID(i);
 		ssao_id = m_data->ssao->GetSSAOid();
@@ -115,8 +117,6 @@ namespace Hazel {
 		m_data->foliage_shader->Bind();//bind the textureShader
 		m_data->foliage_shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
 		m_data->foliage_shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
-		
-		glEnable(GL_CLIP_DISTANCE0);
 
 		m_data->foliageShader_instanced->Bind();//bind the textureShader
 		m_data->foliageShader_instanced->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
@@ -279,7 +279,7 @@ namespace Hazel {
 		glCullFace(GL_BACK);
 	}
 
-	void Renderer3D::InstancedFoliageData(LoadMesh& mesh, const std::vector<glm::mat4>& Instanced_ModelMatrix, uint32_t& bufferIndex)
+	void Renderer3D::InstancedFoliageData(LoadMesh& mesh, uint32_t& bufferIndex)
 	{
 		//needs to be refactored!!
 		glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
@@ -347,7 +347,6 @@ namespace Hazel {
 
 	void Renderer3D::RenderShadows(Scene& scene, Camera& camera)
 	{
-		//m_data->shadow_map->RenderShadows(scene, m_SunLightDir, camera);//Light position is the light direction used for directional light
 		m_data->shadow_map->RenderTerrainShadows(scene, m_SunLightDir, camera);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->shader);
 		m_data->shadow_map->PassShadowUniforms(camera, m_data->foliage_shader);
@@ -360,6 +359,11 @@ namespace Hazel {
 	{
 		m_data->ssao->CaptureScene(scene, camera);
 		//m_data->shader->Bind();
+	}
+
+	ref<Shadows>& Renderer3D::GetShadowObj()
+	{
+		return m_data->shadow_map;
 	}
 
 	void Renderer3D::SetTransperancy(float val)
@@ -423,10 +427,6 @@ namespace Hazel {
 	{
 		SkyRenderer::RenderSky(*scene->GetCamera());
 		DefferedRenderer::DeferredRenderPass();
-
-		//DefferedRenderer::GenerateGBuffers(scene);
-		//RenderShadows(*scene, *scene->GetCamera());
-		//AmbiantOcclusion(*scene, *scene->GetCamera());
 	}
 
 	void Renderer3D::ForwardRenderPass(Scene* scene)

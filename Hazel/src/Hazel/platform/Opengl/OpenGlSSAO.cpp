@@ -4,8 +4,8 @@
 #include "Hazel/Renderer/Terrain.h"
 
 namespace Hazel {
-	OpenGlSSAO::OpenGlSSAO()
-		:m_height(1024),m_width(1024)
+	OpenGlSSAO::OpenGlSSAO(int width, int height)
+		:m_height(width),m_width(height)
 	{
 		SSAOShader = Shader::Create("Assets/Shaders/SSAOShader.glsl");
 		GbufferPosition = Shader::Create("Assets/Shaders/gBuffersShader.glsl");

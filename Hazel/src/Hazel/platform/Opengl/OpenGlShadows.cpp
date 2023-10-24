@@ -1,6 +1,7 @@
 #include "hzpch.h"
 #include "OpenGlShadows.h"
 #include "glad/glad.h"
+#include "Hazel/Renderer/FoliageRenderer.h"
 #include "Hazel/Renderer/Terrain.h"
 
 namespace Hazel {
@@ -109,24 +110,10 @@ namespace Hazel {
 			//render terrain
 			//Needs change as I cannot just make terrain vertex array and terrain data public static		
 			RenderCommand::DrawArrays(*Terrain::m_terrainVertexArray, Terrain::terrainData.size(), GL_PATCHES, 0);
-			
-			//shadow_shaderInstanced->Bind();
-			//shadow_shaderInstanced->SetMat4("LightProjection", LightProjection);
-			////Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
-			//shadow_shaderInstanced->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
-			//shadow_shaderInstanced->SetMat4("u_Model", Terrain::m_terrainModelMat);
-			//shadow_shaderInstanced->SetMat4("u_Projection", cam.GetProjectionMatrix());
-			//shadow_shaderInstanced->SetFloat("u_Time", Terrain::time);
-			//shadow_shaderInstanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
-			//glDisable(GL_CULL_FACE);
-			////render terrain grass
-			//scene.m_Terrain->RenderTerrainGrass();
-			//glEnable(GL_CULL_FACE);
-			//glCullFace(GL_BACK);
 
+			//scene entity shadow caster
 			shadow_shader->Bind();
 			shadow_shader->SetMat4("LightProjection", LightProjection);
-			//Pass a alpha texture in the fragment shader to remove the depth values from the pixels that masked by alpha texture
 			shadow_shader->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
 
 			scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
@@ -150,6 +137,61 @@ namespace Hazel {
 					else
 						Renderer3D::DrawMesh(*mesh, transform, Entity.m_DefaultColor);
 				});
+
+			//for foliage instanced
+			shadow_shaderInstanced->Bind();
+			shadow_shaderInstanced->SetMat4("LightProjection", LightProjection);
+			shadow_shaderInstanced->SetMat4("u_Model", Terrain::m_terrainModelMat);
+			shadow_shaderInstanced->SetInt("u_Albedo", ALBEDO_SLOT); //alpha channel is being used
+			for (Foliage* foliage : Foliage::foliageObjects)
+			{
+				if (foliage->bCanCastShadow) 
+				{
+					glDisable(GL_CULL_FACE);
+					uint32_t bufferID = foliage->GetBufferID_LOD0();
+					Renderer3D::InstancedFoliageData(*foliage->GetMesh(), bufferID);
+					RenderCommand::DrawInstancedArrays(*foliage->GetMesh()->VertexArray, foliage->GetMesh()->Vertices.size(), foliage->NumLOD0);
+					glEnable(GL_CULL_FACE);
+					glCullFace(GL_BACK);
+				}
+			}
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glViewport(0, 0, size.x, size.y);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
+	}
+	void OpenGlShadows::RenderFoliageShadows(LoadMesh* mesh, uint32_t bufferID, int numMeshes, const glm::vec3& LightPosition, Camera& cam)
+	{
+		auto size = RenderCommand::GetViewportSize();
+		PrepareShadowProjectionMatrix(cam, LightPosition);//CREATE THE orthographic projection matrix
+
+		shadow_shaderInstanced->Bind();
+		for (int i = 0; i < MAX_CASCADES; i++)
+		{
+			glm::mat4 LightProjection = m_ShadowProjection[i] * LightView[i]; //placing a orthographic camera on the light position(i.e position at centroid of each frustum)
+
+			shadow_shaderInstanced->SetMat4("LightProjection", LightProjection);
+			shadow_shaderInstanced->SetMat4("u_Model", Terrain::m_terrainModelMat);
+			//shadow_shaderInstanced->SetMat4("u_View", cam.GetViewMatrix());
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
+			glViewport(0, 0, m_width, m_height);
+			//glClear(GL_DEPTH_BUFFER_BIT);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_id[i], 0);
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+				HAZEL_CORE_INFO("shadow map FrameBuffer compleate for foliage!!");
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			//render terrain
+			//Needs change as I cannot just make terrain vertex array and terrain data public static		
+			Renderer3D::InstancedFoliageData(*mesh, bufferID);
+
+			//Renderer3D::BeginSceneFoliage(cam);
+			//Renderer3D::DrawFoliageInstanced(*mesh, glm::mat4(1.0), numMeshes, { 1,1,1,1 }, Terrain::time);
+			RenderCommand::DrawInstancedArrays(*mesh->VertexArray, mesh->Vertices.size(), numMeshes);
+
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glViewport(0, 0, size.x, size.y);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -128,5 +128,6 @@
   <ItemGroup>
     <None Include="Assets\Shaders\cs_GrassPlacement.glsl" />
     <None Include="Assets\Shaders\pp_fogShader.glsl" />
+    <None Include="Assets\Shaders\cs_CreateLODs.glsl" />
   </ItemGroup>
 </Project>

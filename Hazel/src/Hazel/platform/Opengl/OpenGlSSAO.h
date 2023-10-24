@@ -5,7 +5,7 @@ namespace Hazel {
 	class OpenGlSSAO
 	{
 	public:
-		OpenGlSSAO();
+		OpenGlSSAO(int width, int height);
 		~OpenGlSSAO();
 		void Init();
 		inline void SetSSAO_TextureDimension(int width, int height) { m_width = width, m_height = height; }

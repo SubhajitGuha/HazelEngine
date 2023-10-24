@@ -160,7 +160,7 @@ void main()
 {
 	int index = int (m_materialindex);
 	vec4 albedo = texture(u_Albedo,vec3(tcord,index));
-	if(albedo.a < 0.1)
+	if(albedo.a < 0.4)
 		discard;
 	gPosition = vec4(m_pos.xyz,1.0);
 	gNormal = vec4(NormalMapping(index),1.0);

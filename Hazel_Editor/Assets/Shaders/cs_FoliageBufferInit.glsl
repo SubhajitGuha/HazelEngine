@@ -1,5 +1,5 @@
 #shader compute
-#version 430 core
+#version 460 core
 
 layout (local_size_x = 1024) in;
 
