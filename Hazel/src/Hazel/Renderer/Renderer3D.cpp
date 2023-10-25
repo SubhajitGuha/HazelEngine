@@ -64,7 +64,7 @@ namespace Hazel {
 	void Renderer3D::Init()
 	{
 		m_data = new Renderer3DStorage;
-		DefferedRenderer::Init(1920, 1080);//Initilize the Deferred Renderer
+		DefferedRenderer::Init(1366, 768);//Initilize the Deferred Renderer
 
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);

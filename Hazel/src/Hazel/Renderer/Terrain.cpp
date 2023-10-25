@@ -14,7 +14,7 @@
 namespace Hazel
 {
 	float Terrain::WaterLevel = 0.1, Terrain::HillLevel = 0.5, Terrain::MountainLevel = 1.0
-		, Terrain::HeightScale = 100, Terrain::FoliageHeight = 6.0f;
+		, Terrain::HeightScale = 200, Terrain::FoliageHeight = 6.0f;
 
 	bool Terrain::bShowTerrain = true, Terrain::bShowWireframeTerrain = false;
 	int Terrain::maxGrassAmount = 0, Terrain::ChunkIndex = 0, Terrain::RadiusOfSpawn = 1, Terrain::GrassDensity=3;
@@ -52,7 +52,7 @@ namespace Hazel
 		//needs to have different width,height,channels
 		GrassSpawnArea = stbi_load_16("Assets/Textures/grass_mask.png", &m_Width, &m_Height, &m_Channels1, 0);
 
-		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map.png");
+		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map.png",true);
 		m_perlinNoise = Texture2D::Create("Assets/Textures/PerlinTexture.png");
 		TerrainTex_Albedo = Texture2D::Create("Assets/Textures/forrest_ground_01_diff_2k.jpg");
 		TerrainTex_Roughness = Texture2D::Create("Assets/Textures/forrest_ground_01_rough_2k.jpg");
