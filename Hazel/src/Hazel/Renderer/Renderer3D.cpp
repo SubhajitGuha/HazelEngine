@@ -64,7 +64,7 @@ namespace Hazel {
 	void Renderer3D::Init()
 	{
 		m_data = new Renderer3DStorage;
-		DefferedRenderer::Init(1366, 768);//Initilize the Deferred Renderer
+		DefferedRenderer::Init(1920,1080);//Initilize the Deferred Renderer
 
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);
@@ -78,7 +78,7 @@ namespace Hazel {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
-		m_data->reflection = CubeMapReflection::Create();
+		//m_data->reflection = CubeMapReflection::Create();
 		m_data->ssao = std::make_shared<OpenGlSSAO>(1024,1024);
 		m_data->shadow_map = Shadows::Create(4096/2, 4096/2);//create a 2048x2048 shadow map
 		for (int i = 0; i < 4; i++)
@@ -343,6 +343,8 @@ namespace Hazel {
 		DefferedRenderer::GetDeferredPassShader()->Bind();
 		DefferedRenderer::GetDeferredPassShader()->SetInt("diffuse_env", IRR_ENV_SLOT);
 		DefferedRenderer::GetDeferredPassShader()->SetInt("specular_env", ENV_SLOT);
+		DefferedRenderer::GetDeferredPassShader()->SetInt("BRDF_LUT", LUT_SLOT);
+
 	}
 
 	void Renderer3D::RenderShadows(Scene& scene, Camera& camera)

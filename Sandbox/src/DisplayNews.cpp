@@ -159,8 +159,8 @@ void News::OnUpdate()
 		{
 			if (Texture2D::ValidateTexture(path))
 				news_param[i].texture = Texture2D::Create(path);
-			//else
-				//news_param[i].texture = Texture2D::Create("Assets/Textures/Test.png");
+			else
+				news_param[i].texture = Texture2D::Create("Assets/Textures/Test.png");
 		}
 		std::remove(path.c_str());
 	}

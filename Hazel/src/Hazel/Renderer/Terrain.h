@@ -56,7 +56,7 @@ namespace Hazel
 		float ChunkSize = 128.0f;
 		uint32_t foliageBufferIndex;
 	private:
-		ref<Foliage> grass, Tree, Flower;
+		ref<Foliage> grass, Tree, Flower, Fern;
 		int GetChunkIndex(int PosX,int PosZ);
 		void SpawnGrassOnChunks(int PosX, int PosZ, int RadiusOfSpawn = 1);
 		bool HasPlayerMovedFromChunk(int PosX, int PosZ);

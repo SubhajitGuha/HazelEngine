@@ -23,6 +23,7 @@ uniform float u_nearPlane;
 uniform float u_farPlane;
 uniform float u_density;
 uniform float u_gradient;
+uniform vec3 u_fogColor;
 
 in vec2 tcord;
 in vec3 m_pos;
@@ -35,7 +36,7 @@ void main()
     float z_e = 2.0 * u_nearPlane * u_farPlane / (u_farPlane + u_nearPlane - z_n * (u_farPlane - u_nearPlane));
 	float visibility = exp(-pow(z_e*u_density , u_gradient));
 	visibility = clamp(visibility, 0, 1);
-	vec3 skyColor = vec3(0.494,0.78431,0.89019);
+	vec3 skyColor = u_fogColor;
 
 	color = vec4(mix(skyColor, texture(u_sceneColor,tcord).rgb ,visibility), 1.0);
 }

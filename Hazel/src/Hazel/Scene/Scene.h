@@ -48,6 +48,8 @@ namespace Hazel {
 		static float foliage_dist, num_foliage;
 		ref<Bloom> m_Bloom;
 		ref<Fog> m_Fog;
+		float fogDensity=0.00002, fogGradient=1.3;
+		glm::vec3 fogColor = glm::vec3(1,1,1);
 		ref<Terrain> m_Terrain;
 	private:
 		Camera* MainCamera = nullptr;//if there is no main camera Then dont render

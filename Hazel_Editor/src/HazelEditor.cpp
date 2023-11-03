@@ -120,7 +120,6 @@ void  HazelEditor::OnUpdate(float deltatime )
 	m_FrameBuffer->Bind();
 	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
-	//m_scene->PostProcess();
 	m_scene->m_Bloom->Update(deltatime);
 	m_FrameBuffer->UnBind();
 }
@@ -183,7 +182,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Text("diffuse");
 	ImGui::Image((void*)DefferedRenderer::GetBuffers(2), ImVec2(512, 512));
 	ImGui::Text("Roughness metallic");
-	ImGui::Image((void*)DefferedRenderer::GetBuffers(4), ImVec2(512, 512));
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(3), ImVec2(512, 512));
 	ImGui::End();
 
 	ImGui::Begin("Benchmark");
@@ -197,8 +196,10 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Checkbox("Simulate Physics", &Physics3D::SimulatePhysics);
 	//ImGui::DragFloat("Foliage Coverage", &Scene::foliage_dist, 100, 0, 100000, "%8f");
 	//ImGui::DragFloat("Foliage Density", &Scene::num_foliage, 100, 0, 100000, "%8f");
-	ImGui::DragFloat3("2nd Cam Position", glm::value_ptr(Foliage::Showcase_camPosition), 0.1);
-	ImGui::DragFloat3("2nd Cam Rotation", glm::value_ptr(Foliage::Showcase_camRotation), 0.1);
+	
+	ImGui::DragFloat("FOG DENSITY", &m_scene->fogDensity, 0.00001);
+	ImGui::DragFloat("FOG GRADIENT", &m_scene->fogGradient, 0.01);
+	ImGui::ColorEdit3("FOG COLOR", glm::value_ptr(m_scene->fogColor));
 
 	ImGui::End();
 	m_Pannel.OnImGuiRender();

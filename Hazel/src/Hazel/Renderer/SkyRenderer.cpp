@@ -7,9 +7,9 @@ namespace Hazel {
 	ref<SkyRenderer> SkyRenderer::m_skyRenderer = nullptr;
 	SkyType SkyRenderer::m_skyType = SkyType::CUBE_MAP_SKY;
 
-	void SkyRenderer::Initilize()
+	void SkyRenderer::Initilize(const std::string& path)
 	{
-		CubeMapEnvironment::Init();
+		CubeMapEnvironment::Init(path);
 		Atmosphere::InitilizeAtmosphere();
 	}
 

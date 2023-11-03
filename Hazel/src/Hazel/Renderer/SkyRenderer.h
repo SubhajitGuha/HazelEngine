@@ -10,7 +10,9 @@ namespace Hazel
 	class SkyRenderer {
 	public:
 		static void SetSkyType(SkyType type) { m_skyType = type; }
-		static void Initilize();
+		//use path if the sky type is a cube map
+		static void Initilize(const std::string& path = "");
+
 		static void RenderSky(Camera& camera);
 	private:
 		static ref<SkyRenderer> m_skyRenderer;

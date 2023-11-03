@@ -297,7 +297,7 @@ void SandBox2dApp::OnUpdate(float deltatime)
 	if (isWindowFocused)
 		m_camera.OnUpdate(deltatime);
 
-	news->OnUpdate();
+	news->OnUpdate(); //not working!!
 	//draw lines at cursor tip
 	//use y= mx+c 
 	//straight line parallel to y axis is x = k; where k= some constant(here mouse x position)

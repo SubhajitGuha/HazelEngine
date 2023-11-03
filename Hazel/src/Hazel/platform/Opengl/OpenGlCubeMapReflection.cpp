@@ -47,7 +47,7 @@ namespace Hazel {
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		HAZEL_CORE_WARN(glGetError());
 
-		glBindTextureUnit(IRR_ENV_SLOT, tex_id);
+		//glBindTextureUnit(IRR_ENV_SLOT, tex_id);
 	}
 
 	void OpenGlCubeMapReflection::RenderToCubeMap(Scene& scene)

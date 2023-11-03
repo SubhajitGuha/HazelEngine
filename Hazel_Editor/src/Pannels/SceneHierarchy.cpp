@@ -459,7 +459,7 @@ namespace Hazel {
 			}
 			if (ImGui::Button("Flower", { 100,30 }))
 			{
-				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Flower);
+				m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Fern->GetLOD(1));
 				m_selected_entity->GetComponent<StaticMeshComponent>().isFoliage = true;
 			}
 			if (ImGui::Checkbox("Is Foliage?", &m_selected_entity->GetComponent<StaticMeshComponent>().isFoliage))

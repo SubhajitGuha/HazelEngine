@@ -41,6 +41,7 @@ namespace Hazel
 		m_fogShader->SetFloat("u_farPlane", cam.GetPerspectiveFar());
 		m_fogShader->SetFloat("u_density", m_density);
 		m_fogShader->SetFloat("u_gradient", m_gradient);
+		m_fogShader->SetFloat3("u_fogColor", m_fogColor);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferID);
 		glViewport(0, 0, m_screenSize.x, m_screenSize.y);

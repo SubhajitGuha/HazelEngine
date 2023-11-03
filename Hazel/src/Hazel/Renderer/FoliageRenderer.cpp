@@ -52,6 +52,8 @@ namespace Hazel {
 
 	void Foliage::RenderFoliage(Camera& cam, float radius)
 	{
+		float fov = cam.GetVerticalFOV();
+		cam.SetVerticalFOV(fov * 2);
 		if (!bHasSpawnned)
 			SpawnFoliage(cam.GetCameraPosition(), radius);
 
@@ -68,6 +70,7 @@ namespace Hazel {
 		std::cout << "Tot foliage === " << *(int*)val << std::endl;
 		renderedInstanceCount = *(int*)val;
 		CreateLODs(cam);
+		cam.SetVerticalFOV(fov);
 
 		Renderer3D::BeginSceneFoliage(cam);
 		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);
@@ -79,6 +82,8 @@ namespace Hazel {
 
 	void Foliage::RenderFoliage(Camera& cam)
 	{
+		float fov = cam.GetVerticalFOV();
+		cam.SetVerticalFOV(fov * 2);
 		//choose LOD here;
 		SpawnFoliage(cam.GetCameraPosition());
 
@@ -95,6 +100,7 @@ namespace Hazel {
 		std::cout<< *(int*)val << std::endl;
 		renderedInstanceCount = *(int*)val;
 		CreateLODs(cam);
+		cam.SetVerticalFOV(fov);
 
 		Renderer3D::BeginSceneFoliage(cam);
 		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);	//render lod0 elements

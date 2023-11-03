@@ -72,19 +72,22 @@ float cumulus = 0.8;
 
    vec3 ColorCorrection(vec3 incolor)
    {
-   	incolor = clamp(incolor,0,1);
-   	incolor = pow(incolor, vec3(1.0/2.2)); //Gamma correction
-   
-   	incolor = clamp(incolor,0,1);
-   	incolor = vec3(1.0) - exp(-incolor * 3);//exposure
-   
-   	incolor = clamp(incolor,0,1);
-   	incolor = mix(vec3(dot(incolor,vec3(0.299,0.587,0.114))), incolor,1.0);//saturation
-   
-   	incolor = clamp(incolor,0,1);
-   	incolor = 1.0*(incolor-0.5) + 0.5 + 0.00 ; //contrast
-   
-   	return incolor;
+        //HDR Tone mapping
+	    incolor = incolor / (incolor + vec3(1.0));
+
+    	//incolor = clamp(incolor,0,1);
+    	incolor = pow(incolor, vec3(1.0/2.2)); //Gamma correction
+    
+    	//incolor = clamp(incolor,0,1);
+    	incolor = vec3(1.0) - exp(-incolor * 3);//exposure
+    
+    	//incolor = clamp(incolor,0,1);
+    	incolor = mix(vec3(dot(incolor,vec3(0.299,0.587,0.114))), incolor,1.1);//saturation
+    
+    	//incolor = clamp(incolor,0,1);
+    	incolor = 1.2*(incolor-0.5) + 0.5 + 0.00 ; //contrast
+    
+    	return incolor;
     }
 
   void main()

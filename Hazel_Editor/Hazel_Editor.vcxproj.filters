@@ -129,5 +129,9 @@
     <None Include="Assets\Shaders\cs_GrassPlacement.glsl" />
     <None Include="Assets\Shaders\pp_fogShader.glsl" />
     <None Include="Assets\Shaders\cs_CreateLODs.glsl" />
+    <None Include="Assets\Shaders\equirectangularToCube_shader.glsl" />
+    <None Include="Assets\Shaders\irradianceCubeMapShader.glsl" />
+    <None Include="Assets\Shaders\IBL_preFilteredSpecularMap.glsl" />
+    <None Include="Assets\Shaders\IBL_brdfSum.glsl" />
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@ using namespace Hazel;
 struct NewsParameters {
 	std::string summary = "",
 		title = "", url = "", banner_image = "";
-	ref<Texture2D > texture = nullptr;
+	ref<Texture2D > texture;
 };
 
 class News

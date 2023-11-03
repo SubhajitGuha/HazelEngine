@@ -73,5 +73,6 @@ void main()
 	gPosition = vec4(m_pos.xyz,1.0);
 	gNormal = vec4(NormalMapping(index),1.0);
 	gColor = vec4(texture(u_Albedo,vec3(tcord,index)).rgb * m_color.rgb, 1.0);
-	gRoughnessMetallic = vec4(texture(u_Roughness,vec3(tcord,index)).r*Roughness,Metallic,1,1);
+	vec3 roughnessMetallic = texture(u_Roughness,vec3(tcord,index)).xyz;
+	gRoughnessMetallic = vec4(roughnessMetallic.r * Roughness,roughnessMetallic.g * Metallic,1,1);
 }

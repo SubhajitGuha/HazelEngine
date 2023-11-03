@@ -28,9 +28,9 @@ namespace Hazel {
 	void Atmosphere::RenderQuad(const glm::mat4& view, const glm::mat4& proj)
 	{
 		//this function renders a quad infront of the camera
-		glDepthMask(GL_FALSE);//disable depth testing
+		glDepthMask(GL_FALSE);//disable writing to depth buffer
 
-		auto inv = glm::inverse(proj * glm::mat4(glm::mat3(view)));//get inverse of projection view to convert cannonical view to world space
+		glm::mat4 inv = glm::inverse(proj * glm::mat4(glm::mat3(view)));//get inverse of projection view to convert cannonical view to world space
 		glm::vec4 data[] = {
 		glm::vec4(-1,-1,0,1),inv * glm::vec4(-1,-1,0,1),
 		glm::vec4(1,-1,0,1),inv * glm::vec4(1,-1,0,1),
@@ -54,6 +54,6 @@ namespace Hazel {
 
 		RenderCommand::DrawIndex(*vao);
 
-		glDepthMask(GL_TRUE);//again enable depth testing
+		glDepthMask(GL_TRUE);//again enable depth buffer write
 	}
 }

@@ -35,7 +35,7 @@ namespace Hazel {
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
 		Physics3D::Initilize();
 		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
-		SkyRenderer::Initilize();
+		SkyRenderer::Initilize("Assets/Textures/HDR/rainforest_trail_4k.hdr");
 
 		Renderer3D::Init();
 		Renderer2D::Init();
@@ -44,29 +44,32 @@ namespace Hazel {
 
 		Flower = new LoadMesh("Assets/Meshes/flower.fbx");
 		Flower->CreateLOD("Assets/Meshes/flower_LOD1.fbx");
-		Sphere = new LoadMesh("Assets/Meshes/Sphere.fbx");
+		Sphere = new LoadMesh("Assets/Meshes/Ak_47.fbx");
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
-		Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
+		//Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
 		Tree = new LoadMesh("Assets/Meshes/HZ_Pine1.fbx");
 		Tree->CreateLOD("Assets/Meshes/HZ_Pine1_LOD1.fbx");
 		Grass = new LoadMesh("Assets/Meshes/grass3.fbx");
 		Grass->CreateLOD("Assets/Meshes/grass3_LOD1.fbx");
-		plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
+		//plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
 		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
-		Fern = new LoadMesh("Assets/Meshes/Tree.fbx");
-		Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
-		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
+		Fern = new LoadMesh("Assets/Meshes/Fern.fbx");
+		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.fbx");
+
+		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
+		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
 		Renderer3D::SetUpCubeMapReflections(*this);
+		editor_cam.SetVerticalFOV(45.f);
 		editor_cam.SetPerspectiveFar(10000);
 		editor_cam.SetViewportSize(1920/1080);
 		m_Terrain = std::make_shared<Terrain>(2048,2048);
 		//initilize Bloom
 		m_Bloom = Bloom::Create();
-		m_Bloom->GetFinalImage(0, { 1024,1024 });
+		m_Bloom->GetFinalImage(0, { 1920,1080 });
 		m_Bloom->InitBloom();
 
-		m_Fog = Fog::Create(0.00001, 1.3, 30, 5000);
+		m_Fog = Fog::Create(fogDensity, fogGradient, 30, 5000, { 1920,1080 });
 	}
 	Scene::~Scene()
 	{
@@ -92,7 +95,8 @@ namespace Hazel {
 	void Scene::OnUpdate(TimeStep ts)
 	{
 		MainCamera = nullptr;//if there is no main camera Then dont render
-		
+		m_Fog->SetFogParameters(fogDensity, fogGradient, fogColor);
+
 		//update camera , Mesh Forward vectors....
 		auto view = m_registry.view<CameraComponent>();
 		for (auto entt : view) {

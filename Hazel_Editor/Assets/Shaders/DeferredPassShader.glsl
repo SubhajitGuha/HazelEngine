@@ -31,8 +31,11 @@ uniform sampler2D ShadowMap[4];
 uniform float Ranges[5];
 uniform mat4 view;
 uniform mat4 u_ProjectionView;
+
+//IBL
 uniform samplerCube diffuse_env;
 uniform samplerCube specular_env;
+uniform sampler2D BRDF_LUT;
 
 uniform sampler2D SSAO;
 uniform vec3 EyePosition;
@@ -52,12 +55,12 @@ vec3 radiance;
 
 vec3 ks;
 vec3 kd;
-float vdoth;
+vec3 F0;
 
 float alpha = 0; //Roughness value
 float Metallic = 0;
 const float PI = 3.14159265359;
-#define MAX_MIP_LEVEL 28
+#define MAX_MIP_LEVEL 4
 
 int level = 3; // cascade levels
 
@@ -97,16 +100,13 @@ float Geometry_GGX(float dp) //dp = Dot Product
 }
 
 vec3 Fresnel(float VdotH)
-{
-	vec3 f0;
+{	
+	return F0 + (1.0 - F0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+}
 
-	if(Metallic == 0.0)
-		f0 = vec3(0.04); // for non metallic
-	else
-		f0 = vec3(0.4); // for metallic
-	//return f0 + (1.0 - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
-	//greater roughness = lesser fresnel value
-	return f0 + (max(vec3(1.0- alpha),f0) - f0) * pow(clamp(1.0 - VdotH, 0.0 ,1.0) , 5.0);
+vec3 FresnelSchlickRoughness(float VdotH, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
 }
 
 vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
@@ -116,8 +116,6 @@ vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
 	float NdotV = max(dot(Normal,ViewDir) , 0.000001);
 	float NdotL = max(dot(Normal,LightDir) , 0.000001);
 	float VdotH = max(dot(ViewDir,Half) , 0.0);
-
-	vdoth = VdotH;
 
 	float Dggx = NormalDistribution_GGX(NdotH);
 	float Gggx = Geometry_GGX(NdotV) * Geometry_GGX(NdotL);
@@ -130,17 +128,20 @@ vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
 
 vec3 ColorCorrection(vec3 color)
 {
-	color = clamp(color,0,1);
+	//HDR Tone mapping
+	color = color / (color + vec3(1.0));
+
+	//color = clamp(color,0,1);
 	color = pow(color, vec3(1.0/2.2)); //Gamma correction
 
-	color = clamp(color,0,1);
+	//color = clamp(color,0,1);
 	color = vec3(1.0) - exp(-color * 3);//exposure
 
-	color = clamp(color,0,1);
-	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.0);//saturation
+	//color = clamp(color,0,1);
+	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.1);//saturation
 
-	color = clamp(color,0,1);
-	color = 1.0*(color-0.5) + 0.5 + 0.00 ; //contrast
+	//color = clamp(color,0,1);
+	color = 1.2*(color-0.5) + 0.5 + 0.00 ; //contrast
 
 	return color;
 }
@@ -159,8 +160,6 @@ void main()
 
 	alpha = RoughnessMetallic.r;
 	Metallic = RoughnessMetallic.g;
-	//ao = texture(u_Roughness , vec3(tcord,index)).b;
-	//to do metallic in Green channel
 
 	vec4 vert_pos = view * m_pos; //get depth value(z value) in the camera-view space
 	vec3 v_position = vert_pos.xyz/vert_pos.w;
@@ -180,38 +179,45 @@ void main()
 	vec3 DirectionalLight_Direction = normalize(-DirectionalLight_Direction );//for directional light as it has no concept of position
 	vec3 EyeDirection = normalize( EyePosition - m_pos.xyz);
 
-	float visibility = exp(-pow(distance(EyePosition,m_pos.xyz) * 0.003, 5));
-	visibility = clamp(visibility,0,1);
-	vec3 skyColor = vec3(0.494,0.78431,0.89019);
-
 	//shadows
 	float shadow = CalculateShadow(level);
 
 	//diffuse_environment reflections
 	vec3 Light_dir_i = reflect(-EyeDirection,Modified_Normal);
-	//vec3 diffuse_environmentCol = texture(diffuse_env,Light_dir_i).xyz * (1.0 - alpha) ;
 
-	vdoth = max(dot( EyeDirection, normalize( EyeDirection + DirectionalLight_Direction)) ,0.0);//for directional light
-	ks = Fresnel(vdoth);
+	//F0 is 0.04 for non-metallic and albedo for metallics 
+	F0 = vec3(0.04);
+	F0 = mix(F0, m_Color.xyz, Metallic);
+	
+//------------------------------------ambient-----------------------------------------------------------------
+	float ndotv = max(dot( EyeDirection, Modified_Normal),0.0);//for directional light
+	
+	ks = FresnelSchlickRoughness(ndotv, alpha);
 	kd = vec3(1.0) - ks;
 	kd *= (1.0 - Metallic);
 
 	vec3 IBL_diffuse =  texture(diffuse_env,Modified_Normal).rgb * kd; //sampling the irradiance map
-	vec3 BRDFintegration =  ks*alpha + max(dot(Modified_Normal,DirectionalLight_Direction),0.001) ;// we preapare the multiplication factor by the roughness and the NdotL value
-	vec3 IBL_specular = textureLod(specular_env,Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * BRDFintegration ; //sample the the environment map at varying mip level
+	vec2 BRDFintegration =  texture(BRDF_LUT, vec2(max(dot(Modified_Normal , EyeDirection), 0.0), alpha)).rg;// we preapare the multiplication factor by the roughness and the NdotL value
+	vec3 IBL_specular = textureLod(specular_env, Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * (ks * BRDFintegration.x + BRDFintegration.y); //sample the the environment map at varying mip level
 	
 	//ambiance
-		vec3 ambiant = (IBL_diffuse + IBL_specular)* m_Color.xyz * texture(SSAO,tcord).r;
+		vec3 ambiant = (IBL_diffuse * m_Color.xyz + IBL_specular) * texture(SSAO,tcord).r;
 
+//----------------------------------Sun Light-------------------------------------------------------------------
+	float vdoth = max(dot(EyeDirection, normalize(DirectionalLight_Direction + EyeDirection)),0.0);
+	ks = Fresnel(vdoth);
+	kd = vec3(1.0) - ks;
+	kd *= (1.0 - Metallic);
 	PBR_Color += ( (kd * m_Color.xyz / PI) + SpecularBRDF(DirectionalLight_Direction , EyeDirection , Modified_Normal) ) * (shadow * SunLight_Color * SunLight_Intensity) * max(dot(Modified_Normal,DirectionalLight_Direction), 0.001) ; //for directional light (no attenuation)
 
+//--------------------------------Point Lights------------------------------------------------------------------
 	for(int i=0 ; i< Num_PointLights ; i++)
 	{
 		vec3 LightDirection = normalize(PointLight_Position[i] - m_pos.xyz/m_pos.w); //for point light
-
+		vec3 H = normalize(LightDirection + EyeDirection); //Half vector
 		//specular
 		vec3 specular = SpecularBRDF(LightDirection , EyeDirection ,Modified_Normal) ;
-		ks = Fresnel(vdoth);
+		ks = Fresnel(max(dot(H,EyeDirection),0.0)); //VdotH
 
 		//diffuse
 		kd = vec3(1.0) - ks;
@@ -228,8 +234,6 @@ void main()
 
 	PBR_Color += ambiant;
 
-	//PBR_Color = mix(skyColor, PBR_Color, visibility);
-	//PBR_Color = PBR_Color / (PBR_Color + vec3(0.50));
 	PBR_Color = clamp(ColorCorrection(PBR_Color),0.0,1.0);
 
 	color = vec4(PBR_Color,1.0);
