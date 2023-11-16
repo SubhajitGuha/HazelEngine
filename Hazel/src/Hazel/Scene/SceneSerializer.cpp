@@ -5,6 +5,7 @@
 #include "Hazel/Physics/Physics3D.h"
 #include "PointLight.h"
 #include "yaml-cpp/yaml.h"
+#include "Hazel/Renderer/Material.h"
 
 namespace YAML {
 
@@ -205,6 +206,25 @@ namespace Hazel {
 		std::ofstream output(filepath);
 		output << out.c_str();
 	}
+	void SceneSerializer::SerializeMaterial(const std::string& filepath, Material& material)
+	{
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Material ID" << YAML::Value << material.materialID;
+		out << YAML::Key << "Color" << YAML::Value << material.GetColor();
+		out << YAML::Key << "Roughness" << YAML::Value << material.GetRoughness();
+		out << YAML::Key << "Metallic" << YAML::Value << material.GetMetalness();
+		out << YAML::Key << "Normal Strength" << YAML::Value << material.GetNormalStrength();
+		out << YAML::Key << "Emission" << YAML::Value << material.GetEmission();
+		out << YAML::Key << "Albedo Map" << YAML::Value << material.GetAlbedoPath();
+		out << YAML::Key << "Normal Map" << YAML::Value << material.GetNormalPath();
+		out << YAML::Key << "Roughness Map" << YAML::Value << material.GetRoughnessPath();
+		out << YAML::Key << "Shader Path" << YAML::Value <<"TODO";
+		out << YAML::EndMap;
+
+		std::ofstream output(filepath);
+		output << out.c_str();
+	}
 	void SceneSerializer::SerializeRuntime(const std::string& filepath)
 	{
 	}
@@ -375,12 +395,37 @@ namespace Hazel {
 			}
 		}
 	}
+	void SceneSerializer::DeSerializeMaterial(const std::string& filepath, Material& material)
+	{
+		std::ifstream inputfile(filepath);
+		YAML::Node data = YAML::Load(inputfile);
+
+		HZ_ASSERT(data["Material ID"], "Invalid key");
+		HZ_ASSERT(data["Color"], "Invalid key");
+		HZ_ASSERT(data["Roughness"], "Invalid key");
+		HZ_ASSERT(data["Metallic"], "Invalid key");
+		HZ_ASSERT(data["Emission"], "Invalid key");
+		HZ_ASSERT(data["Normal Strength"], "Invalid key");
+		HZ_ASSERT(data["Albedo Map"], "Invalid key");
+		HZ_ASSERT(data["Normal Map"], "Invalid key");
+		HZ_ASSERT(data["Roughness Map"], "Invalid key");
+
+		material.materialID = data["Material ID"].as<uint64_t>();
+		glm::vec3 color = data["Color"].as<glm::vec3>();
+		float roughness = data["Roughness"].as<float>();
+		float metallic = data["Metallic"].as<float>();
+		float normal_strength = data["Normal Strength"].as<float>();
+		float emission = data["Emission"].as<float>();
+		material.SetEmission(emission);
+		material.SetMaterialAttributes(color, roughness, metallic, normal_strength);
+		std::string albedo_path = data["Albedo Map"].as<std::string>();
+		std::string normal_path = data["Normal Map"].as<std::string>();
+		std::string roughness_path = data["Roughness Map"].as<std::string>();
+		material.SetTexturePaths(albedo_path, normal_path, roughness_path);
+		//TODO Shader
+
+	}
 	void SceneSerializer::DeSerializeRuntime(const std::string& filepath)
 	{
-	}
-
-	static void LoadMeshes(const std::string& path, LoadMesh* mesh)
-	{
-		mesh = new LoadMesh(path);
 	}
 }

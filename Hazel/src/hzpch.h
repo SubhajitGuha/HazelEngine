@@ -17,6 +17,7 @@
 #include <random>
 #include <typeinfo>
 #include <future>
+#include <filesystem>
 
 #ifdef HZ_PLATFORM_WINDOWS
 //#include <windows.h>

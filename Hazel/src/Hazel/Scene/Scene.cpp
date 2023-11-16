@@ -17,6 +17,7 @@
 #include "Hazel/Renderer/SkyRenderer.h"
 #include "Hazel/Renderer/Terrain.h"
 #include "Hazel/Renderer/Fog.h"
+#include "Hazel/Renderer/Material.h"
 
 namespace Hazel {
 	
@@ -41,6 +42,8 @@ namespace Hazel {
 		Renderer2D::Init();
 
 		auto viewportSize = { 1920,1080 };// RenderCommand::GetViewportSize();
+
+		Material::DeserializeMaterial();// load all materials from the disc
 
 		Flower = new LoadMesh("Assets/Meshes/flower.fbx");
 		Flower->CreateLOD("Assets/Meshes/flower_LOD1.fbx");

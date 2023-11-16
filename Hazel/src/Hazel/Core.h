@@ -15,6 +15,8 @@
 	#error Hazel only supports windows
 #endif // HZ_PLATFORM_WINDOWS
 
+#define HZ_DEBUG
+
 #ifdef HZ_DEBUG
 	#if HZ_PLATFORM_WINDOWS
 		#define HZ_DEBUGBREAK() __debugbreak()
@@ -26,7 +28,7 @@
 #define HZ_DEBUGBREAK()
 #endif // HZ_DEBUG
 
-#ifdef HZ_ENABLE_ASSERTS
+#ifdef HZ_DEBUG
 #define HZ_ASSERT(x,...) { if(!(x)) { HAZEL_ERROR("Assertion Failed: {0}", __VA_ARGS__); HZ_DEBUGBREAK(); } }
 #else
 #define HZ_ASSERT(x, ...)

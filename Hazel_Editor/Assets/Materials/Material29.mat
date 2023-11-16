@@ -1,0 +1,10 @@
+Material ID: 1876070562
+Color: [1, 1, 1]
+Roughness: 1
+Metallic: 0
+Normal Strength: 1
+Emission: 1
+Albedo Map: Assets/Textures/MeshTextures/cityHouse_Wire03_BaseColor.jpg
+Normal Map: Assets/Textures/MeshTextures/cityHouse_Wire03_Normal.jpg
+Roughness Map: Assets/Textures/MeshTextures/cityHouse_Wire03_Roughness.jpg
+Shader Path: TODO

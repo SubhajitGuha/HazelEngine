@@ -169,14 +169,14 @@ namespace Hazel {
 			TriMeshDesc.triangles.count = indices.size();
 			TriMeshDesc.triangles.data = &indices[0];
 			TriMeshDesc.triangles.stride = 3 * sizeof(unsigned int);
-			HZ_ASSERT(!TriMeshDesc.isValid());
+			HZ_ASSERT(!TriMeshDesc.isValid(),"Not valid");
 			
 			//cook the triangle mesh
 			physx::PxDefaultMemoryOutputStream outBuffer;
 			
 			physx::PxTriangleMeshCookingResult::Enum cookingResult;
 			bool validate = m_cooking->validateTriangleMesh(TriMeshDesc);
-			HZ_ASSERT(!validate);
+			HZ_ASSERT(!validate, "Not Valid");
 			if (!m_cooking->cookTriangleMesh(TriMeshDesc, outBuffer, &cookingResult))
 				HAZEL_CORE_ERROR("Cannot cook the triangle mesh!!");
 
