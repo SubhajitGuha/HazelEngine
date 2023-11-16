@@ -4,18 +4,19 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "Hazel/Renderer/Material.h"
 
 namespace Hazel {
 	LoadMesh::LoadMesh()
 	{
 	}
 	LoadMesh::LoadMesh(const std::string& Path)
-		:Vertices(0),Normal(0),TexCoord(0)
 	{
 		GlobalTransform = glm::mat4(1.0);
 		m_path = Path;	
 		if (m_LOD.size() == 0)
 			m_LOD.push_back(this);
+
 		LoadObj(Path);
 	}
 	LoadMesh::~LoadMesh()
@@ -36,6 +37,9 @@ namespace Hazel {
 		ProcessNode(scene->mRootNode, scene);
 		ProcessMesh();
 		CreateStaticBuffers();
+
+		m_Mesh.clear();
+		m_Mesh.shrink_to_fit();
 	}
 
 	void LoadMesh::CreateLOD(const std::string& Path)
@@ -80,18 +84,18 @@ namespace Hazel {
 		for (int i = 0; i < m_Mesh.size(); i++)
 		{
 			unsigned int material_ind = m_Mesh[i]->mMaterialIndex;
+			m_subMeshes[material_ind].numVertices = m_Mesh[i]->mNumVertices;
+
 			for (int k = 0; k < m_Mesh[i]->mNumVertices; k++) 
-			{
-				Material_Index.push_back(material_ind);
-				
+			{				
 				aiVector3D aivertices = m_Mesh[i]->mVertices[k];
 				glm::vec4 pos = GlobalTransform * glm::vec4(aivertices.x, aivertices.y, aivertices.z, 1.0);
-				Vertices.push_back({ pos.x,pos.y,pos.z });
+				m_subMeshes[material_ind].Vertices.push_back({ pos.x,pos.y,pos.z });
 
 				if (m_Mesh[i]->HasNormals()) {
 					aiVector3D ainormal = m_Mesh[i]->mNormals[k];
 					glm::vec4 norm = GlobalTransform * glm::vec4(ainormal.x, ainormal.y, ainormal.z, 0.0);
-					Normal.push_back({ norm.x,norm.y,norm.z });
+					m_subMeshes[material_ind].Normal.push_back({ norm.x,norm.y,norm.z });
 				}
 
 				glm::vec2 coord(0.0f);
@@ -100,10 +104,10 @@ namespace Hazel {
 					coord.x = m_Mesh[i]->mTextureCoords[0][k].x;
 					coord.y = m_Mesh[i]->mTextureCoords[0][k].y;
 
-					TexCoord.push_back(coord);
+					m_subMeshes[material_ind].TexCoord.push_back(coord);
 				}
 				else
-					TexCoord.push_back(coord);
+					m_subMeshes[material_ind].TexCoord.push_back(coord);
 
 				if (m_Mesh[i]->HasTangentsAndBitangents())
 				{
@@ -112,53 +116,55 @@ namespace Hazel {
 					glm::vec4 tan = GlobalTransform * glm::vec4(tangent.x, tangent.y, tangent.z, 0.0);
 					glm::vec4 bitan = GlobalTransform * glm::vec4(bitangent.x, bitangent.y, bitangent.z, 0.0);
 
-					Tangent.push_back({ tan.x, tan.y, tan.z });
-					BiTangent.push_back({ bitan.x,bitan.y,bitan.z });
+					m_subMeshes[material_ind].Tangent.push_back({ tan.x, tan.y, tan.z });
+					m_subMeshes[material_ind].BiTangent.push_back({ bitan.x,bitan.y,bitan.z });
 					//m_Mesh[i]->biTange
 				}
 				else
 				{
-					Tangent.push_back({ 0,0,0 });
-					BiTangent.push_back({ 0,0,0 });
+					m_subMeshes[material_ind].Tangent.push_back({ 0,0,0 });
+					m_subMeshes[material_ind].BiTangent.push_back({ 0,0,0 });
 				}
 			}
-			for (int k = 0; k < m_Mesh[i]->mNumFaces; k++)
-			{
-				aiFace face = m_Mesh[i]->mFaces[k];
-				for (int j = 0; j < face.mNumIndices; j++)
-					Vertex_Indices.push_back(face.mIndices[j]);
-			}
+			//for (int k = 0; k < m_Mesh[i]->mNumFaces; k++)
+			//{
+			//	aiFace face = m_Mesh[i]->mFaces[k];
+			//	for (int j = 0; j < face.mNumIndices; j++)
+			//		Vertex_Indices.push_back(face.mIndices[j]);
+			//}
 		}
 	}
 	void LoadMesh::ProcessMaterials(const aiScene* scene)//get all the materials in a scene
 	{
 		int NumMaterials = scene->mNumMaterials;
+		m_subMeshes.resize(NumMaterials);
 
 		std::string relative_path = "Assets/Textures/MeshTextures/";
-		auto CreateTextureArray = [&](ref<Texture2DArray>& texture, aiTextureType type) 
+		auto GetTexturePath = [&](int index,aiTextureType type) 
 		{
-			std::vector<std::string> texture_path;
-			for (int k = 0; k < NumMaterials; k++)
+			aiMaterial* material = scene->mMaterials[index];
+			auto x = material->GetTextureCount(type);
+			if (x > 0)
 			{
-				aiMaterial* material = scene->mMaterials[k];
-
-				auto x = material->GetTextureCount(type);
-				if (x > 0)
-				{
-					aiString str;
-					material->GetTexture(type, 0, &str);
-					std::string absolute_path = str.data;
-					
-					texture_path.push_back(relative_path + absolute_path.substr(absolute_path.find_last_of("\\")+1));
-				}
+				aiString str;
+				material->GetTexture(type, 0, &str);
+				std::string absolute_path = str.data;
+				
+				return (relative_path + absolute_path.substr(absolute_path.find_last_of("\\")+1));
 			}
-			ref<Texture2DArray> tex = Texture2DArray::Create(texture_path, NumMaterials);
-			texture = tex;//load the diffuse textures
+			return std::string("");
 		};
-		CreateTextureArray(Diffuse_Texture, aiTextureType_DIFFUSE);
-		CreateTextureArray(Normal_Texture, aiTextureType_NORMALS);
-		CreateTextureArray(Roughness_Texture, aiTextureType_SHININESS);
+		for (int i = 0; i < NumMaterials; i++)
+		{
+			m_subMeshes[i].m_Material = Material::Create();
 
+			std::string diffuse_path = GetTexturePath(i,aiTextureType_DIFFUSE);
+			std::string normal_path = GetTexturePath(i, aiTextureType_NORMALS);
+			std::string roughness_path = GetTexturePath(i, aiTextureType_SHININESS);
+
+			m_subMeshes[i].m_Material->SetTexturePaths(diffuse_path, normal_path, roughness_path);
+			m_subMeshes[i].m_Material->SerializeMaterial(""); //save the material
+		}
 	}
 	void LoadMesh::CalculateTangent()
 	{
@@ -167,29 +173,30 @@ namespace Hazel {
 	}
 	void LoadMesh::CreateStaticBuffers()
 	{
-		std::vector<VertexAttributes> buffer(Vertices.size());
-		VertexArray = VertexArray::Create();
-
-		for (int i = 0; i < Vertices.size(); i++)
+		for (int k = 0; k < m_subMeshes.size(); k++)
 		{
-			glm::vec3 transformed_normals = (Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-			glm::vec3 transformed_tangents = (Tangent[i]);
-			glm::vec3 transformed_binormals = (BiTangent[i]);
-			buffer[i] = (VertexAttributes(glm::vec4(Vertices[i], 1.0), TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals, Material_Index[i]));
+			std::vector<VertexAttributes> buffer(m_subMeshes[k].Vertices.size());
+			m_subMeshes[k].VertexArray = VertexArray::Create();
+
+			for (int i = 0; i < m_subMeshes[k].Vertices.size(); i++)
+			{
+				glm::vec3 transformed_normals = (m_subMeshes[k].Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
+				glm::vec3 transformed_tangents = (m_subMeshes[k].Tangent[i]);
+				glm::vec3 transformed_binormals = (m_subMeshes[k].BiTangent[i]);
+				buffer[i] = (VertexAttributes(glm::vec4(m_subMeshes[k].Vertices[i], 1.0), m_subMeshes[k].TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals));
+			}
+
+			vb = VertexBuffer::Create(&buffer[0].Position.x, sizeof(VertexAttributes) * m_subMeshes[k].Vertices.size());
+
+			bl = std::make_shared<BufferLayout>(); //buffer layout
+
+			bl->push("position", DataType::Float4);
+			bl->push("TexCoord", DataType::Float2);
+			bl->push("Normal", DataType::Float3);
+			bl->push("Tangent", DataType::Float3);
+			bl->push("BiTangent", DataType::Float3);
+
+			m_subMeshes[k].VertexArray->AddBuffer(bl, vb);
 		}
-
-		vb = VertexBuffer::Create(&buffer[0].Position.x,sizeof(VertexAttributes) * Vertices.size());
-
-		bl = std::make_shared<BufferLayout>(); //buffer layout
-
-		bl->push("position", DataType::Float4);
-		bl->push("TexCoord", DataType::Float2);
-		bl->push("Normal", DataType::Float3);
-		bl->push("Tangent", DataType::Float3);
-		bl->push("BiTangent", DataType::Float3);
-		bl->push("Material_Index", DataType::Int);
-		
-
-		VertexArray->AddBuffer(bl, vb);
 	}
 }

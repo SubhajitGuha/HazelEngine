@@ -150,7 +150,7 @@ namespace Hazel {
 					glDisable(GL_CULL_FACE);
 					uint32_t bufferID = foliage->GetBufferID_LOD0();
 					Renderer3D::InstancedFoliageData(*foliage->GetMesh(), bufferID);
-					RenderCommand::DrawInstancedArrays(*foliage->GetMesh()->VertexArray, foliage->GetMesh()->Vertices.size(), foliage->NumLOD0);
+					Renderer3D::DrawFoliageInstanced(*foliage->GetMesh(), glm::mat4(1.0), foliage->NumLOD0);
 					glEnable(GL_CULL_FACE);
 					glCullFace(GL_BACK);
 				}
@@ -190,7 +190,7 @@ namespace Hazel {
 
 			//Renderer3D::BeginSceneFoliage(cam);
 			//Renderer3D::DrawFoliageInstanced(*mesh, glm::mat4(1.0), numMeshes, { 1,1,1,1 }, Terrain::time);
-			RenderCommand::DrawInstancedArrays(*mesh->VertexArray, mesh->Vertices.size(), numMeshes);
+			Renderer3D::DrawFoliageInstanced(*mesh, glm::mat4(1.0), numMeshes);
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glViewport(0, 0, size.x, size.y);

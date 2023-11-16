@@ -5,8 +5,7 @@ layout (location = 1) in vec2 cord;
 layout (location = 2) in vec3 Normal;
 layout (location = 3) in vec3 Tangent;
 layout (location = 4) in vec3 BiTangent;
-layout (location = 5) in float materialindex;
-layout (location = 6) in mat4 instance_mm;
+layout (location = 5) in mat4 instance_mm;
 
 out vec2 tcord;
 out vec4 m_pos;
@@ -14,7 +13,6 @@ out vec3 m_Normal;
 out vec3 m_Tangent;
 out vec3 m_BiTangent;
 out vec3 m_VertexColor;
-flat out float m_materialindex;
 
 uniform mat4 u_ProjectionView;
 uniform mat4 u_View;
@@ -94,7 +92,6 @@ void main()
 
 	//m_VertexColor = factor * m_color.xyz;
 	m_VertexColor = m_color.xyz;
-	m_materialindex = materialindex;
 	tcord = cord;
 	m_Normal = normalize(mat3(u_View * wsGrass ) * Normal );
 	m_Tangent = normalize(mat3(u_View * wsGrass ) * Tangent );
@@ -119,16 +116,15 @@ in vec3 m_Normal;
 in vec3 m_Tangent;
 in vec3 m_BiTangent;
 in vec3 m_VertexColor;
-flat in float m_materialindex;
 in vec2 tcord;
 
 
 uniform samplerCube diffuse_env;
 uniform samplerCube specular_env;
 
-uniform sampler2DArray u_Albedo;
-uniform sampler2DArray u_Roughness;
-uniform sampler2DArray u_NormalMap;
+uniform sampler2D u_Albedo;
+uniform sampler2D u_Roughness;
+uniform sampler2D u_NormalMap;
 uniform vec4 m_color;
 
 //PBR properties
@@ -144,9 +140,9 @@ int level = 3; // cascade levels
 float NdotL = 1.0;
 
 
-vec3 NormalMapping(int index) // index implies which material index normal map to use
+vec3 NormalMapping()
 {
-	vec3 normal = texture(u_NormalMap , vec3(tcord,index)).rgb;
+	vec3 normal = texture(u_NormalMap , tcord).rgb;
 	normal = normal*2.0 - 1.0;
 	mat3 TBN = mat3(m_Tangent , m_BiTangent , m_Normal);
 	if(normal == vec3(1.0))
@@ -158,12 +154,11 @@ vec3 NormalMapping(int index) // index implies which material index normal map t
 float ao = 1.0;
 void main()
 {
-	int index = int (m_materialindex);
-	vec4 albedo = texture(u_Albedo,vec3(tcord,index));
+	vec4 albedo = texture(u_Albedo, tcord);
 	if(albedo.a < 0.4)
 		discard;
 	gPosition = vec4(m_pos.xyz,1.0);
-	gNormal = vec4(NormalMapping(index),1.0);
+	gNormal = vec4(NormalMapping(),1.0);
 	gColor = vec4(albedo.rgb * m_VertexColor, 1.0);
-	gRoughnessMetallic = vec4(texture(u_Roughness,vec3(tcord,index)).r*Roughness,Metallic,1,1);
+	gRoughnessMetallic = vec4(texture(u_Roughness,tcord).r*Roughness,Metallic,1,1);
 }

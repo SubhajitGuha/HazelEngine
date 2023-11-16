@@ -518,17 +518,17 @@ namespace Hazel {
 				Physics3D::AddSphereCollider(physics_component);
 				physics_component.m_shapes = SPHERE_COLLIDER;
 			}
-			if (ImGui::Button("Add Mesh collider", { 200.f,30.f }))
-			{
-				if (m_selected_entity->HasComponent<StaticMeshComponent>())
-				{
-					auto& mesh = m_selected_entity->GetComponent<StaticMeshComponent>();
-					physics_component.m_transform = transform.GetTransform();
-					std::thread t([&]() {Physics3D::AddMeshCollider(mesh.static_mesh->Vertices, mesh.static_mesh->Vertex_Indices, transform.Scale, physics_component); });
-					t.detach();
-					physics_component.m_shapes = MESH_COLLIDER;
-				}
-			}
+			//if (ImGui::Button("Add Mesh collider", { 200.f,30.f }))
+			//{
+			//	if (m_selected_entity->HasComponent<StaticMeshComponent>())
+			//	{
+			//		auto& mesh = m_selected_entity->GetComponent<StaticMeshComponent>();
+			//		physics_component.m_transform = transform.GetTransform();
+			//		std::thread t([&]() {Physics3D::AddMeshCollider(mesh.static_mesh->Vertices, mesh.static_mesh->Vertex_Indices, transform.Scale, physics_component); });
+			//		t.detach();
+			//		physics_component.m_shapes = MESH_COLLIDER;
+			//	}
+			//}
 			if (ImGui::Button("Add Force"))
 			{
 				Physics3D::AddForce(physics_component);

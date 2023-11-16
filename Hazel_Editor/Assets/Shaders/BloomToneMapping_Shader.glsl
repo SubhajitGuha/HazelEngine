@@ -32,9 +32,9 @@ void main()
 	vec3 Original = texture(OriginalImage, tcord).rgb;
 
 	hdrColor *= exposure/(1.0 + hdrColor / exposure);
-	hdrColor = pow(hdrColor, vec3(1.0 / 2.2));
+	Original = mix(Original , Original + hdrColor * BloomAmount,hdrColor.xyz);
 
-	 Original = mix(Original , Original + hdrColor * BloomAmount,hdrColor.xyz);
+	Original = pow(Original, vec3(1.0 / 2.2));
 
 	color = vec4(Original,1.0);
 }

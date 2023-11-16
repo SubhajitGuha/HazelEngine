@@ -69,7 +69,7 @@ float CalculateShadow(int cascade_level)
 	float ShadowSum = 0.0;
 	vec3 p = VertexPosition_LightSpace.xyz/VertexPosition_LightSpace.w;
 	p = p * 0.5 + 0.5;//convert -1 to +1 to 0 to 1 this is needed for getting the location in the texture
-	float bias = 0.00001;//bias to resolve the artifact
+	float bias = 0.00002;//bias to resolve the artifact
 	float TexelSize = 1.0/textureSize(ShadowMap[cascade_level],0).x;
 
 	for(int i=-1; i <=1; i++)
@@ -128,20 +128,17 @@ vec3 SpecularBRDF(vec3 LightDir,vec3 ViewDir, vec3 Normal)
 
 vec3 ColorCorrection(vec3 color)
 {
-	//HDR Tone mapping
-	color = color / (color + vec3(1.0));
+	//color = clamp(color,0,1);
+	//color = pow(color, vec3(1.0/2.2)); //Gamma space
 
 	//color = clamp(color,0,1);
-	color = pow(color, vec3(1.0/2.2)); //Gamma correction
-
-	//color = clamp(color,0,1);
-	color = vec3(1.0) - exp(-color * 3);//exposure
+	color = vec3(1.0) - exp(-color * 2);//exposure
 
 	//color = clamp(color,0,1);
 	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.1);//saturation
 
 	//color = clamp(color,0,1);
-	color = 1.2*(color-0.5) + 0.5 + 0.00 ; //contrast
+	color = 1.1*(color-0.5) + 0.5 + 0.00 ; //contrast
 
 	return color;
 }

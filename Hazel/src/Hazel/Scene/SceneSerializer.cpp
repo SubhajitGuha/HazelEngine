@@ -363,14 +363,14 @@ namespace Hazel {
 						Physics3D::AddPlaneCollider(physics_component);
 					if (physics_component.m_shapes == ShapeTypes::CAPSULE_COLLIDER)
 						Physics3D::AddCapsuleCollider(physics_component);
-					if (physics_component.m_shapes == ShapeTypes::MESH_COLLIDER)
-					{
-						if (DeserializedEntity->HasComponent<StaticMeshComponent>())
-						{
-							auto& mesh = DeserializedEntity->GetComponent<StaticMeshComponent>();
-							Physics3D::AddMeshCollider(mesh.static_mesh->Vertices, mesh.static_mesh->Vertex_Indices, DeserializedEntity->GetComponent<TransformComponent>().Scale, physics_component);
-						}
-					}
+					//if (physics_component.m_shapes == ShapeTypes::MESH_COLLIDER)
+					//{
+					//	if (DeserializedEntity->HasComponent<StaticMeshComponent>())
+					//	{
+					//		auto& mesh = DeserializedEntity->GetComponent<StaticMeshComponent>();
+					//		Physics3D::AddMeshCollider(mesh.static_mesh->Vertices, mesh.static_mesh->Vertex_Indices, DeserializedEntity->GetComponent<TransformComponent>().Scale, physics_component);
+					//	}
+					//}
 				}
 			}
 		}

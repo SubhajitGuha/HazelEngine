@@ -1205,6 +1205,8 @@
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFog.h" />
     <ClInclude Include="src\Hazel\Renderer\Fog.h" />
+    <ClInclude Include="src\Hazel\Renderer\Material.h" />
+    <ClInclude Include="src\Hazel\UUID.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1380,5 +1382,6 @@
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFog.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Fog.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Material.cpp" />
   </ItemGroup>
 </Project>

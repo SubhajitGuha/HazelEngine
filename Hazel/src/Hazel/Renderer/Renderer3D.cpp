@@ -12,6 +12,7 @@
 #include "Hazel/Renderer/Terrain.h"
 #include "Hazel/Renderer/SkyRenderer.h"
 #include "Hazel/Renderer/DeferredRenderer.h"
+#include "Material.h"
 
 namespace Hazel {
 	//Camera* m_camera;
@@ -203,104 +204,110 @@ namespace Hazel {
 	}
 
 	void Renderer3D::DrawMesh(LoadMesh& mesh,glm::mat4& transform, const glm::vec4& color, const float& material_Roughness , const float& material_metallic, ref<Shader> otherShader)
-	{		
-		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
-		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
-		mesh.Normal_Texture->Bind(NORMAL_SLOT);
-
-		if (!otherShader) {
-			m_data->shader->SetFloat("Roughness", material_Roughness); //send the roughness value
-			m_data->shader->SetFloat("Metallic", material_metallic); //send the metallic value
-			m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
-			m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
-			m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
-			m_data->shader->SetMat4("u_Model", transform);
-			m_data->shader->SetFloat4("m_color", color);
-		}
-		else
+	{	
+		for (auto& sub_mesh : mesh.m_subMeshes) 
 		{
-			otherShader->SetFloat("Roughness", material_Roughness); //send the roughness value
-			otherShader->SetFloat("Metallic", material_metallic); //send the metallic value
-			otherShader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
-			otherShader->SetInt("u_Roughness", ROUGHNESS_SLOT);
-			otherShader->SetInt("u_NormalMap", NORMAL_SLOT);
-			otherShader->SetMat4("u_Model", transform);
-			otherShader->SetFloat4("m_color", color);
+			sub_mesh.m_Material->Diffuse_Texture->Bind(ALBEDO_SLOT);
+			sub_mesh.m_Material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
+			sub_mesh.m_Material->Normal_Texture->Bind(NORMAL_SLOT);
+
+			if (!otherShader) {
+				m_data->shader->SetFloat("Roughness", material_Roughness); //send the roughness value
+				m_data->shader->SetFloat("Metallic", material_metallic); //send the metallic value
+				m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+				m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+				m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
+				m_data->shader->SetMat4("u_Model", transform);
+				m_data->shader->SetFloat4("m_color", color);
+			}
+			else
+			{
+				otherShader->SetFloat("Roughness", material_Roughness); //send the roughness value
+				otherShader->SetFloat("Metallic", material_metallic); //send the metallic value
+				otherShader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+				otherShader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+				otherShader->SetInt("u_NormalMap", NORMAL_SLOT);
+				otherShader->SetMat4("u_Model", transform);
+				otherShader->SetFloat4("m_color", color);
+			}
+
+			RenderCommand::DrawArrays(*sub_mesh.VertexArray, sub_mesh.numVertices);
 		}
-
-		RenderCommand::DrawArrays(*mesh.VertexArray, mesh.Vertices.size());
 	}
 
-	void Renderer3D::DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
-	{
-		glDisable(GL_CULL_FACE);
-		//this is not ideal!! I just cannot handle shaders like this in a long run
-		m_data->foliage_shader->Bind();//bind the textureShader
-
-		m_data->foliage_shader->SetFloat("Roughness", material_Roughness); //send the roughness value
-		m_data->foliage_shader->SetFloat("Metallic", material_metallic); //send the metallic value
-
-		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
-		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
-		mesh.Normal_Texture->Bind(NORMAL_SLOT);
-
-		m_data->foliage_shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
-		m_data->foliage_shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
-		m_data->foliage_shader->SetInt("u_NormalMap", NORMAL_SLOT);
-		m_data->foliage_shader->SetMat4("u_Model", transform);
-		m_data->foliage_shader->SetFloat4("m_color", color);
-
-		RenderCommand::DrawArrays(*mesh.VertexArray, mesh.Vertices.size());
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-	}
+	//void Renderer3D::DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
+	//{
+	//	glDisable(GL_CULL_FACE);
+	//	//this is not ideal!! I just cannot handle shaders like this in a long run
+	//	m_data->foliage_shader->Bind();//bind the textureShader
+	//
+	//	m_data->foliage_shader->SetFloat("Roughness", material_Roughness); //send the roughness value
+	//	m_data->foliage_shader->SetFloat("Metallic", material_metallic); //send the metallic value
+	//
+	//	mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
+	//	mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
+	//	mesh.Normal_Texture->Bind(NORMAL_SLOT);
+	//
+	//	m_data->foliage_shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+	//	m_data->foliage_shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+	//	m_data->foliage_shader->SetInt("u_NormalMap", NORMAL_SLOT);
+	//	m_data->foliage_shader->SetMat4("u_Model", transform);
+	//	m_data->foliage_shader->SetFloat4("m_color", color);
+	//
+	//	RenderCommand::DrawArrays(*mesh.VertexArray, mesh.Vertices.size());
+	//	glEnable(GL_CULL_FACE);
+	//	glCullFace(GL_BACK);
+	//}
 
 	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, size_t instance_count, const glm::vec4& color, float TimeElapsed, const float& material_Roughness, const float& material_metallic)
 	{
-		glDisable(GL_CULL_FACE);
-		//m_data->foliageShader_instanced->Bind();
+		for (auto& sub_mesh : mesh.m_subMeshes)
+		{
+			glDisable(GL_CULL_FACE);
+			//m_data->foliageShader_instanced->Bind();
 
-		m_data->foliageShader_instanced->SetFloat("Roughness", material_Roughness); //send the roughness value
-		m_data->foliageShader_instanced->SetFloat("Metallic", material_metallic); //send the metallic value
+			m_data->foliageShader_instanced->SetFloat("Roughness", sub_mesh.m_Material->GetRoughness()); //send the roughness value
+			m_data->foliageShader_instanced->SetFloat("Metallic", sub_mesh.m_Material->GetMetalness()); //send the metallic value
+			
+			sub_mesh.m_Material->Diffuse_Texture->Bind(ALBEDO_SLOT);
+			sub_mesh.m_Material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
+			sub_mesh.m_Material->Normal_Texture->Bind(NORMAL_SLOT);
 
-		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
-		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
-		mesh.Normal_Texture->Bind(NORMAL_SLOT);
-
-		m_data->foliageShader_instanced->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
-		m_data->foliageShader_instanced->SetInt("u_Roughness", ROUGHNESS_SLOT);
-		m_data->foliageShader_instanced->SetInt("u_NormalMap", NORMAL_SLOT);
-		m_data->foliageShader_instanced->SetMat4("u_Model", transform);
-		m_data->foliageShader_instanced->SetFloat4("m_color", color);
-		m_data->foliageShader_instanced->SetFloat("u_Time", TimeElapsed);
-		m_data->foliageShader_instanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
-		RenderCommand::DrawInstancedArrays(*mesh.VertexArray, mesh.Vertices.size(), instance_count);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+			m_data->foliageShader_instanced->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+			m_data->foliageShader_instanced->SetInt("u_Roughness", ROUGHNESS_SLOT);
+			m_data->foliageShader_instanced->SetInt("u_NormalMap", NORMAL_SLOT);
+			m_data->foliageShader_instanced->SetMat4("u_Model", transform);
+			m_data->foliageShader_instanced->SetFloat4("m_color", color);
+			m_data->foliageShader_instanced->SetFloat("u_Time", TimeElapsed);
+			m_data->foliageShader_instanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
+			RenderCommand::DrawInstancedArrays(*sub_mesh.VertexArray, sub_mesh.numVertices, instance_count);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+		}
 	}
 
 	void Renderer3D::InstancedFoliageData(LoadMesh& mesh, uint32_t& bufferIndex)
 	{
 		//needs to be refactored!!
-		glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
-		//void* ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-		//std::memcpy(ptr, &Instanced_ModelMatrix[0], sizeof(glm::mat4) * Instanced_ModelMatrix.size());
-		////glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * Instanced_ModelMatrix.size(), &Instanced_ModelMatrix[0]);
-		//glUnmapBuffer(GL_ARRAY_BUFFER);	
-		mesh.VertexArray->Bind();
-		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
-		glEnableVertexAttribArray(7);
-		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(1 * sizeof(glm::vec4)));
-		glEnableVertexAttribArray(8);
-		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(2 * sizeof(glm::vec4)));
-		glEnableVertexAttribArray(9);
-		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(3 * sizeof(glm::vec4)));
+		for (auto& sub_mesh : mesh.m_subMeshes)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
 
-		glVertexAttribDivisor(6, 1);//repeat 1ce per instance
-		glVertexAttribDivisor(7, 1);
-		glVertexAttribDivisor(8, 1);
-		glVertexAttribDivisor(9, 1);
+			sub_mesh.VertexArray->Bind();
+			glEnableVertexAttribArray(5);
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
+			glEnableVertexAttribArray(6);
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(1 * sizeof(glm::vec4)));
+			glEnableVertexAttribArray(7);
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(2 * sizeof(glm::vec4)));
+			glEnableVertexAttribArray(8);
+			glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(3 * sizeof(glm::vec4)));
+
+			glVertexAttribDivisor(5, 1);//repeat 1ce per instance
+			glVertexAttribDivisor(6, 1);
+			glVertexAttribDivisor(7, 1);
+			glVertexAttribDivisor(8, 1);
+		}
 	}
 	
 	void Renderer3D::AllocateInstancedFoliageData(LoadMesh& mesh,const size_t& size, uint32_t& bufferIndex)
@@ -308,22 +315,23 @@ namespace Hazel {
 		//glGenBuffers(1, &bufferIndex);
 		//glBindBuffer(GL_ARRAY_BUFFER, bufferIndex);
 		//glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * size, nullptr, GL_DYNAMIC_DRAW);
+		for (auto& sub_mesh : mesh.m_subMeshes)
+		{
+			sub_mesh.VertexArray->Bind();
+			glEnableVertexAttribArray(5);
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
+			glEnableVertexAttribArray(6);
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(1 * sizeof(glm::vec4)));
+			glEnableVertexAttribArray(7);
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(2 * sizeof(glm::vec4)));
+			glEnableVertexAttribArray(8);
+			glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(3 * sizeof(glm::vec4)));
 
-		mesh.VertexArray->Bind();
-		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)0);
-		glEnableVertexAttribArray(7);
-		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(1 * sizeof(glm::vec4)));
-		glEnableVertexAttribArray(8);
-		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(2 * sizeof(glm::vec4)));
-		glEnableVertexAttribArray(9);
-		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void*)(3 * sizeof(glm::vec4)));
-
-		glVertexAttribDivisor(6, 1);//repeat 1ce per instance
-		glVertexAttribDivisor(7, 1);
-		glVertexAttribDivisor(8, 1);
-		glVertexAttribDivisor(9, 1);
-
+			glVertexAttribDivisor(5, 1);//repeat 1ce per instance
+			glVertexAttribDivisor(6, 1);
+			glVertexAttribDivisor(7, 1);
+			glVertexAttribDivisor(8, 1);
+		}
 	}
 	void Renderer3D::SetUpCubeMapReflections(Scene& scene)
 	{
@@ -375,50 +383,50 @@ namespace Hazel {
 
 	}
 
-	void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)
-	{
-		m_data->shader->SetFloat("Roughness", 0.6f);
-		m_data->shader->SetFloat("Metallic", 0.0f);
-
-		auto Rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), { 1,0,0 }) *
-			glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), { 0,1,0 }) *
-			glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), { 0,0,1 });
-		auto transform = glm::translate(glm::mat4(1.0f), Position) * Rotation * glm::scale(glm::mat4(1.0), Scale);
-
-		// waiting for the buffer
-		GLenum waitReturn = GL_UNSIGNALED;
-		while (waitReturn != GL_ALREADY_SIGNALED && waitReturn != GL_CONDITION_SATISFIED)
-		{
-			waitReturn = glClientWaitSync(syncObj, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
-		}
-		
-		std::vector<int> n_meshes;
-		for (int i = 0; i < mesh.Vertices.size(); i++)
-			n_meshes.push_back(i);
-
-		std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
-			{
-				glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-				glm::vec3 transformed_tangents = glm::normalize(glm::mat3(transform) * mesh.Tangent[i]);
-				glm::vec3 transformed_binormals = glm::normalize(glm::mat3(transform) * mesh.BiTangent[i]);
-				m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.Vertices[i], 1), mesh.TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals, mesh.Material_Index[i]));
-				//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
-			});
-
-		mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
-		mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
-		mesh.Normal_Texture->Bind(NORMAL_SLOT);
-
-		m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
-		m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
-		m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
-
-		RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
-
-		// lock the buffer:
-		glDeleteSync(syncObj);
-		syncObj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	}
+	//void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)
+	//{
+	//	m_data->shader->SetFloat("Roughness", 0.6f);
+	//	m_data->shader->SetFloat("Metallic", 0.0f);
+	//
+	//	auto Rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), { 1,0,0 }) *
+	//		glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), { 0,1,0 }) *
+	//		glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), { 0,0,1 });
+	//	auto transform = glm::translate(glm::mat4(1.0f), Position) * Rotation * glm::scale(glm::mat4(1.0), Scale);
+	//
+	//	// waiting for the buffer
+	//	GLenum waitReturn = GL_UNSIGNALED;
+	//	while (waitReturn != GL_ALREADY_SIGNALED && waitReturn != GL_CONDITION_SATISFIED)
+	//	{
+	//		waitReturn = glClientWaitSync(syncObj, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
+	//	}
+	//	
+	//	std::vector<int> n_meshes;
+	//	for (int i = 0; i < mesh.Vertices.size(); i++)
+	//		n_meshes.push_back(i);
+	//
+	//	std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
+	//		{
+	//			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
+	//			glm::vec3 transformed_tangents = glm::normalize(glm::mat3(transform) * mesh.Tangent[i]);
+	//			glm::vec3 transformed_binormals = glm::normalize(glm::mat3(transform) * mesh.BiTangent[i]);
+	//			m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.Vertices[i], 1), mesh.TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals, mesh.Material_Index[i]));
+	//			//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
+	//		});
+	//
+	//	mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
+	//	mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
+	//	mesh.Normal_Texture->Bind(NORMAL_SLOT);
+	//
+	//	m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+	//	m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
+	//	m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
+	//
+	//	RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
+	//
+	//	// lock the buffer:
+	//	glDeleteSync(syncObj);
+	//	syncObj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	//}
 
 	ref<Shader>& Renderer3D::GetFoliageInstancedShader()
 	{

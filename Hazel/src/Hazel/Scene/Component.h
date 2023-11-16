@@ -92,7 +92,7 @@ namespace Hazel {
 	class Texture2D;
 	struct SpriteRenderer
 	{
-		glm::vec4 Color = pow(glm::vec4(1.0),glm::vec4(GAMMA));
+		glm::vec4 Color = glm::vec4(1.0);
 		float m_Roughness = 1.0f;
 		float m_Metallic = 0.0f;
 		float Emission_Scale = 1.0;
@@ -100,7 +100,7 @@ namespace Hazel {
 		ref<Texture2D> texture = nullptr;
 		SpriteRenderer() = default;
 		SpriteRenderer(const glm::vec4& color, float roughness = 1.0f, float metallic = 0.0f, const ref<Texture2D> tex = nullptr)
-			:Color(pow(color * Emission_Scale,glm::vec4(GAMMA))),texture(tex),m_Metallic(metallic),m_Roughness(roughness)//Gamma correction in color
+			:Color(color),texture(tex),m_Metallic(metallic),m_Roughness(roughness)//Gamma correction in color
 		{}
 	};
 
