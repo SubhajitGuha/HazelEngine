@@ -12,10 +12,12 @@ namespace Hazel {
 		{}
 		void Serialize(const std::string& filepath);//serialize to the file path
 		void SerializeMaterial(const std::string& filepath, Material& material);
+		void SerializeMesh(const std::string& filepath, LoadMesh& mesh);
 		void SerializeRuntime(const std::string& filepath);
 
 		void DeSerialize(const std::string& filepath);
 		void DeSerializeMaterial(const std::string& filepath, Material& material);
+		void DeSerializeMesh(const std::string& filepath, LoadMesh& mesh);
 		void DeSerializeRuntime(const std::string& filepath);
 		//void SerializeEntity(YAML::Emitter& out, Entity& entity);
 	private:

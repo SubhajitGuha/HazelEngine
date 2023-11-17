@@ -30,16 +30,18 @@ namespace Hazel {
 		};
 	public:
 		LoadMesh();
-		LoadMesh(const std::string& Path);
+		LoadMesh(const std::string& Path, LoadType type = LoadType::LOAD_MESH);
 		~LoadMesh();
-		void CreateLOD(const std::string& Path);
+		void CreateLOD(const std::string& Path, LoadType type = LoadType::LOAD_MESH);
 		LoadMesh* GetLOD(int lodIndex);
 
 	public:
 		std::string m_path;
 		std::vector<SubMesh> m_subMeshes;		
 		glm::mat4 GlobalTransform;
+		uint64_t uuid;
 	private:
+		std::string extension = ".asset";
 		std::vector<LoadMesh*> m_LOD;
 		ref<BufferLayout> bl;
 		ref<VertexBuffer> vb;

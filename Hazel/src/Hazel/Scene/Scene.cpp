@@ -45,23 +45,23 @@ namespace Hazel {
 
 		Material::DeserializeMaterial();// load all materials from the disc
 
-		Flower = new LoadMesh("Assets/Meshes/flower.fbx");
-		Flower->CreateLOD("Assets/Meshes/flower_LOD1.fbx");
-		Sphere = new LoadMesh("Assets/Meshes/Ak_47.fbx");
-		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
+		Flower = new LoadMesh("Assets/Meshes/flower.asset");
+		Flower->CreateLOD("Assets/Meshes/flower_LOD1.asset");
+		Sphere = new LoadMesh("Assets/Meshes/Ak_47.asset");
+		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.asset");
 		//Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
-		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
-		Tree = new LoadMesh("Assets/Meshes/HZ_Pine1.fbx");
-		Tree->CreateLOD("Assets/Meshes/HZ_Pine1_LOD1.fbx");
-		Grass = new LoadMesh("Assets/Meshes/grass3.fbx");
-		Grass->CreateLOD("Assets/Meshes/grass3_LOD1.fbx");
-		//plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx");
-		House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx");
-		Fern = new LoadMesh("Assets/Meshes/Fern.fbx");
-		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.fbx");
+		Cube = new LoadMesh("Assets/Meshes/Cube.asset");
+		Tree = new LoadMesh("Assets/Meshes/HZ_Pine1.asset");
+		Tree->CreateLOD("Assets/Meshes/HZ_Pine1_LOD1.asset");
+		Grass = new LoadMesh("Assets/Meshes/grass3.asset");
+		Grass->CreateLOD("Assets/Meshes/grass3_LOD1.asset");
+		//plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx",LoadMesh::IMPORT_MESH);
+		//House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx", LoadMesh::IMPORT_MESH);
+		Fern = new LoadMesh("Assets/Meshes/Fern.asset");
+		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.asset");
 
 		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
-		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx");
+		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx", LoadMesh::IMPORT_MESH);
 		Renderer3D::SetUpCubeMapReflections(*this);
 		editor_cam.SetVerticalFOV(45.f);
 		editor_cam.SetPerspectiveFar(10000);

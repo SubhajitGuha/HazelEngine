@@ -5,6 +5,7 @@
 #include "Hazel/Physics/Physics3D.h"
 #include "PointLight.h"
 #include "yaml-cpp/yaml.h"
+#include "Hazel/LoadMesh.h"
 #include "Hazel/Renderer/Material.h"
 
 namespace YAML {
@@ -87,7 +88,7 @@ namespace Hazel {
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << "Entity" << YAML::Value << "13212514564232";
-		
+
 		if (entity.HasComponent<TagComponent>())
 		{
 			out << YAML::Key << "TagComponent";
@@ -219,7 +220,47 @@ namespace Hazel {
 		out << YAML::Key << "Albedo Map" << YAML::Value << material.GetAlbedoPath();
 		out << YAML::Key << "Normal Map" << YAML::Value << material.GetNormalPath();
 		out << YAML::Key << "Roughness Map" << YAML::Value << material.GetRoughnessPath();
-		out << YAML::Key << "Shader Path" << YAML::Value <<"TODO";
+		out << YAML::Key << "Shader Path" << YAML::Value << "TODO";
+		out << YAML::EndMap;
+
+		std::ofstream output(filepath);
+		output << out.c_str();
+	}
+	void SceneSerializer::SerializeMesh(const std::string& filepath, LoadMesh& mesh)
+	{
+		/*
+			UUID : 125663
+			0:
+				(uin64_t)materialID
+				(vec3)vertices
+				(vec3)normal
+				(vec3)tangent
+				(vec2)texCoord
+------------------------------------------------------------------------------
+				(vec3)vertices
+				(vec3)normal
+				(vec3)tangent
+				(vec2)texCoord
+		*/
+
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "UUID" << YAML::Value << YAML::Binary(reinterpret_cast<const unsigned char*>(&mesh.uuid),sizeof(uint64_t));
+		for (int i = 0; i < mesh.m_subMeshes.size(); i++)
+		{
+			auto sub_mesh = mesh.m_subMeshes[i];
+			out << YAML::Key << std::to_string(i) << YAML::Value;
+			out << YAML::BeginSeq;
+			out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.m_Material->materialID), sizeof(uint64_t));
+			for (int k = 0; k < sub_mesh.numVertices; k++)
+			{
+				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Vertices[k].x), sizeof(float) * 3);
+				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Normal[k].x), sizeof(float) * 3);
+				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Tangent[k].x), sizeof(float) * 3);
+				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.TexCoord[k].x), sizeof(float) * 2);
+			}
+			out << YAML::EndSeq;
+		}
 		out << YAML::EndMap;
 
 		std::ofstream output(filepath);
@@ -282,7 +323,7 @@ namespace Hazel {
 					glm::vec3 translation = TransformComp["Translation"].as<glm::vec3>();
 					glm::vec3 rotation = TransformComp["Rotation"].as<glm::vec3>();
 					glm::vec3 scale = TransformComp["Scale"].as<glm::vec3>();
-					DeserializedEntity->AddComponent<TransformComponent>(translation,rotation,scale);
+					DeserializedEntity->AddComponent<TransformComponent>(translation, rotation, scale);
 				}
 
 				auto StaticMeshComp = entity["StaticMeshComponent"];
@@ -305,7 +346,7 @@ namespace Hazel {
 					float roughness = SpriteRenderComp["Roughness"].as<float>();
 					float metallic = SpriteRenderComp["Metallic"].as<float>();
 
-					DeserializedEntity->AddComponent<SpriteRenderer>(color,roughness,metallic);
+					DeserializedEntity->AddComponent<SpriteRenderer>(color, roughness, metallic);
 				}
 				auto ScriptComp = entity["ScriptComponent"];
 				if (ScriptComp)
@@ -323,7 +364,7 @@ namespace Hazel {
 					if (CameraComp["Camera Distance"])
 						cc.camera_dist = CameraComp["Camera Distance"].as<glm::vec3>();
 					if (CameraComp["Follow Player"])
-						cc.bFollowPlayer= (bool)CameraComp["Follow Player"].as<int>();
+						cc.bFollowPlayer = (bool)CameraComp["Follow Player"].as<int>();
 					if (CameraComp["FOV"])
 						cc.camera.SetVerticalFOV(CameraComp["FOV"].as<float>());
 					if (CameraComp["Aspect Ratio"])
@@ -342,15 +383,15 @@ namespace Hazel {
 				if (PhysicsComp)
 				{
 					auto& physics_component = DeserializedEntity->AddComponent<PhysicsComponent>();
-					
+
 					if (PhysicsComp["Mass"])
 						physics_component.m_mass = PhysicsComp["Mass"].as<float>();
 
 					if (PhysicsComp["StaticFriction"])
 						physics_component.m_StaticFriction = PhysicsComp["StaticFriction"].as<float>();
-					
-					if(PhysicsComp["DynamicFriction"])
-						physics_component.m_DynamicFriction  = PhysicsComp["DynamicFriction"].as<float>();
+
+					if (PhysicsComp["DynamicFriction"])
+						physics_component.m_DynamicFriction = PhysicsComp["DynamicFriction"].as<float>();
 
 					if (PhysicsComp["Restitution"])
 						physics_component.m_Restitution = PhysicsComp["Restitution"].as<float>();
@@ -358,19 +399,19 @@ namespace Hazel {
 					if (PhysicsComp["Radius"])
 						physics_component.m_radius = PhysicsComp["Radius"].as<float>();
 
-					if(PhysicsComp["Height"])
+					if (PhysicsComp["Height"])
 						physics_component.m_height = PhysicsComp["Height"].as<float>();
 
-					if(PhysicsComp["HalfExtent"])
+					if (PhysicsComp["HalfExtent"])
 						physics_component.m_halfextent = PhysicsComp["HalfExtent"].as<glm::vec3>();
 
-					if(PhysicsComp["isStatic"])
+					if (PhysicsComp["isStatic"])
 						physics_component.isStatic = PhysicsComp["isStatic"].as<int>();
 
-					if(PhysicsComp["isKinematic"])
+					if (PhysicsComp["isKinematic"])
 						physics_component.isKinematic = PhysicsComp["isKinematic"].as<int>();
 
-					if(PhysicsComp["Shape"])
+					if (PhysicsComp["Shape"])
 						physics_component.m_shapes = (ShapeTypes)PhysicsComp["Shape"].as<int>();
 
 					physics_component.m_transform = DeserializedEntity->GetComponent<TransformComponent>().GetTransform();
@@ -424,6 +465,81 @@ namespace Hazel {
 		material.SetTexturePaths(albedo_path, normal_path, roughness_path);
 		//TODO Shader
 
+	}
+	void SceneSerializer::DeSerializeMesh(const std::string& filepath, LoadMesh& mesh)
+	{
+		std::ifstream inputFile(filepath);
+		YAML::Node data = YAML::Load(inputFile);
+
+		{	//mesh UUID decript from binary
+			YAML::Binary bin_data = data["UUID"].as<YAML::Binary>();
+			const unsigned char* binary = bin_data.data();
+			std::memcpy(&mesh.uuid, binary, bin_data.size()); //get uuid
+		}
+		int k = 0;
+		while (true)
+		{
+			if (data[std::to_string(k)])
+			{
+				auto value = data[std::to_string(k)];
+				std::vector<glm::vec3> vertex_pos, vertex_normal, vertex_tangent, vertex_bitangent;
+				std::vector<glm::vec2> texture_coord;
+				uint64_t materialID;
+
+				{	//materialID decript from binary
+					YAML::Binary bin_data = value[0].as<YAML::Binary>();
+					const unsigned char* binary = bin_data.data();
+					std::memcpy(&materialID, binary, bin_data.size()); //get uuid
+				}
+				for (int i = 1; i < value.size(); i+=4)
+				{
+					{	//position decript from binary
+						YAML::Binary bin_data = value[i].as<YAML::Binary>();
+						const unsigned char* binary = bin_data.data();
+						float vertex_data[3];
+						std::memcpy(vertex_data, binary, bin_data.size()); //get vertex position
+						vertex_pos.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
+					}
+					{	//normal decript from binary
+						YAML::Binary bin_data = value[i+1].as<YAML::Binary>();
+						const unsigned char* binary = bin_data.data();
+						float vertex_data[3];
+						std::memcpy(vertex_data, binary, bin_data.size()); //get vertex normal
+						vertex_normal.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
+					}
+					{	//tangent and bi_tangent decript from binary
+						YAML::Binary bin_data = value[i+2].as<YAML::Binary>();
+						const unsigned char* binary = bin_data.data();
+						float vertex_data[3];
+						std::memcpy(vertex_data, binary, bin_data.size()); //get vertex tangent
+						vertex_tangent.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
+
+						glm::vec3 bitangent = glm::cross(vertex_tangent.back(), vertex_normal.back());
+						vertex_bitangent.push_back(bitangent);
+					}
+					{	//tex coord decript from binary
+						YAML::Binary bin_data = value[i+3].as<YAML::Binary>();
+						const unsigned char* binary = bin_data.data();
+						float vertex_data[2];
+						std::memcpy(vertex_data, binary, bin_data.size()); //get uuid
+						texture_coord.push_back({ vertex_data[0],vertex_data[1]});
+					}
+				}
+				LoadMesh::SubMesh sub_mesh;
+				sub_mesh.Vertices = vertex_pos;
+				sub_mesh.Normal = vertex_normal;
+				sub_mesh.Tangent = vertex_tangent;
+				sub_mesh.BiTangent = vertex_bitangent;
+				sub_mesh.TexCoord = texture_coord;
+				sub_mesh.numVertices = vertex_pos.size();
+				sub_mesh.m_Material = Material::allMaterials[materialID];
+
+				mesh.m_subMeshes.push_back(sub_mesh);
+			}
+			else
+				break;
+			k++;
+		}
 	}
 	void SceneSerializer::DeSerializeRuntime(const std::string& filepath)
 	{

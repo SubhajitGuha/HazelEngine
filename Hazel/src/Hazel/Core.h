@@ -15,8 +15,6 @@
 	#error Hazel only supports windows
 #endif // HZ_PLATFORM_WINDOWS
 
-#define HZ_DEBUG
-
 #ifdef HZ_DEBUG
 	#if HZ_PLATFORM_WINDOWS
 		#define HZ_DEBUGBREAK() __debugbreak()

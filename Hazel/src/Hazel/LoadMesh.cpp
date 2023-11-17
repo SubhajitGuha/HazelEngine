@@ -5,19 +5,35 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Hazel/Renderer/Material.h"
+#include "Hazel/UUID.h"
+#include "Hazel/Scene/SceneSerializer.h"
 
 namespace Hazel {
 	LoadMesh::LoadMesh()
 	{
 	}
-	LoadMesh::LoadMesh(const std::string& Path)
+	LoadMesh::LoadMesh(const std::string& Path, LoadType type)
 	{
 		GlobalTransform = glm::mat4(1.0);
-		m_path = Path;	
+		std::filesystem::path mesh_path(Path);
+		m_path = (mesh_path.parent_path() / mesh_path.stem()).string() + extension; //temporary
+
 		if (m_LOD.size() == 0)
 			m_LOD.push_back(this);
 
-		LoadObj(Path);
+		if (type == IMPORT_MESH)
+		{
+			uuid = UUID();
+			LoadObj(Path);
+		}
+		else if (type == LOAD_MESH)
+		{
+			SceneSerializer deserialize;
+			deserialize.DeSerializeMesh(m_path, *this);
+
+			CreateStaticBuffers();
+		}
+
 	}
 	LoadMesh::~LoadMesh()
 	{
@@ -38,13 +54,16 @@ namespace Hazel {
 		ProcessMesh();
 		CreateStaticBuffers();
 
+		SceneSerializer serialize;
+		serialize.SerializeMesh(m_path, *this);
+
 		m_Mesh.clear();
 		m_Mesh.shrink_to_fit();
 	}
 
-	void LoadMesh::CreateLOD(const std::string& Path)
+	void LoadMesh::CreateLOD(const std::string& Path, LoadType type)
 	{
-		m_LOD.push_back(new LoadMesh(Path));
+		m_LOD.push_back(new LoadMesh(Path,type));
 	}
 
 	LoadMesh* LoadMesh::GetLOD(int lodIndex)
