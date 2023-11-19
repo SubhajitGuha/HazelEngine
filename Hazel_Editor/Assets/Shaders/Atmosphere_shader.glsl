@@ -76,13 +76,13 @@ float cumulus = 0.8;
         //incolor = pow(incolor, vec3(1.0/2.2)); //Gamma correction
         
         //incolor = clamp(incolor,0,1);
-        incolor = vec3(1.0) - exp(-incolor * 2);//exposure
+        incolor = vec3(1.0) - exp(-incolor * 1);//exposure
         
         //incolor = clamp(incolor,0,1);
         incolor = mix(vec3(dot(incolor,vec3(0.299,0.587,0.114))), incolor,1.1);//saturation
         
         //incolor = clamp(incolor,0,1);
-        incolor = 1.1*(incolor-0.5) + 0.5 + 0.00 ; //contrast
+        incolor = 1.02*(incolor-0.5) + 0.5 + 0.00 ; //contrast
         
         return incolor;
     }

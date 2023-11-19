@@ -6,6 +6,7 @@
 #include "Hazel/Scene/PointLight.h"
 #include "Hazel/Physics/Physics3D.h"
 #include "Hazel/Scene/SceneSerializer.h"
+#include "Hazel/Renderer/Material.h"
 #include "../CustomScript.h"
 
 namespace Hazel {
@@ -465,6 +466,15 @@ namespace Hazel {
 			if (ImGui::Checkbox("Is Foliage?", &m_selected_entity->GetComponent<StaticMeshComponent>().isFoliage))
 			{
 				//m_selected_entity->GetComponent<StaticMeshComponent>().isFoliage
+			}
+			LoadMesh* mesh = m_selected_entity->GetComponent<StaticMeshComponent>();
+			for (auto& sub_mesh : mesh->m_subMeshes)
+			{
+				ref<Material> mat = sub_mesh.m_Material;
+				ImGui::Button(mat->GetAlbedoPath().c_str(), { 60,60 });
+				ImGui::Button(mat->GetNormalPath().c_str(), { 60,60 });
+				ImGui::Button(mat->GetRoughnessPath().c_str(), { 60,60 });
+
 			}
 			ImGui::TreePop();
 		}

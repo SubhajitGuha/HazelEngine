@@ -30,8 +30,8 @@ void main()
 {		
     vec2 uv = SampleSphericalMap(normalize(locPos));
     vec3 envColor = texture(hdrTexture, uv).rgb;
-    vec3 mapped = vec3(1.0) - exp(-envColor * 3.0);//exposure
-	mapped = pow(mapped, vec3(1.0/2.2)); 
+    vec3 mapped = vec3(1.0) - exp(-envColor * 1.0);//exposure
+	//mapped = pow(mapped, vec3(1.0/2.2)); 
 	//mapped = clamp(mapped,0.0,1.0);
     color = vec4(mapped,1.0);
 }
