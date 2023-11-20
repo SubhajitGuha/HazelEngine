@@ -1,6 +1,7 @@
 #pragma once
 #include "Hazel.h"
 #include "Pannels/SceneHierarchy.h"
+#include "Pannels/ContentBrowser.h"
 #include <unordered_map>
 using namespace Hazel;
 
@@ -32,6 +33,7 @@ private:
 	glm::vec3 SunDirection = { 0,1,0.6 }, PointLightPos = {5,-5,3};
 
 	SceneHierarchyPannel m_Pannel;
+	ContentBrowser m_ContentBrowser;
 	ref<Scene> m_scene;
 	ref<Shader> shader;
 	ref<VertexArray> vao;

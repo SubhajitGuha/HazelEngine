@@ -36,7 +36,7 @@ namespace Hazel {
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
 		Physics3D::Initilize();
 		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
-		SkyRenderer::Initilize("Assets/Textures/HDR/rainforest_trail_4k.hdr");
+		SkyRenderer::Initilize("Assets/Textures/HDR/autumn_forest_04_4k.hdr");
 
 		Renderer3D::Init();
 		Renderer2D::Init();
@@ -61,7 +61,7 @@ namespace Hazel {
 		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.asset");
 
 		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
-		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx", LoadMesh::IMPORT_MESH);
+		Sponza = new LoadMesh("Assets/Meshes/Sponza.asset");
 		Renderer3D::SetUpCubeMapReflections(*this);
 		editor_cam.SetVerticalFOV(45.f);
 		editor_cam.SetPerspectiveFar(10000);

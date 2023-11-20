@@ -47,8 +47,8 @@ namespace Hazel
 		{
 			std::filesystem::path materialpath("Assets/Materials");
 			std::filesystem::create_directory(materialpath);
-			std::string material_name = "Material" + std::to_string(materialNameOffset) + extension;
-			std::string MatPath = (materialpath / std::filesystem::path(material_name)).string();
+			m_MaterialName = "Material" + std::to_string(materialNameOffset) + extension;
+			std::string MatPath = (materialpath / std::filesystem::path(m_MaterialName)).string();
 			SceneSerializer serialize;
 			serialize.SerializeMaterial(MatPath, *this);
 		}
@@ -69,6 +69,7 @@ namespace Hazel
 				ref<Material> mat = Create();
 				SceneSerializer deserialize;
 				deserialize.DeSerializeMaterial(file_name, *mat.get());
+				mat->m_MaterialName = p.path().stem().string();
 				allMaterials[mat->materialID] = mat;
 			}
 		}

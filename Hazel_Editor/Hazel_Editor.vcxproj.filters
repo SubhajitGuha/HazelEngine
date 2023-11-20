@@ -33,6 +33,7 @@
     <ClInclude Include="src\Pannels\SceneHierarchy.h">
       <Filter>src\Pannels</Filter>
     </ClInclude>
+    <ClInclude Include="src\Pannels\ContentBrowser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HazelEditor.cpp">
@@ -44,6 +45,7 @@
     <ClCompile Include="src\SandboxApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Pannels\ContentBrowser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Interior-Cube-Map\0.png">

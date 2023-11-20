@@ -541,6 +541,13 @@ namespace Hazel {
 			k++;
 		}
 	}
+	ref<Material> SceneSerializer::DeSerializeAndGetMaterial(const std::string& filepath)
+	{
+		std::ifstream file(filepath);
+		YAML::Node data = YAML::Load(file);
+		uint64_t materialID = data["Material ID"].as<uint64_t>();
+		return Material::allMaterials[materialID];
+	}
 	void SceneSerializer::DeSerializeRuntime(const std::string& filepath)
 	{
 	}

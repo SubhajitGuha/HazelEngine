@@ -30,6 +30,7 @@ namespace Hazel
 	public:
 		static std::unordered_map<uint64_t, ref<Material>> allMaterials;
 		uint64_t materialID;
+		std::string m_MaterialName;
 		ref<Texture2D> Diffuse_Texture;
 		ref<Texture2D> Roughness_Texture ;
 		ref<Texture2D> Normal_Texture;

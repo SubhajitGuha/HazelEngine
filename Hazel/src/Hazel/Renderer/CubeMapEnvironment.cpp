@@ -131,7 +131,7 @@ namespace Hazel {
 		glGenTextures(1, &tex_id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
 		for (int i = 0; i < 6; i++) {
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, captureRes, captureRes, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, captureRes, captureRes, 0, GL_RGB, GL_FLOAT, nullptr);
 		}
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -190,7 +190,7 @@ namespace Hazel {
 	void CubeMapEnvironment::RenderCubeMap( glm::mat4& view, glm::mat4& proj, const glm::vec3& view_dir)
 	{
 		Cube_Shader->Bind();
-		Cube_Shader->SetInt("env", ENV_SLOT);
+		Cube_Shader->SetInt("env", IRR_ENV_SLOT);
 
 		RenderQuad(view, proj);
 	}
@@ -202,7 +202,7 @@ namespace Hazel {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, irradiance_map_id);
 		for (int i = 0; i < 6; i++)//iterate over 6 images each representing the side of a cube
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, irrMapWidth, irrMapWidth, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, irrMapWidth, irrMapWidth, 0, GL_RGB, GL_FLOAT, nullptr);
 		}
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

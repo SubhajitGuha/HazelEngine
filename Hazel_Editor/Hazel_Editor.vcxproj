@@ -133,10 +133,12 @@
   <ItemGroup>
     <ClInclude Include="src\CustomScript.h" />
     <ClInclude Include="src\HazelEditor.h" />
+    <ClInclude Include="src\Pannels\ContentBrowser.h" />
     <ClInclude Include="src\Pannels\SceneHierarchy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HazelEditor.cpp" />
+    <ClCompile Include="src\Pannels\ContentBrowser.cpp" />
     <ClCompile Include="src\Pannels\SceneHierarchy.cpp" />
     <ClCompile Include="src\SandboxApp.cpp" />
   </ItemGroup>

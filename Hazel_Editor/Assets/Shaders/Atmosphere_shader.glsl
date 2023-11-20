@@ -73,7 +73,7 @@ float cumulus = 0.8;
    vec3 ColorCorrection(vec3 incolor)
    {
         //incolor = clamp(incolor,0,1);
-        //incolor = pow(incolor, vec3(1.0/2.2)); //Gamma correction
+        incolor = pow(incolor, vec3(2.2)); //Inverse Gamma correction
         
         //incolor = clamp(incolor,0,1);
         incolor = vec3(1.0) - exp(-incolor * 1);//exposure
