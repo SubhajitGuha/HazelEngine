@@ -34,6 +34,7 @@
       <Filter>src\Pannels</Filter>
     </ClInclude>
     <ClInclude Include="src\Pannels\ContentBrowser.h" />
+    <ClInclude Include="src\Pannels\MaterialEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HazelEditor.cpp">
@@ -46,6 +47,7 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Pannels\ContentBrowser.cpp" />
+    <ClCompile Include="src\Pannels\MaterialEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Interior-Cube-Map\0.png">

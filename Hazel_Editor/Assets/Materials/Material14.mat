@@ -1,10 +1,10 @@
-Material ID: 765861768
-Color: [1, 1, 1]
+Material ID: 1307477994
+Color: [1, 1, 1, 1]
 Roughness: 1
 Metallic: 0
 Normal Strength: 1
 Emission: 1
-Albedo Map: Assets/Textures/MeshTextures/cityHouse_House_Base_BaseColor.jpg
-Normal Map: Assets/Textures/MeshTextures/cityHouse_House_Base_Normal.jpg
-Roughness Map: Assets/Textures/MeshTextures/cityHouse_House_Base_Roughness.jpg
+Albedo Map: Assets/Textures/MeshTextures/ForestFern_2K_Albedo_packed.png
+Normal Map: ""
+Roughness Map: Assets/Textures/MeshTextures/ForestFern_2K_Roughness.jpg
 Shader Path: TODO

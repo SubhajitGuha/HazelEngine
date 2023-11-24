@@ -25,7 +25,7 @@ namespace Hazel {
 			std::vector<glm::vec3> BiTangent;
 			std::vector<glm::vec2> TexCoord;
 			ref<VertexArray> VertexArray;
-			ref<Material> m_Material;
+			uint64_t m_MaterialID;
 			uint32_t numVertices;
 		};
 	public:

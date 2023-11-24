@@ -1,10 +1,12 @@
 #pragma once
 #include "Hazel/Core.h"
+#include "Hazel/UUID.h"
 
 namespace Hazel {
 	class Texture
 	{
 	public:
+		uint64_t uuid;
 		Texture() = default;
 		virtual ~Texture()=default;
 		virtual unsigned int GetWidth() = 0;

@@ -7,6 +7,7 @@
 #include "yaml-cpp/yaml.h"
 #include "Hazel/LoadMesh.h"
 #include "Hazel/Renderer/Material.h"
+#include "Hazel/ResourceManager.h"
 
 namespace YAML {
 
@@ -229,7 +230,6 @@ namespace Hazel {
 	void SceneSerializer::SerializeMesh(const std::string& filepath, LoadMesh& mesh)
 	{
 		/*
-			UUID : 125663
 			0:
 				(uin64_t)materialID
 				(vec3)vertices
@@ -245,13 +245,12 @@ namespace Hazel {
 
 		YAML::Emitter out;
 		out << YAML::BeginMap;
-		out << YAML::Key << "UUID" << YAML::Value << YAML::Binary(reinterpret_cast<const unsigned char*>(&mesh.uuid),sizeof(uint64_t));
 		for (int i = 0; i < mesh.m_subMeshes.size(); i++)
 		{
 			auto sub_mesh = mesh.m_subMeshes[i];
 			out << YAML::Key << std::to_string(i) << YAML::Value;
 			out << YAML::BeginSeq;
-			out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.m_Material->materialID), sizeof(uint64_t));
+			out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.m_MaterialID), sizeof(uint64_t));
 			for (int k = 0; k < sub_mesh.numVertices; k++)
 			{
 				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Vertices[k].x), sizeof(float) * 3);
@@ -452,7 +451,7 @@ namespace Hazel {
 		HZ_ASSERT(data["Roughness Map"], "Invalid key");
 
 		material.materialID = data["Material ID"].as<uint64_t>();
-		glm::vec3 color = data["Color"].as<glm::vec3>();
+		glm::vec4 color = data["Color"].as<glm::vec4>();
 		float roughness = data["Roughness"].as<float>();
 		float metallic = data["Metallic"].as<float>();
 		float normal_strength = data["Normal Strength"].as<float>();
@@ -471,11 +470,6 @@ namespace Hazel {
 		std::ifstream inputFile(filepath);
 		YAML::Node data = YAML::Load(inputFile);
 
-		{	//mesh UUID decript from binary
-			YAML::Binary bin_data = data["UUID"].as<YAML::Binary>();
-			const unsigned char* binary = bin_data.data();
-			std::memcpy(&mesh.uuid, binary, bin_data.size()); //get uuid
-		}
 		int k = 0;
 		while (true)
 		{
@@ -532,7 +526,7 @@ namespace Hazel {
 				sub_mesh.BiTangent = vertex_bitangent;
 				sub_mesh.TexCoord = texture_coord;
 				sub_mesh.numVertices = vertex_pos.size();
-				sub_mesh.m_Material = Material::allMaterials[materialID];
+				sub_mesh.m_MaterialID = materialID;
 
 				mesh.m_subMeshes.push_back(sub_mesh);
 			}
@@ -541,12 +535,12 @@ namespace Hazel {
 			k++;
 		}
 	}
-	ref<Material> SceneSerializer::DeSerializeAndGetMaterial(const std::string& filepath)
+	uint64_t SceneSerializer::DeSerializeAndGetMaterialID(const std::string& filepath)
 	{
 		std::ifstream file(filepath);
 		YAML::Node data = YAML::Load(file);
 		uint64_t materialID = data["Material ID"].as<uint64_t>();
-		return Material::allMaterials[materialID];
+		return materialID;
 	}
 	void SceneSerializer::DeSerializeRuntime(const std::string& filepath)
 	{

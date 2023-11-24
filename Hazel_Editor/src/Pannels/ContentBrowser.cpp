@@ -1,6 +1,8 @@
 #include "hzpch.h"
 #include "ContentBrowser.h"
 #include "Hazel/Scene/SceneSerializer.h"
+#include "Hazel/ResourceManager.h"
+#include "MaterialEditor.h"
 
 using namespace Hazel;
 namespace FileSystem = std::filesystem;
@@ -9,11 +11,6 @@ constexpr char* dir = "Assets";
 ContentBrowser::ContentBrowser()
 {
 	m_filePath = dir;
-}
-
-void ContentBrowser::Context(const ref<Scene>& context)
-{
-	m_scene = std::move(context);
 }
 
 void ContentBrowser::OnImGuiRender()
@@ -34,15 +31,21 @@ void ContentBrowser::OnImGuiRender()
 			}
 		}
 		else {
-			ImGui::Button(filename.c_str());
-			if (ImGui::BeginDragDropSource() && p.path().extension().string() == ".mat")
+			if (p.path().extension().string() == ".mat")
 			{
 				SceneSerializer ser;
-				auto material = ser.DeSerializeAndGetMaterial(p.path().string()); //Get material Instance			
-
-				ImGui::SetDragDropPayload("Material payload", &material, sizeof(filename));
-				ImGui::Text(filename.c_str());
-				ImGui::EndDragDropSource();
+				uint64_t materialID = ser.DeSerializeAndGetMaterialID(p.path().string()); //Get material Instance			
+				if (ImGui::Button(filename.c_str()))
+				{
+					MaterialEditor::cached_materialID = materialID;
+				}
+				if (ImGui::BeginDragDropSource())
+				{
+					ImGui::SetDragDropPayload("Material payload", &ResourceManager::allMaterials[materialID], sizeof(filename));
+					ImGui::Text(filename.c_str());
+					ImGui::EndDragDropSource();
+				}
+				
 			}
 			//if (ImGui::BeginDragDropTarget())
 			//{

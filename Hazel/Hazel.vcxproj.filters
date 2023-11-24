@@ -1207,6 +1207,7 @@
     <ClInclude Include="src\Hazel\Renderer\Fog.h" />
     <ClInclude Include="src\Hazel\Renderer\Material.h" />
     <ClInclude Include="src\Hazel\UUID.h" />
+    <ClInclude Include="src\Hazel\ResourceManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1383,5 +1384,6 @@
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFog.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Fog.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Material.cpp" />
+    <ClCompile Include="src\Hazel\ResourceManager.cpp" />
   </ItemGroup>
 </Project>

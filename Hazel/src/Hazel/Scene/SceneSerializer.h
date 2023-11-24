@@ -17,7 +17,7 @@ namespace Hazel {
 
 		void DeSerialize(const std::string& filepath);
 		void DeSerializeMaterial(const std::string& filepath, Material& material);
-		ref<Material> DeSerializeAndGetMaterial(const std::string& filepath);
+		uint64_t DeSerializeAndGetMaterialID(const std::string& filepath);
 		void DeSerializeMesh(const std::string& filepath, LoadMesh& mesh);
 		void DeSerializeRuntime(const std::string& filepath);
 		//void SerializeEntity(YAML::Emitter& out, Entity& entity);

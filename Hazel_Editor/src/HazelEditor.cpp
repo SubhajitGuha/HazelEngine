@@ -90,7 +90,6 @@ LoadMesh* mesh;
 	//Square3->AddComponent<CameraComponent>();
 	 //HAZEL_WARN(typeid(CustomScript).raw_name());
 	 m_Pannel.Context(m_scene);
-	 m_ContentBrowser.Context(m_scene);
  }
 
 void  HazelEditor::OnDetach()
@@ -205,6 +204,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::End();
 	m_Pannel.OnImGuiRender();
 	m_ContentBrowser.OnImGuiRender();
+	m_MaterialEditor.OnImGuiRender();
 }
 
 void  HazelEditor::OnEvent(Event& e)

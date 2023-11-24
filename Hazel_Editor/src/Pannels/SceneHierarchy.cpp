@@ -8,6 +8,7 @@
 #include "Hazel/Scene/SceneSerializer.h"
 #include "Hazel/Renderer/Material.h"
 #include "../CustomScript.h"
+#include "Hazel/ResourceManager.h"
 
 using namespace Hazel;
 std::string texture_path = "Assets/Textures/Test.png";
@@ -470,13 +471,13 @@ void SceneHierarchyPannel::DrawStaticMeshComponentUI()
 		LoadMesh* mesh = m_selected_entity->GetComponent<StaticMeshComponent>();
 		for (auto& sub_mesh : mesh->m_subMeshes)
 		{
-			ref<Material> mat = sub_mesh.m_Material;
+			ref<Material> mat = ResourceManager::allMaterials[sub_mesh.m_MaterialID];
 			ImGui::Button(mat->m_MaterialName.c_str(), { 120,20 });
 			if (ImGui::BeginDragDropTarget())//drag drop materials from content browser
 			{
 				if (const ImGuiPayload* val = ImGui::AcceptDragDropPayload("Material payload"))
 				{
-					sub_mesh.m_Material = *(ref<Material>*)val->Data;
+					ResourceManager::allMaterials[sub_mesh.m_MaterialID] = *(ref<Material>*)val->Data;
 				}
 				ImGui::EndDragDropTarget();
 			}

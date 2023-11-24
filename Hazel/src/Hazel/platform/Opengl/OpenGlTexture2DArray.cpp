@@ -9,6 +9,8 @@
 Hazel::OpenGlTexture2DArray::OpenGlTexture2DArray(const std::vector<std::string>& paths,int numMaterials, bool bUse16BitTexture)
 	:m_Height(0), m_Width(0)
 {
+	//no hash ID generation happening
+
 	if (paths.size() == 0)//if there are no texture paths then load a white texture and create a texture array with it
 	{
 		CreateWhiteTextureArray(numMaterials);

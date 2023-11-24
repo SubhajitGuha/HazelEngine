@@ -1,11 +1,11 @@
 #include "hzpch.h"
 #include "Material.h"
 #include "Hazel/Scene/SceneSerializer.h"
+#include "Hazel/ResourceManager.h"
 
 namespace Hazel
 {
 	ref<Material> Material::m_material;
-	std::unordered_map<uint64_t, ref<Material>> Material::allMaterials;
 	uint32_t Material::materialNameOffset = 0;
 	std::string Material::extension = ".mat";
 
@@ -17,7 +17,7 @@ namespace Hazel
 	Material::Material()
 	{
 		materialNameOffset++; //increment when a material is created
-		color = { 1,1,1 };
+		color = { 1,1,1,1 };
 		roughness_multipler = 1;
 		metallic_multipler = 0;
 		normal_multipler = 1;
@@ -34,7 +34,7 @@ namespace Hazel
 
 		CreateTextures();
 	}
-	void Material::SetMaterialAttributes(const glm::vec3& color, float roughness, float metalness, float normal_strength)
+	void Material::SetMaterialAttributes(const glm::vec4& color, float roughness, float metalness, float normal_strength)
 	{
 		this->color = color;
 		roughness_multipler = roughness;
@@ -45,6 +45,8 @@ namespace Hazel
 	{
 		if (path == "")
 		{
+			ResourceManager::allMaterials[materialID] = m_material; //can change but for now only enlist the material in resource manager in material serialization and deserialization
+			
 			std::filesystem::path materialpath("Assets/Materials");
 			std::filesystem::create_directory(materialpath);
 			m_MaterialName = "Material" + std::to_string(materialNameOffset) + extension;
@@ -70,7 +72,7 @@ namespace Hazel
 				SceneSerializer deserialize;
 				deserialize.DeSerializeMaterial(file_name, *mat.get());
 				mat->m_MaterialName = p.path().stem().string();
-				allMaterials[mat->materialID] = mat;
+				ResourceManager::allMaterials[mat->materialID] = mat;
 			}
 		}
 	}

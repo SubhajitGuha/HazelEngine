@@ -186,6 +186,7 @@
     <ClInclude Include="src\Hazel\Renderer\SubTexture.h" />
     <ClInclude Include="src\Hazel\Renderer\Terrain.h" />
     <ClInclude Include="src\Hazel\Renderer\Texture.h" />
+    <ClInclude Include="src\Hazel\ResourceManager.h" />
     <ClInclude Include="src\Hazel\Scene\Component.h" />
     <ClInclude Include="src\Hazel\Scene\Entity.h" />
     <ClInclude Include="src\Hazel\Scene\PointLight.h" />
@@ -536,6 +537,7 @@
     <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Terrain.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp" />
+    <ClCompile Include="src\Hazel\ResourceManager.cpp" />
     <ClCompile Include="src\Hazel\Scene\Entity.cpp" />
     <ClCompile Include="src\Hazel\Scene\PointLight.cpp" />
     <ClCompile Include="src\Hazel\Scene\Scene.cpp" />

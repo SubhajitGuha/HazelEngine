@@ -2,9 +2,9 @@
 #include "Texture.h"
 #include "stb_image.h"
 #include "RendererAPI.h"
+#include "Hazel/ResourceManager.h"
 #include "Hazel/platform/Opengl/OpenGlTexture2D.h"
 #include "Hazel/platform/Opengl/OpenGlTexture2DArray.h"
-
 namespace Hazel {
 	bool Texture2D::ValidateTexture(const std::string& path)
 	{
@@ -18,11 +18,14 @@ namespace Hazel {
 	}
 	ref<Texture2D> Texture2D::Create(const std::string& path,bool bUse16BitTexture)
 	{
+		ref<Texture2D> instance;
 		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::None:
 			return nullptr;
 		case GraphicsAPI::OpenGL:
-			return std::make_shared<OpenGlTexture2D>(path,bUse16BitTexture);
+			instance = std::make_shared<OpenGlTexture2D>(path,bUse16BitTexture);
+			ResourceManager::allTextures[instance->uuid] = instance;
+			return instance;			
 		default:
 			return nullptr;
 		}
@@ -33,7 +36,7 @@ namespace Hazel {
 		case GraphicsAPI::None:
 			return nullptr;
 		case GraphicsAPI::OpenGL:
-			return std::make_shared<OpenGlTexture2D>(Width,Height,data);
+			return std::make_shared<OpenGlTexture2D>(Width,Height,data);			
 		default:
 			return nullptr;
 		}

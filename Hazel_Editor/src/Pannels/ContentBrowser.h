@@ -9,7 +9,6 @@ class ContentBrowser
 public:
 	ContentBrowser();
 	~ContentBrowser() = default;
-	void Context(const ref<Scene>& context);
 	void OnImGuiRender();
 private:
 	ref<Scene> m_scene;

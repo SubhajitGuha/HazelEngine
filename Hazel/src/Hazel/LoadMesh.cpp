@@ -7,6 +7,7 @@
 #include "Hazel/Renderer/Material.h"
 #include "Hazel/UUID.h"
 #include "Hazel/Scene/SceneSerializer.h"
+#include "Hazel/ResourceManager.h"
 
 namespace Hazel {
 	LoadMesh::LoadMesh()
@@ -23,14 +24,14 @@ namespace Hazel {
 
 		if (type == IMPORT_MESH)
 		{
-			uuid = UUID();
 			LoadObj(Path);
 		}
 		else if (type == LOAD_MESH)
 		{
 			SceneSerializer deserialize;
 			deserialize.DeSerializeMesh(m_path, *this);
-
+			uuid = UUID(Path); //only create uuid for engine compatible mesh
+			//ResourceManager::allMeshes[uuid] = 
 			CreateStaticBuffers();
 		}
 
@@ -175,14 +176,16 @@ namespace Hazel {
 		};
 		for (int i = 0; i < NumMaterials; i++)
 		{
-			m_subMeshes[i].m_Material = Material::Create();
+			//m_subMeshes[i].m_Material = Material::Create();
+			ref<Material> material = Material::Create();
+			m_subMeshes[i].m_MaterialID = material->materialID;
 
 			std::string diffuse_path = GetTexturePath(i,aiTextureType_DIFFUSE);
 			std::string normal_path = GetTexturePath(i, aiTextureType_NORMALS);
 			std::string roughness_path = GetTexturePath(i, aiTextureType_SHININESS);
 
-			m_subMeshes[i].m_Material->SetTexturePaths(diffuse_path, normal_path, roughness_path);
-			m_subMeshes[i].m_Material->SerializeMaterial(""); //save the material
+			material->SetTexturePaths(diffuse_path, normal_path, roughness_path);
+			material->SerializeMaterial(""); //save the material
 		}
 	}
 	void LoadMesh::CalculateTangent()

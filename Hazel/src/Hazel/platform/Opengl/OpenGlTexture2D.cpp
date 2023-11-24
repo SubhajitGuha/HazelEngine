@@ -9,6 +9,7 @@ namespace Hazel {
 	OpenGlTexture2D::OpenGlTexture2D(const std::string& path,bool bUse16BitTexture)
 		:m_Height(0),m_Width(0)
 	{
+		uuid = UUID(path);
 		if (bUse16BitTexture)
 			Create16BitTexture(path);
 		else
@@ -19,6 +20,8 @@ namespace Hazel {
 	OpenGlTexture2D::OpenGlTexture2D(const unsigned int Width=1,const  unsigned int Height=1, unsigned int data= 0xffffffff)//for making a custom texture(white,black,red..)
 		:m_Height(Height), m_Width(Width)//default texture is white of height and width = 1
 	{
+		//uuid = UUID(data);
+
 		GLenum InternalFormat = GL_RGBA8, Format = GL_RGBA;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);

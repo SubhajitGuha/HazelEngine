@@ -10,12 +10,12 @@ namespace Hazel
 		static ref<Material> Create();
 		Material();
 		void SetTexturePaths(std::string& albedo_path, std::string& normal_path, std::string& roughness_path);
-		void SetMaterialAttributes(const glm::vec3& color, float roughness, float metalness, float normal_strength);
+		void SetMaterialAttributes(const glm::vec4& color, float roughness, float metalness, float normal_strength);
 		void SerializeMaterial(const std::string& path);
 		void SetEmission(float emission) { this->emission = emission; }
 		void SetShader(ref<Shader> shader) { RenderShader = shader; }
 		inline ref<Shader> GetShader() { return RenderShader; }
-		inline glm::vec3 GetColor() { return color; }
+		inline glm::vec4 GetColor() { return color; }
 		inline float GetRoughness() { return roughness_multipler; }
 		inline float GetMetalness() { return metallic_multipler; }
 		inline float GetNormalStrength() { return normal_multipler; }
@@ -28,7 +28,6 @@ namespace Hazel
 	private:
 		void CreateTextures();
 	public:
-		static std::unordered_map<uint64_t, ref<Material>> allMaterials;
 		uint64_t materialID;
 		std::string m_MaterialName;
 		ref<Texture2D> Diffuse_Texture;
@@ -38,7 +37,7 @@ namespace Hazel
 		static ref<Material> m_material;
 		static uint32_t materialNameOffset;
 		static std::string extension;
-		glm::vec3 color;
+		glm::vec4 color;
 		float metallic_multipler;
 		float roughness_multipler;
 		float normal_multipler;

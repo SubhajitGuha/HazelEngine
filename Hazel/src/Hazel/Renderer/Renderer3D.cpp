@@ -13,6 +13,7 @@
 #include "Hazel/Renderer/SkyRenderer.h"
 #include "Hazel/Renderer/DeferredRenderer.h"
 #include "Material.h"
+#include "Hazel/ResourceManager.h"
 
 namespace Hazel {
 	//Camera* m_camera;
@@ -207,28 +208,35 @@ namespace Hazel {
 	{	
 		for (auto& sub_mesh : mesh.m_subMeshes) 
 		{
-			sub_mesh.m_Material->Diffuse_Texture->Bind(ALBEDO_SLOT);
-			sub_mesh.m_Material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
-			sub_mesh.m_Material->Normal_Texture->Bind(NORMAL_SLOT);
+			ref<Material> material = ResourceManager::allMaterials[sub_mesh.m_MaterialID];
 
-			if (!otherShader) {
-				m_data->shader->SetFloat("Roughness", material_Roughness); //send the roughness value
-				m_data->shader->SetFloat("Metallic", material_metallic); //send the metallic value
+			if (!material) {
+				HAZEL_CORE_ERROR("Material dosent exist");
+				return; //dont render in case of non existing material
+			}
+			material->Diffuse_Texture->Bind(ALBEDO_SLOT);
+			material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
+			material->Normal_Texture->Bind(NORMAL_SLOT);
+
+			if (!otherShader) //shader will be defined from material
+			{
+				m_data->shader->SetFloat("Roughness", material->GetRoughness()); //send the roughness value
+				m_data->shader->SetFloat("Metallic", material->GetMetalness()); //send the metallic value
 				m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
 				m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
 				m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
 				m_data->shader->SetMat4("u_Model", transform);
-				m_data->shader->SetFloat4("m_color", color);
+				m_data->shader->SetFloat4("m_color", material->GetColor());
 			}
 			else
 			{
-				otherShader->SetFloat("Roughness", material_Roughness); //send the roughness value
-				otherShader->SetFloat("Metallic", material_metallic); //send the metallic value
+				otherShader->SetFloat("Roughness", material->GetRoughness()); //send the roughness value
+				otherShader->SetFloat("Metallic", material->GetMetalness()); //send the metallic value
 				otherShader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
 				otherShader->SetInt("u_Roughness", ROUGHNESS_SLOT);
 				otherShader->SetInt("u_NormalMap", NORMAL_SLOT);
 				otherShader->SetMat4("u_Model", transform);
-				otherShader->SetFloat4("m_color", color);
+				otherShader->SetFloat4("m_color", material->GetColor());
 			}
 
 			RenderCommand::DrawArrays(*sub_mesh.VertexArray, sub_mesh.numVertices);
@@ -264,14 +272,18 @@ namespace Hazel {
 		for (auto& sub_mesh : mesh.m_subMeshes)
 		{
 			glDisable(GL_CULL_FACE);
-			//m_data->foliageShader_instanced->Bind();
-
-			m_data->foliageShader_instanced->SetFloat("Roughness", sub_mesh.m_Material->GetRoughness()); //send the roughness value
-			m_data->foliageShader_instanced->SetFloat("Metallic", sub_mesh.m_Material->GetMetalness()); //send the metallic value
+			ref<Material> material = ResourceManager::allMaterials[sub_mesh.m_MaterialID]; //get material from the resource manager
 			
-			sub_mesh.m_Material->Diffuse_Texture->Bind(ALBEDO_SLOT);
-			sub_mesh.m_Material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
-			sub_mesh.m_Material->Normal_Texture->Bind(NORMAL_SLOT);
+			if (!material) {
+				HAZEL_CORE_ERROR("Material dosent exist");
+				return; //dont render in case of non existing material
+			}
+			m_data->foliageShader_instanced->SetFloat("Roughness", material->GetRoughness()); //send the roughness value
+			m_data->foliageShader_instanced->SetFloat("Metallic", material->GetMetalness()); //send the metallic value
+			
+			material->Diffuse_Texture->Bind(ALBEDO_SLOT);
+			material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
+			material->Normal_Texture->Bind(NORMAL_SLOT);
 
 			m_data->foliageShader_instanced->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
 			m_data->foliageShader_instanced->SetInt("u_Roughness", ROUGHNESS_SLOT);

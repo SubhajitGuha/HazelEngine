@@ -2,6 +2,7 @@
 #include "Hazel.h"
 #include "Pannels/SceneHierarchy.h"
 #include "Pannels/ContentBrowser.h"
+#include "Pannels/MaterialEditor.h"
 #include <unordered_map>
 using namespace Hazel;
 
@@ -34,6 +35,7 @@ private:
 
 	SceneHierarchyPannel m_Pannel;
 	ContentBrowser m_ContentBrowser;
+	MaterialEditor m_MaterialEditor;
 	ref<Scene> m_scene;
 	ref<Shader> shader;
 	ref<VertexArray> vao;
