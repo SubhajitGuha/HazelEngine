@@ -31,21 +31,33 @@ void ContentBrowser::OnImGuiRender()
 			}
 		}
 		else {
-			if (p.path().extension().string() == ".mat")
+			std::string extension = p.path().extension().string();
+			if (extension == ".mat")
 			{
 				SceneSerializer ser;
-				uint64_t materialID = ser.DeSerializeAndGetMaterialID(p.path().string()); //Get material Instance			
+				uint64_t materialID = ser.DeSerializeAndGetMaterialID(p.path().string()); //Get material ID			
 				if (ImGui::Button(filename.c_str()))
 				{
 					MaterialEditor::cached_materialID = materialID;
 				}
 				if (ImGui::BeginDragDropSource())
 				{
-					ImGui::SetDragDropPayload("Material payload", &ResourceManager::allMaterials[materialID], sizeof(filename));
+					ImGui::SetDragDropPayload("Material payload", &ResourceManager::allMaterials[materialID], sizeof(Material));
 					ImGui::Text(filename.c_str());
 					ImGui::EndDragDropSource();
 				}
 				
+			}
+			if (extension == ".png" || extension == ".hdr" || extension == ".jpg")//only supported texture formats
+			{
+				ImGui::Button(filename.c_str());
+				if (ImGui::BeginDragDropSource())
+				{
+					MaterialEditor::cached_texturePath = p.path().string(); //this keeps a copy of the texture path that I drag
+					ImGui::SetDragDropPayload("Texture payload", &MaterialEditor::cached_texturePath, p.path().string().size()*sizeof(char));
+					ImGui::Text(filename.c_str());
+					ImGui::EndDragDropSource();
+				}
 			}
 			//if (ImGui::BeginDragDropTarget())
 			//{

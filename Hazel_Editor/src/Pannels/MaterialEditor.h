@@ -7,6 +7,7 @@ class MaterialEditor
 {
 public:
 	static uint64_t cached_materialID;
+	static std::string cached_texturePath;
 public:
 	MaterialEditor();
 	~MaterialEditor() = default;

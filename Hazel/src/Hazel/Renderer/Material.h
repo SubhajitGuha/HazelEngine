@@ -9,7 +9,7 @@ namespace Hazel
 	public:
 		static ref<Material> Create();
 		Material();
-		void SetTexturePaths(std::string& albedo_path, std::string& normal_path, std::string& roughness_path);
+		void SetTexturePaths(std::string& albedo_path , std::string& normal_path , std::string& roughness_path);
 		void SetMaterialAttributes(const glm::vec4& color, float roughness, float metalness, float normal_strength);
 		void SerializeMaterial(const std::string& path);
 		void SetEmission(float emission) { this->emission = emission; }

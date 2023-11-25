@@ -19,13 +19,20 @@ namespace Hazel {
 	ref<Texture2D> Texture2D::Create(const std::string& path,bool bUse16BitTexture)
 	{
 		ref<Texture2D> instance;
+		uint64_t ID;
 		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::None:
 			return nullptr;
 		case GraphicsAPI::OpenGL:
-			instance = std::make_shared<OpenGlTexture2D>(path,bUse16BitTexture);
-			ResourceManager::allTextures[instance->uuid] = instance;
-			return instance;			
+			ID = UUID(path);
+			if (ResourceManager::allTextures.find(ID) == ResourceManager::allTextures.end())// load a texture only once
+			{
+				instance = std::make_shared<OpenGlTexture2D>(path, bUse16BitTexture);
+				ResourceManager::allTextures[instance->uuid] = instance;
+			}
+			else
+				instance = std::dynamic_pointer_cast<Texture2D>(ResourceManager::allTextures[ID]); //dynamic_pointer_cast helps to give a shared ptr of derived type casting from base
+			return instance;		
 		default:
 			return nullptr;
 		}

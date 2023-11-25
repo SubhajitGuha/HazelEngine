@@ -80,6 +80,6 @@ namespace Hazel
 	{
 		Diffuse_Texture = Texture2D::Create(albedoPath);
 		Roughness_Texture = Texture2D::Create(roughnessPath);
-		Normal_Texture = Texture2D::Create(normalPath,true);
+		Normal_Texture = Texture2D::Create(normalPath);
 	}
 }
