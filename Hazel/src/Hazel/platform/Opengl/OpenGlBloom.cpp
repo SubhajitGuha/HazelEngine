@@ -129,7 +129,41 @@ namespace Hazel {
 		BloomToneMapShader->SetFloat("BloomAmount", Bloom::m_BloomAmount);
 
 		glViewport(0, 0, m_Dimension.x, m_Dimension.y);
-		RenderQuad();
+		RenderRotatedQuad(); //flip the final Image after rendering
+	}
+
+	void OpenGlBloom::RenderRotatedQuad () {
+		//this function renders a quad infront of the camera
+		glDisable(GL_CULL_FACE);
+		glDepthMask(GL_FALSE);//disable depth testing
+
+		//quad is rotated by 180 deg by x axis to correct the image orientation
+		glm::vec4 data[] =
+		{
+		glm::vec4(-1,-1,0,1),glm::vec4(0,1,0,0),
+		glm::vec4(1,-1,0,1),glm::vec4(1,1,0,0),
+		glm::vec4(1,1,0,1),glm::vec4(1,0,0,0),
+		glm::vec4(-1,1,0,1),glm::vec4(0,0,0,0)
+		};
+
+		ref<VertexArray> vao = VertexArray::Create();
+		ref<VertexBuffer> vb = VertexBuffer::Create(&data[0].x, sizeof(data));
+		unsigned int i_data[] = { 0,1,2,0,2,3 };
+		ref<IndexBuffer> ib = IndexBuffer::Create(i_data, sizeof(i_data));
+
+		ref<BufferLayout> bl = std::make_shared<BufferLayout>(); //buffer layout
+
+		bl->push("position", DataType::Float4);
+		bl->push("direction", DataType::Float4);
+
+		vao->AddBuffer(bl, vb);
+		vao->SetIndexBuffer(ib);
+
+		RenderCommand::DrawIndex(*vao);
+
+		glDepthMask(GL_TRUE);//again enable depth testing
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	}
 
 	void OpenGlBloom::RenderQuad()
@@ -138,7 +172,6 @@ namespace Hazel {
 		glDisable(GL_CULL_FACE);
 		glDepthMask(GL_FALSE);//disable depth testing
 
-		//auto inv = glm::inverse(proj * glm::mat4(glm::mat3(view)));//get inverse of projection view to convert cannonical view to world space
 		glm::vec4 data[] = {
 		glm::vec4(-1,-1,0,1),glm::vec4(0,0,0,0),
 		glm::vec4(1,-1,0,1),glm::vec4(1,0,0,0),

@@ -17,6 +17,7 @@ namespace Hazel {
 	class Bloom;
 	class Fog;
 	class Terrain;
+	class RayTracer;
 	class Scene
 	{
 	public:
@@ -51,6 +52,7 @@ namespace Hazel {
 		float fogDensity=0.00002, fogGradient=1.3;
 		glm::vec3 fogColor = glm::vec3(1,1,1);
 		ref<Terrain> m_Terrain;
+		ref<RayTracer> m_rayTracer;
 	private:
 		Camera* MainCamera = nullptr;//if there is no main camera Then dont render
 		entt::registry m_registry;

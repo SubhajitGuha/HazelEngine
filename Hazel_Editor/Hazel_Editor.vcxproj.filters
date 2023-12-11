@@ -7,14 +7,17 @@
     <Filter Include="Assets\Textures">
       <UniqueIdentifier>{0B35254A-77C0-920E-80D1-1503ECDBEE0E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets\Textures\Interior-Cube-Map">
-      <UniqueIdentifier>{3DA10909-A90F-5F88-F2F8-19885EA65424}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Assets\Textures\MeshTextures">
       <UniqueIdentifier>{4B5330C7-370E-2073-E0C5-98BDCC5F6A03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets\Textures\Outdoor-Cube-Map">
-      <UniqueIdentifier>{DDBECBBF-C90F-B701-F273-A5C3DE234A6B}</UniqueIdentifier>
+    <Filter Include="Hazel">
+      <UniqueIdentifier>{99294D0D-053E-75BE-CEBF-181E3A9371EF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hazel\vendor">
+      <UniqueIdentifier>{D6D9B06F-C23C-4014-6BC2-78CA57040C97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hazel\vendor\imguizmo">
+      <UniqueIdentifier>{366DB374-A2D9-6E6F-6BCD-06CDD7F890D7}</UniqueIdentifier>
     </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
@@ -30,15 +33,40 @@
     <ClInclude Include="src\HazelEditor.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Pannels\ContentBrowser.h">
+      <Filter>src\Pannels</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Pannels\MaterialEditor.h">
+      <Filter>src\Pannels</Filter>
+    </ClInclude>
     <ClInclude Include="src\Pannels\SceneHierarchy.h">
       <Filter>src\Pannels</Filter>
     </ClInclude>
-    <ClInclude Include="src\Pannels\ContentBrowser.h" />
-    <ClInclude Include="src\Pannels\MaterialEditor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\GraphEditor.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImCurveEdit.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGradient.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGuizmo.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImSequencer.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
     <ClCompile Include="src\HazelEditor.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pannels\ContentBrowser.cpp">
+      <Filter>src\Pannels</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pannels\MaterialEditor.cpp">
+      <Filter>src\Pannels</Filter>
     </ClCompile>
     <ClCompile Include="src\Pannels\SceneHierarchy.cpp">
       <Filter>src\Pannels</Filter>
@@ -46,29 +74,21 @@
     <ClCompile Include="src\SandboxApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Pannels\ContentBrowser.cpp" />
-    <ClCompile Include="src\Pannels\MaterialEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Assets\Textures\Interior-Cube-Map\0.png">
-      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
+    <Image Include="Assets\Textures\MeshTextures\AK_103_Base_Color.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\Interior-Cube-Map\1.png">
-      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
-    </Image>
-    <Image Include="Assets\Textures\Interior-Cube-Map\2.png">
-      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
-    </Image>
-    <Image Include="Assets\Textures\Interior-Cube-Map\3.png">
-      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
-    </Image>
-    <Image Include="Assets\Textures\Interior-Cube-Map\4.png">
-      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
-    </Image>
-    <Image Include="Assets\Textures\Interior-Cube-Map\5.png">
-      <Filter>Assets\Textures\Interior-Cube-Map</Filter>
+    <Image Include="Assets\Textures\MeshTextures\AK_103_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\BarkAI_Spec.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\Billboard_2K_Albedo_packed.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\ForestFern_2K_Albedo_packed.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\Grass 2K.png">
@@ -89,23 +109,50 @@
     <Image Include="Assets\Textures\MeshTextures\Grass_ORA.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\0.png">
-      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    <Image Include="Assets\Textures\MeshTextures\RoughnessMat.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\1.png">
-      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    <Image Include="Assets\Textures\MeshTextures\bark.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\2.png">
-      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    <Image Include="Assets\Textures\MeshTextures\bark01.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\3.png">
-      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    <Image Include="Assets\Textures\MeshTextures\bark01_normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\4.png">
-      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    <Image Include="Assets\Textures\MeshTextures\bark_normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\5.png">
-      <Filter>Assets\Textures\Outdoor-Cube-Map</Filter>
+    <Image Include="Assets\Textures\MeshTextures\flower daisy.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\flower daisy_normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\grass_texture.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\leaf daisy.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\leaf daisy_normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\pine branch.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\pine branch_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\pine leaf.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\pine leaf_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\plant05.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\PerlinTexture.png">
       <Filter>Assets\Textures</Filter>
@@ -128,14 +175,5 @@
     <Image Include="Assets\Textures\rickshaw.png">
       <Filter>Assets\Textures</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\cs_GrassPlacement.glsl" />
-    <None Include="Assets\Shaders\pp_fogShader.glsl" />
-    <None Include="Assets\Shaders\cs_CreateLODs.glsl" />
-    <None Include="Assets\Shaders\equirectangularToCube_shader.glsl" />
-    <None Include="Assets\Shaders\irradianceCubeMapShader.glsl" />
-    <None Include="Assets\Shaders\IBL_preFilteredSpecularMap.glsl" />
-    <None Include="Assets\Shaders\IBL_brdfSum.glsl" />
   </ItemGroup>
 </Project>

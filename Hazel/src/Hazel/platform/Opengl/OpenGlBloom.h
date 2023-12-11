@@ -18,6 +18,8 @@ namespace Hazel {
 
 	private:
 		void RenderQuad();
+		void RenderRotatedQuad();
+
 		void ExtractImageBrightParts();
 	private:
 		unsigned int m_FBO;

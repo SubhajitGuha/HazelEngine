@@ -10,7 +10,7 @@ void main()
 {
 	gl_Position = pos;
 	//tcord = cord.xy;
-	m_pos = -dir.xyz;
+	m_pos = dir.xyz;
     tcord = pos.xy*0.5+0.5;
 }
 

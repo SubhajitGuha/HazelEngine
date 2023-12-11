@@ -18,6 +18,7 @@
 #include "Hazel/Renderer/Terrain.h"
 #include "Hazel/Renderer/Fog.h"
 #include "Hazel/Renderer/Material.h"
+#include "Hazel/RayTracer/RayTracer.h"
 
 namespace Hazel {
 	
@@ -34,6 +35,7 @@ namespace Hazel {
 	Scene::Scene()
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
+		m_rayTracer = std::make_shared<RayTracer>();
 		Physics3D::Initilize();
 		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
 		SkyRenderer::Initilize("Assets/Textures/HDR/autumn_forest_04_4k.hdr");
@@ -161,6 +163,7 @@ namespace Hazel {
 
 		Renderer3D::SetSunLightDirection(Renderer3D::m_SunLightDir);
 		Renderer3D::SetSunLightColorAndIntensity(Renderer3D::m_SunColor, Renderer3D::m_SunIntensity);
+		m_rayTracer->RenderImage(*MainCamera);
 		//Renderer3D::RenderScene_Deferred(this);
 	}
 	void Scene::OnCreate()

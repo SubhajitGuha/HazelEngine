@@ -264,7 +264,7 @@ void main()
 	Normal = normalize(Normal);
 	
 	gPosition = vec4(grass_data.Pos.xyz , 1.0);
-	gNormal = vec4(-Normal.xyz,1.0);
+	gNormal = vec4(Normal.xyz,1.0);
 	gColor = vec4(texture(u_Albedo,fs_data.TexCoord * u_Tiling).xyz , 1.0);
 	gRoughnessMetallic = vec4(texture(u_Roughness,fs_data.TexCoord * u_Tiling).x,0,0 , 1.0);
 }

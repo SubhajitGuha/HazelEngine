@@ -28,6 +28,7 @@ namespace Hazel {
 		inline glm::mat4 GetViewMatrix() override { return m_View; }
 		inline glm::mat4 GetProjectionMatrix() override { return m_Projection; }
 		inline glm::vec3 GetCameraPosition() override { return m_Position; }
+		inline glm::vec3 GetCameraRotation() override { return glm::vec3(m_pitch, m_yaw, m_roll); };
 		inline glm::vec3 GetViewDirection() override { return m_ViewDirection; }
 		inline float GetAspectRatio() override { return m_AspectRatio; }
 		inline float GetVerticalFOV() override { return m_verticalFOV; }
@@ -53,9 +54,9 @@ namespace Hazel {
 		float m_PerspectiveFar = 1000;
 		
 		float m_AspectRatio = 1.0;
-
+		float m_pitch=0, m_yaw=0, m_roll=0;
 		//camera parameters
-		float m_movespeed = 30;
+		float m_movespeed = 5;
 		glm::vec2 OldMousePos = { 0,0};
 	};
 }

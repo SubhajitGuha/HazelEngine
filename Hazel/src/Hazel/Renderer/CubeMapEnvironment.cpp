@@ -388,6 +388,7 @@ namespace Hazel {
 		glDepthMask(GL_FALSE);//disable writing to depth buffer
 
 		glm::mat4 inv = glm::inverse(glm::mat4(glm::mat3(view))) * glm::inverse(proj);
+
 		glm::vec4 data[] = {
 		glm::vec4(-1,-1,0,1),inv * glm::vec4(-1,-1,0,1),
 		glm::vec4(1,-1,0,1),inv * glm::vec4(1,-1,0,1),

@@ -32,6 +32,7 @@ namespace Hazel {
 		virtual inline glm::mat4 GetViewMatrix() = 0;
 		virtual inline glm::mat4 GetProjectionMatrix() = 0;
 		virtual inline glm::vec3 GetCameraPosition() = 0;
+		virtual inline glm::vec3 GetCameraRotation() = 0;
 		virtual inline glm::vec3 GetViewDirection() = 0;
 		virtual inline float GetAspectRatio() = 0;
 		virtual inline float GetVerticalFOV() = 0;

@@ -17,6 +17,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
 IncludeDir["Glad"] = "Hazel/vendor/Glad/include"
 IncludeDir["imgui"] = "Hazel/vendor/imgui"
+IncludeDir["imguizmo"] = "Hazel/vendor/imguizmo"
 IncludeDir["glm"] = "Hazel/vendor/glm"
 IncludeDir["stb_image"] = "Hazel/vendor/stb_image"
 IncludeDir["entt"] = "Hazel/vendor/entt"
@@ -25,7 +26,6 @@ IncludeDir["json"]="Hazel/vendor/jsoncpp"
 IncludeDir["assimp"]="Hazel/vendor/assimp/include"
 IncludeDir["Physx"]="Hazel/vendor/physx_x64-windows/include"
 IncludeDir["yaml_cpp"] = "Hazel/vendor/yaml_cpp/include"
-IncludeDir["cyCodeBase"] = "Hazel/vendor/cyCodeBase"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
@@ -67,7 +67,8 @@ project "Hazel"
 		"%{IncludeDir.Physx}/**.h",
 		"%{IncludeDir.Physx}/**.hpp",
 		"%{IncludeDir.Physx}/**.cpp",
-		"%{IncludeDir.cyCodeBase}/**.h"
+		"%{IncludeDir.imguizmo}/**.h",
+		"%{IncludeDir.imguizmo}/**.cpp",
 	}
 
 	includedirs
@@ -77,6 +78,7 @@ project "Hazel"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.imgui}",
+		"%{IncludeDir.imguizmo}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.curl}",
@@ -85,7 +87,6 @@ project "Hazel"
 		"%{IncludeDir.assimp}",
 		"%{IncludeDir.Physx}",
 		"%{IncludeDir.yaml_cpp}",
-		"%{IncludeDir.cyCodeBase}"
 	}
 
 	links{
@@ -116,6 +117,9 @@ project "Hazel"
 		"Hazel/vendor/physx_x64-windows/lib/SceneQuery_static_64.lib",
 		"Hazel/vendor/physx_x64-windows/lib/SimulationController_static_64.lib",
 	}
+
+	files "Hazel/vendor/imguizmo/**.cpp"
+	flags {"NoPCH"}
 
 	filter "system:windows"
 		
@@ -171,6 +175,7 @@ project "Sandbox"
 	{
 		"Hazel/vendor/spdlog/include",
 		"%{IncludeDir.imgui}",
+		"%{IncludeDir.imguizmo}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.curl}",
@@ -179,6 +184,9 @@ project "Sandbox"
 	}
 	links "Hazel"
 
+	files "Hazel/vendor/imguizmo/**.cpp"
+	flags {"NoPCH"}
+	
 	filter "system:windows"
 		
 		systemversion "latest"
@@ -225,6 +233,7 @@ project "Hazel_Editor"
 	{
 		"Hazel/vendor/spdlog/include",
 		"%{IncludeDir.imgui}",
+		"%{IncludeDir.imguizmo}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.curl}",
@@ -234,6 +243,9 @@ project "Hazel_Editor"
 		"%{IncludeDir.yaml_cpp}"
 	}
 	links "Hazel"
+
+	files "Hazel/vendor/imguizmo/**.cpp"
+	flags {"NoPCH"}
 
 	filter "system:windows"
 		

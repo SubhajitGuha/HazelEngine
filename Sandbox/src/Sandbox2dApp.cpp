@@ -7,6 +7,7 @@
 #include "json/json.h"
 
 //#include "Hazel/Profiling.h"
+std::vector<float> SandBox2dApp::ClosingPrices;
 SandBox2dApp::SandBox2dApp()
 	:Layer("Renderer2D layer"), m_camera(1366 / 768)
 {
@@ -30,6 +31,7 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 	m_Points.clear();
 	val.clear();
 	Renderer2D::Init();
+	ChangeInterval(APIInterval::_INTRADAY);
 
 	//get data from a server using an api key
 	//curl is used to connect to the server
@@ -55,11 +57,13 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 	}
 	curl_global_cleanup();
 	//std::cout << result << "\n\n";
-	std::ifstream file("trading_data.json");
+	std::ifstream file("default_trading_data.json");
+	std::string line;
 	Json::Value jsonData;//json file parser
 	Json::Reader jsonReader;
-
-	if (jsonReader.parse(file, jsonData)) 
+	Json::CharReaderBuilder rbuilder;
+	std::string errs;
+	if (Json::parseFromStream(rbuilder,file, &jsonData,&errs))
 	{
 		uint32_t JsonSize = jsonData[interval].size();
 
@@ -90,18 +94,22 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 			jsonData[interval][it.name()]["2. high"].asString(),jsonData[interval][it.name()]["3. low"].asString(),
 			jsonData[interval][it.name()][volume_index.c_str()].asString() };
 			val.push_back(value);
+			ClosingPrices.push_back(y);
 		}
+		
+		
 		HAZEL_CORE_WARN(max_volume);
 		HAZEL_CORE_INFO(min_volume);
 
-		if (JsonSize > NumPoints)
-		{
-			m_Points.erase(m_Points.begin(), m_Points.end() - NumPoints);
-			val.erase(val.begin(), val.end() - NumPoints);
-		}
+		//if (JsonSize > NumPoints)
+		//{
+		//	m_Points.erase(m_Points.begin(), m_Points.end() - NumPoints);
+		//	val.erase(val.begin(), val.end() - NumPoints);
+		//}
 	}
 	HAZEL_CORE_ERROR(result);
-	m_camera.SetCameraPosition({ normalize_data(m_Points[m_Points.size() - 1],m_Points.size() - 1),0 });
+	if(m_Points.size()>0)
+	m_camera.SetCameraPosition({ normalize_data(m_Points[0],0),0 });
 }
 
 
@@ -267,6 +275,19 @@ void SandBox2dApp::Draw_X_axis_Label(ImDrawList* draw_list)
 	drawVolumeBarGraph(draw_list);
 }
 
+void SandBox2dApp::PlotMonteCarloSimVals()
+{
+	if(FuturePrices.size()==0)
+		return
+	Renderer2D::LineBeginScene(m_camera.GetCamera());
+	{
+		for (int i = 0; i < FuturePrices.size() - 1; i++)
+			Renderer2D::DrawLine(glm::vec3(normalize_data({ m_Points[i].x,FuturePrices[i] }, i), 0), glm::vec3(normalize_data({ m_Points[i + 1].x,FuturePrices[i + 1] }, i + 1), 0), {0.2,1.0,0.3,1.0});
+
+		Renderer2D::LineEndScene();
+	}
+}
+
 
 glm::vec2 SandBox2dApp::ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm::vec2& ViewportSize) //this function converts opengl coordinate to screen coordinate
 {
@@ -278,6 +299,10 @@ glm::vec2 SandBox2dApp::ConvertToScreenCoordinate(glm::vec4& OGlCoordinate, glm:
 
 void SandBox2dApp::OnAttach()
 {
+	//std::thread t1([&]() {FetchData(); });
+	//std::thread t2([&]() {news->OnAttach(); });
+	//t1.join();
+	//t2.join();
 	FetchData();
 	news->OnAttach();
 }
@@ -344,7 +369,18 @@ void SandBox2dApp::OnUpdate(float deltatime)
 		drawCurve();
 		break;
 	};
+	if (FuturePrices.size() != 0)
+	{
+		Renderer2D::LineBeginScene(m_camera.GetCamera());
+		{
+			for (int i = 0; i < FuturePrices.size() - 1; i++) {
+				//std::cout << normalize_data({ m_Points[i].x,-FuturePrices[i] }, i).y;
+				Renderer2D::DrawLine(glm::vec3(normalize_data({ m_Points[i].x,-FuturePrices[i] }, i), 0), glm::vec3(normalize_data({ m_Points[i + 1].x,-FuturePrices[i + 1] }, i + 1), 0), { 0.2,1.0,0.3,1.0 });
+			}//Renderer2D::DrawLine(glm::vec3(0,0, 0), glm::vec3(180,2, 0), { 0.2,1.0,0.3,1.0 },20.0f);
 
+			Renderer2D::LineEndScene();
+		}
+	}
 
 	//draw the x-axises
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
@@ -434,6 +470,10 @@ void SandBox2dApp::OnImGuiRender()
 	ImGui::PopStyleVar();
 
 	ImGui::Begin("Properties");
+	if (ImGui::Button("Run MonteCarlo Simulation"))
+	{
+		FuturePrices = MCSim.RunSimulation(1, 100, 300, 200);
+	}
 	ImGui::DragFloat("Curvature Factor", &factor, 0.1, 0, 1);
 	ImGui::DragInt("Coordinate Spacing", &coordinate_scale, 1, 1, 10);
 	ImGui::DragFloat("Volume Scale", &volume_scale, 10, 0, 500000);
@@ -517,7 +557,7 @@ void SandBox2dApp::OnImGuiRender()
 		FetchData();
 	}
 	{
-		const char*const list[2] = { "CandleStick","Line" };//names must be same as the GraphType_Map(unordered_map) key values
+		const char*const list[2] = { "Line","CandleStick" };//names must be same as the GraphType_Map(unordered_map) key values
 		if (ImGui::Combo("Graph Types", &IndexOfGraph, list, 2)) 
 			Renderer2D::Init();//to clear the previous drawn buffer
 		graphtype = GraphType_Map[list[IndexOfGraph]];
@@ -632,9 +672,10 @@ void SandBox2dApp::drawCurve()
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
 	{
 		if (factor == 0)//if factor is ==0 no need to draw curved lines 
-			for (int i = 0; i < m_Points.size() - 1; i++)
+			for (int i = 0; i < m_Points.size() - 1; i++) {
+				//std::cout << normalize_data(m_Points[i], i).y;
 				Renderer2D::DrawLine(glm::vec3(normalize_data(m_Points[i], i), 0), glm::vec3(normalize_data(m_Points[i + 1], i + 1), 0), color);
-		
+			}
 		else {
 			for (int i = 0; i < m_Points.size() - 1; i++) 
 			{

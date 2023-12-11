@@ -79,11 +79,12 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -95,7 +96,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -103,6 +104,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,7 +117,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -123,6 +125,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,20 +136,24 @@
   <ItemGroup>
     <ClInclude Include="src\DisplayNews.h" />
     <ClInclude Include="src\ImGuiInputText.h" />
+    <ClInclude Include="src\MonteCarloSim.h" />
     <ClInclude Include="src\Sandbox2dApp.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\GraphEditor.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGradient.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGuizmo.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImSequencer.cpp" />
     <ClCompile Include="src\DisplayNews.cpp" />
     <ClCompile Include="src\ImGuiInputText.cpp" />
+    <ClCompile Include="src\MonteCarloSim.cpp" />
     <ClCompile Include="src\Sandbox2dApp.cpp" />
     <ClCompile Include="src\SandboxApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png" />
     <Image Include="Assets\Textures\Test.png" />
-    <Image Include="Assets\Textures\img_0.png" />
-    <Image Include="Assets\Textures\img_2.png" />
-    <Image Include="Assets\Textures\img_3.png" />
     <Image Include="Assets\Textures\rickshaw.png" />
   </ItemGroup>
   <ItemGroup>

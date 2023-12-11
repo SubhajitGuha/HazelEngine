@@ -53,7 +53,7 @@ namespace Hazel
 		//needs to have different width,height,channels
 		GrassSpawnArea = stbi_load_16("Assets/Textures/grass_mask.png", &m_Width, &m_Height, &m_Channels1, 0);
 
-		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map.png",true);
+		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map2.png",true);
 		m_perlinNoise = Texture2D::Create("Assets/Textures/PerlinTexture.png");
 		TerrainTex_Albedo = Texture2D::Create("Assets/Textures/forrest_ground_01_diff_2k.jpg");
 		TerrainTex_Roughness = Texture2D::Create("Assets/Textures/forrest_ground_01_rough_2k.jpg");
@@ -79,9 +79,9 @@ namespace Hazel
 
 		//divide the landscape in 'n' number of patches
 		float res = ChunkSize;
-		for (int i = 0; i < m_dimension.y; i+=res)
+		for (int i = 0; i <= m_dimension.y; i+=res)
 		{
-			for (int j = 0; j < m_dimension.x; j+=res)
+			for (int j = 0; j <= m_dimension.x; j+=res)
 			{
 				TerrainData v1;
 				v1.Position = glm::vec3( j, 0, i);
@@ -112,7 +112,7 @@ namespace Hazel
 		m_terrainVertexArray->AddBuffer(bl, vb);
 		glPatchParameteri(GL_PATCH_VERTICES, 4);//will be present after all vertex array operations for tessellation
 
-		glm::mat4 terrain_transform = glm::translate(glm::mat4(1.0f), { 0,1,0 }) * glm::rotate(glm::mat4(1.0), glm::radians(180.0f), { 0,0,1 });
+		glm::mat4 terrain_transform = glm::translate(glm::mat4(1.0f), { 0,0,0 }) * glm::rotate(glm::mat4(1.0), glm::radians(0.0f), { 0,0,1 });
 		max_height = std::numeric_limits<float>::min();
 		min_height = std::numeric_limits<float>::max();
 
@@ -199,9 +199,9 @@ namespace Hazel
 		int CamX = cam.GetCameraPosition().x;
 		int CamZ = cam.GetCameraPosition().z;
 
-		//glDisable(GL_CULL_FACE)
+		glDisable(GL_CULL_FACE);
 		//glCullFace(GL_FRONT);
-		m_terrainModelMat = glm::rotate(glm::mat4(1.0), glm::radians(0.0f), {0,0,1});
+		m_terrainModelMat = glm::mat4(1.0);
 
 		TerrainTex_Albedo->Bind(ALBEDO_SLOT);
 		TerrainTex_Roughness->Bind(ROUGHNESS_SLOT);
@@ -227,8 +227,8 @@ namespace Hazel
 		//HAZEL_CORE_ERROR(time);
 		if (bShowTerrain)
 			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
-		//glEnable(GL_CULL_FACE);
-		//glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 
 		m_terrainWireframeShader->Bind();
 		m_terrainWireframeShader->SetFloat("HEIGHT_SCALE", HeightScale);

@@ -10,7 +10,7 @@ namespace Hazel {
 		:m_View(1.0)
 	{
 		RightVector = glm::normalize(glm::cross(m_ViewDirection, Up));
-		m_Projection = glm::perspective(m_verticalFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+		m_Projection = glm::perspective(glm::radians(m_verticalFOV), m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		m_ProjectionView = m_Projection * m_View;
 		
 	}
@@ -30,9 +30,12 @@ namespace Hazel {
 
 	void EditorCamera::RotateCamera(float pitch, float yaw, float roll)
 	{
-		glm::quat rotation = glm::angleAxis(glm::radians(yaw), Up) * glm::angleAxis(glm::radians(pitch),RightVector) ;
-		m_ViewDirection = glm::rotate(rotation, m_ViewDirection);
-		//m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::mat3(glm::rotate(glm::radians(roll), m_ViewDirection)) * glm::vec3(0, 0, 1);
+		m_pitch = pitch;
+		m_yaw = yaw;
+		m_roll = roll;
+		//glm::quat rotation = glm::angleAxis(glm::radians(yaw), Up) * glm::angleAxis(glm::radians(pitch),RightVector) ;
+		//m_ViewDirection = glm::rotate(rotation, m_ViewDirection);
+		m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::mat3(glm::rotate(glm::radians(roll), m_ViewDirection)) * m_ViewDirection;
 		//m_ViewDirection = rotation * glm::vec3(0, 0, 1);
 		RecalculateProjectionView();
 	}
@@ -77,15 +80,15 @@ namespace Hazel {
 		if (Input::IsKeyPressed(HZ_KEY_D))
 			m_Position += RightVector * glm::vec3(m_movespeed*deltatime);
 		if(Input::IsKeyPressed(HZ_KEY_Q))
-			m_Position -= Up * glm::vec3(m_movespeed*deltatime);//move along up vector
+			m_Position += Up * glm::vec3(m_movespeed*deltatime);//move along up vector
 		if (Input::IsKeyPressed(HZ_KEY_E))
-			m_Position += Up * glm::vec3(m_movespeed*deltatime);
-		if (Input::IsKeyPressed(HZ_KEY_R))//reset camera when R is pressed
-		{
-			m_Position = { 0,0,-1 };
-			m_ViewDirection = { 0,0,1 };
-			m_verticalFOV = 45.0f;
-		}
+			m_Position -= Up * glm::vec3(m_movespeed*deltatime);
+		//if (Input::IsKeyPressed(HZ_KEY_R))//reset camera when R is pressed
+		//{
+		//	m_Position = { 0,0,-1 };
+		//	m_ViewDirection = { 0,0,1 };
+		//	m_verticalFOV = 45.0f;
+		//}
 
 		glm::vec2 NewMousePos = { Input::GetCursorPosition().first,Input::GetCursorPosition().second };
 		if (Input::IsButtonPressed(HZ_MOUSE_BUTTON_2))//camera pan
@@ -93,7 +96,7 @@ namespace Hazel {
 			auto delta = NewMousePos - OldMousePos;//get change in mouse position
 
 			m_ViewDirection = glm::mat3(glm::rotate(glm::radians(-delta.x) * 0.1f, Up)) * m_ViewDirection;//invert it
-			m_ViewDirection = glm::mat3(glm::rotate(glm::radians(delta.y) * 0.1f, RightVector)) * m_ViewDirection;//rotate along right vector
+			m_ViewDirection = glm::mat3(glm::rotate(glm::radians(-delta.y) * 0.1f, RightVector)) * m_ViewDirection;//rotate along right vector
 			m_ViewDirection = glm::normalize(m_ViewDirection);
 		}
 		OldMousePos = NewMousePos;
@@ -105,7 +108,7 @@ namespace Hazel {
 	{
 		//moving the camera is nothing but transforming the world
 		//glm::vec3 up = glm::normalize(glm::cross(RightVector, glm::normalize(m_ViewDirection)));
-		m_View = glm::lookAt(m_Position, glm::normalize(m_ViewDirection) + m_Position, Up);//this gives the view matrix
+		m_View = glm::lookAt(m_Position - glm::normalize(m_ViewDirection), m_Position, Up);//this gives the view matrix
 		m_ProjectionView = m_Projection * m_View;
 	}
 }

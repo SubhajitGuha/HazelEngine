@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -95,7 +95,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -115,7 +115,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -131,39 +131,51 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Pannels\MaterialEditor.h" />
     <ClInclude Include="src\CustomScript.h" />
     <ClInclude Include="src\HazelEditor.h" />
     <ClInclude Include="src\Pannels\ContentBrowser.h" />
+    <ClInclude Include="src\Pannels\MaterialEditor.h" />
     <ClInclude Include="src\Pannels\SceneHierarchy.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Pannels\MaterialEditor.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\GraphEditor.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGradient.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGuizmo.cpp" />
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImSequencer.cpp" />
     <ClCompile Include="src\HazelEditor.cpp" />
     <ClCompile Include="src\Pannels\ContentBrowser.cpp" />
+    <ClCompile Include="src\Pannels\MaterialEditor.cpp" />
     <ClCompile Include="src\Pannels\SceneHierarchy.cpp" />
     <ClCompile Include="src\SandboxApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Assets\Textures\Interior-Cube-Map\0.png" />
-    <Image Include="Assets\Textures\Interior-Cube-Map\1.png" />
-    <Image Include="Assets\Textures\Interior-Cube-Map\2.png" />
-    <Image Include="Assets\Textures\Interior-Cube-Map\3.png" />
-    <Image Include="Assets\Textures\Interior-Cube-Map\4.png" />
-    <Image Include="Assets\Textures\Interior-Cube-Map\5.png" />
+    <Image Include="Assets\Textures\MeshTextures\AK_103_Base_Color.png" />
+    <Image Include="Assets\Textures\MeshTextures\AK_103_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\BarkAI_Spec.png" />
+    <Image Include="Assets\Textures\MeshTextures\Billboard_2K_Albedo_packed.png" />
+    <Image Include="Assets\Textures\MeshTextures\ForestFern_2K_Albedo_packed.png" />
     <Image Include="Assets\Textures\MeshTextures\Grass 2K.png" />
     <Image Include="Assets\Textures\MeshTextures\GrassUE5_D.png" />
     <Image Include="Assets\Textures\MeshTextures\GrassUE5_N.png" />
     <Image Include="Assets\Textures\MeshTextures\GrassUE5_ORA.png" />
     <Image Include="Assets\Textures\MeshTextures\Grass_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\Grass_ORA.png" />
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\0.png" />
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\1.png" />
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\2.png" />
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\3.png" />
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\4.png" />
-    <Image Include="Assets\Textures\Outdoor-Cube-Map\5.png" />
+    <Image Include="Assets\Textures\MeshTextures\RoughnessMat.png" />
+    <Image Include="Assets\Textures\MeshTextures\bark.png" />
+    <Image Include="Assets\Textures\MeshTextures\bark01.png" />
+    <Image Include="Assets\Textures\MeshTextures\bark01_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\bark_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\flower daisy.png" />
+    <Image Include="Assets\Textures\MeshTextures\flower daisy_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\grass_texture.png" />
+    <Image Include="Assets\Textures\MeshTextures\leaf daisy.png" />
+    <Image Include="Assets\Textures\MeshTextures\leaf daisy_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\pine branch.png" />
+    <Image Include="Assets\Textures\MeshTextures\pine branch_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\pine leaf.png" />
+    <Image Include="Assets\Textures\MeshTextures\pine leaf_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\plant05.png" />
     <Image Include="Assets\Textures\PerlinTexture.png" />
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png" />
     <Image Include="Assets\Textures\Terrain_Height_Map.png" />
@@ -176,15 +188,6 @@
     <ProjectReference Include="..\Hazel\Hazel.vcxproj">
       <Project>{99294D0D-053E-75BE-CEBF-181E3A9371EF}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\cs_CreateLODs.glsl" />
-    <None Include="Assets\Shaders\cs_GrassPlacement.glsl" />
-    <None Include="Assets\Shaders\equirectangularToCube_shader.glsl" />
-    <None Include="Assets\Shaders\IBL_brdfSum.glsl" />
-    <None Include="Assets\Shaders\irradianceCubeMapShader.glsl" />
-    <None Include="Assets\Shaders\pp_fogShader.glsl" />
-    <None Include="Assets\Shaders\IBL_preFilteredSpecularMap.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

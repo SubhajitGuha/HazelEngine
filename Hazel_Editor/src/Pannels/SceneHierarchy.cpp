@@ -12,6 +12,7 @@
 
 using namespace Hazel;
 std::string texture_path = "Assets/Textures/Test.png";
+ref<Entity> SceneHierarchyPannel::m_selected_entity;
 SceneHierarchyPannel::SceneHierarchyPannel() = default;
 SceneHierarchyPannel::~SceneHierarchyPannel()
 {

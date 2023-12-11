@@ -2,7 +2,6 @@
 #include "Material.h"
 #include "Hazel/Scene/SceneSerializer.h"
 #include "Hazel/ResourceManager.h"
-
 namespace Hazel
 {
 	ref<Material> Material::m_material;

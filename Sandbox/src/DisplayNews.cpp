@@ -75,7 +75,7 @@ void News::OnAttach()
 		CURL* curl;
 		CURLcode res;
 		FILE* fp;
-		std::string api = "https://www.alphavantage.co/query?function=NEWS_SENTIMENT&"+tickers+"&time_from=20220410T0130&limit=200&apikey=NT07D3RF1DRQBSL";
+		std::string api = "https://www.alphavantage.co/query?function=NEWS_SENTIMENT&"+tickers+"&time_from=20220410T0130&limit=200&apikey=RPX72XW6HBJ7J59R";
 		char outfilename[FILENAME_MAX] = "news_data.json";
 		curl = curl_easy_init();
 		if (curl) {

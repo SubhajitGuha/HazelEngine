@@ -1,5 +1,6 @@
 #include <hzpch.h>
 #include "HazelEditor.h"
+#include "ImGuizmo.h"
 #include "Hazel//Renderer/Shadows.h"
 #include "Hazel/Physics/Physics3D.h"
 #include "Hazel/Renderer/DeferredRenderer.h"
@@ -7,6 +8,7 @@
 #include "Hazel/Renderer/FoliageRenderer.h"
 #include "Hazel/Renderer/SkyRenderer.h"
 #include "Hazel/Renderer/Fog.h"
+#include "Hazel/RayTracer/RayTracer.h"
 
 //#include "Hazel/Profiling.h"
 
@@ -100,12 +102,12 @@ void  HazelEditor::OnUpdate(float deltatime )
 {
 	frame_time = deltatime;
 	m_scene->OnUpdate(deltatime);
-	Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
+	//Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
 
 	m_FrameBuffer2->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
-	Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
+	//Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
 	m_scene->Resize(m_ViewportSize.x, m_ViewportSize.y);
 	m_FrameBuffer2->UnBind();
 
@@ -140,9 +142,46 @@ void  HazelEditor::OnImGuiRender()
 		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 		m_camera.onResize(Size.x, Size.y);
 	}
-	ImGui::Image((void*)m_FrameBuffer->GetSceneTextureID(), *(ImVec2*)&m_ViewportSize);
+	ImGui::Image(reinterpret_cast<void*>(m_FrameBuffer->GetSceneTextureID()), *(ImVec2*)&m_ViewportSize);
+
+	if (SceneHierarchyPannel::m_selected_entity) //gizmo logics
+	{
+		auto w_pos = ImGui::GetWindowPos();
+		auto& transform = SceneHierarchyPannel::m_selected_entity->GetComponent<TransformComponent>();
+		ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+		if (Input::IsKeyPressed(HZ_KEY_E))
+			transform.mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+		if(Input::IsKeyPressed(HZ_KEY_R))
+			transform.mCurrentGizmoOperation = ImGuizmo::ROTATE;
+		if (Input::IsKeyPressed(HZ_KEY_T))
+			transform.mCurrentGizmoOperation = ImGuizmo::SCALE;
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::SetRect(w_pos.x,w_pos.y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+		//ImGuizmo::DrawGrid(&m_scene->GetCamera()->GetViewMatrix()[0][0], &m_scene->GetCamera()->GetProjectionMatrix()[0][0], &transform.GetTransform()[0][0], 100);
+		glm::mat4 trans = (transform.GetTransform());
+		glm::mat4 camera_view = (m_scene->GetCamera()->GetViewMatrix());
+		glm::mat4 proj = (m_scene->GetCamera()->GetProjectionMatrix());
+		ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(proj), transform.mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(trans));
+		if (ImGuizmo::IsUsing())
+		{
+			ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(trans), glm::value_ptr(transform.Translation), glm::value_ptr(transform.Rotation),
+				glm::value_ptr(transform.Scale));
+		}
+	}
 	ImGui::End();
 
+	ImGui::Begin("Viewport_RayTracer");
+	isWindowFocused = ImGui::IsWindowFocused();
+	ImVec2 Size2 = ImGui::GetContentRegionAvail();
+	if (m_ViewportSize != *(glm::vec2*)&Size2)
+	{
+		m_ViewportSize = { Size2.x,Size2.y };
+		m_FrameBuffer2->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		m_camera.onResize(Size2.x, Size2.y);
+	}
+	ImGui::Image(reinterpret_cast<void*>(RayTracer::m_RT_TextureID), *(ImVec2*)&m_ViewportSize);
+	ImGui::End();
 
 	ImGui::Begin("Light controller");
 	ImGui::DragFloat3("Sun Direction", (float*)&Renderer3D::m_SunLightDir,0.01);

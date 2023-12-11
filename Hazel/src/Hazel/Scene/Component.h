@@ -6,7 +6,7 @@
 #include "Hazel/Renderer/Camareas/SceneCamera.h"
 #include "Hazel/LoadMesh.h"
 #include "ScriptableEntity.h"
-
+#include "ImGuizmo.h"
 
 namespace physx {
 	class PxRigidDynamic;
@@ -30,6 +30,7 @@ namespace Hazel {
 			:tag(name){}
 		operator std::string() { return tag; }
 	};
+
 	struct TransformComponent {
 		glm::vec3 Translation = { 0,0,0 };
 		glm::vec3 Rotation = { 0,0,0 };//in degrees
@@ -38,7 +39,7 @@ namespace Hazel {
 		glm::vec3 UpVector = { 0,1,0 };
 		glm::vec3 RightVector = glm::cross(ForwardVector, UpVector);
 		glm::mat4 m_transform = glm::mat4(1.0f); // can be set to the physx_transform
-
+		ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
 		TransformComponent() = default;
 		TransformComponent(const glm::vec3& translation,const glm::vec3& rotatation=glm::vec3(0),const glm::vec3& scale=glm::vec3(1))
 			:Translation(translation),Rotation(rotatation),Scale(scale)

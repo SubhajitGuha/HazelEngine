@@ -7,6 +7,15 @@
     <Filter Include="Assets\Textures">
       <UniqueIdentifier>{0B35254A-77C0-920E-80D1-1503ECDBEE0E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Hazel">
+      <UniqueIdentifier>{99294D0D-053E-75BE-CEBF-181E3A9371EF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hazel\vendor">
+      <UniqueIdentifier>{D6D9B06F-C23C-4014-6BC2-78CA57040C97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hazel\vendor\imguizmo">
+      <UniqueIdentifier>{366DB374-A2D9-6E6F-6BCD-06CDD7F890D7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
@@ -21,8 +30,24 @@
     <ClInclude Include="src\Sandbox2dApp.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\MonteCarloSim.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\GraphEditor.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImCurveEdit.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGradient.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGuizmo.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hazel\vendor\imguizmo\ImSequencer.cpp">
+      <Filter>Hazel\vendor\imguizmo</Filter>
+    </ClCompile>
     <ClCompile Include="src\DisplayNews.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -35,21 +60,13 @@
     <ClCompile Include="src\SandboxApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\MonteCarloSim.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\Test.png">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\img_0.png">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\img_2.png">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\img_3.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\rickshaw.png">

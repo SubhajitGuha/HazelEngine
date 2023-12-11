@@ -1,5 +1,6 @@
 #pragma once
 #include "Hazel.h"
+#include "MonteCarloSim.h" 
 #include <unordered_map>
 
 #define WEEKLY "Weekly Time Series"
@@ -35,7 +36,10 @@ public:
 	virtual void OnUpdate(float deltatime) override;
 	virtual void OnImGuiRender() override;
 	virtual void OnEvent(Event& e) override;
-
+public:
+	static std::vector<float> ClosingPrices;
+	std::vector<float> FuturePrices;
+	MonteCarloSim MCSim;
 private:
 	News* news;
 	OrthographicCameraController m_camera;
@@ -54,19 +58,19 @@ private:
 	std::pair<std::string, std::string> MousePos_Label;
 	glm::vec4 color = { 1,0.462,0,1 };
 
-	std::string DataInterval = "TIME_SERIES_WEEKLY",interval=WEEKLY;
+	std::string DataInterval = "TIME_SERIES_INTRADAY",interval=DAILY;
 
 	std::string CompanyName="IBM";//default
 	std::string tmp_string = "";//used in Draw_X_axis_Label function
 	std::string SearchResult = "";//contain the search result of auto search
 
 	APIInterval ApiInterval = APIInterval::_WEEKLY;//used in x-axis labeling
-	GraphType graphtype = GraphType::_CANDLESTICK;
+	GraphType graphtype = GraphType::_LINE;
 
 	std::unordered_map<std::string, GraphType> GraphType_Map;
 	int IndexOfGraph = 0;
 
-	float factor = 0.2;
+	float factor = 0.0;
 	float max_val = INT_MIN, min_val = INT_MAX;
 	float max_volume = INT_MIN,min_volume = INT_MAX;
 	float volume_scale=100;
@@ -74,7 +78,7 @@ private:
 	int UpscaledValue = 100; // this variable is used for scaling the normalized-finance data values
 	int NumPoints = 1000;
 	int SkipCoordinate = 0;//used to skip coordinate label
-	int interval_in_min = 15;
+	int interval_in_min = 5;
 	bool isFetchingData = false;
 	bool isWindowFocused = false;
 	bool isDatafetched = false;
@@ -98,4 +102,5 @@ private:
 	void MoveCameraToNearestPoint();
 	void ChangeInterval(APIInterval apiinterval);
 	void Draw_X_axis_Label(ImDrawList* draw_list);
+	void PlotMonteCarloSimVals();
 };

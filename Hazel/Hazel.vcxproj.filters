@@ -70,6 +70,9 @@
     <Filter Include="vendor\entt">
       <UniqueIdentifier>{DD8078C1-4936-F1B6-D22A-EB8D3EDFE7BA}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vendor\imguizmo">
+      <UniqueIdentifier>{B36F5F1F-1FFB-CCE3-280C-50D8941629E4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="vendor\jsoncpp">
       <UniqueIdentifier>{DF9952C1-CB67-46C7-B4FB-B6EDA068222C}</UniqueIdentifier>
     </Filter>
@@ -225,6 +228,9 @@
     <ClInclude Include="src\Hazel\Renderer\DeferredRenderer.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\Fog.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\FoliageRenderer.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
@@ -232,6 +238,9 @@
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\GraphicsContext.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\Material.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\OrthographicCamera.h">
@@ -270,6 +279,9 @@
     <ClInclude Include="src\Hazel\Renderer\Texture.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\ResourceManager.h">
+      <Filter>src\Hazel</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Scene\Component.h">
       <Filter>src\Hazel\Scene</Filter>
     </ClInclude>
@@ -288,6 +300,9 @@
     <ClInclude Include="src\Hazel\Scene\ScriptableEntity.h">
       <Filter>src\Hazel\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\UUID.h">
+      <Filter>src\Hazel</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Window.h">
       <Filter>src\Hazel</Filter>
     </ClInclude>
@@ -304,6 +319,9 @@
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.h">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFog.h">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.h">
@@ -626,6 +644,24 @@
     </ClInclude>
     <ClInclude Include="vendor\entt\entt.hpp">
       <Filter>vendor\entt</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\imguizmo\GraphEditor.h">
+      <Filter>vendor\imguizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\imguizmo\ImCurveEdit.h">
+      <Filter>vendor\imguizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\imguizmo\ImGradient.h">
+      <Filter>vendor\imguizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\imguizmo\ImGuizmo.h">
+      <Filter>vendor\imguizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\imguizmo\ImSequencer.h">
+      <Filter>vendor\imguizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\imguizmo\ImZoomSlider.h">
+      <Filter>vendor\imguizmo</Filter>
     </ClInclude>
     <ClInclude Include="vendor\jsoncpp\json\json-forwards.h">
       <Filter>vendor\jsoncpp\json</Filter>
@@ -1203,11 +1239,7 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlFog.h" />
-    <ClInclude Include="src\Hazel\Renderer\Fog.h" />
-    <ClInclude Include="src\Hazel\Renderer\Material.h" />
-    <ClInclude Include="src\Hazel\UUID.h" />
-    <ClInclude Include="src\Hazel\ResourceManager.h" />
+    <ClInclude Include="src\Hazel\RayTracer\RayTracer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1264,6 +1296,9 @@
     <ClCompile Include="src\Hazel\Renderer\DeferredRenderer.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\Fog.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\FoliageRenderer.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
@@ -1271,6 +1306,9 @@
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\GraphicsContext.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\Material.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\OrthographicCamera.cpp">
@@ -1309,6 +1347,9 @@
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp">
       <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\ResourceManager.cpp">
+      <Filter>src\Hazel</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\Scene\Entity.cpp">
       <Filter>src\Hazel\Scene</Filter>
     </ClCompile>
@@ -1337,6 +1378,9 @@
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlDeferredRenderer.cpp">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFog.cpp">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFrameBuffer.cpp">
@@ -1372,6 +1416,21 @@
     <ClCompile Include="src\hzpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="vendor\imguizmo\GraphEditor.cpp">
+      <Filter>vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imguizmo\ImCurveEdit.cpp">
+      <Filter>vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imguizmo\ImGradient.cpp">
+      <Filter>vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imguizmo\ImGuizmo.cpp">
+      <Filter>vendor\imguizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imguizmo\ImSequencer.cpp">
+      <Filter>vendor\imguizmo</Filter>
+    </ClCompile>
     <ClCompile Include="vendor\jsoncpp\jsoncpp.cpp">
       <Filter>vendor\jsoncpp</Filter>
     </ClCompile>
@@ -1381,9 +1440,6 @@
     <ClCompile Include="vendor\stb_image\stb_image_resize.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlFog.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\Fog.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\Material.cpp" />
-    <ClCompile Include="src\Hazel\ResourceManager.cpp" />
+    <ClCompile Include="src\Hazel\RayTracer\RayTracer.cpp" />
   </ItemGroup>
 </Project>
