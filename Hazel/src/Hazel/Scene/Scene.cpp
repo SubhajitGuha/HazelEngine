@@ -164,7 +164,6 @@ namespace Hazel {
 		Renderer3D::SetSunLightDirection(Renderer3D::m_SunLightDir);
 		Renderer3D::SetSunLightColorAndIntensity(Renderer3D::m_SunColor, Renderer3D::m_SunIntensity);
 		m_rayTracer->RenderImage(*MainCamera);
-		//Renderer3D::RenderScene_Deferred(this);
 	}
 	void Scene::OnCreate()
 	{

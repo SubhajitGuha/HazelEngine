@@ -92,7 +92,7 @@ float cumulus = 0.8;
     //if (m_pos.y < 0)
       //discard;
 
-    vec3 sun_dir = -sun_direction;
+    vec3 sun_dir = sun_direction;
     // Atmosphere Scattering
     float mu = dot(normalize(m_pos), normalize(sun_dir));
     float rayleigh = 3.0 / (8.0 * 3.14) * (1.0 + mu * mu);

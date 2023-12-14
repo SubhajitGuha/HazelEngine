@@ -296,8 +296,7 @@ namespace Hazel {
 			}
 			centre /= 8.0f;//calculate the centroid of the frustum cube and this will be the position for the light view matrix
 
-			//light dir should be inverted as we are looking from the light
-			LightView[i-1] = glm::lookAt(centre , centre - glm::normalize(LightPosition), { 0.0,1.0,0.0 }); //move the camera to the centroid of each frustum
+			LightView[i-1] = glm::lookAt(centre , centre + glm::normalize(LightPosition), { 0.0,1.0,0.0 }); //move the camera to the centroid of each frustum
 
 			glm::mat4 matrix_lv = LightView[i - 1];
 			float min_x = std::numeric_limits<float>::max();

@@ -102,12 +102,12 @@ void  HazelEditor::OnUpdate(float deltatime )
 {
 	frame_time = deltatime;
 	m_scene->OnUpdate(deltatime);
-	//Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
+	Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
 
 	m_FrameBuffer2->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
-	//Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
+	Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
 	m_scene->Resize(m_ViewportSize.x, m_ViewportSize.y);
 	m_FrameBuffer2->UnBind();
 
@@ -173,14 +173,12 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Begin("Viewport_RayTracer");
 	isWindowFocused = ImGui::IsWindowFocused();
 	ImVec2 Size2 = ImGui::GetContentRegionAvail();
-	if (m_ViewportSize != *(glm::vec2*)&Size2)
+	if (m_RTViewportSize != *(glm::vec2*)&Size2)
 	{
-		m_ViewportSize = { Size2.x,Size2.y };
-		m_FrameBuffer2->Resize(m_ViewportSize.x, m_ViewportSize.y);
-		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
-		m_camera.onResize(Size2.x, Size2.y);
+		m_RTViewportSize = { Size2.x,Size2.y };
+		m_scene->m_rayTracer->Resize(static_cast<int>(m_RTViewportSize.x), static_cast<int>(m_RTViewportSize.y));
 	}
-	ImGui::Image(reinterpret_cast<void*>(RayTracer::m_RT_TextureID), *(ImVec2*)&m_ViewportSize);
+	ImGui::Image(reinterpret_cast<void*>(RayTracer::m_RT_TextureID), *(ImVec2*)glm::value_ptr(m_ViewportSize), { 0,1 }, {1,0});
 	ImGui::End();
 
 	ImGui::Begin("Light controller");

@@ -7,9 +7,10 @@ namespace Hazel {
 	public:
 		RayTracer() ;
 		RayTracer(int image_w, int image_h, int viewport_w, int viewport_h, int samples=2);
-		void Init();
 		void RenderImage(Camera& cam);
-
+		void Resize(int width, int height);
+	private:
+		void Init(int width, int height);
 	public:
 		int image_width, image_height;
 		float viewport_width, viewport_height;

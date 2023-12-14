@@ -173,7 +173,7 @@ void main()
 
 	VertexPosition_LightSpace = MatrixShadow[level] * m_pos;
 
-	vec3 DirectionalLight_Direction = normalize(DirectionalLight_Direction );//for directional light as it has no concept of position
+	vec3 DirectionalLight_Direction = normalize(-DirectionalLight_Direction );//for directional light as it has no concept of position
 	vec3 EyeDirection = normalize( EyePosition - m_pos.xyz);
 
 	//shadows

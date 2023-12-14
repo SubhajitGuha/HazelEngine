@@ -23,7 +23,7 @@ private:
 	glm::vec3 position = { 0,0,0 };
 	float ObjSpeed = 20;
 	float scale = 1;
-	glm::vec2 m_ViewportSize = { 1920,1080 };
+	glm::vec2 m_ViewportSize = { 1920,1080 }, m_RTViewportSize = {1920,1080};
 	bool isWindowFocused = false;
 	Entity* Square_entity,*Square2,*Square3;
 	Entity* camera_entity;
