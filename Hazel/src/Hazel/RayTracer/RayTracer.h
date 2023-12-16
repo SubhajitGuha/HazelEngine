@@ -20,5 +20,6 @@ namespace Hazel {
 		uint16_t m_Binding;
 		float m_focalLength;
 		ref<Shader> cs_RayTracingShader;
+		std::chrono::steady_clock::time_point StartTime;
 	};
 }

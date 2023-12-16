@@ -13,6 +13,7 @@ namespace Hazel
 		viewport_width = viewport_height * float(image_width)/image_height;
 		samples = 2;
 		Init(512,512);
+		StartTime = std::chrono::high_resolution_clock::now();
 	}
 	RayTracer::RayTracer(int image_w, int image_h, int viewport_w, int viewport_h, int samples)
 	{		
@@ -39,17 +40,17 @@ namespace Hazel
 	}
 	void RayTracer::RenderImage(Camera& cam)
 	{
-		viewport_height = 2.0 * m_focalLength * glm::tan(glm::radians(cam.GetVerticalFOV())/2.0f); // 10.0f is the focal length of the camera get height from Vfov
-		viewport_width = viewport_height * float(image_width) / image_height;
+		float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-StartTime).count();
 		cs_RayTracingShader->Bind();
 		cs_RayTracingShader->SetFloat("viewport_w",viewport_width);
 		cs_RayTracingShader->SetFloat("viewport_h", viewport_height);
+		cs_RayTracingShader->SetFloat("time", time);
 		cs_RayTracingShader->SetFloat3("camera_pos", cam.GetCameraPosition());
 		cs_RayTracingShader->SetFloat3("camera_viewdir", -cam.GetViewDirection());
 		cs_RayTracingShader->SetFloat("focal_length", m_focalLength);
 		cs_RayTracingShader->SetMat4("mat_view", cam.GetViewMatrix());
 		cs_RayTracingShader->SetMat4("mat_proj", cam.GetProjectionMatrix());
-		cs_RayTracingShader->SetFloat3("light_dir", Renderer3D::m_SunLightDir);
+		cs_RayTracingShader->SetFloat3("light_dir", glm::normalize(Renderer3D::m_SunLightDir));
 		
 		glDispatchCompute(image_width/8, image_height/8, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
