@@ -217,6 +217,11 @@ namespace Hazel {
 		UpladUniformFloat3Array(str, pointer, count);
 	}
 
+	void OpenGlShader::SetFloat4Array(const std::string& str, const float* arr, size_t count)
+	{
+		UpladUniformFloat4Array(str, arr, count);
+	}
+
 	void OpenGlShader::SetIntArray(const std::string& str, const size_t size, const void* pointer)
 	{
 		UploadIntArray(str, size, pointer);
@@ -268,5 +273,10 @@ namespace Hazel {
 	{
 		uint32_t location = glGetUniformLocation(program, str.c_str());
 		glUniform3fv(location, count,(const GLfloat*) pointer);
+	}
+	void OpenGlShader::UpladUniformFloat4Array(const std::string& str, const float* pointer, size_t count)
+	{
+		uint32_t location = glGetUniformLocation(program, str.c_str());
+		glUniform4fv(location, count, (const GLfloat*)pointer);
 	}
 }

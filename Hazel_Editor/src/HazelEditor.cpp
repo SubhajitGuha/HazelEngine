@@ -102,12 +102,12 @@ void  HazelEditor::OnUpdate(float deltatime )
 {
 	frame_time = deltatime;
 	m_scene->OnUpdate(deltatime);
-	Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
+	//Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
 
 	m_FrameBuffer2->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
-	Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
+	//Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
 	m_scene->Resize(m_ViewportSize.x, m_ViewportSize.y);
 	m_FrameBuffer2->UnBind();
 
@@ -179,6 +179,42 @@ void  HazelEditor::OnImGuiRender()
 		m_scene->m_rayTracer->Resize(static_cast<int>(m_RTViewportSize.x), static_cast<int>(m_RTViewportSize.y));
 	}
 	ImGui::Image(reinterpret_cast<void*>(RayTracer::m_RT_TextureID), *(ImVec2*)glm::value_ptr(m_ViewportSize), { 0,1 }, {1,0});
+	ImGui::End();
+
+	ImGui::Begin("RayTracer Control");
+	ImGui::Checkbox("RenderSky?", &RayTracer::EnableSky);
+	if (ImGui::Button("Update Scene"))
+		m_scene->m_rayTracer->UpdateScene();
+	ImGui::DragInt("Num Bounces", &RayTracer::numBounces);
+	ImGui::DragInt("Samples Per Pixel", &RayTracer::samplesPerPixel);
+
+	if (ImGui::Button("+"))
+	{
+		glm::vec3 pos(0.0);
+		float radius = 5.0f;
+
+		glm::vec4 col(1.0);
+		glm::vec4 Emi_col(1.0);
+		float Emi_strength = 0.0f;
+		float roughness = 1.0f;
+
+		RayTracer::m_SpherePos.push_back(pos);
+		RayTracer::m_SphereRadius.push_back(radius);
+		RayTracer::m_SphereCol.push_back(col);
+		RayTracer::m_SphereEmissionCol.push_back(Emi_col);
+		RayTracer::m_SphereEmissionStrength.push_back(Emi_strength);
+		RayTracer::m_SphereRoughness.push_back(roughness);
+	}
+	for (int i = 0; i < RayTracer::m_SpherePos.size(); i++)
+	{
+		ImGui::TextColored({ 1.0,0.2,0.0,1.0 }, (std::string("SPHERE ") + std::to_string(i)).c_str());
+		ImGui::DragFloat3((std::string("SPHERE ") + std::to_string(i) + std::string(" Position")).c_str(), (float*)glm::value_ptr(RayTracer::m_SpherePos[i]), 0.1);
+		ImGui::DragFloat((std::string("SPHERE ") + std::to_string(i) + std::string(" Radius")).c_str(), &RayTracer::m_SphereRadius[i], 0.01);
+		ImGui::ColorEdit4((std::string("SPHERE ") + std::to_string(i) + std::string(" Color")).c_str(), (float*)glm::value_ptr(RayTracer::m_SphereCol[i]));
+		ImGui::ColorEdit4((std::string("SPHERE ") + std::to_string(i) + std::string(" Emission Color")).c_str(), (float*)glm::value_ptr(RayTracer::m_SphereEmissionCol[i]));
+		ImGui::DragFloat((std::string("SPHERE ") + std::to_string(i) + std::string(" Emission Strength")).c_str(), &RayTracer::m_SphereEmissionStrength[i], 0.01);
+		ImGui::DragFloat((std::string("SPHERE ") + std::to_string(i) + std::string(" Roughness")).c_str(), &RayTracer::m_SphereRoughness[i], 0.01);
+	}
 	ImGui::End();
 
 	ImGui::Begin("Light controller");

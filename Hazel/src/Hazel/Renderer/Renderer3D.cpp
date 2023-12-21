@@ -18,7 +18,7 @@
 namespace Hazel {
 	//Camera* m_camera;
 	GLsync syncObj;
-	glm::vec3 Renderer3D::m_SunLightDir = { 0,1,0.60 };//initial light position
+	glm::vec3 Renderer3D::m_SunLightDir = { 0,-5,0.60 };//initial light position
 	glm::vec3 Renderer3D::m_SunColor = { 1,1,1 };
 	float Renderer3D::m_SunIntensity = 1.0f;
 

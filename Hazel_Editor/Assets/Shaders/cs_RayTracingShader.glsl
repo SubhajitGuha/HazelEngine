@@ -3,26 +3,38 @@
 #define MIN -2147483648
 #define MAX 2147483647
 #define BG_COLOR vec4(0.0,0.6,0.86,1.0)
-#define NUM_SPHERES 4
+#define MAX_NUM_SPHERES 7
 #define MAX_RAYS_PER_PIXEL 100
 
 layout (local_size_x = 8, local_size_y = 8) in;
 
-uniform layout(binding = 1, rgba8) writeonly image2D FinalImage;
-uniform float viewport_w;
-uniform float viewport_h;
+uniform layout(binding = 1, rgba8) image2D FinalImage;
+uniform int frame_num;
+
 uniform float focal_length;
 uniform float time;
 uniform vec3 camera_pos;
 uniform vec3 camera_viewdir;
 uniform vec3 light_dir;
+uniform int num_bounces;
+uniform int samplesPerPixel;
+
+int num_spheres = MAX_NUM_SPHERES;
+//uniform vec3 SpherePos[MAX_NUM_SPHERES];
+//uniform float SphereRadius[MAX_NUM_SPHERES];
+//uniform vec4 SphereCol[MAX_NUM_SPHERES];
+//uniform vec4 SphereEmissionCol[MAX_NUM_SPHERES];
+//uniform float SphereEmissionStrength[MAX_NUM_SPHERES];
+//uniform float SphereRoughness[MAX_NUM_SPHERES];
+
+
 uniform mat4 mat_view;
 uniform mat4 mat_proj;
 
-int EnvironmentEnabled = 1 ;
+uniform int EnvironmentEnabled;
 vec4 GroundColour = vec4(0.4);
-vec4 SkyColourHorizon = vec4(0.3,0.6,0.8,1.0);
-vec4 SkyColourZenith = vec4(0.0,0.2,0.8,1.0);
+vec4 SkyColourHorizon = vec4(1,1,1,1.0);
+vec4 SkyColourZenith = vec4(0.114,0.525,1.0,1.0);
 float SunFocus=20.0;
 float SunIntensity=10;
 
@@ -93,7 +105,7 @@ vec4 GetEnvironmentLight(Ray ray)
 	float skyGradientT = pow(smoothstep(0.0, 0.8, ray.dir.y), 0.35);
 	float groundToSkyT = smoothstep(-0.01, 0.0, ray.dir.y);
 	vec4 skyGradient = mix(SkyColourHorizon, SkyColourZenith, skyGradientT);
-	float sun = pow(max(0, dot(ray.dir, light_dir)), SunFocus) * SunIntensity;
+	float sun = pow(max(0, dot(ray.dir, -light_dir)), SunFocus) * SunIntensity;
 	// Combine ground, sky, and sun
 	vec4 composite = mix(GroundColour, skyGradient, groundToSkyT) + sun * (groundToSkyT>=1.0?1.0:0.0);
 	return composite;
@@ -114,12 +126,12 @@ float rayHit(Sphere sh,Ray ray)
 		return (-b-sqrt(discriminant))/2*a;
 }
 
-HitInfo ClosestHit(Sphere sphere[NUM_SPHERES],Ray ray)
+HitInfo ClosestHit(Sphere sphere[MAX_NUM_SPHERES],Ray ray)
 {
 	HitInfo info;
 	info.isHit = false; //initially ray will not hit anything
 	float min_dist = MAX;
-	for(int i=0;i<NUM_SPHERES;i++)
+	for(int i=0;i<num_spheres;i++)
 	{
 		float t = rayHit(sphere[i],ray);			
 		if(t >= 0 && t < min_dist) //get hit to nearest sphere
@@ -132,17 +144,11 @@ HitInfo ClosestHit(Sphere sphere[NUM_SPHERES],Ray ray)
 			info.material = sphere[i].material ;
 		}			
 	}
-	if(info.isHit == false)//if the ray dosent hit anything
-	{
-		info.material.color = BG_COLOR; //background color
-		info.material.emissive_col = vec4(1.0,0,0,1.0);
-		info.material.emissive_strength = 0.0;
-	}
 	return info;
 }
 
 //returns color
-vec4 perPixel(int numBounces, Sphere sphere[NUM_SPHERES],Ray ray, inout uint seed)
+vec4 perPixel(int numBounces, Sphere sphere[MAX_NUM_SPHERES],Ray ray, inout uint seed)
 {
 	vec4 color=vec4(1.0);
 	vec4 incommingLight = vec4(0);
@@ -157,7 +163,7 @@ vec4 perPixel(int numBounces, Sphere sphere[NUM_SPHERES],Ray ray, inout uint see
 			vec3 randomDir = normalize(info.Normal + randomDirInSphere(seed)); //cosine weighted distribution by shifting random direction by the normal
 			randomDir = randomDir * sign(dot(info.Normal,randomDir)); //if the ray is inside the hemisphere then invert it
 			vec3 DiffuseDir = randomDir;
-			vec3 SpecularDir = reflect(ray.dir,info.Normal);
+			vec3 SpecularDir = reflect(ray.dir,info.Normal);			
 			ray.dir = mix(DiffuseDir,SpecularDir, (1.0 - info.material.roughness));
 
 			vec4 emittedLight = info.material.emissive_col * info.material.emissive_strength;
@@ -166,7 +172,7 @@ vec4 perPixel(int numBounces, Sphere sphere[NUM_SPHERES],Ray ray, inout uint see
 			color *= info.material.color;
 		}
 		else{
-			incommingLight += GetEnvironmentLight(ray)*color;
+			incommingLight += GetEnvironmentLight(ray)*color; //get the environment color
 			break;
 		}
 	}
@@ -187,52 +193,100 @@ void main()
 	ray.origin = camera_pos;//in world space
 	ray.dir = normalize(vec3(inverse(mat_view)*vec4(target.xyz/target.w,0))); //ray dir in world space
 
-	Material mat,mat_1, mat_2, mat_3;
-	mat.color =  vec4(0.4,0.89,0.1,1.0);
-	mat.roughness = 0.01;
-	mat.metalness = 0.0;
-	mat.emissive_col = vec4(0.9,0.67,0.1,1.0);
-	mat.emissive_strength = 0.0;
+	//Material mat[MAX_NUM_SPHERES];
+	//for(int i=0;i<num_spheres;i++)
+	//{
+	//	mat[i].color = SphereCol[i];
+	//	mat[i].roughness = SphereRoughness[i];
+	//	mat[i].emissive_col = SphereEmissionCol[i];
+	//	mat[i].emissive_strength = SphereEmissionStrength[i];
+	//	//TODO metalness;
+	//}
+	//
+	//Sphere sphere[MAX_NUM_SPHERES];
+	//for(int i=0;i<num_spheres;i++)
+	//{
+	//	sphere[i].centre = SpherePos[i];
+	//	sphere[i].radius = SphereRadius[i];
+	//	sphere[i].material = mat[i];
+	//}
 
-	mat_1.color =  vec4(0);
-	mat_1.emissive_col = vec4(0.9,0.67,0.1,1.0);
-	mat_1.roughness = 0.85;
-	mat.metalness = 1.0;
-	mat_1.emissive_strength = 5.0;
+	Material mat[MAX_NUM_SPHERES];
+	mat[0].color =  vec4(0.698,0.443,1.0,1.0);
+	mat[0].roughness = 1.0;
+	mat[0].metalness = 0.0;
+	mat[0].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	mat[0].emissive_strength = 0.0;
 
-	mat_2.color =  vec4(0.8,0.2,0.5,1.0);
-	mat_2.roughness = 1.0;
-	mat.metalness = 0.0;
-	mat_2.emissive_col = vec4(0.9,0.67,0.1,1.0);
-	mat_2.emissive_strength = 0.0;
+	mat[1].color =  vec4(0,0,0,1.0);
+	mat[1].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	mat[1].roughness = 0.13;
+	mat[1].metalness = 0.0;
+	mat[1].emissive_strength = 15.0;
 
-	mat_3.color =  vec4(0.89,0.37,0.0,1.0);
-	mat_3.roughness = 0.3;
-	mat.metalness = 0.0;
-	mat_3.emissive_col = vec4(0.9,0.67,0.1,1.0);
-	mat_3.emissive_strength = 0.0;
+	mat[2].color =  vec4(0.8,0.2,0.5,1.0);
+	mat[2].roughness = 0.98;
+	mat[2].metalness = 0.0;
+	mat[2].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	mat[2].emissive_strength = 0.0;
 
-	Sphere sphere[NUM_SPHERES];
-	sphere[0].centre = vec3(0,1,0);
-	sphere[0].radius = 10.0;
-	sphere[0].material = mat;
+	mat[3].color =  vec4(0.0,0.514,1.0,1.0);
+	mat[3].roughness = 0.68;
+	mat[3].metalness = 1.0;
+	mat[3].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	mat[3].emissive_strength = 0.0;
 
-	sphere[1].centre = vec3(0,-310,0);
-	sphere[1].radius = 300.0;
-	sphere[1].material = mat_2;
+	mat[4].color =  vec4(1.0,1.0,1.0,1.0);
+	mat[4].roughness = 0.13;
+	mat[4].metalness = 1.0;
+	mat[4].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	mat[4].emissive_strength = 0.0;
 
-	sphere[2].centre = vec3(23,3,5);
+	mat[5].color =  vec4(1.0,0.518,0.0,1.0);
+	mat[5].roughness = 1.0;
+	mat[5].metalness = 0.0;
+	mat[5].emissive_col = vec4(1.0,0.518,0.0,1.0);
+	mat[5].emissive_strength = 0.0;
+
+	mat[6].color =  vec4(0.822,1.0,0.278,1.0);
+	mat[6].roughness = 0.2;
+	mat[6].metalness = 1.0;
+	mat[6].emissive_col = vec4(1.0,0.518,0.0,1.0);
+	mat[6].emissive_strength = 0.0;
+
+	Sphere sphere[MAX_NUM_SPHERES];
+	sphere[0].centre = vec3(0,-810,0);
+	sphere[0].radius = 800.0;	
+
+	sphere[1].centre = vec3(0,-6,430);
+	sphere[1].radius = 200.0;
+
+	sphere[2].centre = vec3(18,0,5);
 	sphere[2].radius = 10.0;
-	sphere[2].material = mat_1;
 
-	sphere[3].centre = vec3(-23,3,5);
+	sphere[3].centre = vec3(-18,0,5);
 	sphere[3].radius = 10.0;
-	sphere[3].material = mat_3;
 
-	uint hash = uint(uv.x + image_res.x * uv.y);
-	for(int i=0;i<MAX_RAYS_PER_PIXEL;i++)
-		color += perPixel(5, sphere, ray, hash);
-	color/=MAX_RAYS_PER_PIXEL;
-	//color = pow(color,vec4(1.0/2.2));
+	sphere[4].centre = vec3(0,0,25);
+	sphere[4].radius = 10.0;
+
+	sphere[5].centre = vec3(30,0,-15);
+	sphere[5].radius = 10.0;
+
+	sphere[6].centre = vec3(-30,0,-25);
+	sphere[6].radius = 10.0;
+
+	for(int i=0;i<MAX_NUM_SPHERES;i++)
+		sphere[i].material = mat[i];
+
+	uint hash = uint(uv.x + image_res.x * uv.y + frame_num* 1874);
+	for(int i=0; i<samplesPerPixel; i++)
+		color += perPixel(num_bounces, sphere, ray, hash); //10 bounces per ray
+	color /= samplesPerPixel;
+
+	//progressive render
+	float weight = 1.0/(frame_num+1.0);
+	color = color * weight + imageLoad(FinalImage,uv)*(1.0-weight);
+
 	imageStore(FinalImage,uv,color);
 }

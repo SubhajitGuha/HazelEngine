@@ -35,7 +35,6 @@ namespace Hazel {
 	Scene::Scene()
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
-		m_rayTracer = std::make_shared<RayTracer>();
 		Physics3D::Initilize();
 		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
 		SkyRenderer::Initilize("Assets/Textures/HDR/autumn_forest_04_4k.hdr");
@@ -75,6 +74,7 @@ namespace Hazel {
 		m_Bloom->InitBloom();
 
 		m_Fog = Fog::Create(fogDensity, fogGradient, 30, 5000, { 1920,1080 });
+		m_rayTracer = std::make_shared<RayTracer>();
 	}
 	Scene::~Scene()
 	{

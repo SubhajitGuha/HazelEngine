@@ -1240,6 +1240,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\RayTracer\RayTracer.h" />
+    <ClInclude Include="src\Hazel\RayTracer\BVH.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1441,5 +1442,6 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\RayTracer\RayTracer.cpp" />
+    <ClCompile Include="src\Hazel\RayTracer\BVH.cpp" />
   </ItemGroup>
 </Project>

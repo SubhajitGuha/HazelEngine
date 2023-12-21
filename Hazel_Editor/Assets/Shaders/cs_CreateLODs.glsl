@@ -1,4 +1,4 @@
-#shader compute
+//#shader compute
 #version 460 core
 
 layout (local_size_x = 64) in;

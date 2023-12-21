@@ -1,5 +1,6 @@
 #pragma once
 #include "Hazel.h"
+#include "BVH.h"
 
 namespace Hazel {
 	class RayTracer
@@ -9,6 +10,7 @@ namespace Hazel {
 		RayTracer(int image_w, int image_h, int viewport_w, int viewport_h, int samples=2);
 		void RenderImage(Camera& cam);
 		void Resize(int width, int height);
+		void UpdateScene();
 	private:
 		void Init(int width, int height);
 	public:
@@ -16,10 +18,27 @@ namespace Hazel {
 		float viewport_width, viewport_height;
 		uint16_t samples;
 		static uint32_t m_RT_TextureID;
+
+		static std::vector<glm::vec3> m_SpherePos;
+		static std::vector<float> m_SphereRadius;
+
+		static std::vector<glm::vec4> m_SphereCol;
+		static std::vector<glm::vec4> m_SphereEmissionCol;
+		static std::vector<float> m_SphereEmissionStrength;
+		static std::vector<float> m_SphereRoughness;
+		static bool EnableSky;
+		static int numBounces;
+		static int samplesPerPixel;
+
+		//static std::vector<float> m_SphereSpecStrength;
+
 	private:
 		uint16_t m_Binding;
+		int frame_num;
+		glm::mat4 old_view;
 		float m_focalLength;
 		ref<Shader> cs_RayTracingShader;
+		ref<BVH> bvh;
 		std::chrono::steady_clock::time_point StartTime;
 	};
 }

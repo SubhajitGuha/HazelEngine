@@ -156,6 +156,7 @@
     <ClInclude Include="src\Hazel\Log.h" />
     <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
     <ClInclude Include="src\Hazel\Physics\Physics3D.h" />
+    <ClInclude Include="src\Hazel\RayTracer\BVH.h" />
     <ClInclude Include="src\Hazel\RayTracer\RayTracer.h" />
     <ClInclude Include="src\Hazel\Renderer\Atmosphere.h" />
     <ClInclude Include="src\Hazel\Renderer\Bloom.h" />
@@ -514,6 +515,7 @@
     <ClCompile Include="src\Hazel\Log.cpp" />
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Physics\Physics3D.cpp" />
+    <ClCompile Include="src\Hazel\RayTracer\BVH.cpp" />
     <ClCompile Include="src\Hazel\RayTracer\RayTracer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Atmosphere.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Bloom.cpp" />
