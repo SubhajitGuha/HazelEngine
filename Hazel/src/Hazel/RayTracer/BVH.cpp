@@ -3,6 +3,7 @@
 
 namespace Hazel
 {
+	static int val = 0;
 	BVH::BVH()
 	{
 		numNodes = 0;
@@ -11,11 +12,14 @@ namespace Hazel
 		triIndex.resize(arrRTTriangles.size()); //making a seperate triangle index for swaping
 		for (int i = 0; i < arrRTTriangles.size(); i++)
 			triIndex[i] = i;
-		arrBVHNode.resize(arrRTTriangles.size() * 2+1);
+		arrLinearBVHNode.resize(arrRTTriangles.size() * 2+1);
 		std::cout << "BVH Creation started " << std::endl;		
 		BuildBVH(head,0, arrRTTriangles.size());
+		CleanBVH(head);//identify child nodes by making their triangle count = 0
 		std::cout << "BVH Creation Finished " << std::endl;
-		arrBVHNode.resize(numNodes);
+		int* offset = &numNodes;
+		FlattenBVH(head,&numNodes);
+		arrLinearBVHNode.resize(numNodes);
 	}
 	void BVH::CreateTriangles(LoadMesh* mesh, glm::mat4& transform)
 	{
@@ -53,11 +57,51 @@ namespace Hazel
 		return cost > 0 ? cost : 1e30f;
 	}
 
+	int BVH::FlattenBVH(BVHNode* node, int *offset)
+	{
+		LinearBVHNode* linearNode = &arrLinearBVHNode[*offset];
+		linearNode->aabbMax = node->aabbMax;
+		linearNode->aabbMin = node->aabbMin;
+		//linearNode->triangleStartID = node->triangleStartID;
+		//linearNode->triangleCount = node->triangleCount;		
+		if (node->triangleCount>0)
+		{
+			linearNode->triangleStartID = node->triangleStartID;
+			linearNode->triangleCount = node->triangleCount;
+			return (*offset)+1;
+		}
+		else {
+			int myOffset = (*offset)++;
+			linearNode->triangleStartID = node->triangleStartID;
+			linearNode->triangleCount = 0;
+
+			BVH::FlattenBVH(node->leftChild,offset);	
+			linearNode->rightChild = BVH::FlattenBVH(node->rightChild,offset);
+			return myOffset;
+		}
+	}
+
+	void BVH::CleanBVH(BVHNode* node)
+	{
+		if (node->leftChild == nullptr && node->rightChild == nullptr)
+		{
+			return;
+		}
+		else
+		{
+			node->triangleCount = 0;
+			if (node->leftChild)
+				CleanBVH(node->leftChild);
+			if (node->rightChild)
+				CleanBVH(node->rightChild);
+		}
+	}
+
 	//recursively building the bvh tree and storing it as dfs format
 	void BVH::BuildBVH(BVHNode*& node, uint32_t triStartID, uint32_t triCount)
 	{
 		node = new BVHNode();
-		++numNodes;
+		//++numNodes;
 		Bounds bounds;
 		for (int i = 0; i < triCount; i++)
 		{

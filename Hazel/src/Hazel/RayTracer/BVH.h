@@ -58,7 +58,9 @@ namespace Hazel
 		};
 		struct LinearBVHNode
 		{
-
+			int rightChild;
+			uint32_t triangleStartID, triangleCount;
+			glm::vec3 aabbMin, aabbMax;
 		};
 
 	public:
@@ -67,11 +69,13 @@ namespace Hazel
 		void CreateTriangles(LoadMesh* mesh, glm::mat4& transform = glm::mat4(1.0)); //create triangles from mesh vertex positions
 	private:
 		float EvaluateSAH(BVHNode& node, int axis, float pos);
+		int FlattenBVH(BVHNode* node,int* offset);
+		void CleanBVH(BVHNode* node);//removes count of triangles from child nodes
 	private:
 		BVHNode* head = nullptr;
-		std::vector<BVHNode> arrBVHNode;
+		std::vector<LinearBVHNode> arrLinearBVHNode;
 		std::vector<RTTriangles> arrRTTriangles;
 		std::vector<int> triIndex;
-		uint32_t numNodes;
+		int numNodes;
 	};
 }
