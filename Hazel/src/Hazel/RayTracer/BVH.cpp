@@ -8,7 +8,8 @@ namespace Hazel
 	{
 		numNodes = 0;
 		uint32_t rootIndex = 0;
-		CreateTriangles(Scene::Sphere);
+		glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), { 0,0,1 }) * glm::scale(glm::mat4(1.0), glm::vec3(10.0f));
+		CreateTriangles(Scene::Sphere,transform);
 		triIndex.resize(arrRTTriangles.size()); //making a seperate triangle index for swaping
 		for (int i = 0; i < arrRTTriangles.size(); i++)
 			triIndex[i] = i;
@@ -28,7 +29,11 @@ namespace Hazel
 			for (int i = 0; i < sub_mesh.Vertices.size(); i+=3)
 			{
 				auto vertices = sub_mesh.Vertices;
-				RTTriangles triangles(vertices[i], vertices[i+1], vertices[i+2]);
+				glm::vec3 v0 = transform * glm::vec4(vertices[i],1.0);
+				glm::vec3 v1 = transform * glm::vec4(vertices[i+1], 1.0);
+				glm::vec3 v2 = transform * glm::vec4(vertices[i+2], 1.0);
+
+				RTTriangles triangles(v0, v1, v2);
 				arrRTTriangles.push_back(triangles);
 			}
 		}
@@ -62,23 +67,21 @@ namespace Hazel
 		LinearBVHNode* linearNode = &arrLinearBVHNode[*offset];
 		linearNode->aabbMax = node->aabbMax;
 		linearNode->aabbMin = node->aabbMin;
-		//linearNode->triangleStartID = node->triangleStartID;
-		//linearNode->triangleCount = node->triangleCount;		
+
+		int myOffset = (*offset)++;
 		if (node->triangleCount>0)
 		{
 			linearNode->triangleStartID = node->triangleStartID;
-			linearNode->triangleCount = node->triangleCount;
-			return (*offset)+1;
+			linearNode->triangleCount = node->triangleCount;		
 		}
 		else {
-			int myOffset = (*offset)++;
 			linearNode->triangleStartID = node->triangleStartID;
-			linearNode->triangleCount = 0;
+			linearNode->triangleCount = node->triangleCount;
 
 			BVH::FlattenBVH(node->leftChild,offset);	
-			linearNode->rightChild = BVH::FlattenBVH(node->rightChild,offset);
-			return myOffset;
+			linearNode->rightChild = BVH::FlattenBVH(node->rightChild,offset);			
 		}
+		return myOffset;
 	}
 
 	void BVH::CleanBVH(BVHNode* node)
@@ -98,7 +101,7 @@ namespace Hazel
 	}
 
 	//recursively building the bvh tree and storing it as dfs format
-	void BVH::BuildBVH(BVHNode*& node, uint32_t triStartID, uint32_t triCount)
+	void BVH::BuildBVH(BVHNode*& node, int triStartID, int triCount)
 	{
 		node = new BVHNode();
 		//++numNodes;
@@ -108,23 +111,17 @@ namespace Hazel
 			auto bnds = arrRTTriangles[triIndex[i + triStartID]].GetBounds();
 			bounds.Union(bnds);
 		}
- 		//std::cout << bounds.aabbMax.x << " " << bounds.aabbMax.y << " " << bounds.aabbMax.z<<"\n";
-		//std::cout << bounds.aabbMin.x << " " << bounds.aabbMin.y << " " << bounds.aabbMin.z << "\n";
 
 		node->aabbMax = bounds.aabbMax;
 		node->aabbMin = bounds.aabbMin;
 		node->triangleStartID = triStartID;
 		node->triangleCount = triCount;
 
-		if (triCount <= 4)//4 is the minimum number of triangles that a node should contain
-		{
-			return;
-		}
 		int bestAxis = -1;
 		float bestPos = 0, bestCost = 1e30f;
 		for (int axis = 0; axis < 3; axis++) //evaluate for each axis
 		{
-			for (uint32_t i = 0; i < triCount; i++)
+			for (int i = 0; i < triCount; i++)
 			{
 				auto& triangle = arrRTTriangles[triIndex[triStartID + i]];
 				float candidatePos = triangle.GetCentroid()[axis];
@@ -136,6 +133,12 @@ namespace Hazel
 				}
 			}
 		}
+		node->axis = bestAxis;//net the node axis
+		if (triCount <= 4)//4 is the minimum number of triangles that a node should contain
+		{
+			return;
+		}
+
 		int axis = bestAxis;
 		glm::vec3 extent = bounds.aabbMax - bounds.aabbMin;
 		float splitPos = bestPos;

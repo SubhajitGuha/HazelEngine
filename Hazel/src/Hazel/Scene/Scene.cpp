@@ -35,7 +35,7 @@ namespace Hazel {
 	Scene::Scene()
 	{
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
-		Physics3D::Initilize();
+		//Physics3D::Initilize();
 		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
 		SkyRenderer::Initilize("Assets/Textures/HDR/autumn_forest_04_4k.hdr");
 
@@ -56,8 +56,8 @@ namespace Hazel {
 		Tree->CreateLOD("Assets/Meshes/HZ_Pine1_LOD1.asset");
 		Grass = new LoadMesh("Assets/Meshes/grass3.asset");
 		Grass->CreateLOD("Assets/Meshes/grass3_LOD1.asset");
-		//plant = new LoadMesh("Assets/Meshes/ZombiePlant.fbx",LoadMesh::IMPORT_MESH);
-		//House = new LoadMesh("Assets/Meshes/cityHouse_Unreal.fbx", LoadMesh::IMPORT_MESH);
+		plant = new LoadMesh("Assets/Meshes/dragon.fbx",LoadMesh::IMPORT_MESH);
+		House = new LoadMesh("Assets/Meshes/house.asset");
 		Fern = new LoadMesh("Assets/Meshes/Fern.asset");
 		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.asset");
 

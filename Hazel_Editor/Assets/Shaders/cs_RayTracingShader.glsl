@@ -8,9 +8,41 @@
 
 layout (local_size_x = 8, local_size_y = 8) in;
 
-uniform layout(binding = 1, rgba8) image2D FinalImage;
-uniform int frame_num;
+struct LinearBVHNode
+{
+	int rightChild;
+	int triangleStartID;
+	int triangleCount;
+	float[3] aabbMin;
+	float[3] aabbMax;
+};
 
+struct RTTriangles
+{
+	float[3] v0;
+	float[3] v1;
+	float[3] v2;
+};
+
+uniform layout(binding = 1, rgba8) image2D FinalImage;
+
+layout (std430, binding = 2) buffer layoutLinearBVHNode
+{
+	LinearBVHNode arrLinearBVHNode[];
+}arr_LinearBVHNode;
+
+layout (std430, binding = 3) buffer layoutRTTriangles
+{
+	RTTriangles arrRTTriangles[];
+}arr_RTTriangles;
+
+layout (std430, binding = 4) buffer layoutTriangleIndices
+{
+	int triIndices[];
+}arr_triIndices;
+
+uniform int BVHNodeSize;
+uniform int frame_num;
 uniform float focal_length;
 uniform float time;
 uniform vec3 camera_pos;
@@ -20,13 +52,6 @@ uniform int num_bounces;
 uniform int samplesPerPixel;
 
 int num_spheres = MAX_NUM_SPHERES;
-//uniform vec3 SpherePos[MAX_NUM_SPHERES];
-//uniform float SphereRadius[MAX_NUM_SPHERES];
-//uniform vec4 SphereCol[MAX_NUM_SPHERES];
-//uniform vec4 SphereEmissionCol[MAX_NUM_SPHERES];
-//uniform float SphereEmissionStrength[MAX_NUM_SPHERES];
-//uniform float SphereRoughness[MAX_NUM_SPHERES];
-
 
 uniform mat4 mat_view;
 uniform mat4 mat_proj;
@@ -47,6 +72,7 @@ struct Material //sphere material
 	float emissive_strength;
 };
 
+Material defaultMat;
 struct Sphere
 {
 	vec3 centre;
@@ -147,6 +173,109 @@ HitInfo ClosestHit(Sphere sphere[MAX_NUM_SPHERES],Ray ray)
 	return info;
 }
 
+//ray-box intersection
+bool intersectAABB(vec3 aabbMin,vec3 aabbMax, float t, Ray ray)
+{
+	float tx1 = (aabbMin.x - ray.origin.x) / ray.dir.x;
+	float tx2 = (aabbMax.x - ray.origin.x) / ray.dir.x;
+	float tmin = min( tx1, tx2 );
+	float tmax = max( tx1, tx2 );
+	float ty1 = (aabbMin.y - ray.origin.y) / ray.dir.y;
+	float ty2 = (aabbMax.y - ray.origin.y) / ray.dir.y;
+	tmin = max( tmin, min( ty1, ty2 ) );
+	tmax = min( tmax, max( ty1, ty2 ) );
+	float tz1 = (aabbMin.z - ray.origin.z) / ray.dir.z;
+	float tz2 = (aabbMax.z - ray.origin.z) / ray.dir.z;
+	tmin = max( tmin, min( tz1, tz2 ) ), tmax = min( tmax, max( tz1, tz2 ) );
+	return tmax >= tmin && tmin < t && tmax > 0;
+}
+
+//ray-triangle intersection
+int intersectTriangle(vec3 v0,vec3 v1, vec3 v2,inout float t, Ray ray)
+{
+    vec3 edge1 = v1 - v0;
+	vec3 edge2 = v2 - v0;
+	vec3 h = cross( ray.dir, edge2 );
+	float a = dot( edge1, h );
+	if (a > -0.0001f && a < 0.0001f) return 0; // ray parallel to triangle
+	const float f = 1 / a;
+	vec3 s = ray.origin - v0;
+	const float u = f * dot( s, h );
+	if (u < 0 || u > 1) return 0;
+	vec3 q = cross( s, edge1 );
+	float v = f * dot( ray.dir, q );
+	if (v < 0 || u + v > 1) return 0;
+	float p = f * dot( edge2, q );
+	if (p > 0.0001f) {t = min( p, t );return 1;}
+	return 0;
+}
+
+//get closest hit from the bvh
+HitInfo ClosestHit(Ray ray)
+{
+	HitInfo info;
+	info.isHit = false; //initially ray will not hit anything
+	float t = MAX;
+	int i=0;
+	int toVisit = 0;
+	int nodesToVisit[64];
+	RTTriangles nearestTriangle;//stores the hit triangle info	
+    int dirIsNeg[3] = { ray.dir.x < 0?1:0, ray.dir.y < 0? 1 : 0, ray.dir.z < 0? 1 : 0 };
+	while(true)
+	{
+		LinearBVHNode node= arr_LinearBVHNode.arrLinearBVHNode[i];
+		vec3 aabbMin = vec3(node.aabbMin[0],node.aabbMin[1],node.aabbMin[2]);
+		vec3 aabbMax = vec3(node.aabbMax[0],node.aabbMax[1],node.aabbMax[2]);
+		if(intersectAABB(aabbMin,aabbMax,t,ray))
+		{
+			if(node.triangleCount>0)//leaf node
+			{
+				for(uint k=0; k<node.triangleCount; k++)
+				{
+					RTTriangles triangle = arr_RTTriangles.arrRTTriangles[arr_triIndices.triIndices[k+node.triangleStartID]];
+					vec3 v0 = vec3(triangle.v0[0],triangle.v0[1],triangle.v0[2]);
+					vec3 v1 = vec3(triangle.v1[0],triangle.v1[1],triangle.v1[2]);
+					vec3 v2 = vec3(triangle.v2[0],triangle.v2[1],triangle.v2[2]);
+	
+					//get smallest intersection value "t"
+					float p = MAX;
+					if(intersectTriangle(v0, v1, v2, p, ray)>0 && p<t)
+					{
+						t=p;
+						nearestTriangle=triangle;
+					}
+				}
+				if(toVisit == 0)
+					break;
+				i = nodesToVisit[--toVisit];	
+			}
+			else{
+
+					nodesToVisit[toVisit++] = node.rightChild;
+					i=i+1;//left child
+			}
+		}
+		else
+		{
+			if(toVisit == 0)
+				break;
+			i = nodesToVisit[--toVisit];			
+		}
+	}
+
+	info.HitDist = t;
+	t!=MAX? info.isHit=true:info.isHit=false;
+	info.HitPos = ray.origin + t*ray.dir;
+	info.material = defaultMat;
+	vec3 v0 = vec3(nearestTriangle.v0[0],nearestTriangle.v0[1],nearestTriangle.v0[2]);
+	vec3 v1 = vec3(nearestTriangle.v1[0],nearestTriangle.v1[1],nearestTriangle.v1[2]);
+	vec3 v2 = vec3(nearestTriangle.v2[0],nearestTriangle.v2[1],nearestTriangle.v2[2]);
+	vec3 e01 = v1-v0;
+    vec3 e20 = v0-v2;
+	info.Normal = normalize(cross(e20,e01));
+	return info;
+}
+
 //returns color
 vec4 perPixel(int numBounces, Sphere sphere[MAX_NUM_SPHERES],Ray ray, inout uint seed)
 {
@@ -155,7 +284,8 @@ vec4 perPixel(int numBounces, Sphere sphere[MAX_NUM_SPHERES],Ray ray, inout uint
 	for(int k=0;k<=numBounces;k++)
 	{
 		HitInfo info;
-		info = ClosestHit(sphere,ray);		
+		//info = ClosestHit(sphere,ray);
+		info = ClosestHit(ray);		
 		if(info.isHit == true)
 		{
 			ray.origin = info.HitPos + info.Normal*0.0001;
@@ -193,26 +323,8 @@ void main()
 	ray.origin = camera_pos;//in world space
 	ray.dir = normalize(vec3(inverse(mat_view)*vec4(target.xyz/target.w,0))); //ray dir in world space
 
-	//Material mat[MAX_NUM_SPHERES];
-	//for(int i=0;i<num_spheres;i++)
-	//{
-	//	mat[i].color = SphereCol[i];
-	//	mat[i].roughness = SphereRoughness[i];
-	//	mat[i].emissive_col = SphereEmissionCol[i];
-	//	mat[i].emissive_strength = SphereEmissionStrength[i];
-	//	//TODO metalness;
-	//}
-	//
-	//Sphere sphere[MAX_NUM_SPHERES];
-	//for(int i=0;i<num_spheres;i++)
-	//{
-	//	sphere[i].centre = SpherePos[i];
-	//	sphere[i].radius = SphereRadius[i];
-	//	sphere[i].material = mat[i];
-	//}
-
 	Material mat[MAX_NUM_SPHERES];
-	mat[0].color =  vec4(0.698,0.443,1.0,1.0);
+	mat[0].color =  vec4(1.0,0.6,0.1,1.0);
 	mat[0].roughness = 1.0;
 	mat[0].metalness = 0.0;
 	mat[0].emissive_col = vec4(0.9,0.67,0.1,1.0);
@@ -278,6 +390,8 @@ void main()
 
 	for(int i=0;i<MAX_NUM_SPHERES;i++)
 		sphere[i].material = mat[i];
+
+	defaultMat = mat[0];//for now do this 
 
 	uint hash = uint(uv.x + image_res.x * uv.y + frame_num* 1874);
 	for(int i=0; i<samplesPerPixel; i++)

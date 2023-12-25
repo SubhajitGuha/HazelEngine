@@ -33,6 +33,7 @@ namespace Hazel {
 		//static std::vector<float> m_SphereSpecStrength;
 
 	private:
+		uint32_t ssbo_linearBVHNodes = -1, ssbo_rtTriangles = -1, ssbo_triangleIndices = -1;
 		uint16_t m_Binding;
 		int frame_num;
 		glm::mat4 old_view;

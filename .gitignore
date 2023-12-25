@@ -4,3 +4,7 @@ bin/
 bin-int/
 Benchmark/
 CameraProperties/
+/Hazel_Editor/Assets/Meshes/Sponza.asset
+/Hazel_Editor/Assets/Meshes/house.asset
+/Hazel_Editor/Assets/Meshes/dragon.asset
+/Hazel_Editor/Assets/Meshes/cityHouse_Unreal.asset

@@ -19,7 +19,7 @@ namespace Hazel {
 		bIsMainCamera = true;
 		RightVector = glm::cross(m_ViewDirection, Up);
 		SetViewportSize(width/Height);
-		m_movespeed = 20;
+		m_movespeed = 50;
 
 	}
 

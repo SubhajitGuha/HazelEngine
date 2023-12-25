@@ -191,7 +191,7 @@ namespace Hazel
 				HeightValues.push_back(ceil(y));
 			}
 		}
-		Physics3D::AddHeightFieldCollider(HeightValues, m_Width, m_Height, spacing, glm::mat4(1.0f));//transform is hard codded
+		//Physics3D::AddHeightFieldCollider(HeightValues, m_Width, m_Height, spacing, glm::mat4(1.0f));//transform is hard codded
 		//stbi_image_free(Height_data);
 }
 	void Terrain::RenderTerrain(Camera& cam)

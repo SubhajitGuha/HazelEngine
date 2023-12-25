@@ -115,14 +115,14 @@ void  HazelEditor::OnUpdate(float deltatime )
 	m_FrameBuffer2->BindFramebufferTexture(SCENE_TEXTURE_SLOT);
 
 	//do post processing stuff here
-	m_scene->m_Fog->RenderFog(*m_scene->GetCamera(), RenderCommand::GetViewportSize());
-	m_scene->m_Bloom->GetFinalImage(m_FrameBuffer2->GetSceneTextureID(), RenderCommand::GetViewportSize());	
-	m_scene->m_Bloom->RenderBloomTexture();
+	//m_scene->m_Fog->RenderFog(*m_scene->GetCamera(), RenderCommand::GetViewportSize());
+	//m_scene->m_Bloom->GetFinalImage(m_FrameBuffer2->GetSceneTextureID(), RenderCommand::GetViewportSize());	
+	//m_scene->m_Bloom->RenderBloomTexture();
 	
 	m_FrameBuffer->Bind();
 	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
-	m_scene->m_Bloom->Update(deltatime);
+	//m_scene->m_Bloom->Update(deltatime);
 	m_FrameBuffer->UnBind();
 }
 

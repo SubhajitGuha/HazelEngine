@@ -13,8 +13,8 @@ namespace Hazel
 	std::vector<float> RayTracer::m_SphereEmissionStrength;
 	std::vector<float> RayTracer::m_SphereRoughness;
 	bool RayTracer::EnableSky = true;
-	int RayTracer::numBounces = 30;
-	int RayTracer::samplesPerPixel = 20;
+	int RayTracer::numBounces = 10;
+	int RayTracer::samplesPerPixel = 2;
 
 	RayTracer::RayTracer()
 	{
@@ -23,6 +23,25 @@ namespace Hazel
 		Init(512,512);
 		bvh = std::make_shared<BVH>();
 		StartTime = std::chrono::high_resolution_clock::now();
+
+		//pass the nodes,triangles as ssbos
+		glGenBuffers(1, &ssbo_linearBVHNodes);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_linearBVHNodes);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::LinearBVHNode) * bvh->arrLinearBVHNode.size(), &bvh->arrLinearBVHNode[0], GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_linearBVHNodes);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		glGenBuffers(1, &ssbo_rtTriangles);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_rtTriangles);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::RTTriangles) * bvh->arrRTTriangles.size(), &bvh->arrRTTriangles[0], GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo_rtTriangles);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		glGenBuffers(1, &ssbo_triangleIndices);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_triangleIndices);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * bvh->triIndex.size(), &bvh->triIndex[0], GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, ssbo_triangleIndices);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 	RayTracer::RayTracer(int image_w, int image_h, int viewport_w, int viewport_h, int samples)
 	{		
@@ -65,8 +84,21 @@ namespace Hazel
 		cs_RayTracingShader->SetInt("frame_num", abs(frame_num));
 		cs_RayTracingShader->SetInt("num_bounces", numBounces);
 		cs_RayTracingShader->SetInt("samplesPerPixel", samplesPerPixel);
+		cs_RayTracingShader->SetInt("BVHNodeSize", bvh->arrLinearBVHNode.size());
 
-		//UpdateScene();
+		//bind the ssbo objects
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_linearBVHNodes);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_linearBVHNodes);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_rtTriangles);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo_rtTriangles);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_triangleIndices);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, ssbo_triangleIndices);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 		glDispatchCompute(image_width/8, image_height/8, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		frame_num++;

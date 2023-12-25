@@ -52,20 +52,22 @@ namespace Hazel
 		struct BVHNode
 		{
 			BVHNode *leftChild,*rightChild;
-			uint32_t triangleStartID, triangleCount;
+			int axis;
+			int triangleStartID, triangleCount;
 			glm::vec3 aabbMin, aabbMax;//bounds of the node
 			BVHNode() { leftChild = nullptr, rightChild = nullptr; triangleStartID = 0, triangleCount = 0; }
 		};
 		struct LinearBVHNode
 		{
 			int rightChild;
-			uint32_t triangleStartID, triangleCount;
+			int triangleStartID, triangleCount;
 			glm::vec3 aabbMin, aabbMax;
 		};
-
+		enum SplitMethod
+		{SAH,MEAN};
 	public:
 		BVH();
-		void BuildBVH(BVHNode*& node, uint32_t triStartID, uint32_t triCount);
+		void BuildBVH(BVHNode*& node, int triStartID, int triCount);
 		void CreateTriangles(LoadMesh* mesh, glm::mat4& transform = glm::mat4(1.0)); //create triangles from mesh vertex positions
 	private:
 		float EvaluateSAH(BVHNode& node, int axis, float pos);
@@ -73,9 +75,10 @@ namespace Hazel
 		void CleanBVH(BVHNode* node);//removes count of triangles from child nodes
 	private:
 		BVHNode* head = nullptr;
-		std::vector<LinearBVHNode> arrLinearBVHNode;
-		std::vector<RTTriangles> arrRTTriangles;
-		std::vector<int> triIndex;
+	public:
+		std::vector<LinearBVHNode> arrLinearBVHNode;//to be sent on to the gpu
+		std::vector<RTTriangles> arrRTTriangles;//to be sent on to the gpu
+		std::vector<int> triIndex;//to be sent on to the gpu
 		int numNodes;
 	};
 }
