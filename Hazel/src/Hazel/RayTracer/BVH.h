@@ -39,12 +39,18 @@ namespace Hazel
 		struct RTTriangles
 		{
 			glm::vec3 v0, v1, v2;
+			glm::vec2 uv0,uv1,uv2;
+			int materialID;
 			RTTriangles() = default;
-			RTTriangles(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2)
+			RTTriangles(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, glm::vec2& uv0, glm::vec2& uv1, glm::vec2& uv2, int materialID)
 			{
 				this->v0 = v0;
 				this->v1 = v1;
 				this->v2 = v2;
+				this->uv0 = uv0;
+				this->uv1 = uv1;
+				this->uv2 = uv2;
+				this->materialID = materialID;
 			}
 			glm::vec3 GetCentroid() { return (v0 + v1 + v2) * 0.3333333333333f; };
 			Bounds GetBounds() { return Bounds(v0, v1, v2); };
@@ -75,7 +81,9 @@ namespace Hazel
 		void CleanBVH(BVHNode* node);//removes count of triangles from child nodes
 	private:
 		BVHNode* head = nullptr;
+		std::vector<std::string> texturePaths;
 	public:
+		ref<Texture2DArray> texArray;
 		std::vector<LinearBVHNode> arrLinearBVHNode;//to be sent on to the gpu
 		std::vector<RTTriangles> arrRTTriangles;//to be sent on to the gpu
 		std::vector<int> triIndex;//to be sent on to the gpu

@@ -1,5 +1,6 @@
 #pragma once
 #include "Hazel.h"
+#include "Hazel/Renderer/Material.h"
 #include "BVH.h"
 
 namespace Hazel {
@@ -19,13 +20,10 @@ namespace Hazel {
 		uint16_t samples;
 		static uint32_t m_RT_TextureID;
 
-		static std::vector<glm::vec3> m_SpherePos;
-		static std::vector<float> m_SphereRadius;
-
-		static std::vector<glm::vec4> m_SphereCol;
-		static std::vector<glm::vec4> m_SphereEmissionCol;
-		static std::vector<float> m_SphereEmissionStrength;
-		static std::vector<float> m_SphereRoughness;
+		static glm::vec4 m_Color;
+		//static glm::vec4 m_SphereEmissionCol;
+		//static std::vector<float> m_SphereEmissionStrength;
+		static float m_Roughness;
 		static bool EnableSky;
 		static int numBounces;
 		static int samplesPerPixel;

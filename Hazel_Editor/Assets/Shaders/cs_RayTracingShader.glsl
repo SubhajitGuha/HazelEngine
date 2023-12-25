@@ -22,6 +22,12 @@ struct RTTriangles
 	float[3] v0;
 	float[3] v1;
 	float[3] v2;
+
+	float[2] uv0;
+	float[2] uv1;
+	float[2] uv2;
+
+	int materialID;
 };
 
 uniform layout(binding = 1, rgba8) image2D FinalImage;
@@ -41,6 +47,8 @@ layout (std430, binding = 4) buffer layoutTriangleIndices
 	int triIndices[];
 }arr_triIndices;
 
+uniform sampler2DArray albedo;
+
 uniform int BVHNodeSize;
 uniform int frame_num;
 uniform float focal_length;
@@ -48,8 +56,12 @@ uniform float time;
 uniform vec3 camera_pos;
 uniform vec3 camera_viewdir;
 uniform vec3 light_dir;
+uniform float light_intensity;
 uniform int num_bounces;
 uniform int samplesPerPixel;
+
+uniform vec4 u_Color;
+uniform float u_Roughness;
 
 int num_spheres = MAX_NUM_SPHERES;
 
@@ -57,9 +69,9 @@ uniform mat4 mat_view;
 uniform mat4 mat_proj;
 
 uniform int EnvironmentEnabled;
-vec4 GroundColour = vec4(0.4);
-vec4 SkyColourHorizon = vec4(1,1,1,1.0);
-vec4 SkyColourZenith = vec4(0.114,0.525,1.0,1.0);
+vec4 GroundColour = vec4(0.0);
+vec4 SkyColourHorizon = vec4(0.0);
+vec4 SkyColourZenith = vec4(0.0);
 float SunFocus=20.0;
 float SunIntensity=10;
 
@@ -131,7 +143,7 @@ vec4 GetEnvironmentLight(Ray ray)
 	float skyGradientT = pow(smoothstep(0.0, 0.8, ray.dir.y), 0.35);
 	float groundToSkyT = smoothstep(-0.01, 0.0, ray.dir.y);
 	vec4 skyGradient = mix(SkyColourHorizon, SkyColourZenith, skyGradientT);
-	float sun = pow(max(0, dot(ray.dir, -light_dir)), SunFocus) * SunIntensity;
+	float sun = pow(max(0, dot(ray.dir, -light_dir)), SunFocus) * light_intensity;
 	// Combine ground, sky, and sun
 	vec4 composite = mix(GroundColour, skyGradient, groundToSkyT) + sun * (groundToSkyT>=1.0?1.0:0.0);
 	return composite;
@@ -191,7 +203,7 @@ bool intersectAABB(vec3 aabbMin,vec3 aabbMax, float t, Ray ray)
 }
 
 //ray-triangle intersection
-int intersectTriangle(vec3 v0,vec3 v1, vec3 v2,inout float t, Ray ray)
+int intersectTriangle(vec3 v0,vec3 v1, vec3 v2,inout float t,inout float u, inout float v, Ray ray)
 {
     vec3 edge1 = v1 - v0;
 	vec3 edge2 = v2 - v0;
@@ -200,10 +212,10 @@ int intersectTriangle(vec3 v0,vec3 v1, vec3 v2,inout float t, Ray ray)
 	if (a > -0.0001f && a < 0.0001f) return 0; // ray parallel to triangle
 	const float f = 1 / a;
 	vec3 s = ray.origin - v0;
-	const float u = f * dot( s, h );
+	u = f * dot( s, h );
 	if (u < 0 || u > 1) return 0;
 	vec3 q = cross( s, edge1 );
-	float v = f * dot( ray.dir, q );
+	v = f * dot( ray.dir, q );
 	if (v < 0 || u + v > 1) return 0;
 	float p = f * dot( edge2, q );
 	if (p > 0.0001f) {t = min( p, t );return 1;}
@@ -219,8 +231,8 @@ HitInfo ClosestHit(Ray ray)
 	int i=0;
 	int toVisit = 0;
 	int nodesToVisit[64];
+	float u, v;
 	RTTriangles nearestTriangle;//stores the hit triangle info	
-    int dirIsNeg[3] = { ray.dir.x < 0?1:0, ray.dir.y < 0? 1 : 0, ray.dir.z < 0? 1 : 0 };
 	while(true)
 	{
 		LinearBVHNode node= arr_LinearBVHNode.arrLinearBVHNode[i];
@@ -239,9 +251,11 @@ HitInfo ClosestHit(Ray ray)
 	
 					//get smallest intersection value "t"
 					float p = MAX;
-					if(intersectTriangle(v0, v1, v2, p, ray)>0 && p<t)
+					float u_0,v_0;
+					if(intersectTriangle(v0, v1, v2, p, u_0, v_0, ray)>0 && p<t)
 					{
 						t=p;
+						u=u_0;v=v_0;
 						nearestTriangle=triangle;
 					}
 				}
@@ -251,7 +265,7 @@ HitInfo ClosestHit(Ray ray)
 			}
 			else{
 
-					nodesToVisit[toVisit++] = node.rightChild;
+					nodesToVisit[toVisit++] = node.rightChild; //put the next child in to the stack
 					i=i+1;//left child
 			}
 		}
@@ -259,7 +273,7 @@ HitInfo ClosestHit(Ray ray)
 		{
 			if(toVisit == 0)
 				break;
-			i = nodesToVisit[--toVisit];			
+			i = nodesToVisit[--toVisit]; //get the right child		
 		}
 	}
 
@@ -267,6 +281,12 @@ HitInfo ClosestHit(Ray ray)
 	t!=MAX? info.isHit=true:info.isHit=false;
 	info.HitPos = ray.origin + t*ray.dir;
 	info.material = defaultMat;
+	vec2 uv0 = vec2(nearestTriangle.uv0[0],nearestTriangle.uv0[1]);
+	vec2 uv1 = vec2(nearestTriangle.uv1[0],nearestTriangle.uv1[1]);
+	vec2 uv2 = vec2(nearestTriangle.uv2[0],nearestTriangle.uv2[1]);
+	vec2 uv = uv1*u + uv2*v + uv0*(1.0-u-v);
+
+	info.material.color *= texture(albedo,vec3(uv,nearestTriangle.materialID)); 
 	vec3 v0 = vec3(nearestTriangle.v0[0],nearestTriangle.v0[1],nearestTriangle.v0[2]);
 	vec3 v1 = vec3(nearestTriangle.v1[0],nearestTriangle.v1[1],nearestTriangle.v1[2]);
 	vec3 v2 = vec3(nearestTriangle.v2[0],nearestTriangle.v2[1],nearestTriangle.v2[2]);
@@ -309,6 +329,23 @@ vec4 perPixel(int numBounces, Sphere sphere[MAX_NUM_SPHERES],Ray ray, inout uint
 	return incommingLight;
 }
 
+vec4 ColorCorrection(vec4 color)
+{
+	color = clamp(color,0,1);
+	color = pow(color, vec4(1.0/2.2)); //Gamma space
+
+	//color = clamp(color,0,1);
+	color = vec4(1.0) - exp(-color * 1);//exposure
+
+	//color = clamp(color,0,1);
+	//color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.0);//saturation
+
+	//color = clamp(color,0,1);
+	//color = 1.00*(color-0.5) + 0.5 + 0.00 ; //contrast
+
+	return color;
+}
+
 void main()
 {
 	vec4 color = vec4(0); //background color
@@ -324,8 +361,8 @@ void main()
 	ray.dir = normalize(vec3(inverse(mat_view)*vec4(target.xyz/target.w,0))); //ray dir in world space
 
 	Material mat[MAX_NUM_SPHERES];
-	mat[0].color =  vec4(1.0,0.6,0.1,1.0);
-	mat[0].roughness = 1.0;
+	mat[0].color =  u_Color;
+	mat[0].roughness = u_Roughness;
 	mat[0].metalness = 0.0;
 	mat[0].emissive_col = vec4(0.9,0.67,0.1,1.0);
 	mat[0].emissive_strength = 0.0;
@@ -401,6 +438,6 @@ void main()
 	//progressive render
 	float weight = 1.0/(frame_num+1.0);
 	color = color * weight + imageLoad(FinalImage,uv)*(1.0-weight);
-
+	//color = clamp(ColorCorrection(color),0.0,1.0);
 	imageStore(FinalImage,uv,color);
 }

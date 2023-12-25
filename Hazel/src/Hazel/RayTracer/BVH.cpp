@@ -1,5 +1,6 @@
 #include "hzpch.h"
 #include "BVH.h"
+#include "Hazel/ResourceManager.h"
 
 namespace Hazel
 {
@@ -8,8 +9,10 @@ namespace Hazel
 	{
 		numNodes = 0;
 		uint32_t rootIndex = 0;
-		glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), { 0,0,1 }) * glm::scale(glm::mat4(1.0), glm::vec3(10.0f));
-		CreateTriangles(Scene::Sphere,transform);
+		//glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 0,0,1 }) * glm::scale(glm::mat4(1.0), glm::vec3(1.0f));
+		glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), { 0,0,1 }) * glm::scale(glm::mat4(1.0), glm::vec3(0.10f));
+
+		CreateTriangles(Scene::House,transform);
 		triIndex.resize(arrRTTriangles.size()); //making a seperate triangle index for swaping
 		for (int i = 0; i < arrRTTriangles.size(); i++)
 			triIndex[i] = i;
@@ -24,19 +27,24 @@ namespace Hazel
 	}
 	void BVH::CreateTriangles(LoadMesh* mesh, glm::mat4& transform)
 	{
+		int matCount = 0;
 		for (auto sub_mesh : mesh->m_subMeshes)
 		{
 			for (int i = 0; i < sub_mesh.Vertices.size(); i+=3)
 			{
 				auto vertices = sub_mesh.Vertices;
+				auto uv = sub_mesh.TexCoord;
 				glm::vec3 v0 = transform * glm::vec4(vertices[i],1.0);
 				glm::vec3 v1 = transform * glm::vec4(vertices[i+1], 1.0);
 				glm::vec3 v2 = transform * glm::vec4(vertices[i+2], 1.0);
 
-				RTTriangles triangles(v0, v1, v2);
+				RTTriangles triangles(v0, v1, v2, uv[i],uv[i+1],uv[i+2],matCount);
 				arrRTTriangles.push_back(triangles);
 			}
+			texturePaths.push_back(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetAlbedoPath());
+			matCount++; //increment the material as we move to the next sub mesh
 		}
+		texArray = Texture2DArray::Create(texturePaths, matCount);
 	}
 
 	float BVH::EvaluateSAH(BVHNode& node, int axis, float pos)

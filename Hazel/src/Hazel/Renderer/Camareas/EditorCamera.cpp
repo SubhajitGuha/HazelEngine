@@ -12,7 +12,7 @@ namespace Hazel {
 		RightVector = glm::normalize(glm::cross(m_ViewDirection, Up));
 		m_Projection = glm::perspective(glm::radians(m_verticalFOV), m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		m_ProjectionView = m_Projection * m_View;
-		m_movespeed = 20;
+		m_movespeed = 50;
 	}
 	EditorCamera::EditorCamera(float width, float Height)
 	{

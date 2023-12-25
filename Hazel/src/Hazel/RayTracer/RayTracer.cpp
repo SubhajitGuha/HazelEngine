@@ -5,13 +5,9 @@
 namespace Hazel
 {
 	uint32_t RayTracer::m_RT_TextureID;
-	std::vector<glm::vec3> RayTracer::m_SpherePos;
-	std::vector<float> RayTracer::m_SphereRadius;
 
-	std::vector<glm::vec4> RayTracer::m_SphereCol;
-	std::vector<glm::vec4> RayTracer::m_SphereEmissionCol;
-	std::vector<float> RayTracer::m_SphereEmissionStrength;
-	std::vector<float> RayTracer::m_SphereRoughness;
+	glm::vec4 RayTracer::m_Color = glm::vec4(1.0,0.6,0.1,1.0);
+	float RayTracer::m_Roughness = 1.0f;
 	bool RayTracer::EnableSky = true;
 	int RayTracer::numBounces = 10;
 	int RayTracer::samplesPerPixel = 2;
@@ -74,6 +70,8 @@ namespace Hazel
 		//float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-StartTime).count();
 		cs_RayTracingShader->Bind();
 		//cs_RayTracingShader->SetFloat("time", time);
+		bvh->texArray->Bind(ALBEDO_SLOT);
+		cs_RayTracingShader->SetInt("albedo", ALBEDO_SLOT);
 		cs_RayTracingShader->SetFloat3("camera_pos", cam.GetCameraPosition());
 		cs_RayTracingShader->SetFloat3("camera_viewdir", -cam.GetViewDirection());
 		cs_RayTracingShader->SetFloat("focal_length", m_focalLength);
@@ -85,6 +83,9 @@ namespace Hazel
 		cs_RayTracingShader->SetInt("num_bounces", numBounces);
 		cs_RayTracingShader->SetInt("samplesPerPixel", samplesPerPixel);
 		cs_RayTracingShader->SetInt("BVHNodeSize", bvh->arrLinearBVHNode.size());
+		cs_RayTracingShader->SetFloat("light_intensity", Renderer3D::m_SunIntensity);
+		cs_RayTracingShader->SetFloat4("u_Color", m_Color);
+		cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
 
 		//bind the ssbo objects
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_linearBVHNodes);
@@ -112,13 +113,7 @@ namespace Hazel
 	}
 	void RayTracer::UpdateScene()
 	{
-		int num_spheres = m_SpherePos.size();
-		cs_RayTracingShader->SetInt("num_spheres", num_spheres);
-		cs_RayTracingShader->SetFloat3Array("SpherePos", &m_SpherePos[0].x, num_spheres);
-		cs_RayTracingShader->SetFloatArray("SphereRadius", m_SphereRadius[0], num_spheres);
-		cs_RayTracingShader->SetFloat4Array("SphereCol", &m_SphereCol[0].x, num_spheres);
-		cs_RayTracingShader->SetFloat4Array("SphereEmissionCol", &m_SphereEmissionCol[0].x, num_spheres);
-		cs_RayTracingShader->SetFloatArray("SphereEmissionStrength", m_SphereEmissionStrength[0], num_spheres);
-		cs_RayTracingShader->SetFloatArray("SphereRoughness", m_SphereRoughness[0], num_spheres);
+		cs_RayTracingShader->SetFloat4("u_Color", m_Color);
+		cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
 	}
 }
