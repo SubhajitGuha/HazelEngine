@@ -53,8 +53,8 @@ namespace Hazel
 		glGenTextures(1, &m_RT_TextureID);
 		glBindTexture(GL_TEXTURE_2D, m_RT_TextureID);
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, image_width, image_height);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glBindImageTexture(m_Binding, m_RT_TextureID, 0, 0, 0, GL_READ_WRITE, GL_RGBA8);
@@ -67,43 +67,45 @@ namespace Hazel
 			old_view = cam.GetViewMatrix();
 			frame_num = 1;
 		}
-		//float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-StartTime).count();
-		cs_RayTracingShader->Bind();
-		//cs_RayTracingShader->SetFloat("time", time);
-		bvh->texArray->Bind(ALBEDO_SLOT);
-		cs_RayTracingShader->SetInt("albedo", ALBEDO_SLOT);
-		cs_RayTracingShader->SetFloat3("camera_pos", cam.GetCameraPosition());
-		cs_RayTracingShader->SetFloat3("camera_viewdir", -cam.GetViewDirection());
-		cs_RayTracingShader->SetFloat("focal_length", m_focalLength);
-		cs_RayTracingShader->SetMat4("mat_view", cam.GetViewMatrix());
-		cs_RayTracingShader->SetMat4("mat_proj", cam.GetProjectionMatrix());
-		cs_RayTracingShader->SetFloat3("light_dir", glm::normalize(Renderer3D::m_SunLightDir));
-		cs_RayTracingShader->SetInt("EnvironmentEnabled", EnableSky);
-		cs_RayTracingShader->SetInt("frame_num", abs(frame_num));
-		cs_RayTracingShader->SetInt("num_bounces", numBounces);
-		cs_RayTracingShader->SetInt("samplesPerPixel", samplesPerPixel);
-		cs_RayTracingShader->SetInt("BVHNodeSize", bvh->arrLinearBVHNode.size());
-		cs_RayTracingShader->SetFloat("light_intensity", Renderer3D::m_SunIntensity);
-		cs_RayTracingShader->SetFloat4("u_Color", m_Color);
-		cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
+		if (frame_num < 10000) {
+			//float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-StartTime).count();
+			cs_RayTracingShader->Bind();
+			//cs_RayTracingShader->SetFloat("time", time);
+			bvh->texArray->Bind(ALBEDO_SLOT);
+			cs_RayTracingShader->SetInt("albedo", ALBEDO_SLOT);
+			cs_RayTracingShader->SetFloat3("camera_pos", cam.GetCameraPosition());
+			cs_RayTracingShader->SetFloat3("camera_viewdir", -cam.GetViewDirection());
+			cs_RayTracingShader->SetFloat("focal_length", m_focalLength);
+			cs_RayTracingShader->SetMat4("mat_view", cam.GetViewMatrix());
+			cs_RayTracingShader->SetMat4("mat_proj", cam.GetProjectionMatrix());
+			cs_RayTracingShader->SetFloat3("light_dir", glm::normalize(Renderer3D::m_SunLightDir));
+			cs_RayTracingShader->SetInt("EnvironmentEnabled", EnableSky);
+			cs_RayTracingShader->SetInt("frame_num", abs(frame_num));
+			cs_RayTracingShader->SetInt("num_bounces", numBounces);
+			cs_RayTracingShader->SetInt("samplesPerPixel", samplesPerPixel);
+			cs_RayTracingShader->SetInt("BVHNodeSize", bvh->arrLinearBVHNode.size());
+			cs_RayTracingShader->SetFloat("light_intensity", Renderer3D::m_SunIntensity);
+			cs_RayTracingShader->SetFloat4("u_Color", m_Color);
+			cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
 
-		//bind the ssbo objects
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_linearBVHNodes);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_linearBVHNodes);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			//bind the ssbo objects
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_linearBVHNodes);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_linearBVHNodes);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_rtTriangles);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo_rtTriangles);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_rtTriangles);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo_rtTriangles);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_triangleIndices);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, ssbo_triangleIndices);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_triangleIndices);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, ssbo_triangleIndices);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-		glDispatchCompute(image_width/8, image_height/8, 1);
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-		frame_num++;
-		frame_num %= 2147483647;
+			glDispatchCompute(image_width / 8, image_height / 8, 1);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			frame_num++;
+		}
+		//frame_num %= 2147483647;
 	}
 	void RayTracer::Resize(int width, int height)
 	{
