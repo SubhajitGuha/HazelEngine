@@ -21,17 +21,14 @@ namespace Hazel {
 		static uint32_t m_RT_TextureID;
 
 		static glm::vec4 m_Color;
-		//static glm::vec4 m_SphereEmissionCol;
-		//static std::vector<float> m_SphereEmissionStrength;
 		static float m_Roughness;
 		static bool EnableSky;
 		static int numBounces;
 		static int samplesPerPixel;
 
-		//static std::vector<float> m_SphereSpecStrength;
-
 	private:
-		uint32_t ssbo_linearBVHNodes = -1, ssbo_rtTriangles = -1, ssbo_triangleIndices = -1;
+		uint32_t ssbo_linearBVHNodes = -1, ssbo_rtTriangles = -1, ssbo_triangleIndices = -1,
+			ssbo_arrMaterials = -1;
 		uint16_t m_Binding;
 		int frame_num;
 		glm::mat4 old_view;

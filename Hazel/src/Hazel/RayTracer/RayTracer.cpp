@@ -9,35 +9,36 @@ namespace Hazel
 	glm::vec4 RayTracer::m_Color = glm::vec4(1.0,0.6,0.1,1.0);
 	float RayTracer::m_Roughness = 1.0f;
 	bool RayTracer::EnableSky = true;
-	int RayTracer::numBounces = 10;
+	int RayTracer::numBounces = 3;
 	int RayTracer::samplesPerPixel = 2;
 
 	RayTracer::RayTracer()
 	{
 		frame_num = 1;
-		samples = 2;
+		samples = 1;
 		Init(512,512);
-		bvh = std::make_shared<BVH>();
+		bvh = std::make_shared<BVH>(Scene::plant);
 		StartTime = std::chrono::high_resolution_clock::now();
 
 		//pass the nodes,triangles as ssbos
 		glGenBuffers(1, &ssbo_linearBVHNodes);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_linearBVHNodes);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::LinearBVHNode) * bvh->arrLinearBVHNode.size(), &bvh->arrLinearBVHNode[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::LinearBVHNode) * bvh->arrLinearBVHNode.size(), &bvh->arrLinearBVHNode[0], GL_STATIC_READ);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_linearBVHNodes);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		glGenBuffers(1, &ssbo_rtTriangles);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_rtTriangles);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::RTTriangles) * bvh->arrRTTriangles.size(), &bvh->arrRTTriangles[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::RTTriangles) * bvh->arrRTTriangles.size(), &bvh->arrRTTriangles[0], GL_STATIC_READ);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo_rtTriangles);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		glGenBuffers(1, &ssbo_triangleIndices);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_triangleIndices);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * bvh->triIndex.size(), &bvh->triIndex[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * bvh->triIndex.size(), &bvh->triIndex[0], GL_STATIC_READ);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, ssbo_triangleIndices);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 	}
 	RayTracer::RayTracer(int image_w, int image_h, int viewport_w, int viewport_h, int samples)
 	{		
@@ -52,12 +53,12 @@ namespace Hazel
 		image_height = height;
 		glGenTextures(1, &m_RT_TextureID);
 		glBindTexture(GL_TEXTURE_2D, m_RT_TextureID);
-		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, image_width, image_height);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16, image_width, image_height);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		glBindImageTexture(m_Binding, m_RT_TextureID, 0, 0, 0, GL_READ_WRITE, GL_RGBA8);
+		glBindImageTexture(m_Binding, m_RT_TextureID, 0, 0, 0, GL_READ_WRITE, GL_RGBA16);
 		cs_RayTracingShader = Shader::Create("Assets/Shaders/cs_RayTracingShader.glsl");
 	}
 	void RayTracer::RenderImage(Camera& cam)
@@ -71,8 +72,11 @@ namespace Hazel
 			//float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-StartTime).count();
 			cs_RayTracingShader->Bind();
 			//cs_RayTracingShader->SetFloat("time", time);
-			bvh->texArray->Bind(ALBEDO_SLOT);
+			bvh->texArray_albedo->Bind(ALBEDO_SLOT);
+			bvh->texArray_roughness->Bind(ROUGHNESS_SLOT);
+
 			cs_RayTracingShader->SetInt("albedo", ALBEDO_SLOT);
+			cs_RayTracingShader->SetInt("roughness_metallic", ROUGHNESS_SLOT);
 			cs_RayTracingShader->SetFloat3("camera_pos", cam.GetCameraPosition());
 			cs_RayTracingShader->SetFloat3("camera_viewdir", -cam.GetViewDirection());
 			cs_RayTracingShader->SetFloat("focal_length", m_focalLength);
@@ -87,6 +91,7 @@ namespace Hazel
 			cs_RayTracingShader->SetFloat("light_intensity", Renderer3D::m_SunIntensity);
 			cs_RayTracingShader->SetFloat4("u_Color", m_Color);
 			cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
+			bvh->UpdateMaterials(); //update material every frame
 
 			//bind the ssbo objects
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_linearBVHNodes);
@@ -99,6 +104,12 @@ namespace Hazel
 
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_triangleIndices);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, ssbo_triangleIndices);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			glGenBuffers(1, &ssbo_arrMaterials);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_arrMaterials);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::Material) * bvh->arrMaterials.size(), &bvh->arrMaterials[0], GL_STATIC_READ);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, ssbo_arrMaterials);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 			glDispatchCompute(image_width / 8, image_height / 8, 1);

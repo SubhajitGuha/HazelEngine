@@ -32,7 +32,16 @@ struct RTTriangles
 	int materialID;
 };
 
-uniform layout(binding = 1, rgba8) image2D FinalImage;
+struct Material
+{
+	float[4] color;
+	float roughness;
+	float metalness;
+	float[4] emissive_col;
+	float emissive_strength;
+};
+
+uniform layout(binding = 1, rgba16) image2D FinalImage;
 
 layout (std430, binding = 2) buffer layoutLinearBVHNode
 {
@@ -49,7 +58,13 @@ layout (std430, binding = 4) buffer layoutTriangleIndices
 	int triIndices[];
 }arr_triIndices;
 
+layout (std430, binding = 5) buffer layoutMaterials
+{
+	Material arrMaterials[];
+}arr_Materials;
+
 uniform sampler2DArray albedo;
+uniform sampler2DArray roughness_metallic;
 
 uniform int BVHNodeSize;
 uniform int frame_num;
@@ -77,15 +92,6 @@ vec4 SkyColourZenith = vec4(0.1,0.4,0.89,1.0);
 float SunFocus=20.0;
 float SunIntensity=10;
 
-struct Material //sphere material
-{
-	vec4 color;
-	float roughness;
-	float metalness;
-	vec4 emissive_col;
-	float emissive_strength;
-};
-
 Material defaultMat;
 struct Sphere
 {
@@ -108,6 +114,11 @@ struct HitInfo
 	vec3 Normal;
 	Material material; //change color to material
 };
+
+vec4 float4_to_vec4(float[4] arr)
+{
+	return vec4(arr[0],arr[1],arr[2],arr[3]);
+}
 
 //random number generator pcg_hash
 //https://www.reedbeta.com/blog/hash-functions-for-gpu-rendering/
@@ -337,13 +348,23 @@ HitInfo ClosestHit(Ray ray)
 	info.HitDist = t;
 	t!=MAX? info.isHit=true:info.isHit=false;
 	info.HitPos = ray.origin + t*ray.dir;
-	info.material = defaultMat;
+	info.material = arr_Materials.arrMaterials[nearestTriangle.materialID];
 	vec2 uv0 = vec2(nearestTriangle.uv0[0],nearestTriangle.uv0[1]);
 	vec2 uv1 = vec2(nearestTriangle.uv1[0],nearestTriangle.uv1[1]);
 	vec2 uv2 = vec2(nearestTriangle.uv2[0],nearestTriangle.uv2[1]);
 	vec2 uv = uv1*u + uv2*v + uv0*(1.0-u-v);
 
-	info.material.color = texture(albedo,vec3(uv,nearestTriangle.materialID)); 
+	//multiply texture with material color(tint);
+	vec4 tex_albedo = texture(albedo,vec3(uv,nearestTriangle.materialID));
+	vec4 tex_roughness = texture(roughness_metallic,vec3(uv,nearestTriangle.materialID));
+
+	info.material.color[0] *= tex_albedo.r;
+	info.material.color[1] *= tex_albedo.g; 
+	info.material.color[2] *= tex_albedo.b;
+	info.material.color[3] *= tex_albedo.a; 
+	info.material.roughness *= tex_roughness.g;
+	//info.material.metalness = tex_roughness.b;
+
 	vec3 v0 = vec3(nearestTriangle.v0[0],nearestTriangle.v0[1],nearestTriangle.v0[2]);
 	vec3 v1 = vec3(nearestTriangle.v1[0],nearestTriangle.v1[1],nearestTriangle.v1[2]);
 	vec3 v2 = vec3(nearestTriangle.v2[0],nearestTriangle.v2[1],nearestTriangle.v2[2]);
@@ -389,11 +410,11 @@ vec3 perPixel(int numBounces, Ray ray,Sphere[MAX_NUM_SPHERES] sphere, inout uint
 {
 	vec3 color=vec3(1.0);
 	vec3 incommingLight = vec3(0.0);
-	for(int k=0;k<numBounces;k++)
+	for(int k=1;k<=numBounces;k++)
 	{
 		HitInfo info;
-		info = ClosestHit(sphere,ray);
-		//info = ClosestHit(ray);		
+		//info = ClosestHit(sphere,ray);
+		info = ClosestHit(ray);		
 		if(info.isHit == true)
 		{
 			alpha = info.material.roughness;
@@ -426,7 +447,7 @@ vec3 perPixel(int numBounces, Ray ray,Sphere[MAX_NUM_SPHERES] sphere, inout uint
 			else
 				F0 = vec3(0.04f);
 			float specular = 1.0;
-			F0 = mix(F0*specular, info.material.color.rgb, info.material.metalness);
+			F0 = mix(F0*specular, float4_to_vec4(info.material.color).rgb, info.material.metalness);
 		
 			float Dggx = NormalDistribution_GGX(NdotH);
 			float Gggx = Geometry_GGX(NdotV) * Geometry_GGX(NdotL);
@@ -436,7 +457,7 @@ vec3 perPixel(int numBounces, Ray ray,Sphere[MAX_NUM_SPHERES] sphere, inout uint
 			kd *= (1.0f - info.material.metalness);
 
 			vec3 specularBRDF = SpecularBRDF(Dggx, Gggx, fresnel, NdotV, NdotL, info.Normal);
-			vec3 diffuseBRDF = info.material.color.rgb / PI;
+			vec3 diffuseBRDF = float4_to_vec4(info.material.color).rgb / PI;
 			float specularPDF = ImportanceSampleGGX_PDF(Dggx,NdotH,VdotH);
 			float diffusePDF = CosinSamplingPDF(NdotL);
 
@@ -446,7 +467,7 @@ vec3 perPixel(int numBounces, Ray ray,Sphere[MAX_NUM_SPHERES] sphere, inout uint
 			ray.origin = info.HitPos + info.Normal*0.001;
 			ray.dir = reflectionDir;
 
-			vec3 emittedLight = info.material.emissive_col.rgb * info.material.emissive_strength;
+			vec3 emittedLight = float4_to_vec4(info.material.emissive_col).rgb * info.material.emissive_strength;
 			incommingLight += emittedLight*color;
 			if(totalPDF > 0.0)
 				color *= totalBRDF/totalPDF;
@@ -497,78 +518,78 @@ void main()
 	ray.origin = camera_pos;//in world space
 	ray.dir = normalize(vec3(inverse(mat_view)*vec4(target.xyz/target.w,0))); //ray dir in world space
 
-	Material mat[MAX_NUM_SPHERES];
-	mat[0].color =  u_Color;
-	mat[0].roughness = u_Roughness;
-	mat[0].metalness = 1.0;
-	mat[0].emissive_col = vec4(0.9,0.67,0.1,1.0);
-	mat[0].emissive_strength = 0.0;
-
-	mat[1].color =  vec4(1.0,0.67,0.1,1.0);
-	mat[1].emissive_col = vec4(1.0,0.67,0.1,1.0);
-	mat[1].roughness = 0.13;
-	mat[1].metalness = 0.0;
-	mat[1].emissive_strength = 0.0;
-
-	mat[2].color =  vec4(0.8,0.2,0.5,1.0);
-	mat[2].roughness = 0.08;
-	mat[2].metalness = 0.0;
-	mat[2].emissive_col = vec4(0.9,0.67,0.1,1.0);
-	mat[2].emissive_strength = 0.0;
-
-	mat[3].color =  vec4(0.0,0.514,1.0,1.0);
-	mat[3].roughness = 0.68;
-	mat[3].metalness = 1.0;
-	mat[3].emissive_col = vec4(0.9,0.67,0.1,1.0);
-	mat[3].emissive_strength = 0.0;
-
-	mat[4].color =  vec4(1.0,1.0,1.0,1.0);
-	mat[4].roughness = 0.10;
-	mat[4].metalness = 1.0;
-	mat[4].emissive_col = vec4(0.9,0.67,0.1,1.0);
-	mat[4].emissive_strength = 0.0;
-
-	mat[5].color =  vec4(1.0,0.518,0.0,1.0);
-	mat[5].roughness = 0.1;
-	mat[5].metalness = 0.0;
-	mat[5].emissive_col = vec4(1.0,0.518,0.0,1.0);
-	mat[5].emissive_strength = 0.0;
-
-	mat[6].color =  vec4(0.822,1.0,0.278,1.0);
-	mat[6].roughness = 0.2;
-	mat[6].metalness = 1.0;
-	mat[6].emissive_col = vec4(1.0,0.518,0.0,1.0);
-	mat[6].emissive_strength = 0.0;
-
+	//Material mat[MAX_NUM_SPHERES];
+	//mat[0].color =  u_Color;
+	//mat[0].roughness = u_Roughness;
+	//mat[0].metalness = 1.0;
+	//mat[0].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	//mat[0].emissive_strength = 0.0;
+	//
+	//mat[1].color =  vec4(1.0,0.67,0.1,1.0);
+	//mat[1].emissive_col = vec4(1.0,0.67,0.1,1.0);
+	//mat[1].roughness = 0.13;
+	//mat[1].metalness = 0.0;
+	//mat[1].emissive_strength = 0.0;
+	//
+	//mat[2].color =  vec4(0.8,0.2,0.5,1.0);
+	//mat[2].roughness = 0.08;
+	//mat[2].metalness = 0.0;
+	//mat[2].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	//mat[2].emissive_strength = 0.0;
+	//
+	//mat[3].color =  vec4(0.0,0.514,1.0,1.0);
+	//mat[3].roughness = 0.68;
+	//mat[3].metalness = 1.0;
+	//mat[3].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	//mat[3].emissive_strength = 0.0;
+	//
+	//mat[4].color =  vec4(1.0,1.0,1.0,1.0);
+	//mat[4].roughness = 0.10;
+	//mat[4].metalness = 1.0;
+	//mat[4].emissive_col = vec4(0.9,0.67,0.1,1.0);
+	//mat[4].emissive_strength = 0.0;
+	//
+	//mat[5].color =  vec4(1.0,0.518,0.0,1.0);
+	//mat[5].roughness = 0.1;
+	//mat[5].metalness = 0.0;
+	//mat[5].emissive_col = vec4(1.0,0.518,0.0,1.0);
+	//mat[5].emissive_strength = 0.0;
+	//
+	//mat[6].color =  vec4(0.822,1.0,0.278,1.0);
+	//mat[6].roughness = 0.2;
+	//mat[6].metalness = 1.0;
+	//mat[6].emissive_col = vec4(1.0,0.518,0.0,1.0);
+	//mat[6].emissive_strength = 0.0;
+	//
 	Sphere sphere[MAX_NUM_SPHERES];
 	sphere[0].centre = vec3(0,-810,0);
 	sphere[0].radius = 800.0;	
-
+	
 	sphere[1].centre = vec3(0,-6,0);
 	sphere[1].radius = 5.0;
-
+	
 	sphere[2].centre = vec3(18,0,5);
 	sphere[2].radius = 10.0;
-
+	
 	sphere[3].centre = vec3(-18,0,5);
 	sphere[3].radius = 10.0;
-
+	
 	sphere[4].centre = vec3(0,0,25);
 	sphere[4].radius = 10.0;
-
+	
 	sphere[5].centre = vec3(30,0,-15);
 	sphere[5].radius = 10.0;
-
+	
 	sphere[6].centre = vec3(-30,0,-25);
 	sphere[6].radius = 10.0;
+	//
+	//for(int i=0;i<MAX_NUM_SPHERES;i++)
+	//	sphere[i].material = mat[i];
+	//
+	//defaultMat = mat[0];//for now do this 
 
-	for(int i=0;i<MAX_NUM_SPHERES;i++)
-		sphere[i].material = mat[i];
 
-	defaultMat = mat[0];//for now do this 
-
-
-	defaultMat = mat[0];//for now do this 
+	//defaultMat = mat[0];//for now do this 
 
 	uint hash = uint(uv.x + image_res.x * uv.y + frame_num* 1874);
 	for(int i=0; i<samplesPerPixel; i++)
@@ -576,8 +597,8 @@ void main()
 	color /= samplesPerPixel;
 
 	//progressive render
-	float weight = 1.0/(frame_num);
-	color = color * weight + imageLoad(FinalImage,uv).rgb*(1.0-weight);
-	//color = clamp(ColorCorrection(color),0.0,1.0);
+	float weight = 1.0f/(frame_num+0.0f);
+	color = color * weight + imageLoad(FinalImage,uv).rgb*(1.0f-weight);
+	color = clamp(color,0.0,1.0);
 	imageStore(FinalImage,uv,vec4(color,1.0));
 }

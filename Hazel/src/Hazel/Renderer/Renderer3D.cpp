@@ -285,7 +285,7 @@ namespace Hazel {
 			material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
 			material->Normal_Texture->Bind(NORMAL_SLOT);
 
-			m_data->foliageShader_instanced->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
+			m_data->foliageShader_instanced->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture to slot1;
 			m_data->foliageShader_instanced->SetInt("u_Roughness", ROUGHNESS_SLOT);
 			m_data->foliageShader_instanced->SetInt("u_NormalMap", NORMAL_SLOT);
 			m_data->foliageShader_instanced->SetMat4("u_Model", transform);

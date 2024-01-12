@@ -71,19 +71,32 @@ namespace Hazel
 		};
 		enum SplitMethod
 		{SAH,MEAN};
+		struct Material
+		{
+			glm::vec4 color;
+			float roughness;
+			float metalness;
+			glm::vec4 emissive_col;
+			float emissive_strength;
+		};
 	public:
-		BVH();
-		void BuildBVH(BVHNode*& node, int triStartID, int triCount);
-		void CreateTriangles(LoadMesh* mesh, glm::mat4& transform = glm::mat4(1.0)); //create triangles from mesh vertex positions
+		BVH()=default;
+		BVH(LoadMesh*& mesh);
+		void UpdateMaterials();
 	private:
+		void BuildBVH(BVHNode*& node, int triStartID, int triCount);
+		void CreateTriangles(glm::mat4& transform = glm::mat4(1.0)); //create triangles from mesh vertex positions
 		float EvaluateSAH(BVHNode& node, int axis, float pos);
 		int FlattenBVH(BVHNode* node,int* offset);
 		void CleanBVH(BVHNode* node);//removes count of triangles from child nodes
 	private:
-		BVHNode* head = nullptr;
-		std::vector<std::string> texturePaths;
+		LoadMesh* m_Mesh;
+		BVHNode* head = nullptr;		
 	public:
-		ref<Texture2DArray> texArray;
+		std::vector<Material> arrMaterials;
+		ref<Texture2DArray> texArray_albedo;
+		ref<Texture2DArray> texArray_roughness;
+
 		std::vector<LinearBVHNode> arrLinearBVHNode;//to be sent on to the gpu
 		std::vector<RTTriangles> arrRTTriangles;//to be sent on to the gpu
 		std::vector<int> triIndex;//to be sent on to the gpu
