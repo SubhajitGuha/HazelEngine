@@ -10,15 +10,6 @@
     <Filter Include="Assets\Textures\MeshTextures">
       <UniqueIdentifier>{4B5330C7-370E-2073-E0C5-98BDCC5F6A03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Hazel">
-      <UniqueIdentifier>{99294D0D-053E-75BE-CEBF-181E3A9371EF}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Hazel\vendor">
-      <UniqueIdentifier>{D6D9B06F-C23C-4014-6BC2-78CA57040C97}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Hazel\vendor\imguizmo">
-      <UniqueIdentifier>{366DB374-A2D9-6E6F-6BCD-06CDD7F890D7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
@@ -44,21 +35,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Hazel\vendor\imguizmo\GraphEditor.cpp">
-      <Filter>Hazel\vendor\imguizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Hazel\vendor\imguizmo\ImCurveEdit.cpp">
-      <Filter>Hazel\vendor\imguizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGradient.cpp">
-      <Filter>Hazel\vendor\imguizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGuizmo.cpp">
-      <Filter>Hazel\vendor\imguizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Hazel\vendor\imguizmo\ImSequencer.cpp">
-      <Filter>Hazel\vendor\imguizmo</Filter>
-    </ClCompile>
     <ClCompile Include="src\HazelEditor.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -137,6 +113,21 @@
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\leaf daisy_normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part1.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part1.tga.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part2.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part3.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part4.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\pine branch.png">

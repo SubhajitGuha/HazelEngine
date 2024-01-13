@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -95,7 +95,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -115,7 +115,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\imguizmo;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Hazel\vendor\spdlog\include;..\Hazel\vendor\imgui;..\Hazel\vendor\glm;..\Hazel\vendor\entt;..\Hazel\vendor\Curl\include;..\Hazel\vendor\jsoncpp;..\Hazel\src;..\Hazel\vendor\physx_x64-windows\include;..\Hazel\vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -138,11 +138,6 @@
     <ClInclude Include="src\Pannels\SceneHierarchy.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Hazel\vendor\imguizmo\GraphEditor.cpp" />
-    <ClCompile Include="..\Hazel\vendor\imguizmo\ImCurveEdit.cpp" />
-    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGradient.cpp" />
-    <ClCompile Include="..\Hazel\vendor\imguizmo\ImGuizmo.cpp" />
-    <ClCompile Include="..\Hazel\vendor\imguizmo\ImSequencer.cpp" />
     <ClCompile Include="src\HazelEditor.cpp" />
     <ClCompile Include="src\Pannels\ContentBrowser.cpp" />
     <ClCompile Include="src\Pannels\MaterialEditor.cpp" />
@@ -171,6 +166,11 @@
     <Image Include="Assets\Textures\MeshTextures\grass_texture.png" />
     <Image Include="Assets\Textures\MeshTextures\leaf daisy.png" />
     <Image Include="Assets\Textures\MeshTextures\leaf daisy_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part1.png" />
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part1.tga.png" />
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part2.png" />
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part3.png" />
+    <Image Include="Assets\Textures\MeshTextures\miniHouse_Part4.png" />
     <Image Include="Assets\Textures\MeshTextures\pine branch.png" />
     <Image Include="Assets\Textures\MeshTextures\pine branch_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\pine leaf.png" />

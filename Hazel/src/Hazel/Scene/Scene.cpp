@@ -62,7 +62,7 @@ namespace Hazel {
 		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.fbx", LoadMesh::IMPORT_MESH);
 
 		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
-		Sponza = new LoadMesh("Assets/Meshes/Sponza.asset");
+		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx", LoadMesh::IMPORT_MESH);
 		Renderer3D::SetUpCubeMapReflections(*this);
 		editor_cam.SetVerticalFOV(45.f);
 		editor_cam.SetPerspectiveFar(10000);

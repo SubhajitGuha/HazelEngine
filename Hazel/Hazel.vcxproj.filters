@@ -22,6 +22,9 @@
     <Filter Include="src\Hazel\Physics">
       <UniqueIdentifier>{622BAB77-CE41-A90D-17B9-342F830E7A95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Hazel\RayTracer">
+      <UniqueIdentifier>{6C3DA13A-D89E-7E48-610C-C5FACD6CB507}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Hazel\Renderer">
       <UniqueIdentifier>{9669EB43-824D-AC99-EBAD-A6ECD7B0961B}</UniqueIdentifier>
     </Filter>
@@ -69,9 +72,6 @@
     </Filter>
     <Filter Include="vendor\entt">
       <UniqueIdentifier>{DD8078C1-4936-F1B6-D22A-EB8D3EDFE7BA}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vendor\imguizmo">
-      <UniqueIdentifier>{B36F5F1F-1FFB-CCE3-280C-50D8941629E4}</UniqueIdentifier>
     </Filter>
     <Filter Include="vendor\jsoncpp">
       <UniqueIdentifier>{DF9952C1-CB67-46C7-B4FB-B6EDA068222C}</UniqueIdentifier>
@@ -200,6 +200,12 @@
     </ClInclude>
     <ClInclude Include="src\Hazel\Physics\Physics3D.h">
       <Filter>src\Hazel\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\RayTracer\BVH.h">
+      <Filter>src\Hazel\RayTracer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\RayTracer\RayTracer.h">
+      <Filter>src\Hazel\RayTracer</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\Atmosphere.h">
       <Filter>src\Hazel\Renderer</Filter>
@@ -644,24 +650,6 @@
     </ClInclude>
     <ClInclude Include="vendor\entt\entt.hpp">
       <Filter>vendor\entt</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\imguizmo\GraphEditor.h">
-      <Filter>vendor\imguizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\imguizmo\ImCurveEdit.h">
-      <Filter>vendor\imguizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\imguizmo\ImGradient.h">
-      <Filter>vendor\imguizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\imguizmo\ImGuizmo.h">
-      <Filter>vendor\imguizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\imguizmo\ImSequencer.h">
-      <Filter>vendor\imguizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\imguizmo\ImZoomSlider.h">
-      <Filter>vendor\imguizmo</Filter>
     </ClInclude>
     <ClInclude Include="vendor\jsoncpp\json\json-forwards.h">
       <Filter>vendor\jsoncpp\json</Filter>
@@ -1239,8 +1227,6 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hazel\RayTracer\RayTracer.h" />
-    <ClInclude Include="src\Hazel\RayTracer\BVH.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1269,6 +1255,12 @@
     </ClCompile>
     <ClCompile Include="src\Hazel\Physics\Physics3D.cpp">
       <Filter>src\Hazel\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\RayTracer\BVH.cpp">
+      <Filter>src\Hazel\RayTracer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\RayTracer\RayTracer.cpp">
+      <Filter>src\Hazel\RayTracer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Atmosphere.cpp">
       <Filter>src\Hazel\Renderer</Filter>
@@ -1417,21 +1409,6 @@
     <ClCompile Include="src\hzpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="vendor\imguizmo\GraphEditor.cpp">
-      <Filter>vendor\imguizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="vendor\imguizmo\ImCurveEdit.cpp">
-      <Filter>vendor\imguizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="vendor\imguizmo\ImGradient.cpp">
-      <Filter>vendor\imguizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="vendor\imguizmo\ImGuizmo.cpp">
-      <Filter>vendor\imguizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="vendor\imguizmo\ImSequencer.cpp">
-      <Filter>vendor\imguizmo</Filter>
-    </ClCompile>
     <ClCompile Include="vendor\jsoncpp\jsoncpp.cpp">
       <Filter>vendor\jsoncpp</Filter>
     </ClCompile>
@@ -1441,7 +1418,5 @@
     <ClCompile Include="vendor\stb_image\stb_image_resize.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hazel\RayTracer\RayTracer.cpp" />
-    <ClCompile Include="src\Hazel\RayTracer\BVH.cpp" />
   </ItemGroup>
 </Project>

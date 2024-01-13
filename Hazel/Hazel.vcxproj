@@ -73,10 +73,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -92,10 +93,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -115,10 +117,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imguizmo;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -306,12 +309,6 @@
     <ClInclude Include="vendor\assimp\include\assimp\vector3.h" />
     <ClInclude Include="vendor\assimp\include\assimp\version.h" />
     <ClInclude Include="vendor\entt\entt.hpp" />
-    <ClInclude Include="vendor\imguizmo\GraphEditor.h" />
-    <ClInclude Include="vendor\imguizmo\ImCurveEdit.h" />
-    <ClInclude Include="vendor\imguizmo\ImGradient.h" />
-    <ClInclude Include="vendor\imguizmo\ImGuizmo.h" />
-    <ClInclude Include="vendor\imguizmo\ImSequencer.h" />
-    <ClInclude Include="vendor\imguizmo\ImZoomSlider.h" />
     <ClInclude Include="vendor\jsoncpp\json\json-forwards.h" />
     <ClInclude Include="vendor\jsoncpp\json\json.h" />
     <ClInclude Include="vendor\physx_x64-windows\include\PxActor.h" />
@@ -565,12 +562,9 @@
     <ClCompile Include="src\Hazel\platform\Opengl\OpenglVertexArray.cpp" />
     <ClCompile Include="src\Hazel\platform\WindowsInput.cpp" />
     <ClCompile Include="src\Hazel\platform\WindowsWindow.cpp" />
-    <ClCompile Include="src\hzpch.cpp" />
-    <ClCompile Include="vendor\imguizmo\GraphEditor.cpp" />
-    <ClCompile Include="vendor\imguizmo\ImCurveEdit.cpp" />
-    <ClCompile Include="vendor\imguizmo\ImGradient.cpp" />
-    <ClCompile Include="vendor\imguizmo\ImGuizmo.cpp" />
-    <ClCompile Include="vendor\imguizmo\ImSequencer.cpp" />
+    <ClCompile Include="src\hzpch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="vendor\jsoncpp\jsoncpp.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image_resize.cpp" />

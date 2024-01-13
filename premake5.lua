@@ -17,7 +17,6 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
 IncludeDir["Glad"] = "Hazel/vendor/Glad/include"
 IncludeDir["imgui"] = "Hazel/vendor/imgui"
-IncludeDir["imguizmo"] = "Hazel/vendor/imguizmo"
 IncludeDir["glm"] = "Hazel/vendor/glm"
 IncludeDir["stb_image"] = "Hazel/vendor/stb_image"
 IncludeDir["entt"] = "Hazel/vendor/entt"
@@ -67,8 +66,6 @@ project "Hazel"
 		"%{IncludeDir.Physx}/**.h",
 		"%{IncludeDir.Physx}/**.hpp",
 		"%{IncludeDir.Physx}/**.cpp",
-		"%{IncludeDir.imguizmo}/**.h",
-		"%{IncludeDir.imguizmo}/**.cpp",
 	}
 
 	includedirs
@@ -78,7 +75,6 @@ project "Hazel"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.imgui}",
-		"%{IncludeDir.imguizmo}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.curl}",
@@ -117,9 +113,6 @@ project "Hazel"
 		"Hazel/vendor/physx_x64-windows/lib/SceneQuery_static_64.lib",
 		"Hazel/vendor/physx_x64-windows/lib/SimulationController_static_64.lib",
 	}
-
-	files "Hazel/vendor/imguizmo/**.cpp"
-	flags {"NoPCH"}
 
 	filter "system:windows"
 		
@@ -175,7 +168,6 @@ project "Sandbox"
 	{
 		"Hazel/vendor/spdlog/include",
 		"%{IncludeDir.imgui}",
-		"%{IncludeDir.imguizmo}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.curl}",
@@ -183,9 +175,6 @@ project "Sandbox"
 		"Hazel/src"
 	}
 	links "Hazel"
-
-	files "Hazel/vendor/imguizmo/**.cpp"
-	flags {"NoPCH"}
 	
 	filter "system:windows"
 		
@@ -233,7 +222,6 @@ project "Hazel_Editor"
 	{
 		"Hazel/vendor/spdlog/include",
 		"%{IncludeDir.imgui}",
-		"%{IncludeDir.imguizmo}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.curl}",
@@ -243,9 +231,6 @@ project "Hazel_Editor"
 		"%{IncludeDir.yaml_cpp}"
 	}
 	links "Hazel"
-
-	files "Hazel/vendor/imguizmo/**.cpp"
-	flags {"NoPCH"}
 
 	filter "system:windows"
 		

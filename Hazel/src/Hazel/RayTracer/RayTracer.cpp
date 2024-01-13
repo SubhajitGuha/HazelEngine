@@ -17,7 +17,7 @@ namespace Hazel
 		frame_num = 1;
 		samples = 1;
 		Init(512,512);
-		bvh = std::make_shared<BVH>(Scene::plant);
+		bvh = std::make_shared<BVH>(Scene::House);
 		StartTime = std::chrono::high_resolution_clock::now();
 
 		//pass the nodes,triangles as ssbos
@@ -106,6 +106,7 @@ namespace Hazel
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, ssbo_triangleIndices);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
+			//pass material data to the gpu using ssbo every frame
 			glGenBuffers(1, &ssbo_arrMaterials);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_arrMaterials);
 			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::Material) * bvh->arrMaterials.size(), &bvh->arrMaterials[0], GL_STATIC_READ);

@@ -362,7 +362,7 @@ HitInfo ClosestHit(Ray ray)
 	info.material.color[1] *= tex_albedo.g; 
 	info.material.color[2] *= tex_albedo.b;
 	info.material.color[3] *= tex_albedo.a; 
-	info.material.roughness *= tex_roughness.g;
+	info.material.roughness *= tex_roughness.r;
 	//info.material.metalness = tex_roughness.b;
 
 	vec3 v0 = vec3(nearestTriangle.v0[0],nearestTriangle.v0[1],nearestTriangle.v0[2]);
