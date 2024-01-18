@@ -12,7 +12,7 @@ namespace Hazel
 		numNodes = 0;
 		uint32_t rootIndex = 0;
 		//glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 0,0,1 }) * glm::scale(glm::mat4(1.0), glm::vec3(1.0f));
-		glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), { 0,0,1 }) * glm::scale(glm::mat4(1.0), glm::vec3(15.1f));
+		glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), { 0,0,1 }) * glm::scale(glm::mat4(1.0), glm::vec3(0.1f));
 
 		CreateTriangles(transform);
 		UpdateMaterials();

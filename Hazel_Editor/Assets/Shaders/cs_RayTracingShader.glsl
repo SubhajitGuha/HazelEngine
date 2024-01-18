@@ -68,6 +68,7 @@ uniform sampler2DArray roughness_metallic;
 
 uniform int BVHNodeSize;
 uniform int frame_num;
+uniform int sample_count;
 uniform float focal_length;
 uniform float time;
 uniform vec3 camera_pos;
@@ -86,6 +87,12 @@ uniform mat4 mat_view;
 uniform mat4 mat_proj;
 
 uniform int EnvironmentEnabled;
+
+uniform int TileIndex_X;
+uniform int TileIndex_Y;
+uniform float u_ImageWidth;
+uniform float u_ImageHeight;
+
 vec4 GroundColour = vec4(0.664f, 0.887f, 1.000f, 1.000f);
 vec4 SkyColourHorizon = vec4(1.0,1.0,1.0,1.0);
 vec4 SkyColourZenith = vec4(0.1,0.4,0.89,1.0);
@@ -122,30 +129,29 @@ vec4 float4_to_vec4(float[4] arr)
 
 //random number generator pcg_hash
 //https://www.reedbeta.com/blog/hash-functions-for-gpu-rendering/
-float random(inout uint seed) //in 0-1 range
+uvec4 seed;
+void pcg4d(inout uvec4 v)
 {
-    seed = seed * 747796405u + 2891336453u;
-    seed = ((seed >> ((seed >> 28u) + 4u)) ^ seed) * 277803737u;
-    seed = (seed >> 22u) ^ seed;
-	return seed/4294967295.0; //2^32-1
+    v = v * 1664525u + 1013904223u;
+    v.x += v.y * v.w; v.y += v.z * v.x; v.z += v.x * v.y; v.w += v.y * v.z;
+    v = v ^ (v >> 16u);
+    v.x += v.y * v.w; v.y += v.z * v.x; v.z += v.x * v.y; v.w += v.y * v.z;
 }
 
-float randomNormalDist(inout uint seed)
+float random() //in 0-1 range
 {
-	float theta = 2.0 * 3.1415926 * random(seed);
-	float rho = sqrt(-2.0 * log(random(seed)));
-	return rho*cos(theta);
+	 pcg4d(seed); return float(seed.x) / float(0xffffffffu);
 }
 
 //random around a sphere
-vec3 randomDirInSphere(vec3 normal,inout uint seed,float alpha)
+vec3 randomDirInSphere(vec3 normal,float alpha)
 {
 	//float x = randomNormalDist(seed);
 	//float y = randomNormalDist(seed);
 	//float z = randomNormalDist(seed);
 
-	float r1 = random(seed);
-    float r2 = random(seed);
+	float r1 = random();
+    float r2 = random();
     float phi = 2*PI*r1;
 	float sqrt_r2 = sqrt(r2);
     float x = cos(phi)*sqrt_r2;
@@ -165,11 +171,11 @@ vec3 randomDirInSphere(vec3 normal,inout uint seed,float alpha)
 	return normalize(mat3(tangent,bitangent,normal)*tangentSpaceDir);
 }
 
-vec3 ImportanceSamplingGGX(inout uint seed,vec3 N, float roughness)
+vec3 ImportanceSamplingGGX(vec3 N, float roughness)
 {
 	float a2 = roughness*roughness;
-	float r1 = random(seed);
-	float r2 = random(seed);
+	float r1 = random();
+	float r2 = random();
 	//GGX sampling see https://schuttejoe.github.io/post/ggximportancesamplingpart1/
 	float phi = 2.0 * PI * r1;
     float cosTheta = sqrt((1.0 - r2) / (1.0 + (a2 * a2 - 1.0) * r2));
@@ -362,7 +368,7 @@ HitInfo ClosestHit(Ray ray)
 	info.material.color[1] *= tex_albedo.g; 
 	info.material.color[2] *= tex_albedo.b;
 	info.material.color[3] *= tex_albedo.a; 
-	info.material.roughness *= tex_roughness.r;
+	info.material.roughness *= tex_roughness.g;
 	//info.material.metalness = tex_roughness.b;
 
 	vec3 v0 = vec3(nearestTriangle.v0[0],nearestTriangle.v0[1],nearestTriangle.v0[2]);
@@ -406,7 +412,7 @@ vec3 SpecularBRDF(float Dggx, float Gggx, vec3 fresnel, float NdotV, float NdotL
 }
 
 //returns color
-vec3 perPixel(int numBounces, Ray ray,Sphere[MAX_NUM_SPHERES] sphere, inout uint seed)
+vec3 perPixel(int numBounces, Ray ray,Sphere[MAX_NUM_SPHERES] sphere)
 {
 	vec3 color=vec3(1.0);
 	vec3 incommingLight = vec3(0.0);
@@ -418,7 +424,7 @@ vec3 perPixel(int numBounces, Ray ray,Sphere[MAX_NUM_SPHERES] sphere, inout uint
 		if(info.isHit == true)
 		{
 			alpha = info.material.roughness;
-			float roulette = random(seed);
+			float roulette = random();
 			vec3 reflectionDir;
 			float diffuseRatio = 0.5f * (1.0f - info.material.metalness);
 			float specularRatio = 1.0f - diffuseRatio;
@@ -427,11 +433,11 @@ vec3 perPixel(int numBounces, Ray ray,Sphere[MAX_NUM_SPHERES] sphere, inout uint
 			//determine the direction of the next ray
 			if(roulette < diffuseRatio)
 			{//sample diffuse lobe
-				reflectionDir = randomDirInSphere(info.Normal,seed,1.0f); //cosine weighed hemispherical sampling
+				reflectionDir = randomDirInSphere(info.Normal,1.0f); //cosine weighed hemispherical sampling
 			}
 			else
 			{//sample specular lobe
-				vec3 halfVec = ImportanceSamplingGGX(seed, info.Normal, alpha);
+				vec3 halfVec = ImportanceSamplingGGX(info.Normal, alpha);
 				reflectionDir = -normalize(reflect(V,halfVec));
 			}
 
@@ -507,10 +513,11 @@ vec3 ColorCorrection(vec3 color)
 void main()
 {
 	vec3 color = vec3(0.0); //background color
-	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 
 	vec2 image_res = gl_NumWorkGroups.xy*gl_WorkGroupSize.xy;
-	vec2 coord = gl_GlobalInvocationID.xy/image_res;
+	ivec2 uv = ivec2(gl_GlobalInvocationID.xy) ;
+	uv = uv + ivec2(image_res) * ivec2(TileIndex_X,TileIndex_Y);
+	vec2 coord = vec2(uv)/vec2(u_ImageWidth,u_ImageHeight);
 	coord = coord*2.0-1.0;
 	vec4 target = inverse(mat_proj) * vec4(coord,1,1); //to view space from clip-space
 	
@@ -591,14 +598,14 @@ void main()
 
 	//defaultMat = mat[0];//for now do this 
 
-	uint hash = uint(uv.x + image_res.x * uv.y + frame_num* 1874);
-	for(int i=0; i<samplesPerPixel; i++)
-		color += perPixel(num_bounces, ray, sphere, hash); //10 bounces per ray
-	color /= samplesPerPixel;
+	seed = uvec4(uv, uint(frame_num + sample_count), uint(uv.x) + uint(uv.y));
+	//for(int i=0; i<samplesPerPixel; i++)
+		color += perPixel(num_bounces, ray, sphere); //10 bounces per ray
+	//color /= samplesPerPixel;
 
 	//progressive render
-	float weight = 1.0f/(frame_num+0.0f);
-	color = color * weight + imageLoad(FinalImage,uv).rgb*(1.0f-weight);
+	float weight = 1.0f/(sample_count+ 0.0f);
+	color = color * weight + imageLoad(FinalImage,uv).rgb *(1.0f-weight);
 	color = clamp(color,0.0,1.0);
 	imageStore(FinalImage,uv,vec4(color,1.0));
 }

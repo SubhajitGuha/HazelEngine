@@ -14,12 +14,17 @@ namespace Hazel {
 		void UpdateScene();
 	private:
 		void Init(int width, int height);
+		//outputTextureID is the texID that will be used to accumulate the progressive rendered image
+		void draw(Camera& cam, uint32_t& outputTextureID);
+		void RenderLowResImage(Camera& cam);
+		void copyAccmulatedImage(uint32_t& ImageToCopy);
+		void RenderScreenSizeQuad();
 	public:
 		int image_width, image_height;
 		float viewport_width, viewport_height;
 		uint16_t samples;
-		static uint32_t m_RT_TextureID;
-
+		static uint32_t m_Sampled_TextureID; //textureIDs to store the accmulated image
+		static bool isViewportFocused;
 		static glm::vec4 m_Color;
 		static float m_Roughness;
 		static bool EnableSky;
@@ -27,13 +32,18 @@ namespace Hazel {
 		static int samplesPerPixel;
 
 	private:
+		uint32_t m_RT_TextureID, m_LowRes_TextureID; //textureIDs to store the rendered and low resolution image
+		uint32_t m_fbo; //framebuffer object
+		bool isMoved = false;
 		uint32_t ssbo_linearBVHNodes = -1, ssbo_rtTriangles = -1, ssbo_triangleIndices = -1,
 			ssbo_arrMaterials = -1;
 		uint16_t m_Binding;
-		int frame_num;
+		int frame_num,sample_count;
+		glm::uvec2 tile_size;
+		glm::uvec2 tile_index;
 		glm::mat4 old_view;
 		float m_focalLength;
-		ref<Shader> cs_RayTracingShader;
+		ref<Shader> cs_RayTracingShader, RayTracing_CopyShader;
 		ref<BVH> bvh;
 		std::chrono::steady_clock::time_point StartTime;
 	};

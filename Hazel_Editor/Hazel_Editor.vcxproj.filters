@@ -167,4 +167,7 @@
       <Filter>Assets\Textures</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\RayTracing_CopyShader.glsl" />
+  </ItemGroup>
 </Project>

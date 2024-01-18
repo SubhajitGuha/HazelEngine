@@ -56,13 +56,13 @@ namespace Hazel {
 		Tree->CreateLOD("Assets/Meshes/HZ_Pine1_LOD1.asset");
 		Grass = new LoadMesh("Assets/Meshes/grass3.asset");
 		Grass->CreateLOD("Assets/Meshes/grass3_LOD1.asset");
-		plant = new LoadMesh("Assets/Meshes/dragon.asset");
-		House = new LoadMesh("Assets/Meshes/house.asset");
+		//plant = new LoadMesh("Assets/Meshes/dragon.asset");
+		//House = new LoadMesh("Assets/Meshes/house.asset");
 		Fern = new LoadMesh("Assets/Meshes/Fern.asset");
 		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.fbx", LoadMesh::IMPORT_MESH);
 
 		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
-		//Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx", LoadMesh::IMPORT_MESH);
+		Sponza = new LoadMesh("Assets/Meshes/Sponza.asset");
 		Renderer3D::SetUpCubeMapReflections(*this);
 		editor_cam.SetVerticalFOV(45.f);
 		editor_cam.SetPerspectiveFar(10000);

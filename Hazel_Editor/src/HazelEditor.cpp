@@ -172,13 +172,14 @@ void  HazelEditor::OnImGuiRender()
 
 	ImGui::Begin("Viewport_RayTracer");
 	isWindowFocused = ImGui::IsWindowFocused();
+	RayTracer::isViewportFocused = isWindowFocused;
 	ImVec2 Size2 = ImGui::GetContentRegionAvail();
 	if (m_RTViewportSize != *(glm::vec2*)&Size2)
 	{
 		m_RTViewportSize = { Size2.x,Size2.y };
 		m_scene->m_rayTracer->Resize(static_cast<int>(m_RTViewportSize.x), static_cast<int>(m_RTViewportSize.y));
 	}
-	ImGui::Image(reinterpret_cast<void*>(RayTracer::m_RT_TextureID), *(ImVec2*)glm::value_ptr(m_ViewportSize), { 0,1 }, {1,0});
+	ImGui::Image(reinterpret_cast<void*>(RayTracer::m_Sampled_TextureID), *(ImVec2*)glm::value_ptr(m_ViewportSize), { 0,1 }, {1,0});
 	ImGui::End();
 
 	ImGui::Begin("RayTracer Control");
