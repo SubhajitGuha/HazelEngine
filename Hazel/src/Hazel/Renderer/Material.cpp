@@ -20,7 +20,7 @@ namespace Hazel
 		roughness_multipler = 1;
 		metallic_multipler = 0;
 		normal_multipler = 1;
-		emission = 1;
+		emission = 0;
 
 		UUID uuid;
 		materialID = uuid;

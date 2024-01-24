@@ -25,7 +25,7 @@ namespace Hazel {
 		uint16_t samples;
 		static uint32_t m_Sampled_TextureID; //textureIDs to store the accmulated image
 		static bool isViewportFocused;
-		static glm::vec4 m_Color;
+		static glm::vec3 m_LightPos;
 		static float m_Roughness;
 		static bool EnableSky;
 		static int numBounces;

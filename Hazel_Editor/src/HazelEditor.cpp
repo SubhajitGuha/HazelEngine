@@ -189,7 +189,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::DragInt("Num Bounces", &RayTracer::numBounces);
 	ImGui::DragInt("Samples Per Pixel", &RayTracer::samplesPerPixel);
 
-	ImGui::ColorEdit4(" Color", (float*)glm::value_ptr(RayTracer::m_Color));
+	ImGui::DragFloat3("LightPos", (float*)glm::value_ptr(RayTracer::m_LightPos));
 	ImGui::DragFloat(" Roughness", &RayTracer::m_Roughness, 0.01);
 	
 	ImGui::End();

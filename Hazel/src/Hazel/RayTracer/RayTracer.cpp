@@ -6,7 +6,7 @@ namespace Hazel
 {
 	uint32_t RayTracer::m_Sampled_TextureID; bool RayTracer::isViewportFocused = false;
 
-	glm::vec4 RayTracer::m_Color = glm::vec4(1.0,0.6,0.1,1.0);
+	glm::vec3 RayTracer::m_LightPos = glm::vec3(0.0,18.83,0.0);
 	float RayTracer::m_Roughness = 1.0f;
 	bool RayTracer::EnableSky = true;
 	int RayTracer::numBounces = 3;
@@ -118,7 +118,7 @@ namespace Hazel
 		cs_RayTracingShader->SetInt("samplesPerPixel", samplesPerPixel);
 		cs_RayTracingShader->SetInt("BVHNodeSize", bvh->arrLinearBVHNode.size());
 		cs_RayTracingShader->SetFloat("light_intensity", Renderer3D::m_SunIntensity);
-		cs_RayTracingShader->SetFloat4("u_Color", m_Color);
+		cs_RayTracingShader->SetFloat3("LightPos", m_LightPos);
 		cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
 		cs_RayTracingShader->SetFloat("u_ImageWidth", image_width);
 		cs_RayTracingShader->SetFloat("u_ImageHeight", image_height);
@@ -224,8 +224,8 @@ namespace Hazel
 	}
 	void RayTracer::UpdateScene()
 	{
-		cs_RayTracingShader->SetFloat4("u_Color", m_Color);
-		cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
+		//cs_RayTracingShader->SetFloat3("LightPos", m_LightPos);
+		//cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
 	}
 	void RayTracer::RenderScreenSizeQuad()
 	{
