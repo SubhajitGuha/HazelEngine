@@ -9,7 +9,8 @@
 #include "Hazel/Scene/SceneSerializer.h"
 #include "Hazel/ResourceManager.h"
 
-namespace Hazel {
+namespace Hazel 
+{
 	LoadMesh::LoadMesh()
 	{
 	}
@@ -17,23 +18,24 @@ namespace Hazel {
 	{
 		GlobalTransform = glm::mat4(1.0);
 		std::filesystem::path mesh_path(Path);
+		objectName = mesh_path.stem().string();
 		m_path = (mesh_path.parent_path() / mesh_path.stem()).string() + extension; //temporary
 
 		if (m_LOD.size() == 0)
 			m_LOD.push_back(this);
 
-		if (type == IMPORT_MESH)
+		//if (type == IMPORT_MESH)
 		{
 			LoadObj(Path);
 		}
-		else if (type == LOAD_MESH)
-		{
-			SceneSerializer deserialize;
-			deserialize.DeSerializeMesh(m_path, *this);
-			uuid = UUID(Path); //only create uuid for engine compatible mesh
-			//ResourceManager::allMeshes[uuid] = 
-			CreateStaticBuffers();
-		}
+		//else if (type == LOAD_MESH)
+		//{
+		//	SceneSerializer deserialize;
+		//	deserialize.DeSerializeMesh(m_path, *this);
+		//	uuid = UUID(Path); //only create uuid for engine compatible mesh
+		//	//ResourceManager::allMeshes[uuid] = 
+		//	CreateStaticBuffers();
+		//}
 
 	}
 	LoadMesh::~LoadMesh()
@@ -42,7 +44,8 @@ namespace Hazel {
 	void LoadMesh::LoadObj(const std::string& Path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(Path,aiProcess_OptimizeGraph | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace );
+
+		const aiScene* scene = importer.ReadFile(Path, aiProcess_OptimizeGraph | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace );
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HAZEL_CORE_ERROR("ERROR::ASSIMP::");
@@ -54,9 +57,6 @@ namespace Hazel {
 		ProcessNode(scene->mRootNode, scene);
 		ProcessMesh();
 		CreateStaticBuffers();
-
-		SceneSerializer serialize;
-		serialize.SerializeMesh(m_path, *this);
 
 		m_Mesh.clear();
 		m_Mesh.shrink_to_fit();
@@ -160,9 +160,8 @@ namespace Hazel {
 		m_subMeshes.resize(NumMaterials);
 
 		std::string relative_path = "Assets/Textures/MeshTextures/";
-		auto GetTexturePath = [&](int index,aiTextureType type) 
+		auto GetTexturePath = [&](aiMaterial*& material,aiTextureType type)
 		{
-			aiMaterial* material = scene->mMaterials[index];
 			auto x = material->GetTextureCount(type);
 			if (x > 0)
 			{
@@ -176,16 +175,21 @@ namespace Hazel {
 		};
 		for (int i = 0; i < NumMaterials; i++)
 		{
-			//m_subMeshes[i].m_Material = Material::Create();
-			ref<Material> material = Material::Create();
+			aiMaterial* scene_material = scene->mMaterials[i];
+			std::string materialName = objectName + std::string("_") + std::string(scene_material->GetName().C_Str());
+			ref<Material> material = Material::Create(materialName, ""); //create a material in the default storage directory
 			m_subMeshes[i].m_MaterialID = material->materialID;
 
-			std::string diffuse_path = GetTexturePath(i,aiTextureType_DIFFUSE);
-			std::string normal_path = GetTexturePath(i, aiTextureType_NORMALS);
-			std::string roughness_path = GetTexturePath(i, aiTextureType_SHININESS);
+			//if material cannot be found then create and serialize the material
+			if (ResourceManager::allMaterials.find(material->materialID) == ResourceManager::allMaterials.end())			
+			{
+				std::string diffuse_path = GetTexturePath(scene_material, aiTextureType_DIFFUSE);
+				std::string normal_path = GetTexturePath(scene_material, aiTextureType_NORMALS);
+				std::string roughness_path = GetTexturePath(scene_material, aiTextureType_SHININESS);
 
-			material->SetTexturePaths(diffuse_path, normal_path, roughness_path);
-			material->SerializeMaterial(""); //save the material
+				material->SetTexturePaths(diffuse_path, normal_path, roughness_path);
+				material->SerializeMaterial("", materialName); //save the material
+			}
 		}
 	}
 	void LoadMesh::CalculateTangent()

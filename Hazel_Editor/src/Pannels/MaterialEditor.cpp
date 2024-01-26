@@ -1,6 +1,6 @@
 #include "MaterialEditor.h"
 #include "Hazel/ResourceManager.h"
-
+#include "Hazel/Scene/SceneSerializer.h"
 using namespace Hazel;
 
 uint64_t MaterialEditor::cached_materialID;
@@ -76,6 +76,11 @@ void MaterialEditor::OnImGuiRender()
 		ImGui::DragFloat("Metallic", &metalness, 0.1f, 0.0f, 1.0f);
 		ImGui::DragFloat("Normal Strength", &normal, 0.1f, 0.0f, 1.0f);
 		cached_material->SetMaterialAttributes(color, roughness, metalness, normal);
+		if (ImGui::Button("Save Material"))
+		{
+			//save the material at the default location
+			ResourceManager::allMaterials[cached_materialID]->SerializeMaterial("", ResourceManager::allMaterials[cached_materialID]->m_MaterialName);
+		}
 	}
 	ImGui::End();
 }

@@ -48,13 +48,13 @@ namespace Hazel {
 			return nullptr;
 		}
 	}
-	ref<Texture2DArray> Texture2DArray::Create(const std::vector<std::string>& paths, int numMaterials, bool bUse16BitTexture)
+	ref<Texture2DArray> Texture2DArray::Create(const std::vector<std::string>& paths, int numMaterials, int numChannels, bool bUse16BitTexture)
 	{
 		switch (RendererAPI::GetAPI()) {
 		case GraphicsAPI::None:
 			return nullptr;
 		case GraphicsAPI::OpenGL:
-			return std::make_shared<OpenGlTexture2DArray>(paths, numMaterials,bUse16BitTexture);
+			return std::make_shared<OpenGlTexture2DArray>(paths, numMaterials, numChannels, bUse16BitTexture);
 		default:
 			return nullptr;
 		}

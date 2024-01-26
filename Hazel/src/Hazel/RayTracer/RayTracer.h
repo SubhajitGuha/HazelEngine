@@ -22,11 +22,12 @@ namespace Hazel {
 	public:
 		int image_width, image_height;
 		float viewport_width, viewport_height;
+		ref<BVH> bvh;
 		uint16_t samples;
 		static uint32_t m_Sampled_TextureID; //textureIDs to store the accmulated image
 		static bool isViewportFocused;
 		static glm::vec3 m_LightPos;
-		static float m_Roughness;
+		static float m_LightStrength;
 		static bool EnableSky;
 		static int numBounces;
 		static int samplesPerPixel;
@@ -44,7 +45,6 @@ namespace Hazel {
 		glm::mat4 old_view;
 		float m_focalLength;
 		ref<Shader> cs_RayTracingShader, RayTracing_CopyShader;
-		ref<BVH> bvh;
 		std::chrono::steady_clock::time_point StartTime;
 	};
 }

@@ -1,6 +1,7 @@
 #include "hzpch.h"
 #include "BVH.h"
 #include "Hazel/Core.h"
+#include "glad/glad.h"
 #include "Hazel/ResourceManager.h"
 
 namespace Hazel
@@ -34,24 +35,43 @@ namespace Hazel
 		std::vector<std::string> texturePaths_albedo, texturePaths_roughness;
 		for (auto sub_mesh : m_Mesh->m_subMeshes)
 		{
+			auto albedoTexture = Texture2D::Create(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetAlbedoPath());
+			auto roughnessTexture = Texture2D::Create(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetRoughnessPath());
+
+			uint64_t albedo_handle = glGetTextureHandleARB(albedoTexture->GetID()); //get a handle from the gpu
+			glMakeTextureHandleResidentARB(albedo_handle); //load the texture into gpu memory using the handle
+			uint64_t roughness_handle = glGetTextureHandleARB(roughnessTexture->GetID());
+			glMakeTextureHandleResidentARB(roughness_handle);
+
 			for (int i = 0; i < sub_mesh.Vertices.size(); i+=3)
 			{
-				auto vertices = sub_mesh.Vertices;
-				auto uv = sub_mesh.TexCoord;
-				glm::vec3 v0 = transform * glm::vec4(vertices[i],1.0);
-				glm::vec3 v1 = transform * glm::vec4(vertices[i+1], 1.0);
-				glm::vec3 v2 = transform * glm::vec4(vertices[i+2], 1.0);
+				//auto vertices = sub_mesh.Vertices;
+				//auto normals = sub_mesh.Normal;
+				//auto uv = sub_mesh.TexCoord;
 
-				RTTriangles triangles(v0, v1, v2, uv[i],uv[i+1],uv[i+2],matCount);
+				//transforming the vertices and normals to world space
+				glm::vec3 v0 = transform * glm::vec4(sub_mesh.Vertices[i],1.0);
+				glm::vec3 v1 = transform * glm::vec4(sub_mesh.Vertices[i+1], 1.0);
+				glm::vec3 v2 = transform * glm::vec4(sub_mesh.Vertices[i+2], 1.0);
+
+				glm::vec3 n0 = transform * glm::vec4(sub_mesh.Normal[i], 0.0);
+				glm::vec3 n1 = transform * glm::vec4(sub_mesh.Normal[i + 1], 0.0);
+				glm::vec3 n2 = transform * glm::vec4(sub_mesh.Normal[i + 2], 0.0);
+
+				RTTriangles triangles(v0, v1, v2, n0, n1, n2, sub_mesh.TexCoord[i], sub_mesh.TexCoord[i+1], sub_mesh.TexCoord[i+2], matCount);
+				triangles.tex_albedo = albedo_handle;
+				triangles.tex_roughness = roughness_handle;
+
 				arrRTTriangles.push_back(triangles);
 			}
-			texturePaths_albedo.push_back(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetAlbedoPath());
-			texturePaths_roughness.push_back(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetRoughnessPath());
+
+			//texturePaths_albedo.push_back(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetAlbedoPath());
+			//texturePaths_roughness.push_back(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetRoughnessPath());
 			matCount++; //increment the material as we move to the next sub mesh
 		}
 		arrMaterials.resize(matCount);
-		texArray_albedo = Texture2DArray::Create(texturePaths_albedo, matCount);
-		texArray_roughness = Texture2DArray::Create(texturePaths_roughness, matCount);
+		//texArray_albedo = Texture2DArray::Create(texturePaths_albedo, matCount,3);
+		//texArray_roughness = Texture2DArray::Create(texturePaths_roughness, matCount,1);
 	}
 
 	void BVH::UpdateMaterials()

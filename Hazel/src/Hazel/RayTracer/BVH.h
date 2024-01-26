@@ -39,14 +39,23 @@ namespace Hazel
 		struct RTTriangles
 		{
 			glm::vec3 v0, v1, v2;
+			glm::vec3 n0, n1, n2;
 			glm::vec2 uv0,uv1,uv2;
+			uint64_t tex_albedo; //handle value for bindless albedo texture
+			uint64_t tex_roughness; //handle value for bindless roughness texture
 			int materialID;
+
+			//int materialID;
 			RTTriangles() = default;
-			RTTriangles(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, glm::vec2& uv0, glm::vec2& uv1, glm::vec2& uv2, int materialID)
+			RTTriangles(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, glm::vec3& n0, glm::vec3& n1, glm::vec3& n2,
+				glm::vec2& uv0, glm::vec2& uv1, glm::vec2& uv2, int materialID)
 			{
 				this->v0 = v0;
 				this->v1 = v1;
 				this->v2 = v2;
+				this->n0 = n0;
+				this->n1 = n1;
+				this->n2 = n2;
 				this->uv0 = uv0;
 				this->uv1 = uv1;
 				this->uv2 = uv2;
@@ -94,8 +103,8 @@ namespace Hazel
 		BVHNode* head = nullptr;		
 	public:
 		std::vector<Material> arrMaterials;
-		ref<Texture2DArray> texArray_albedo;
-		ref<Texture2DArray> texArray_roughness;
+		std::vector<ref<Texture2D>> tex_albedo;
+		std::vector<ref<Texture2D>> tex_roughness;
 
 		std::vector<LinearBVHNode> arrLinearBVHNode;//to be sent on to the gpu
 		std::vector<RTTriangles> arrRTTriangles;//to be sent on to the gpu

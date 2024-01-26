@@ -1,5 +1,8 @@
 //#shader compute
 #version 460 core
+#extension GL_ARB_bindless_texture : require //for bindless texture samplers
+#extension GL_NV_gpu_shader5 : require //for uint64_t
+
 #define SHADOW 1
 #define MIN -2147483648
 #define MAX 2147483647
@@ -8,7 +11,8 @@
 #define MAX_RAYS_PER_PIXEL 100
 #define PI 3.14159265359
 
-layout (local_size_x = 8, local_size_y = 8) in;
+layout (local_size_x = 4, local_size_y = 4) in;
+layout(bindless_sampler) uniform sampler2D tex;
 
 struct LinearBVHNode
 {
@@ -25,9 +29,16 @@ struct RTTriangles
 	float[3] v1;
 	float[3] v2;
 
+	float[3] n0;
+	float[3] n1;
+	float[3] n2;
+
 	float[2] uv0;
 	float[2] uv1;
 	float[2] uv2;
+
+	uint64_t tex_albedo; //bindless albedo texture
+	uint64_t tex_roughness; //bindless roughness texture
 
 	int materialID;
 };
@@ -79,7 +90,7 @@ uniform int num_bounces;
 uniform int samplesPerPixel;
 
 uniform vec3 LightPos;
-uniform float u_Roughness;
+uniform float u_LightStrength;
 
 int num_spheres = MAX_NUM_SPHERES;
 
@@ -99,7 +110,7 @@ vec4 SkyColourZenith = vec4(0.1,0.4,0.89,1.0);
 float SunFocus=20.0;
 float SunIntensity=10;
 
-int numLights = 1; //needs to be an uniform
+int numLights = 11; //needs to be an uniform
 
 Material defaultMat;
 struct Sphere
@@ -134,7 +145,7 @@ struct Light
     vec3 v;
     //float type;
 };
-Light lights[1];
+Light lights[11];
 
 struct LightInfo
 {
@@ -505,22 +516,24 @@ HitInfo ClosestHit(Ray ray, inout LightInfo light_info)
 	vec2 uv = uv1*u + uv2*v + uv0*(1.0-u-v);
 
 	//multiply texture with material color(tint);
-	vec4 tex_albedo = texture(albedo,vec3(uv,nearestTriangle.materialID));
-	vec4 tex_roughness = texture(roughness_metallic,vec3(uv,nearestTriangle.materialID));
+	//sampler2D albedo = sampler2D(nearestTriangle.tex_albedo);
+	//sampler2D roughness = sampler2D(nearestTriangle.tex_roughness);
+	//
+	//vec4 tex_albedo = texture(albedo, uv); //load the bindless textures
+	//vec4 tex_roughness = texture(roughness, uv);
+	//
+	//info.material.color[0] *= tex_albedo.r;
+	//info.material.color[1] *= tex_albedo.g; 
+	//info.material.color[2] *= tex_albedo.b;
+	////info.material.color[3] *= tex_albedo.a; 
+	//info.material.roughness *= tex_roughness.g;
+	////info.material.metalness = tex_roughness.b;
 
-	info.material.color[0] *= tex_albedo.r;
-	info.material.color[1] *= tex_albedo.g; 
-	info.material.color[2] *= tex_albedo.b;
-	info.material.color[3] *= tex_albedo.a; 
-	info.material.roughness *= tex_roughness.g;
-	//info.material.metalness = tex_roughness.b;
+	vec3 n0 = vec3(nearestTriangle.n0[0],nearestTriangle.n0[1],nearestTriangle.n0[2]);
+	vec3 n1 = vec3(nearestTriangle.n1[0],nearestTriangle.n1[1],nearestTriangle.n1[2]);
+	vec3 n2 = vec3(nearestTriangle.n2[0],nearestTriangle.n2[1],nearestTriangle.n2[2]);
 
-	vec3 v0 = vec3(nearestTriangle.v0[0],nearestTriangle.v0[1],nearestTriangle.v0[2]);
-	vec3 v1 = vec3(nearestTriangle.v1[0],nearestTriangle.v1[1],nearestTriangle.v1[2]);
-	vec3 v2 = vec3(nearestTriangle.v2[0],nearestTriangle.v2[1],nearestTriangle.v2[2]);
-	vec3 e01 = v1-v0;
-    vec3 e20 = v0-v2;
-	info.Normal = normalize(cross(e20,e01));
+	info.Normal = normalize(n1*u + n2*v + n0*(1.0-u-v));
 	//info.Normal = dot(info.Normal,ray.dir)<=0.0? info.Normal : -info.Normal;
 	return info;
 }
@@ -706,6 +719,7 @@ vec3 perPixel(int numBounces, Ray ray)
 	vec3 incommingLight = vec3(0.0);
 	LightInfo light_info;
 	BRDFInformation brdf_info;
+	vec3 nextDirection;
 	for(int k=1;k<=numBounces;k++)
 	{
 		HitInfo info;
@@ -727,16 +741,27 @@ vec3 perPixel(int numBounces, Ray ray)
 				break;
 			}
 
-			incommingLight += DirectLight(info, ray) * color;
-
-			brdf_info = CalcBRDF(info, -ray.dir); //calculate and evaluate cook-torrance brdf
-			if(brdf_info.brdfPDF>0.0f)
-				color *= brdf_info.totalBRDF/brdf_info.brdfPDF;
+			if(random() > info.material.color[3])
+			{
+				nextDirection = ray.dir;
+				k--;
+				ray.dir = nextDirection;
+				ray.origin = info.HitPos + ray.dir*0.003;
+			}
 			else
-				break;
+			{
+				incommingLight += DirectLight(info, ray) * color;
 
-			ray.origin = info.HitPos + info.Normal*0.001;
-			ray.dir = brdf_info.reflectionDir;
+				brdf_info = CalcBRDF(info, -ray.dir); //calculate and evaluate cook-torrance brdf
+				if(brdf_info.brdfPDF>0.0f)
+					color *= brdf_info.totalBRDF/brdf_info.brdfPDF;
+				else
+					break;
+				nextDirection = brdf_info.reflectionDir;
+
+				ray.dir = nextDirection;
+				ray.origin = info.HitPos + info.Normal*0.003;
+			}			
 		}
 		else{
 			incommingLight += GetEnvironmentLight(ray)*color; //get the environment color
@@ -780,8 +805,11 @@ void main()
 	ray.origin = camera_pos;//in world space
 	ray.dir = normalize(vec3(inverse(mat_view)*vec4(target.xyz/target.w,0))); //ray dir in world space
 
-	lights[0] = Light(vec3(1.0,0.8,0.0), 20.0f, LightPos, vec3(15,0,0), vec3(0,0,15)); //fow now there is only one light
-
+	for(int i=0;i<numLights;i++)
+	{
+		lights[i] = Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(i*6,0,0), vec3(5,0,0), vec3(0,0,150)); //fow now there is only one light
+	}
+	lights[numLights-1] =  Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(100,0,0), vec3(0,-50,0), vec3(0,0,150));
 	for(int i=0; i<samplesPerPixel; i++)
 		color += perPixel(num_bounces, ray); //10 bounces per ray
 	color /= samplesPerPixel;

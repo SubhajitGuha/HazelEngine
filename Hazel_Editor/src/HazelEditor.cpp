@@ -184,13 +184,13 @@ void  HazelEditor::OnImGuiRender()
 
 	ImGui::Begin("RayTracer Control");
 	ImGui::Checkbox("RenderSky?", &RayTracer::EnableSky);
-	if (ImGui::Button("Update Scene"))
-		m_scene->m_rayTracer->UpdateScene();
+	if (ImGui::Button("Update Materials"))
+		m_scene->m_rayTracer->bvh->UpdateMaterials();
 	ImGui::DragInt("Num Bounces", &RayTracer::numBounces);
 	ImGui::DragInt("Samples Per Pixel", &RayTracer::samplesPerPixel);
 
-	ImGui::DragFloat3("LightPos", (float*)glm::value_ptr(RayTracer::m_LightPos));
-	ImGui::DragFloat(" Roughness", &RayTracer::m_Roughness, 0.01);
+	ImGui::DragFloat3("LightPos", (float*)glm::value_ptr(RayTracer::m_LightPos),0.01);
+	ImGui::DragFloat(" LightStrength ", &RayTracer::m_LightStrength, 0.01);
 	
 	ImGui::End();
 

@@ -42,6 +42,7 @@ namespace Hazel {
 		uint64_t uuid;
 	private:
 		std::string extension = ".asset";
+		std::string objectName;
 		std::vector<LoadMesh*> m_LOD;
 		ref<BufferLayout> bl;
 		ref<VertexBuffer> vb;

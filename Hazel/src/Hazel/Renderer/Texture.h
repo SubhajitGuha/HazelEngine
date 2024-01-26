@@ -27,7 +27,8 @@ namespace Hazel {
 	class Texture2DArray : public Texture {
 	public:
 		virtual void UnBind()const = 0;
-		static ref<Texture2DArray> Create(const std::vector<std::string>& paths, int numMaterials = 1,bool bUse16BitTexture = false);
+		//default number of materials =1 , number of channels = 3
+		static ref<Texture2DArray> Create(const std::vector<std::string>& paths, int numMaterials = 1, int numChannels = 3, bool bUse16BitTexture = false);
 	};
 }
 

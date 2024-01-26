@@ -250,13 +250,13 @@ namespace Hazel {
 			auto sub_mesh = mesh.m_subMeshes[i];
 			out << YAML::Key << std::to_string(i) << YAML::Value;
 			out << YAML::BeginSeq;
-			out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.m_MaterialID), sizeof(uint64_t));
+			out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.m_MaterialID), sizeof(uint64_t));			
 			for (int k = 0; k < sub_mesh.numVertices; k++)
 			{
-				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Vertices[k].x), sizeof(float) * 3);
-				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Normal[k].x), sizeof(float) * 3);
-				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Tangent[k].x), sizeof(float) * 3);
-				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.TexCoord[k].x), sizeof(float) * 2);
+				out << YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Vertices[k].x), sizeof(float) * 3)
+				<< YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Normal[k].x), sizeof(float) * 3)
+				<< YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.Tangent[k].x), sizeof(float) * 3)
+				<< YAML::Binary(reinterpret_cast<const unsigned char*>(&sub_mesh.TexCoord[k].x), sizeof(float) * 2);
 			}
 			out << YAML::EndSeq;
 		}
@@ -476,10 +476,9 @@ namespace Hazel {
 			if (data[std::to_string(k)])
 			{
 				auto value = data[std::to_string(k)];
-				std::vector<glm::vec3> vertex_pos, vertex_normal, vertex_tangent, vertex_bitangent;
-				std::vector<glm::vec2> texture_coord;
 				uint64_t materialID;
 
+				LoadMesh::SubMesh sub_mesh;
 				{	//materialID decript from binary
 					YAML::Binary bin_data = value[0].as<YAML::Binary>();
 					const unsigned char* binary = bin_data.data();
@@ -492,40 +491,34 @@ namespace Hazel {
 						const unsigned char* binary = bin_data.data();
 						float vertex_data[3];
 						std::memcpy(vertex_data, binary, bin_data.size()); //get vertex position
-						vertex_pos.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
+						sub_mesh.Vertices.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
 					}
 					{	//normal decript from binary
 						YAML::Binary bin_data = value[i+1].as<YAML::Binary>();
 						const unsigned char* binary = bin_data.data();
 						float vertex_data[3];
 						std::memcpy(vertex_data, binary, bin_data.size()); //get vertex normal
-						vertex_normal.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
+						sub_mesh.Normal.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
 					}
 					{	//tangent and bi_tangent decript from binary
 						YAML::Binary bin_data = value[i+2].as<YAML::Binary>();
 						const unsigned char* binary = bin_data.data();
 						float vertex_data[3];
 						std::memcpy(vertex_data, binary, bin_data.size()); //get vertex tangent
-						vertex_tangent.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
+						sub_mesh.Tangent.push_back({ vertex_data[0],vertex_data[1],vertex_data[2] });
 
-						glm::vec3 bitangent = glm::cross(vertex_tangent.back(), vertex_normal.back());
-						vertex_bitangent.push_back(bitangent);
+						glm::vec3 bitangent = glm::cross(sub_mesh.Tangent.back(), sub_mesh.Normal.back());
+						sub_mesh.BiTangent.push_back(bitangent);
 					}
 					{	//tex coord decript from binary
 						YAML::Binary bin_data = value[i+3].as<YAML::Binary>();
 						const unsigned char* binary = bin_data.data();
 						float vertex_data[2];
 						std::memcpy(vertex_data, binary, bin_data.size()); //get uuid
-						texture_coord.push_back({ vertex_data[0],vertex_data[1]});
+						sub_mesh.TexCoord.push_back({ vertex_data[0],vertex_data[1]});
 					}
 				}
-				LoadMesh::SubMesh sub_mesh;
-				sub_mesh.Vertices = vertex_pos;
-				sub_mesh.Normal = vertex_normal;
-				sub_mesh.Tangent = vertex_tangent;
-				sub_mesh.BiTangent = vertex_bitangent;
-				sub_mesh.TexCoord = texture_coord;
-				sub_mesh.numVertices = vertex_pos.size();
+				sub_mesh.numVertices = sub_mesh.Vertices.size();
 				sub_mesh.m_MaterialID = materialID;
 
 				mesh.m_subMeshes.push_back(sub_mesh);

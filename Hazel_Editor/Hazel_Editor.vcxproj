@@ -161,6 +161,7 @@
     <Image Include="Assets\Textures\MeshTextures\bark01.png" />
     <Image Include="Assets\Textures\MeshTextures\bark01_normal.png" />
     <Image Include="Assets\Textures\MeshTextures\bark_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\brake_di.png" />
     <Image Include="Assets\Textures\MeshTextures\flower daisy.png" />
     <Image Include="Assets\Textures\MeshTextures\flower daisy_normal.png" />
     <Image Include="Assets\Textures\MeshTextures\grass_texture.png" />
@@ -176,6 +177,7 @@
     <Image Include="Assets\Textures\MeshTextures\pine leaf.png" />
     <Image Include="Assets\Textures\MeshTextures\pine leaf_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\plant05.png" />
+    <Image Include="Assets\Textures\MeshTextures\sidewall.png" />
     <Image Include="Assets\Textures\PerlinTexture.png" />
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png" />
     <Image Include="Assets\Textures\Terrain_Height_Map.png" />
@@ -188,9 +190,6 @@
     <ProjectReference Include="..\Hazel\Hazel.vcxproj">
       <Project>{99294D0D-053E-75BE-CEBF-181E3A9371EF}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\RayTracing_CopyShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

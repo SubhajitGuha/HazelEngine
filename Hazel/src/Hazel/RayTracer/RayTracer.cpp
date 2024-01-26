@@ -6,11 +6,11 @@ namespace Hazel
 {
 	uint32_t RayTracer::m_Sampled_TextureID; bool RayTracer::isViewportFocused = false;
 
-	glm::vec3 RayTracer::m_LightPos = glm::vec3(0.0,18.83,0.0);
-	float RayTracer::m_Roughness = 1.0f;
+	glm::vec3 RayTracer::m_LightPos = glm::vec3(-122.0,46.83,-55.0);
+	float RayTracer::m_LightStrength = 20.0f;
 	bool RayTracer::EnableSky = true;
-	int RayTracer::numBounces = 3;
-	int RayTracer::samplesPerPixel = 2;
+	int RayTracer::numBounces = 2;
+	int RayTracer::samplesPerPixel = 1;
 
 	RayTracer::RayTracer()
 	{
@@ -20,7 +20,7 @@ namespace Hazel
 		tile_size = { 128,128 };
 		tile_index = { 0,0 };
 		Init(512,512);
-		bvh = std::make_shared<BVH>(Scene::Sponza);
+		bvh = std::make_shared<BVH>(Scene::Sphere);
 		StartTime = std::chrono::high_resolution_clock::now();
 
 		glGenFramebuffers(1, &m_fbo); //create framebuffer object to copy the final rendered image
@@ -50,11 +50,11 @@ namespace Hazel
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		//create buffers to pass the materials
-		glGenBuffers(1, &ssbo_arrMaterials);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_arrMaterials);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::Material) * bvh->arrMaterials.size(), &bvh->arrMaterials[0], GL_STATIC_READ);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, ssbo_arrMaterials);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		//glGenBuffers(1, &ssbo_arrMaterials);
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_arrMaterials);
+		//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::Material) * bvh->arrMaterials.size(), &bvh->arrMaterials[0], GL_STATIC_READ);
+		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, ssbo_arrMaterials);
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		cs_RayTracingShader = Shader::Create("Assets/Shaders/cs_RayTracingShader.glsl");
 		RayTracing_CopyShader = Shader::Create("Assets/Shaders/RayTracing_CopyShader.glsl");
@@ -100,8 +100,8 @@ namespace Hazel
 	{
 		cs_RayTracingShader->Bind();
 		//cs_RayTracingShader->SetFloat("time", time);
-		bvh->texArray_albedo->Bind(ALBEDO_SLOT);
-		bvh->texArray_roughness->Bind(ROUGHNESS_SLOT);
+		//bvh->texArray_albedo->Bind(ALBEDO_SLOT);
+		//bvh->texArray_roughness->Bind(ROUGHNESS_SLOT);
 
 		cs_RayTracingShader->SetInt("albedo", ALBEDO_SLOT);
 		cs_RayTracingShader->SetInt("roughness_metallic", ROUGHNESS_SLOT);
@@ -119,7 +119,7 @@ namespace Hazel
 		cs_RayTracingShader->SetInt("BVHNodeSize", bvh->arrLinearBVHNode.size());
 		cs_RayTracingShader->SetFloat("light_intensity", Renderer3D::m_SunIntensity);
 		cs_RayTracingShader->SetFloat3("LightPos", m_LightPos);
-		cs_RayTracingShader->SetFloat("u_Roughness", m_Roughness);
+		cs_RayTracingShader->SetFloat("u_LightStrength", m_LightStrength);
 		cs_RayTracingShader->SetFloat("u_ImageWidth", image_width);
 		cs_RayTracingShader->SetFloat("u_ImageHeight", image_height);
 
@@ -143,14 +143,15 @@ namespace Hazel
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		//pass material data to the gpu using ssbo every frame
-		//glGenBuffers(1, &ssbo_arrMaterials);
+		glGenBuffers(1, &ssbo_arrMaterials);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_arrMaterials);
-		//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::Material) * bvh->arrMaterials.size(), &bvh->arrMaterials[0], GL_STATIC_READ);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(BVH::Material) * bvh->arrMaterials.size(), &bvh->arrMaterials[0], GL_STATIC_READ);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, ssbo_arrMaterials);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-		glDispatchCompute(tile_size.x / 8, tile_size.y / 8, 1); //render by tile size
+		glDispatchCompute(tile_size.x / 4, tile_size.y / 4, 1); //render by tile size
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
 	}
 
 	void RayTracer::RenderLowResImage(Camera& cam)

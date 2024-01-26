@@ -100,6 +100,9 @@
     <Image Include="Assets\Textures\MeshTextures\bark_normal.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
+    <Image Include="Assets\Textures\MeshTextures\brake_di.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
     <Image Include="Assets\Textures\MeshTextures\flower daisy.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
@@ -145,6 +148,9 @@
     <Image Include="Assets\Textures\MeshTextures\plant05.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
+    <Image Include="Assets\Textures\MeshTextures\sidewall.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
     <Image Include="Assets\Textures\PerlinTexture.png">
       <Filter>Assets\Textures</Filter>
     </Image>
@@ -166,8 +172,5 @@
     <Image Include="Assets\Textures\rickshaw.png">
       <Filter>Assets\Textures</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\RayTracing_CopyShader.glsl" />
   </ItemGroup>
 </Project>
