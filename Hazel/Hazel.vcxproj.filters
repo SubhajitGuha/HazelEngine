@@ -79,6 +79,15 @@
     <Filter Include="vendor\jsoncpp\json">
       <UniqueIdentifier>{08359755-7496-7463-FD03-BB156964AB22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vendor\oidn">
+      <UniqueIdentifier>{4CE57DC1-B89A-F6B6-418F-F08DAD43EDBA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\oidn\include">
+      <UniqueIdentifier>{BF9811CF-2BFA-EEDC-B467-358F20C8259C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\oidn\include\OpenImageDenoise">
+      <UniqueIdentifier>{CAB0CC1E-B697-8E16-5FE8-F4334BAE077D}</UniqueIdentifier>
+    </Filter>
     <Filter Include="vendor\physx_x64-windows">
       <UniqueIdentifier>{9739A155-835E-F0D5-ACA9-D565982DEFF3}</UniqueIdentifier>
     </Filter>
@@ -656,6 +665,15 @@
     </ClInclude>
     <ClInclude Include="vendor\jsoncpp\json\json.h">
       <Filter>vendor\jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\oidn\include\OpenImageDenoise\config.h">
+      <Filter>vendor\oidn\include\OpenImageDenoise</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\oidn\include\OpenImageDenoise\oidn.h">
+      <Filter>vendor\oidn\include\OpenImageDenoise</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\oidn\include\OpenImageDenoise\oidn.hpp">
+      <Filter>vendor\oidn\include\OpenImageDenoise</Filter>
     </ClInclude>
     <ClInclude Include="vendor\physx_x64-windows\include\PxActor.h">
       <Filter>vendor\physx_x64-windows\include</Filter>

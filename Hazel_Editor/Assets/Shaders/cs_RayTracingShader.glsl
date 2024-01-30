@@ -11,7 +11,7 @@
 #define MAX_RAYS_PER_PIXEL 100
 #define PI 3.14159265359
 
-layout (local_size_x = 4, local_size_y = 4) in;
+layout (local_size_x = 8, local_size_y = 8) in;
 layout(bindless_sampler) uniform sampler2D tex;
 
 struct LinearBVHNode
@@ -52,7 +52,7 @@ struct Material
 	float emissive_strength;
 };
 
-uniform layout(binding = 1, rgba16) image2D FinalImage;
+uniform layout(binding = 1, rgba32f) image2D FinalImage;
 
 layout (std430, binding = 2) buffer layoutLinearBVHNode
 {
@@ -110,7 +110,7 @@ vec4 SkyColourZenith = vec4(0.1,0.4,0.89,1.0);
 float SunFocus=20.0;
 float SunIntensity=10;
 
-int numLights = 11; //needs to be an uniform
+int numLights = 2; //needs to be an uniform
 
 Material defaultMat;
 struct Sphere
@@ -145,7 +145,7 @@ struct Light
     vec3 v;
     //float type;
 };
-Light lights[11];
+Light lights[2];
 
 struct LightInfo
 {
@@ -728,8 +728,8 @@ vec3 perPixel(int numBounces, Ray ray)
 		if(info.isHit == true)
 		{
 			//gather the emissive material radiance
-			//vec3 emittedLight = float4_to_vec4(info.material.emissive_col).rgb * info.material.emissive_strength;
-			//incommingLight += emittedLight*color;
+			vec3 emittedLight = float4_to_vec4(info.material.emissive_col).rgb * info.material.emissive_strength;
+			incommingLight += emittedLight*color;
 
 			//gather lights radiance
 			if(info.isEmitter)
@@ -805,9 +805,9 @@ void main()
 	ray.origin = camera_pos;//in world space
 	ray.dir = normalize(vec3(inverse(mat_view)*vec4(target.xyz/target.w,0))); //ray dir in world space
 
-	for(int i=0;i<numLights;i++)
+	for(int i=0;i<numLights-1;i++)
 	{
-		lights[i] = Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(i*6,0,0), vec3(5,0,0), vec3(0,0,150)); //fow now there is only one light
+		lights[i] = Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(i*6,0,0), vec3(50,0,0), vec3(0,0,150)); //fow now there is only one light
 	}
 	lights[numLights-1] =  Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(100,0,0), vec3(0,-50,0), vec3(0,0,150));
 	for(int i=0; i<samplesPerPixel; i++)

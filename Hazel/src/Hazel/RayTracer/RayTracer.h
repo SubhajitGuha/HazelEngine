@@ -24,8 +24,9 @@ namespace Hazel {
 		float viewport_width, viewport_height;
 		ref<BVH> bvh;
 		uint16_t samples;
-		static uint32_t m_Sampled_TextureID; //textureIDs to store the accmulated image
+		static uint32_t m_Output_TextureID; //output texture id is either sampled texture ID or denoised texture ID
 		static bool isViewportFocused;
+		static bool Denoise;
 		static glm::vec3 m_LightPos;
 		static float m_LightStrength;
 		static bool EnableSky;
@@ -33,6 +34,7 @@ namespace Hazel {
 		static int samplesPerPixel;
 
 	private:
+		uint32_t m_Sampled_TextureID, m_Denoised_TextureID;  //image textureIDs to store the accmulated result and the denoised result
 		uint32_t m_RT_TextureID, m_LowRes_TextureID; //textureIDs to store the rendered and low resolution image
 		uint32_t m_fbo; //framebuffer object
 		bool isMoved = false;

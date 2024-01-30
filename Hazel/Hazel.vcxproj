@@ -77,7 +77,7 @@
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;vendor\oidn\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -88,7 +88,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;vendor\oidn\lib\OpenImageDenoise.lib;vendor\oidn\lib\OpenImageDenoise_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -97,7 +97,7 @@
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;vendor\oidn\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -112,7 +112,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;vendor\oidn\lib\OpenImageDenoise.lib;vendor\oidn\lib\OpenImageDenoise_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -121,7 +121,7 @@
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>HZ_PLATFORM_WINDOWS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;NDEBUG;PX_PHYSX_STATIC_LIB;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\Curl\include;vendor\jsoncpp;vendor\entt;vendor\assimp\include;vendor\physx_x64-windows\include;vendor\yaml_cpp\include;vendor\oidn\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -136,7 +136,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Normaliz.lib;Ws2_32.lib;Wldap32.lib;Crypt32.lib;advapi32.lib;vendor\Curl\lib\libcurl_a_debug.lib;vendor\assimp\lib\Release\assimp-vc142-mt.lib;vendor\physx_x64-windows\lib\LowLevel_static_64.lib;vendor\physx_x64-windows\lib\LowLevelAABB_static_64.lib;vendor\physx_x64-windows\lib\LowLevelDynamics_static_64.lib;vendor\physx_x64-windows\lib\PhysX_64.lib;vendor\physx_x64-windows\lib\PhysXCharacterKinematic_static_64.lib;vendor\physx_x64-windows\lib\PhysXCommon_64.lib;vendor\physx_x64-windows\lib\PhysXCooking_64.lib;vendor\physx_x64-windows\lib\PhysXExtensions_static_64.lib;vendor\physx_x64-windows\lib\PhysXFoundation_64.lib;vendor\physx_x64-windows\lib\PhysXPvdSDK_static_64.lib;vendor\physx_x64-windows\lib\PhysXTask_static_64.lib;vendor\physx_x64-windows\lib\PhysXVehicle_static_64.lib;vendor\physx_x64-windows\lib\SceneQuery_static_64.lib;vendor\physx_x64-windows\lib\SimulationController_static_64.lib;vendor\oidn\lib\OpenImageDenoise.lib;vendor\oidn\lib\OpenImageDenoise_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -311,6 +311,9 @@
     <ClInclude Include="vendor\entt\entt.hpp" />
     <ClInclude Include="vendor\jsoncpp\json\json-forwards.h" />
     <ClInclude Include="vendor\jsoncpp\json\json.h" />
+    <ClInclude Include="vendor\oidn\include\OpenImageDenoise\config.h" />
+    <ClInclude Include="vendor\oidn\include\OpenImageDenoise\oidn.h" />
+    <ClInclude Include="vendor\oidn\include\OpenImageDenoise\oidn.hpp" />
     <ClInclude Include="vendor\physx_x64-windows\include\PxActor.h" />
     <ClInclude Include="vendor\physx_x64-windows\include\PxAggregate.h" />
     <ClInclude Include="vendor\physx_x64-windows\include\PxArticulation.h" />

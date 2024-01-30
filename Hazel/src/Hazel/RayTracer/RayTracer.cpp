@@ -1,10 +1,12 @@
 #include "hzpch.h"
 #include "RayTracer.h"
 #include "glad/glad.h"
+#include "OpenImageDenoise/oidn.hpp"
 
 namespace Hazel
 {
-	uint32_t RayTracer::m_Sampled_TextureID; bool RayTracer::isViewportFocused = false;
+	uint32_t RayTracer::m_Output_TextureID;
+	bool RayTracer::isViewportFocused = false, RayTracer::Denoise = false;
 
 	glm::vec3 RayTracer::m_LightPos = glm::vec3(-122.0,46.83,-55.0);
 	float RayTracer::m_LightStrength = 20.0f;
@@ -70,12 +72,12 @@ namespace Hazel
 		m_focalLength = 10.f;
 		image_width = width;
 		image_height = height;
-		
+
 		if (m_LowRes_TextureID == 0) 
 		{
 			glGenTextures(1, &m_LowRes_TextureID);
 			glBindTexture(GL_TEXTURE_2D, m_LowRes_TextureID);
-			glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16, tile_size.x, tile_size.y);
+			glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, tile_size.x, tile_size.y);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glBindTexture(GL_TEXTURE_2D, 0);
@@ -83,25 +85,26 @@ namespace Hazel
 
 		glGenTextures(1, &m_Sampled_TextureID);
 		glBindTexture(GL_TEXTURE_2D, m_Sampled_TextureID);
-		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16, image_width, image_height);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, image_width, image_height);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glGenTextures(1, &m_RT_TextureID);
 		glBindTexture(GL_TEXTURE_2D, m_RT_TextureID);
-		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16, image_width, image_height);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, image_width, image_height);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glBindTexture(GL_TEXTURE_2D, 0);		
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		glGenTextures(1, &m_Denoised_TextureID);
+		glBindTexture(GL_TEXTURE_2D, m_Denoised_TextureID);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void RayTracer::draw(Camera& cam, uint32_t& outputTextureID)
 	{
 		cs_RayTracingShader->Bind();
-		//cs_RayTracingShader->SetFloat("time", time);
-		//bvh->texArray_albedo->Bind(ALBEDO_SLOT);
-		//bvh->texArray_roughness->Bind(ROUGHNESS_SLOT);
 
 		cs_RayTracingShader->SetInt("albedo", ALBEDO_SLOT);
 		cs_RayTracingShader->SetInt("roughness_metallic", ROUGHNESS_SLOT);
@@ -128,7 +131,7 @@ namespace Hazel
 
 		//bvh->UpdateMaterials(); //update material every frame
 
-		glBindImageTexture(1, outputTextureID, 0, 0, 0, GL_READ_WRITE, GL_RGBA16);
+		glBindImageTexture(1, outputTextureID, 0, 0, 0, GL_READ_WRITE, GL_RGBA32F);
 		//bind the ssbo objects
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_linearBVHNodes);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_linearBVHNodes);
@@ -149,7 +152,7 @@ namespace Hazel
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, ssbo_arrMaterials);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-		glDispatchCompute(tile_size.x / 4, tile_size.y / 4, 1); //render by tile size
+		glDispatchCompute(tile_size.x / 8, tile_size.y / 8, 1); //render by tile size
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 	}
@@ -172,13 +175,50 @@ namespace Hazel
 		RayTracing_CopyShader->SetInt("InputTexture", PT_IMAGE_SLOT);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 		glViewport(0, 0, image_width, image_height);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Sampled_TextureID, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Sampled_TextureID, 0); //final accmulated image is copied to m_Sampled_TextureID
 		RenderScreenSizeQuad();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void RayTracer::RenderImage(Camera& cam)
 	{
+		if (Denoise && (tile_index.x == image_width / tile_size.x - 1) && (tile_index.y == image_height / tile_size.y-1))
+		{
+			if (sample_count % 15 == 0)
+			{
+				// Create an Open Image Denoise device
+				oidn::DeviceRef device = oidn::newDevice(oidn::DeviceType::CUDA); // CPU or GPU if available
+				device.commit();
+
+				auto buff = device.newBuffer(sizeof(float) * 3 * image_width * image_height);
+				auto out_buff = device.newBuffer(sizeof(float) * 3 * image_width * image_height);
+
+				oidn::FilterRef filter = device.newFilter("RT"); // generic ray tracing filter
+				filter.setImage("color", buff, oidn::Format::Float3, image_width, image_height); // beauty
+				filter.setImage("output", out_buff, oidn::Format::Float3, image_width, image_height); // denoised beauty
+				filter.set("hdr", false);
+				filter.commit();
+
+				float* fill_image = (float*)buff.getData();
+				glBindTexture(GL_TEXTURE_2D, m_Sampled_TextureID);
+				glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, fill_image);
+
+				filter.execute();
+
+				const char* errorMessage;
+				if (device.getError(errorMessage) != oidn::Error::None)
+					HAZEL_CORE_ERROR(errorMessage);
+
+				float* out_image = (float*)out_buff.getData();
+				glBindTexture(GL_TEXTURE_2D, m_Denoised_TextureID);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, image_width, image_height, 0, GL_RGB, GL_FLOAT, out_image);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+				m_Output_TextureID = m_Denoised_TextureID;
+			}
+			
+		}
 		//if any if the buttons are pressed then re-initilize the frame
 		if (isViewportFocused && (Input::IsButtonPressed(HZ_MOUSE_BUTTON_1) || Input::IsButtonPressed(HZ_MOUSE_BUTTON_2) || 
 			Input::IsKeyPressed(HZ_KEY_W) || Input::IsKeyPressed(HZ_KEY_A) || Input::IsKeyPressed(HZ_KEY_S)||
@@ -196,6 +236,7 @@ namespace Hazel
 			frame_num = 1; //reset frame counter
 			sample_count = 1; //reset sample counter
 			tile_index = { 0,0 }; //reset tile indices
+			m_Output_TextureID = m_Sampled_TextureID;
 		}
 		else 
 		{

@@ -25,6 +25,7 @@ IncludeDir["json"]="Hazel/vendor/jsoncpp"
 IncludeDir["assimp"]="Hazel/vendor/assimp/include"
 IncludeDir["Physx"]="Hazel/vendor/physx_x64-windows/include"
 IncludeDir["yaml_cpp"] = "Hazel/vendor/yaml_cpp/include"
+IncludeDir["oidn"] = "Hazel/vendor/oidn/include"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
@@ -66,6 +67,8 @@ project "Hazel"
 		"%{IncludeDir.Physx}/**.h",
 		"%{IncludeDir.Physx}/**.hpp",
 		"%{IncludeDir.Physx}/**.cpp",
+		"%{IncludeDir.oidn}/**.h",
+		"%{IncludeDir.oidn}/**.hpp",
 	}
 
 	includedirs
@@ -83,6 +86,7 @@ project "Hazel"
 		"%{IncludeDir.assimp}",
 		"%{IncludeDir.Physx}",
 		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.oidn}",
 	}
 
 	links{
@@ -112,6 +116,9 @@ project "Hazel"
 		"Hazel/vendor/physx_x64-windows/lib/PhysXVehicle_static_64.lib",
 		"Hazel/vendor/physx_x64-windows/lib/SceneQuery_static_64.lib",
 		"Hazel/vendor/physx_x64-windows/lib/SimulationController_static_64.lib",
+		"Hazel/vendor/oidn/lib/OpenImageDenoise.lib",
+		"Hazel/vendor/oidn/lib/OpenImageDenoise_core.lib",
+
 	}
 
 	filter "system:windows"

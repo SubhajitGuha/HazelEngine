@@ -179,11 +179,12 @@ void  HazelEditor::OnImGuiRender()
 		m_RTViewportSize = { Size2.x,Size2.y };
 		m_scene->m_rayTracer->Resize(static_cast<int>(m_RTViewportSize.x), static_cast<int>(m_RTViewportSize.y));
 	}
-	ImGui::Image(reinterpret_cast<void*>(RayTracer::m_Sampled_TextureID), *(ImVec2*)glm::value_ptr(m_ViewportSize), { 0,1 }, {1,0});
+	ImGui::Image(reinterpret_cast<void*>(RayTracer::m_Output_TextureID), *(ImVec2*)glm::value_ptr(m_ViewportSize), { 0,1 }, {1,0});
 	ImGui::End();
 
 	ImGui::Begin("RayTracer Control");
 	ImGui::Checkbox("RenderSky?", &RayTracer::EnableSky);
+	ImGui::Checkbox("Denoise", &RayTracer::Denoise);
 	if (ImGui::Button("Update Materials"))
 		m_scene->m_rayTracer->bvh->UpdateMaterials();
 	ImGui::DragInt("Num Bounces", &RayTracer::numBounces);

@@ -57,7 +57,7 @@ namespace Hazel {
 		Grass = new LoadMesh("Assets/Meshes/grass3.fbx");
 		Grass->CreateLOD("Assets/Meshes/grass3_LOD1.fbx");
 		plant = new LoadMesh("Assets/Meshes/dragon.fbx", LoadMesh::IMPORT_MESH);
-		//House = new LoadMesh("Assets/Meshes/house.asset");
+		House = new LoadMesh("Assets/Meshes/house.fbx");
 		Fern = new LoadMesh("Assets/Meshes/Fern.asset");
 		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.fbx", LoadMesh::IMPORT_MESH);
 

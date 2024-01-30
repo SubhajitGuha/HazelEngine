@@ -191,7 +191,7 @@ namespace Hazel
 			}
 		}
 		node->axis = bestAxis;//net the node axis
-		if (triCount <= 2)//4 is the minimum number of triangles that a node should contain
+		if (triCount <= 2)//2 is the minimum number of triangles that a node should contain
 		{
 			return;
 		}
