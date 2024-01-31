@@ -1,6 +1,5 @@
 #pragma once
 #include "Hazel.h"
-
 namespace Hazel
 {
 	class BVH
@@ -78,6 +77,11 @@ namespace Hazel
 			int triangleStartID, triangleCount;
 			glm::vec3 aabbMin, aabbMax;
 		};
+		struct Bins
+		{
+			Bounds bounds;
+			int triangleCount=0;
+		};
 		enum SplitMethod
 		{SAH,MEAN};
 		struct Material
@@ -95,7 +99,7 @@ namespace Hazel
 	private:
 		void BuildBVH(BVHNode*& node, int triStartID, int triCount);
 		void CreateTriangles(glm::mat4& transform = glm::mat4(1.0)); //create triangles from mesh vertex positions
-		float EvaluateSAH(BVHNode& node, int axis, float pos);
+		float EvaluateSAH(BVHNode& node, int& axis, float& pos); //returns cost after finding best axis and position
 		int FlattenBVH(BVHNode* node,int* offset);
 		void CleanBVH(BVHNode* node);//removes count of triangles from child nodes
 	private:

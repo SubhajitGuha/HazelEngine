@@ -4,6 +4,8 @@
 #include "glad/glad.h"
 #include "Hazel/ResourceManager.h"
 
+#define NUM_BINS 100
+
 namespace Hazel
 {
 	static int val = 0;
@@ -92,27 +94,64 @@ namespace Hazel
 		}
 	}
 
-	float BVH::EvaluateSAH(BVHNode& node, int axis, float pos)
+	float BVH::EvaluateSAH(BVHNode& node, int& axis, float& pos)
 	{
-		// determine triangle counts and bounds for this split candidate
-		Bounds leftBox, rightBox;
-		int leftCount = 0, rightCount = 0;
-		for (uint32_t i = 0; i < node.triangleCount; i++)
+		float best_cost = std::numeric_limits<float>::max();
+		Bounds m_Bounds; //get the total bounds of all the triangles in a particular node
+		for (int i = 0; i < node.triangleCount; i++)
 		{
-			auto& triangle = arrRTTriangles[triIndex[node.triangleStartID + i]];
-			if (triangle.GetCentroid()[axis] < pos)
+			Bounds bnds = (arrRTTriangles[triIndex[node.triangleStartID + i]].GetBounds());
+			m_Bounds.Union(bnds);
+		}
+
+		for (int a = 0; a < 3; a++) //iterate through all the axises
+		{
+
+			if (m_Bounds.aabbMax[a] == m_Bounds.aabbMin[a])
+				continue;
+
+			Bins bins[NUM_BINS]; //create bins array to store the triangle count and the bounds of the triangles in a node
+			auto size = (m_Bounds.aabbMax[a] - m_Bounds.aabbMin[a]) / NUM_BINS; //get size of individual bin
+			for (int i = 0; i < node.triangleCount; i++)
 			{
-				leftCount++;
-				leftBox.Union(triangle.GetBounds());				
+				auto& triangle = arrRTTriangles[triIndex[node.triangleStartID + i]];
+				//get the bin index
+				int binIndx = std::min(NUM_BINS - 1,
+					static_cast<int>(std::abs((triangle.GetCentroid()[a] - m_Bounds.aabbMin[a]) / size)));
+				bins[binIndx].triangleCount++;
+				bins[binIndx].bounds.Union(triangle.GetBounds());
 			}
-			else
+
+			// determine triangle counts and bounds for this split candidate
+			Bounds leftBox, rightBox;
+			int leftTriangleCount[NUM_BINS - 1], rightTriangleCount[NUM_BINS - 1]; //containers to store the total triangle count and area on left side of the split plane
+			float leftSurfaceArea[NUM_BINS - 1], rightSurfaceArea[NUM_BINS - 1]; //containers to store the total triangle count and area on right side of the split plane
+			int leftCount = 0, rightCount = 0;
+			for (uint32_t i = 0; i < NUM_BINS-1; i++) //accumulate the triangle count and box area.
+			{				
+				leftCount += bins[i].triangleCount;
+				leftBox.Union(bins[i].bounds);
+				leftTriangleCount[i] = leftCount;
+				leftSurfaceArea[i] = leftBox.area(); //fill from first to last
+
+				rightCount += bins[NUM_BINS - 1 - i].triangleCount;
+				rightBox.Union(bins[NUM_BINS - 1 - i].bounds);
+				rightTriangleCount[NUM_BINS - 2 - i] = rightCount;
+				rightSurfaceArea[NUM_BINS - 2 - i] = rightBox.area(); //fill from last to first
+			}
+
+			for (uint32_t i = 0; i < NUM_BINS - 1; i++) //evaluate cost using surface area heuristic
 			{
-				rightCount++;
-				rightBox.Union(triangle.GetBounds());				
+				float cost = leftTriangleCount[i] * leftSurfaceArea[i] + rightTriangleCount[i] * rightSurfaceArea[i];
+				if (cost < best_cost) 
+				{
+					best_cost = cost;
+					axis = a;
+					pos = m_Bounds.aabbMin[a] + (i+1) * size;
+				}
 			}
 		}
-		float cost = leftCount * leftBox.area() + rightCount * rightBox.area();
-		return cost > 0 ? cost : 1e30f;
+		return best_cost > 0 ? best_cost : 1e30f;
 	}
 
 	int BVH::FlattenBVH(BVHNode* node, int *offset)//dfs traversal
@@ -172,24 +211,9 @@ namespace Hazel
 
 		int bestAxis = -1;
 		float bestPos = 0, bestCost = 1e30f;
-		for (int axis = 0; axis < 3; axis++) //evaluate for each axis
-		{
-			if (bounds.aabbMax[axis] == bounds.aabbMin[axis])
-				continue;
-			float scale = (bounds.aabbMax[axis] - bounds.aabbMin[axis]) / 100.0f; //splitting the bounds into equally spaced line intervals
-			for (int i = 1; i < 100; i++)
-			{
-				//auto& triangle = arrRTTriangles[triIndex[triStartID + i]];
-				glm::vec3 extent = bounds.aabbMax - bounds.aabbMin;
-				float candidatePos = bounds.aabbMin[axis] + i*scale;//triangle.GetCentroid()[axis];
-				float cost = EvaluateSAH(*node, axis, candidatePos);
-				if (cost < bestCost) {
-					bestPos = candidatePos;
-					bestAxis = axis;
-					bestCost = cost;
-				}
-			}
-		}
+		
+		bestCost = EvaluateSAH(*node, bestAxis, bestPos);
+
 		node->axis = bestAxis;//net the node axis
 		if (triCount <= 2)//2 is the minimum number of triangles that a node should contain
 		{
