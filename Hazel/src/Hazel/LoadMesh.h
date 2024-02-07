@@ -10,6 +10,17 @@ struct aiScene;
 namespace Hazel {
 	class Texture2DArray;
 	class Material;
+	struct SubMesh
+	{
+		std::vector<glm::vec3> Vertices;
+		std::vector<glm::vec3> Normal;
+		std::vector<glm::vec3> Tangent;
+		std::vector<glm::vec3> BiTangent;
+		std::vector<glm::vec2> TexCoord;
+		ref<VertexArray> VertexArray;
+		uint64_t m_MaterialID;
+		uint32_t numVertices;
+	};
 	class LoadMesh
 	{
 	public:
@@ -17,17 +28,7 @@ namespace Hazel {
 		{
 			IMPORT_MESH, LOAD_MESH
 		};
-		struct SubMesh
-		{
-			std::vector<glm::vec3> Vertices;
-			std::vector<glm::vec3> Normal;
-			std::vector<glm::vec3> Tangent;
-			std::vector<glm::vec3> BiTangent;
-			std::vector<glm::vec2> TexCoord;
-			ref<VertexArray> VertexArray;
-			uint64_t m_MaterialID;
-			uint32_t numVertices;
-		};
+		
 	public:
 		LoadMesh();
 		LoadMesh(const std::string& Path, LoadType type = LoadType::LOAD_MESH);

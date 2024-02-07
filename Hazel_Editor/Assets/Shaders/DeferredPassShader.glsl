@@ -5,9 +5,15 @@ layout (location = 1) in vec4 cord;
 
 out vec2 tcord;
 
+//jitter for temporal anti-aliasing
+uniform float jitterX;
+uniform float jitterY;
+
 void main()
 {
-	gl_Position = position;
+	vec4 clip_space = position;
+	clip_space += vec4(jitterX*clip_space.w, jitterY*clip_space.w, 0.0, 0.0);
+	gl_Position = clip_space;
 	tcord = cord.xy;
 }
 
@@ -21,6 +27,7 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gColor;
 uniform sampler2D gRoughnessMetallic;
+uniform sampler2D gVelocity;
 
 #define MAX_LIGHTS 100
 vec4 VertexPosition_LightSpace;
@@ -49,6 +56,9 @@ uniform vec3 PointLight_Color[MAX_LIGHTS];
 uniform int Num_PointLights;
 
 uniform sampler2D u_DepthTexture;
+
+//
+uniform sampler2D History_Buffer;
 
 vec3 PBR_Color = vec3(0.0);
 vec3 radiance;
@@ -84,7 +94,7 @@ float CalculateShadow(int cascade_level)
 	}
 	//depth < p.z - bias? 0:1;// sample the depth map and check the p.xy coordinate of depth map with the p.z value
 	
-	return ShadowSum/9.0;
+	return pow(ShadowSum/9.0,16);
 }
 
 float NormalDistribution_GGX(float NdotH)
@@ -132,7 +142,7 @@ vec3 ColorCorrection(vec3 color)
 	//color = pow(color, vec3(1.0/2.2)); //Gamma space
 
 	//color = clamp(color,0,1);
-	color = vec3(1.0) - exp(-color * 1);//exposure
+	color = vec3(1.0) - exp(-color * 1.1);//exposure
 
 	//color = clamp(color,0,1);
 	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.0);//saturation
@@ -141,6 +151,15 @@ vec3 ColorCorrection(vec3 color)
 	color = 1.00*(color-0.5) + 0.5 + 0.00 ; //contrast
 
 	return color;
+}
+
+vec3 aces(vec3 x) {
+  const float a = 2.51;
+  const float b = 0.03;
+  const float c = 2.43;
+  const float d = 0.59;
+  const float e = 0.14;
+  return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
 }
 
 void main()
@@ -198,7 +217,7 @@ void main()
 	vec3 IBL_specular = textureLod(specular_env, Light_dir_i , MAX_MIP_LEVEL * alpha).rgb * (ks * BRDFintegration.x + BRDFintegration.y); //sample the the environment map at varying mip level
 	
 	//ambiance
-		vec3 ambiant = (IBL_diffuse * m_Color.xyz + IBL_specular) * texture(SSAO,tcord).r;
+		vec3 ambiant = (IBL_diffuse * m_Color.xyz + IBL_specular) * pow(texture(SSAO,tcord).r,1.0);
 
 //----------------------------------Sun Light-------------------------------------------------------------------
 	float vdoth = max(dot(EyeDirection, normalize(DirectionalLight_Direction + EyeDirection)),0.0);
@@ -231,7 +250,7 @@ void main()
 
 	PBR_Color += ambiant;
 
-	PBR_Color = clamp(ColorCorrection(PBR_Color),0.0,1.0);
+	PBR_Color = clamp(aces(PBR_Color),0.0,1.0);
 
 	color = vec4(PBR_Color,1.0);
 }

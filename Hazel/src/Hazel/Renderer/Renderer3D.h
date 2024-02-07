@@ -1,20 +1,22 @@
 #pragma once
 #include "Hazel/Core.h"
-#include "Hazel.h"
 #include "Hazel/Renderer/CubeMapReflection.h"
+#include "Hazel/LoadMesh.h"
 
 namespace Hazel {
 	class Camera;
-	class LoadMesh;
+	//class LoadMesh;
+	struct SubMesh;
 	class Shadows;
 	class Renderer3D
 	{
 	public:
-		static void Init();
+		static void Init(int width=1920, int height = 1080);
 		static void BeginScene(OrthographicCamera& camera);
-		//static void BeginScene(Camera& camera);
-		static void BeginScene(Camera&);
-		static void BeginSceneFoliage(Camera&);
+		//if the otherShader is nullptr then the renderer will use the default shaders for rendering
+		static void BeginScene(Camera& camera, const ref<Shader>& otherShader = nullptr);
+		//if the otherShader is nullptr then the renderer will use the default shaders for rendering
+		static void BeginSceneFoliage(Camera&, const ref<Shader>& otherShader = nullptr);
 
 		static void EndScene();
 	public:
@@ -24,12 +26,13 @@ namespace Hazel {
 		static void DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale = {1,1,1}, const glm::vec3& rotation = { 0,0,0 }, const glm::vec4& color = { 1,1,1,1 });//take the mesh class reference
 		static void DrawMesh(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = {1,1,1,1} ,const float& material_Roughness=1.0f,const float& material_metallic = 0.0f, ref<Shader> otherShader = nullptr);//take the mesh class reference
 		static void DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color = { 1,1,1,1 }, const float& material_Roughness = 1.0f, const float& material_metallic = 0.0f);//take the mesh class reference
-		static void DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform,size_t instance_count, const glm::vec4& color = { 1,1,1,1 }, float TimeElapsed=0, const float& material_Roughness = 1.0f, const float& material_metallic = 0.0f);//take the mesh class reference
+		static void DrawFoliageInstanced(SubMesh& sub_mesh, glm::mat4& transform, uint32_t& indirectBufferID, float TimeElapsed=0);//take the mesh class reference
 		static void AllocateInstancedFoliageData(LoadMesh& mesh, const size_t& size, uint32_t& buffIndex);
 		static void InstancedFoliageData(LoadMesh& mesh, uint32_t& buffIndex);
 		static void SetUpCubeMapReflections(Scene& scene);
 		static void RenderShadows(Scene& scene, Camera& camera);
 		static void AmbiantOcclusion(Scene& scene, Camera& camera);
+		static void RenderWithAntialiasing();
 		static void SetTransperancy(float val);
 		static ref<Shader>& GetFoliageInstancedShader();
 		static ref<Shadows>& GetShadowObj();
@@ -43,7 +46,9 @@ namespace Hazel {
 		static glm::vec3 m_SunLightDir;
 		static glm::vec3 m_SunColor;
 		static float m_SunIntensity;
+		static glm::mat4 m_oldProjectionView;
 	private:
+		static glm::vec3 m_oldSunLightDir;
 		friend class LoadMesh;
 	};
 }

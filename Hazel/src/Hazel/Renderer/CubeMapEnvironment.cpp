@@ -100,7 +100,6 @@ namespace Hazel {
 		float* hdr_map_data = nullptr, *resized_image=nullptr;
 
 
-		std::string filename = "Assets/Textures/Outdoor-Cube-Map/";
 		stbi_set_flip_vertically_on_load(1);
 		hdr_map_data = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
 

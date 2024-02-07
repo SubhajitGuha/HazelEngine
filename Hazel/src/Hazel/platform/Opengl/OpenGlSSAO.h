@@ -11,8 +11,8 @@ namespace Hazel {
 		inline void SetSSAO_TextureDimension(int width, int height) { m_width = width, m_height = height; }
 		void CaptureScene(Scene& scene , Camera& cam);
 		unsigned int GetSSAOid() { return SSAOblur_id; }
+		void CreateSSAOTexture(int width, int height);
 	private:
-		void CreateSSAOTexture();
 		void RenderScene(Scene& scene , ref<Shader>& current_shader);// This will be changed later
 		void RenderTerrain(Scene& scene, ref<Shader>& current_shader1, ref<Shader>& current_shader2);// This will be changed later
 		void RenderQuad();

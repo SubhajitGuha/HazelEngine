@@ -9,6 +9,12 @@ namespace Hazel
 	class Foliage
 	{
 	public:
+		struct DrawArraysIndirectCommand {
+			uint32_t  count = 0;
+			uint32_t  instanceCount = 0;
+			uint32_t  first = 0;
+			uint32_t  baseInstance = 0;
+		};
 		/*mesh : Foliage Mesh
 		numInstances : total number of Instances that will be used
 		coverageX,coverageY : How much area(sq m) will the foliage cover (must be a power of 2) eg 512,512
@@ -24,6 +30,8 @@ namespace Hazel
 		void RenderFoliage(Camera& cam, float radius);
 		//this version spawns foliage in everry area(per pixel)
 		void RenderFoliage(Camera& cam);
+		//this version is used by the shadows renderer to cast shadows
+		void RenderFoliage(ref<Shader>& shadow_shader);
 		//What will be the space between each foliage object
 		inline void SetFoliageSpacing(float spacing) { m_Spacing = spacing; }
 		glm::mat4 getTransform(int index);
@@ -65,10 +73,13 @@ namespace Hazel
 		ref<Shader> cs_createLod; //compute shader that prepares 2 transform matrices(LOD0,LOD1) from the culled matrix
 		uint32_t atomicCounter_lod0 = -1, atomicCounter_lod1 = -1; //Atomic_counter_Buffer IDs
 		uint32_t ssbo_outTransformsLOD0 = -1, ssbo_outTransformsLOD1 = -1; //2 transform matrix buffer IDs
+		uint32_t ssbo_indirectBuffer_LOD0 = -1, ssbo_indirectBuffer_LOD1 = -1;
+		DrawArraysIndirectCommand indirectBuffer_LOD0, indirectBuffer_LOD1; //
 
 		uint32_t m_instanceCount;
 		ref<Texture2D> FoliageDensityMap; //custom density map
-		ref<Shader> cs_FrustumCullVote, cs_PrefixSum, cs_FrustumCullCompact, cs_FoliageSpawn, cs_GrassPlacement, cs_FoliageBuffersInit;
+		ref<Shader> cs_FrustumCullVote, cs_PrefixSum, cs_FrustumCullCompact, cs_FoliageSpawn,
+			cs_GrassPlacement, cs_FoliageBuffersInit, cs_CopyIndirectBufferData;
 		glm::vec2 oldPlayerPos = {20000,20000}; //needs refactoring
 		//void* gpuData;
 		LoadMesh* m_foliageMesh; //Foliage Mesh That is used

@@ -46,12 +46,12 @@ float randomInRange (float min, float max, float seed)
 }
 
 //column major format
-mat4 CreateTranslationMatrix(float x, float y, float z)
+mat4 CreateTranslationMatrix(vec3 pos)
 {
 	return mat4(1,0,0,0,
 				0,1,0,0,
 				0,0,1,0,
-				x,y,z,1);
+				pos.x,pos.y,pos.z,1);
 }
 
 mat4 CreateRotationMatrix(float x, float y, float z)
@@ -91,6 +91,44 @@ mat4 CreateScaleMatrix(float scale)
 	);
 }
 
+vec3 CalculateNormal(vec2 texCoord , vec2 texelSize)
+{
+	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * u_HeightMapScale  *2.0 - u_HeightMapScale;
+	float right = texture(u_HeightMap,texCoord + vec2(texelSize.x,0.0)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+	float up = texture(u_HeightMap,texCoord + vec2(0.0 , texelSize.y)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+	float down = texture(u_HeightMap,texCoord + vec2(0.0 , -texelSize.y)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+
+	return normalize(vec3(down-up,2.0,left-right));
+}
+
+vec3 CalculateTangent(vec2 texCoord , vec2 texelSize)
+{
+	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * u_HeightMapScale  *2.0 - u_HeightMapScale;
+	float right = texture(u_HeightMap,texCoord + vec2(texelSize.x,0.0)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+	float up = texture(u_HeightMap,texCoord + vec2(0.0 , texelSize.y)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+	float down = texture(u_HeightMap,texCoord + vec2(0.0 , -texelSize.y)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+
+	return normalize(vec3(2.0,0.0,left-right));
+}
+
+mat4 TBN(vec2 texCoord , vec2 texelSize)
+{
+	vec3 N = CalculateNormal(texCoord,texelSize);	
+	vec3 T = CalculateTangent(texCoord, texelSize);
+	vec3 B = cross(N,T);
+
+	return mat4(vec4(T,0),vec4(B,0),vec4(N,0),vec4(0,0,0,1));
+}
+
+float GetSteepness(vec2 texCoord , vec2 texelSize)
+{
+	float height = texture(u_HeightMap,texCoord).x;
+	float dx = texture(u_HeightMap, texCoord + vec2(texelSize.x,0.0)).x - height;
+	float dy = texture(u_HeightMap, texCoord + vec2(0.0,texelSize.y)).x - height;
+
+	return abs(dy/dx);
+}
+
 void main()
 {
 	int m_index = int(gl_GlobalInvocationID.y * gl_NumWorkGroups.x * gl_WorkGroupSize.x + gl_GlobalInvocationID.x);
@@ -109,11 +147,15 @@ void main()
 	{
 		vec2 foliagePos = vec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y) * u_spacing; //2.0 is the spacing that I need for certain foliage
 		foliagePos = max(foliagePos + u_PlayerPos.xz - vec2(gl_NumWorkGroups.x*32/2), foliagePos); //offset by player position
-		vec2 uv = foliagePos / textureSize(u_HeightMap,0).x; // convert to 0-1 range
+		vec2 texelSize = 1.0/textureSize(u_HeightMap,0);
+		vec2 uv = foliagePos * texelSize; // convert to 0-1 range
 		float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
 
-		inBuffer.trans[m_index] = CreateTranslationMatrix(foliagePos.x + randomInRange(1.0,5.0,m_index) , height, foliagePos.y + randomInRange(1.0,5.0,m_index + 1)) 
-		* CreateRotationMatrix(randomInRange(5.0,35.0,m_index + 2),randomInRange(5.0,45.0,m_index + 3),randomInRange(5.0,15.0,m_index + 6)) * CreateScaleMatrix(randomInRange(1.0,3.0,m_index + 4));
+		vec3 pos = vec3(foliagePos.x + randomInRange(1.0,5.0,m_index) , height, foliagePos.y + randomInRange(1.0,5.0,m_index + 1));
+		if((1.0 - CalculateNormal(uv,texelSize).y)> 0.4)
+			pos = pos + CalculateNormal(uv,texelSize)*2; 
+		inBuffer.trans[m_index] = CreateTranslationMatrix(pos)
+		* CreateRotationMatrix(randomInRange(5.0,10.0,m_index + 2),randomInRange(5.0,10.0,m_index + 3),randomInRange(5.0,10.0,m_index + 6)) * CreateScaleMatrix(randomInRange(1.0,3.0,m_index + 4));		
 	}
 	
 }

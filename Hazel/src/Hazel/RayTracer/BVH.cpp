@@ -4,7 +4,7 @@
 #include "glad/glad.h"
 #include "Hazel/ResourceManager.h"
 
-#define NUM_BINS 100
+#define NUM_BINS 200
 
 namespace Hazel
 {
@@ -37,12 +37,13 @@ namespace Hazel
 		std::vector<std::string> texturePaths_albedo, texturePaths_roughness;
 		for (auto sub_mesh : m_Mesh->m_subMeshes)
 		{
-			auto albedoTexture = Texture2D::Create(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetAlbedoPath());
-			auto roughnessTexture = Texture2D::Create(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetRoughnessPath());
+			ref<Texture2D> albedoTexture = Texture2D::Create(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetAlbedoPath());
+			ref<Texture2D> roughnessTexture = Texture2D::Create(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetRoughnessPath());
 
 			uint64_t albedo_handle = glGetTextureHandleARB(albedoTexture->GetID()); //get a handle from the gpu
 			glMakeTextureHandleResidentARB(albedo_handle); //load the texture into gpu memory using the handle
 			uint64_t roughness_handle = glGetTextureHandleARB(roughnessTexture->GetID());
+			//if(albedo_handle!=roughness_handle)
 			glMakeTextureHandleResidentARB(roughness_handle);
 
 			for (int i = 0; i < sub_mesh.Vertices.size(); i+=3)

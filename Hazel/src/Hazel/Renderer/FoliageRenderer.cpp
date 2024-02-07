@@ -3,6 +3,7 @@
 #include "glad/glad.h"
 #include "Hazel/Renderer/Shadows.h"
 #include "Hazel/Renderer/Terrain.h"
+#include "Hazel/ResourceManager.h"
 
 namespace Hazel {
 	glm::vec3 Foliage::Showcase_camPosition = { 300,10,300 };
@@ -25,7 +26,7 @@ namespace Hazel {
 		cs_GrassPlacement = Shader::Create("Assets/Shaders/cs_GrassPlacement.glsl");
 		cs_FoliageBuffersInit = Shader::Create("Assets/Shaders/cs_FoliageBufferInit.glsl");
 		cs_createLod = Shader::Create("Assets/Shaders/cs_CreateLODs.glsl");
-
+		cs_CopyIndirectBufferData = Shader::Create("Assets/Shaders/cs_CopyIndirectBufferData.glsl");
 
 		foliageObjects.push_back(this);//this is a static vector that keeps track of all foliage objects created
 	}
@@ -45,11 +46,6 @@ namespace Hazel {
 		m_foliageTransforms.push_back(transform);
 	}
 
-	auto CalculateFrustumPlanes = [&](Camera& cam)
-	{
-
-	};
-
 	void Foliage::RenderFoliage(Camera& cam, float radius)
 	{
 		float fov = cam.GetVerticalFOV();
@@ -64,20 +60,69 @@ namespace Hazel {
 			Scan(i);
 			Compact(i);
 		}
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_totalPrefixSum);
-		void* val = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
-		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-		std::cout << "Tot foliage === " << *(int*)val << std::endl;
-		renderedInstanceCount = *(int*)val;
 		CreateLODs(cam);
 		cam.SetVerticalFOV(fov);
 
 		Renderer3D::BeginSceneFoliage(cam);
-		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);
-		Renderer3D::DrawFoliageInstanced(*m_foliageMesh->GetLOD(0), Terrain::m_terrainModelMat, NumLOD0, { 1,1,1,1 }, Terrain::time);
-	
-		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(1), ssbo_outTransformsLOD1);
-		Renderer3D::DrawFoliageInstanced(*m_foliageMesh->GetLOD(1), Terrain::m_terrainModelMat, NumLOD1, { 1,1,1,1 }, Terrain::time);
+		//LOD 0
+		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);	//render lod0 elements
+		for (auto sub_mesh : m_foliageMesh->GetLOD(0)->m_subMeshes)
+		{
+			cs_CopyIndirectBufferData->Bind();
+			cs_CopyIndirectBufferData->SetInt("VertexBufferSize", sub_mesh.numVertices);
+
+			if (ssbo_indirectBuffer_LOD0 == -1)
+			{
+				glGenBuffers(1, &ssbo_indirectBuffer_LOD0);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD0);
+				glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawArraysIndirectCommand), &indirectBuffer_LOD0, GL_DYNAMIC_DRAW);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD0);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+			else
+			{
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD0);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD0);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, atomicCounter_lod0);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, atomicCounter_lod0);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			glDispatchCompute(1, 1, 1);
+			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD0, Terrain::time);
+		}
+		//LOD 1
+		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(1), ssbo_outTransformsLOD1);	//render lod1 elements
+		for (auto sub_mesh : m_foliageMesh->GetLOD(1)->m_subMeshes)
+		{
+			cs_CopyIndirectBufferData->Bind();
+			cs_CopyIndirectBufferData->SetInt("VertexBufferSize", sub_mesh.numVertices);
+
+			if (ssbo_indirectBuffer_LOD1 == -1)
+			{
+				glGenBuffers(1, &ssbo_indirectBuffer_LOD1);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD1);
+				glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawArraysIndirectCommand), &indirectBuffer_LOD1, GL_DYNAMIC_DRAW);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD1);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+			else 
+			{
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD1);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD1);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, atomicCounter_lod1);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, atomicCounter_lod1);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			glDispatchCompute(1, 1, 1);
+			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD1, Terrain::time);
+		}
 	}
 
 	void Foliage::RenderFoliage(Camera& cam)
@@ -94,20 +139,82 @@ namespace Hazel {
 			Scan(i);
 			Compact(i);
 		}
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_totalPrefixSum);
-		void* val = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
-		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-		std::cout<< *(int*)val << std::endl;
-		renderedInstanceCount = *(int*)val;
 		CreateLODs(cam);
 		cam.SetVerticalFOV(fov);
 
 		Renderer3D::BeginSceneFoliage(cam);
+		//LOD 0
 		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);	//render lod0 elements
-		Renderer3D::DrawFoliageInstanced(*m_foliageMesh->GetLOD(0), Terrain::m_terrainModelMat, NumLOD0, { 1,1,1,1 }, Terrain::time);
+		for (auto sub_mesh : m_foliageMesh->GetLOD(0)->m_subMeshes) 
+		{
+			cs_CopyIndirectBufferData->Bind();
+			cs_CopyIndirectBufferData->SetInt("VertexBufferSize", sub_mesh.numVertices);
 
+			if (ssbo_indirectBuffer_LOD0 == -1)
+			{
+				glGenBuffers(1, &ssbo_indirectBuffer_LOD0);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD0);
+				glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawArraysIndirectCommand), &indirectBuffer_LOD0, GL_DYNAMIC_DRAW);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD0);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+			else 
+			{
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD0);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD0);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, atomicCounter_lod0);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, atomicCounter_lod0);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			glDispatchCompute(1,1,1);
+			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD0, Terrain::time);
+		}
+		//LOD 1
 		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(1), ssbo_outTransformsLOD1);	//render lod1 elements
-		Renderer3D::DrawFoliageInstanced(*m_foliageMesh->GetLOD(1), Terrain::m_terrainModelMat, NumLOD1, { 1,1,1,1 }, Terrain::time);
+		for (auto sub_mesh : m_foliageMesh->GetLOD(1)->m_subMeshes)
+		{
+			cs_CopyIndirectBufferData->Bind();
+			cs_CopyIndirectBufferData->SetInt("VertexBufferSize", sub_mesh.numVertices);
+
+			if (ssbo_indirectBuffer_LOD1 == -1)
+			{
+				glGenBuffers(1, &ssbo_indirectBuffer_LOD1);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD1);
+				glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(DrawArraysIndirectCommand), &indirectBuffer_LOD1, GL_DYNAMIC_DRAW);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD1);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+			else
+			{
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD1);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD1);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, atomicCounter_lod1);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, atomicCounter_lod1);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			glDispatchCompute(1, 1, 1);
+			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD1, Terrain::time);
+		}
+	}
+	void Foliage::RenderFoliage(ref<Shader>& shadow_shader)
+	{
+		//LOD 0
+		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);	//render lod0 elements
+		for (auto sub_mesh : m_foliageMesh->GetLOD(0)->m_subMeshes)
+		{
+			ref<Material> material = ResourceManager::allMaterials[sub_mesh.m_MaterialID]; //get material from the resource manager
+			material->Diffuse_Texture->Bind(ALBEDO_SLOT);
+			shadow_shader->SetInt("u_Albedo", ALBEDO_SLOT); //alpha channel is being used
+			RenderCommand::DrawArraysIndirect(*sub_mesh.VertexArray, ssbo_indirectBuffer_LOD0);			
+		}
 	}
 	glm::mat4 Foliage::getTransform(int index)
 	{
@@ -242,7 +349,6 @@ namespace Hazel {
 		cs_createLod->Bind();
 		cs_createLod->SetFloat3("u_camPos", cam.GetCameraPosition());
 		cs_createLod->SetMat4("u_ModelMat", Terrain::m_terrainModelMat);
-		cs_createLod->SetInt("u_InstanceCount", renderedInstanceCount);
 		cs_createLod->SetFloat("u_LOD0Distance", lod0Distance);
 
 		if (ssbo_outTransformsLOD0 == -1)
@@ -275,6 +381,11 @@ namespace Hazel {
 			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 4, atomicCounter_lod1);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
+			//pass the prefix sum (total amount of foliage to be rendered after frustum culling)
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_totalPrefixSum);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, ssbo_totalPrefixSum);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 		}
 		else
 		{
@@ -297,24 +408,18 @@ namespace Hazel {
 			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_lod1);
 			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 4, atomicCounter_lod1);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			//pass the prefix sum (total amount of foliage to be rendered after frustum culling)
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_totalPrefixSum);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, ssbo_totalPrefixSum);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		}
 
-		if(renderedInstanceCount<64)
+		if(m_instanceCount <64)
 			glDispatchCompute(1, 1, 1);
 		else
-			glDispatchCompute((int)std::ceil(renderedInstanceCount/64.0), 1, 1);
+			glDispatchCompute((int)std::ceil(m_instanceCount/64.0), 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_lod0);
-		NumLOD0 = *(uint32_t*)glMapBuffer(GL_ATOMIC_COUNTER_BUFFER, GL_READ_ONLY);
-		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-		std::cout<<"lod0 Count ==== "<< NumLOD0 << std::endl;
-
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_lod1);
-		NumLOD1 = *(uint32_t*)glMapBuffer(GL_ATOMIC_COUNTER_BUFFER, GL_READ_ONLY);
-		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-		std::cout << "lod1 Count ==== " << NumLOD1 << std::endl;
-
 	}
 	
 	void Foliage::SpawnFoliage(glm::vec3 playerPos, float radius)

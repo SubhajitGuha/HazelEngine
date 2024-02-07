@@ -478,7 +478,7 @@ namespace Hazel {
 				auto value = data[std::to_string(k)];
 				uint64_t materialID;
 
-				LoadMesh::SubMesh sub_mesh;
+				SubMesh sub_mesh;
 				{	//materialID decript from binary
 					YAML::Binary bin_data = value[0].as<YAML::Binary>();
 					const unsigned char* binary = bin_data.data();

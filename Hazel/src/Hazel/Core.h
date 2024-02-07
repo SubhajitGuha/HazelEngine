@@ -58,10 +58,10 @@
 #define G_COLOR_TEXTURE_SLOT 21
 #define G_NORMAL_TEXTURE_SLOT 22
 #define G_ROUGHNESS_METALLIC_TEXTURE_SLOT 23
-#define LUT_SLOT 24
-#define PT_IMAGE_SLOT 25 //Image slot for path tracing to copy the accmulated image
-
-
+#define G_VELOCITY_BUFFER_SLOT 24
+#define LUT_SLOT 25
+#define PT_IMAGE_SLOT 26 //Image slot for path tracing to copy the accmulated image
+#define HISTORY_TEXTURE_SLOT 27
 
 namespace Hazel {
 

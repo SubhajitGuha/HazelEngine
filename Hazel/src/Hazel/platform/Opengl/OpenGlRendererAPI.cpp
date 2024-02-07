@@ -38,6 +38,13 @@ namespace Hazel {
 	{
 		vertexarray.Bind();
 		glDrawArraysInstanced(GL_TRIANGLES, first, count, instance_count);
+		int size = sizeof(int) * 4;
+	}
+	void OpenGlRendererAPI::DrawArraysIndirect(VertexArray& vertexarray, uint32_t& indirectBufferID)
+	{
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBufferID);
+		vertexarray.Bind();
+		glDrawArraysIndirect(GL_TRIANGLES, 0);
 	}
 	void OpenGlRendererAPI::DrawLine(VertexArray& vertexarray,uint32_t count)
 	{
@@ -46,7 +53,15 @@ namespace Hazel {
 	}
 	void OpenGlRendererAPI::Init()
 	{
+		int MaxTextureImageUnits;
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
+		HAZEL_CORE_INFO("Number of texture slots available are :- {}",MaxTextureImageUnits);
+	
+		//glEnable(GL_DEBUG_OUTPUT);
+		//glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		//glDebugMessageCallback(glDebugOutput, nullptr);
 		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);

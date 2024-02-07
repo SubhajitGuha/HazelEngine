@@ -9,12 +9,15 @@ layout (location = 5) in mat4 instance_mm;
 
 out vec2 tcord;
 out vec4 m_pos;
+out vec4 m_curPos; //current clip-space position
+out vec4 m_oldPos; //previous clip-space position
 out vec3 m_Normal;
 out vec3 m_Tangent;
 out vec3 m_BiTangent;
 out vec3 m_VertexColor;
 
 uniform mat4 u_ProjectionView;
+uniform mat4 u_oldProjectionView;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
 uniform mat4 u_Model;
@@ -22,8 +25,9 @@ uniform vec3 u_cameraPos;
 uniform float u_Time;
 uniform vec4 m_color;
 uniform sampler2D Noise;
-float amplitude=40;
-float wsAmplitude=0.6;
+
+float amplitude=0;
+float wsAmplitude=0.0;
 
 mat4 CreateRotationMat(float x, float y, float z)
 {
@@ -71,12 +75,12 @@ void main()
 	vec3 origin = vec3(wsGrass[3][0],wsGrass[3][1],wsGrass[3][2]);
 
 	//wind system
-	float factor = distance(wsVertexPos.xyz , origin)/10;	//bottom part of foliage is not affected by wind
+	float factor = distance(wsVertexPos.xyz , origin)/3;	//bottom part of foliage is not affected by wind
 	if(factor<0)
 		factor = 0;
 	
 	vec3 coord = mod(abs(wsVertexPos.xyz),256);
-	coord/=vec3(256);
+	coord/=vec3(256); //256 is the size of noise texture
 
 	vec3 noise = texture(Noise , coord.xz*2 ).rgb*2;
 	vec3 rotVal = vec3(sin(u_Time + noise.r)*0.5+0.5+1) *factor*amplitude;
@@ -88,15 +92,18 @@ void main()
 	float val = texture(Noise,coord.xz*10).r;
 
 	//gl_Position = u_ProjectionView * ws_rot * wsGrass * rot * CreateScaleMatrix(val*2) * pos;
-	gl_Position = u_ProjectionView * wsGrass * pos;
+	vec4 clip_space = u_ProjectionView * ws_rot * wsGrass * rot * pos;
+	m_curPos = clip_space;
+	m_oldPos = u_oldProjectionView * ws_rot * wsGrass * rot * pos; //required for the velocity buffer
+	gl_Position = clip_space;
 
-	//m_VertexColor = factor * m_color.xyz;
-	m_VertexColor = m_color.xyz;
+	m_VertexColor = clamp(factor,0.0,1.0) * m_color.xyz;
+	//m_VertexColor = m_color.xyz;
 	tcord = cord;
 	m_Normal = normalize(mat3(u_View * wsGrass ) * Normal );
 	m_Tangent = normalize(mat3(u_View * wsGrass ) * Tangent );
 	m_BiTangent = normalize(mat3(u_View * wsGrass ) * BiTangent );
-	//m_pos = u_View * ws_rot * wsGrass * rot * CreateScaleMatrix(val*2) * pos;
+
 	m_pos = u_View * wsGrass * pos;
 
 }
@@ -107,11 +114,14 @@ layout (location = 0) out vec4 gPosition;
 layout (location = 1) out vec4 gNormal;
 layout (location = 2) out vec4 gColor;
 layout (location = 3) out vec4 gRoughnessMetallic;
+layout (location = 4) out vec4 gVelocity;
 
 //pbr mapping
 //the u_Roughness texture contains "opacity map" on R-channel "Roughness map" on G-channel and "Ambient occlusion" on B-channel
 
 in vec4 m_pos;
+in vec4 m_curPos; //current clip-space position
+in vec4 m_oldPos; //previous clip-space position
 in vec3 m_Normal;
 in vec3 m_Tangent;
 in vec3 m_BiTangent;
@@ -125,7 +135,7 @@ uniform samplerCube specular_env;
 uniform sampler2D u_Albedo;
 uniform sampler2D u_Roughness;
 uniform sampler2D u_NormalMap;
-uniform vec4 m_color;
+//uniform vec4 m_color;
 
 //PBR properties
 uniform float Roughness;
@@ -150,15 +160,42 @@ vec3 NormalMapping()
 	else
 		return normalize(TBN * normal);
 }
+vec3 GammaCorrection(in vec3 color)
+{
+	return pow(color, vec3(2.2)); //Gamma space
+}
+
+vec2 CalculateVelocity(in vec4 curPos,in vec4 oldPos)
+{
+	curPos /= curPos.w;
+	curPos.xy = (curPos.xy+1.0) * 0.5; //convert to 0-1
+	//curPos.y = 1.0 - curPos.y;
+
+	oldPos /= oldPos.w;
+	oldPos.xy = (oldPos.xy+1.0) * 0.5;
+	//oldPos.y = 1.0 - oldPos.y;
+
+	return (curPos - oldPos).xy;
+}
 
 float ao = 1.0;
 void main()
 {
 	vec4 albedo = texture(u_Albedo, tcord);
-	if(albedo.a < 0.4)
+	mat4x4 thresholdMatrix = mat4x4(
+	
+		1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
+		13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
+		4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
+		16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
+	);
+	float alpha = albedo.a;
+	float val = thresholdMatrix[int(gl_FragCoord.x) % 4][int(gl_FragCoord.y) % 4];
+	if(alpha < 0.5f)
 		discard;
 	gPosition = vec4(m_pos.xyz,1.0);
 	gNormal = vec4(NormalMapping(),1.0);
-	gColor = vec4(albedo.rgb * m_VertexColor, 1.0);
-	gRoughnessMetallic = vec4(texture(u_Roughness,tcord).r*Roughness,Metallic,1,1);
+	gColor = vec4(GammaCorrection(albedo.rgb * m_VertexColor), 1.0);
+	gRoughnessMetallic = vec4(texture(u_Roughness,tcord).r*Roughness,Metallic,1,1.0);
+	gVelocity = vec4(CalculateVelocity(m_curPos,m_oldPos),0,1.0);
 }

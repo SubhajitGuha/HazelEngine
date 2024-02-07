@@ -159,6 +159,7 @@
     <ClInclude Include="src\Hazel\Log.h" />
     <ClInclude Include="src\Hazel\OrthographicCameraController.h" />
     <ClInclude Include="src\Hazel\Physics\Physics3D.h" />
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlAntialiasing.h" />
     <ClInclude Include="src\Hazel\RayTracer\BVH.h" />
     <ClInclude Include="src\Hazel\RayTracer\RayTracer.h" />
     <ClInclude Include="src\Hazel\Renderer\Atmosphere.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="src\Hazel\Renderer\Shadows.h" />
     <ClInclude Include="src\Hazel\Renderer\SkyRenderer.h" />
     <ClInclude Include="src\Hazel\Renderer\SubTexture.h" />
+    <ClInclude Include="src\Hazel\Renderer\Antialiasing.h" />
     <ClInclude Include="src\Hazel\Renderer\Terrain.h" />
     <ClInclude Include="src\Hazel\Renderer\Texture.h" />
     <ClInclude Include="src\Hazel\ResourceManager.h" />
@@ -515,6 +517,7 @@
     <ClCompile Include="src\Hazel\Log.cpp" />
     <ClCompile Include="src\Hazel\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Physics\Physics3D.cpp" />
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlAntialiasing.cpp" />
     <ClCompile Include="src\Hazel\RayTracer\BVH.cpp" />
     <ClCompile Include="src\Hazel\RayTracer\RayTracer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Atmosphere.cpp" />
@@ -541,6 +544,7 @@
     <ClCompile Include="src\Hazel\Renderer\Shadows.cpp" />
     <ClCompile Include="src\Hazel\Renderer\SkyRenderer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\SubTexture.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Antialiasing.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Terrain.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp" />
     <ClCompile Include="src\Hazel\ResourceManager.cpp" />

@@ -41,7 +41,8 @@ private:
 	ref<VertexArray> vao;
 	ref <Texture2D> texture, tex2;
 	ref<SubTexture2D> tree,land,mud,water;
-	ref<FrameBuffer> m_FrameBuffer,m_FrameBuffer2;
+	ref<FrameBuffer> m_FrameBuffer,m_FrameBuffer2, m_FrameBuffer3, m_FrameBuffer4;
 
 	float frame_time = 0;//capture the delta time
+	int numFrame =0;
 };

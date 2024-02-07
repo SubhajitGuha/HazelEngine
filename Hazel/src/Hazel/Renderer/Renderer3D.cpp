@@ -12,13 +12,17 @@
 #include "Hazel/Renderer/Terrain.h"
 #include "Hazel/Renderer/SkyRenderer.h"
 #include "Hazel/Renderer/DeferredRenderer.h"
+#include "Hazel/Renderer/Antialiasing.h"
 #include "Material.h"
 #include "Hazel/ResourceManager.h"
+
 
 namespace Hazel {
 	//Camera* m_camera;
 	GLsync syncObj;
+	glm::mat4 Renderer3D::m_oldProjectionView = glm::mat4(1.0f);
 	glm::vec3 Renderer3D::m_SunLightDir = { 0,-5,0.60 };//initial light position
+	glm::vec3 Renderer3D::m_oldSunLightDir = {0,0,0};
 	glm::vec3 Renderer3D::m_SunColor = { 1,1,1 };
 	float Renderer3D::m_SunIntensity = 1.0f;
 
@@ -45,28 +49,19 @@ namespace Hazel {
 		//may more ..uv coord , tangents , normals..
 	};
 
-	struct Renderer3DStorage {
-		int max_Vertices = 2000000;
-		VertexAttributes* Vertex=nullptr;
-		uint32_t vertexb_id;
+	struct Renderer3DStorage {		
 		ref<OpenGlSSAO> ssao;
+		ref<Antialiasing> taa; //temporal antialiasing
 		ref<Shadows> shadow_map;
 		ref<CubeMapReflection> reflection;
 		ref<Shader> shader, foliage_shader, foliageShader_instanced;
-		ref<Texture2D> WhiteTex,tex;
-		ref<BufferLayout> bl;
-		ref<VertexBuffer> vb;
-		ref<IndexBuffer> ib;
-		ref<VertexArray> va;
-
-		uint32_t m_VertexCounter = 0;
 	};
 	static Renderer3DStorage* m_data;
 
-	void Renderer3D::Init()
+	void Renderer3D::Init(int width, int height)
 	{
 		m_data = new Renderer3DStorage;
-		DefferedRenderer::Init(1920,1080);//Initilize the Deferred Renderer
+		DefferedRenderer::Init(width,height);//Initilize the Deferred Renderer
 
 		m_data->shader = (Shader::Create("Assets/Shaders/3D_2_In_1Shader.glsl"));//texture shader
 		m_data->shader->SetInt("SSAO", SSAO_BLUR_SLOT);
@@ -81,17 +76,13 @@ namespace Hazel {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Loading cube map so that it can act as an environment light
 		//m_data->reflection = CubeMapReflection::Create();
-		m_data->ssao = std::make_shared<OpenGlSSAO>(1024,1024);
-		m_data->shadow_map = Shadows::Create(4096/2, 4096/2);//create a 2048x2048 shadow map
+		m_data->taa = Antialiasing::Create(width,height);
+		m_data->ssao = std::make_shared<OpenGlSSAO>(width/2,height/2);
+		m_data->shadow_map = Shadows::Create(2048, 2048);//create a 2048x2048 shadow map
 		for (int i = 0; i < 4; i++)
 			depth_id[i] = m_data->shadow_map->GetDepth_ID(i);
 		ssao_id = m_data->ssao->GetSSAOid();
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		m_data->WhiteTex = Texture2D::Create(1, 1, 0xffffffff);//create a default white texture
-		m_data->tex = Texture2D::Create("Assets/Textures/Test.png");
-		m_data->tex->Bind(1);
-		m_data->WhiteTex->Bind(0);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		SetSunLightDirection({ 3,5,2});
 	}
@@ -103,29 +94,51 @@ namespace Hazel {
 		m_data->shader->SetFloat3("EyePosition", camera.GetPosition());
 	}
 
-	void Renderer3D::BeginScene(Camera& camera)
+	void Renderer3D::BeginScene(Camera& camera,const ref<Shader>& otherShader)
 	{
-		//Init();
-		m_data->shader->Bind();//bind the textureShader
-		m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
-		m_data->shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
-		//m_camera = camera;
-		m_data->m_VertexCounter = 0;
-		//Renderer2D::LineBeginScene(camera);
+		if (otherShader == nullptr) {
+			m_data->shader->Bind();//bind the textureShader
+			m_data->shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+			//m_data->shader->
+			m_data->shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
+		}
+		else
+		{
+			otherShader->Bind();//bind the textureShader
+			otherShader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+			otherShader->SetMat4("u_View", camera.GetViewMatrix());
+			otherShader->SetMat4("u_oldProjectionView", m_oldProjectionView);
+			//otherShader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
+		}
 	}
 
-	void Renderer3D::BeginSceneFoliage(Camera& camera)
+	void Renderer3D::BeginSceneFoliage(Camera& camera, const ref<Shader>& otherShader)
 	{
 		m_data->foliage_shader->Bind();//bind the textureShader
 		m_data->foliage_shader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
 		m_data->foliage_shader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
 
-		m_data->foliageShader_instanced->Bind();//bind the textureShader
-		m_data->foliageShader_instanced->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
-		m_data->foliageShader_instanced->SetMat4("u_Projection", camera.GetProjectionMatrix());
-		m_data->foliageShader_instanced->SetMat4("u_View", camera.GetViewMatrix());
-		m_data->foliageShader_instanced->SetFloat3("u_cameraPos", camera.GetCameraPosition());
-		m_data->foliageShader_instanced->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
+		if (otherShader == nullptr) 
+		{
+			m_data->foliageShader_instanced->Bind();//bind the textureShader
+			m_data->foliageShader_instanced->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+			m_data->foliageShader_instanced->SetMat4("u_Projection", camera.GetProjectionMatrix());
+			m_data->foliageShader_instanced->SetMat4("u_View", camera.GetViewMatrix());
+			m_data->foliageShader_instanced->SetMat4("u_oldProjectionView", m_oldProjectionView);
+			m_data->foliageShader_instanced->SetFloat3("u_cameraPos", camera.GetCameraPosition());
+			m_data->foliageShader_instanced->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
+
+		}
+		else
+		{
+			otherShader->Bind();//bind the textureShader
+			otherShader->SetMat4("u_ProjectionView", camera.GetProjectionView());//here the projection is ProjectionView
+			otherShader->SetMat4("u_Projection", camera.GetProjectionMatrix());
+			otherShader->SetMat4("u_View", camera.GetViewMatrix());
+			otherShader->SetMat4("u_oldProjectionView", m_oldProjectionView);
+			otherShader->SetFloat3("u_cameraPos", camera.GetCameraPosition());
+			otherShader->SetFloat3("EyePosition", camera.GetCameraPosition());//get the eye position for specular lighting calculation
+		}
 	}
 
 	void Renderer3D::EndScene()
@@ -236,66 +249,40 @@ namespace Hazel {
 				otherShader->SetInt("u_Roughness", ROUGHNESS_SLOT);
 				otherShader->SetInt("u_NormalMap", NORMAL_SLOT);
 				otherShader->SetMat4("u_Model", transform);
-				otherShader->SetFloat4("m_color", material->GetColor());
+				otherShader->SetFloat4("m_color", material->GetColor());			
 			}
 
 			RenderCommand::DrawArrays(*sub_mesh.VertexArray, sub_mesh.numVertices);
 		}
 	}
 
-	//void Renderer3D::DrawFoliage(LoadMesh& mesh, glm::mat4& transform, const glm::vec4& color, const float& material_Roughness, const float& material_metallic)
-	//{
-	//	glDisable(GL_CULL_FACE);
-	//	//this is not ideal!! I just cannot handle shaders like this in a long run
-	//	m_data->foliage_shader->Bind();//bind the textureShader
-	//
-	//	m_data->foliage_shader->SetFloat("Roughness", material_Roughness); //send the roughness value
-	//	m_data->foliage_shader->SetFloat("Metallic", material_metallic); //send the metallic value
-	//
-	//	mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
-	//	mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
-	//	mesh.Normal_Texture->Bind(NORMAL_SLOT);
-	//
-	//	m_data->foliage_shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
-	//	m_data->foliage_shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
-	//	m_data->foliage_shader->SetInt("u_NormalMap", NORMAL_SLOT);
-	//	m_data->foliage_shader->SetMat4("u_Model", transform);
-	//	m_data->foliage_shader->SetFloat4("m_color", color);
-	//
-	//	RenderCommand::DrawArrays(*mesh.VertexArray, mesh.Vertices.size());
-	//	glEnable(GL_CULL_FACE);
-	//	glCullFace(GL_BACK);
-	//}
-
-	void Renderer3D::DrawFoliageInstanced(LoadMesh& mesh, glm::mat4& transform, size_t instance_count, const glm::vec4& color, float TimeElapsed, const float& material_Roughness, const float& material_metallic)
+	void Renderer3D::DrawFoliageInstanced(SubMesh& sub_mesh, glm::mat4& transform, uint32_t& indirectBufferID, float TimeElapsed)
 	{
-		for (auto& sub_mesh : mesh.m_subMeshes)
-		{
-			glDisable(GL_CULL_FACE);
-			ref<Material> material = ResourceManager::allMaterials[sub_mesh.m_MaterialID]; //get material from the resource manager
-			
-			if (!material) {
-				HAZEL_CORE_ERROR("Material dosent exist");
-				return; //dont render in case of non existing material
-			}
-			m_data->foliageShader_instanced->SetFloat("Roughness", material->GetRoughness()); //send the roughness value
-			m_data->foliageShader_instanced->SetFloat("Metallic", material->GetMetalness()); //send the metallic value
-			
-			material->Diffuse_Texture->Bind(ALBEDO_SLOT);
-			material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
-			material->Normal_Texture->Bind(NORMAL_SLOT);
-
-			m_data->foliageShader_instanced->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture to slot1;
-			m_data->foliageShader_instanced->SetInt("u_Roughness", ROUGHNESS_SLOT);
-			m_data->foliageShader_instanced->SetInt("u_NormalMap", NORMAL_SLOT);
-			m_data->foliageShader_instanced->SetMat4("u_Model", transform);
-			m_data->foliageShader_instanced->SetFloat4("m_color", color);
-			m_data->foliageShader_instanced->SetFloat("u_Time", TimeElapsed);
-			m_data->foliageShader_instanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
-			RenderCommand::DrawInstancedArrays(*sub_mesh.VertexArray, sub_mesh.numVertices, instance_count);
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+		m_data->foliageShader_instanced->Bind();
+		glDisable(GL_CULL_FACE);
+		ref<Material> material = ResourceManager::allMaterials[sub_mesh.m_MaterialID]; //get material from the resource manager
+		
+		if (!material) {
+			HAZEL_CORE_ERROR("Material dosent exist");
+			return; //dont render in case of non existing material
 		}
+		m_data->foliageShader_instanced->SetFloat("Roughness", material->GetRoughness()); //send the roughness value
+		m_data->foliageShader_instanced->SetFloat("Metallic", material->GetMetalness()); //send the metallic value
+		
+		material->Diffuse_Texture->Bind(ALBEDO_SLOT);
+		material->Roughness_Texture->Bind(ROUGHNESS_SLOT);
+		material->Normal_Texture->Bind(NORMAL_SLOT);
+		
+		m_data->foliageShader_instanced->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture to slot1;
+		m_data->foliageShader_instanced->SetInt("u_Roughness", ROUGHNESS_SLOT);
+		m_data->foliageShader_instanced->SetInt("u_NormalMap", NORMAL_SLOT);
+		m_data->foliageShader_instanced->SetMat4("u_Model", transform);
+		m_data->foliageShader_instanced->SetFloat4("m_color", material->GetColor());
+		m_data->foliageShader_instanced->SetFloat("u_Time", TimeElapsed);
+		m_data->foliageShader_instanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
+		RenderCommand::DrawArraysIndirect(*sub_mesh.VertexArray, indirectBufferID);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);		
 	}
 
 	void Renderer3D::InstancedFoliageData(LoadMesh& mesh, uint32_t& bufferIndex)
@@ -392,68 +379,26 @@ namespace Hazel {
 	{
 		m_data->shader->Bind();//you need to bind this other wise nothing will be rendererd
 		m_data->shader->SetFloat("Transperancy", val);//for now assign to 10 :)
-
 	}
-
-	//void Renderer3D::DrawMesh(LoadMesh& mesh, const glm::vec3& Position, const glm::vec3& Scale, const glm::vec3& rotation, const glm::vec4& color)
-	//{
-	//	m_data->shader->SetFloat("Roughness", 0.6f);
-	//	m_data->shader->SetFloat("Metallic", 0.0f);
-	//
-	//	auto Rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), { 1,0,0 }) *
-	//		glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), { 0,1,0 }) *
-	//		glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), { 0,0,1 });
-	//	auto transform = glm::translate(glm::mat4(1.0f), Position) * Rotation * glm::scale(glm::mat4(1.0), Scale);
-	//
-	//	// waiting for the buffer
-	//	GLenum waitReturn = GL_UNSIGNALED;
-	//	while (waitReturn != GL_ALREADY_SIGNALED && waitReturn != GL_CONDITION_SATISFIED)
-	//	{
-	//		waitReturn = glClientWaitSync(syncObj, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
-	//	}
-	//	
-	//	std::vector<int> n_meshes;
-	//	for (int i = 0; i < mesh.Vertices.size(); i++)
-	//		n_meshes.push_back(i);
-	//
-	//	std::for_each(std::execution::par, n_meshes.begin(), n_meshes.end(), [&](int i)
-	//		{
-	//			glm::vec3 transformed_normals = glm::normalize(glm::mat3(transform) * mesh.Normal[i]);//re-orienting the normals (do not include translation as normals only needs to be orinted)
-	//			glm::vec3 transformed_tangents = glm::normalize(glm::mat3(transform) * mesh.Tangent[i]);
-	//			glm::vec3 transformed_binormals = glm::normalize(glm::mat3(transform) * mesh.BiTangent[i]);
-	//			m_data->Vertex[i] = (VertexAttributes(transform * glm::vec4(mesh.Vertices[i], 1), mesh.TexCoord[i], transformed_normals, transformed_tangents, transformed_binormals, mesh.Material_Index[i]));
-	//			//Renderer2D::DrawLine(Quad[i].Position, (glm::vec3)Quad[i].Position + mesh.Normal[mesh.Normal_Indices[i]]*glm::vec3(2), { 0.0f,0.0f,1.0f,1.0f },2);
-	//		});
-	//
-	//	mesh.Diffuse_Texture->Bind(ALBEDO_SLOT);
-	//	mesh.Roughness_Texture->Bind(ROUGHNESS_SLOT);
-	//	mesh.Normal_Texture->Bind(NORMAL_SLOT);
-	//
-	//	m_data->shader->SetInt("u_Albedo", ALBEDO_SLOT);//bind albedo texture array to slot1;
-	//	m_data->shader->SetInt("u_Roughness", ROUGHNESS_SLOT);
-	//	m_data->shader->SetInt("u_NormalMap", NORMAL_SLOT);
-	//
-	//	RenderCommand::DrawArrays(*m_data->va, mesh.Vertices.size());
-	//
-	//	// lock the buffer:
-	//	glDeleteSync(syncObj);
-	//	syncObj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	//}
 
 	ref<Shader>& Renderer3D::GetFoliageInstancedShader()
 	{
 		return m_data->foliageShader_instanced;
 	}
-
+	void Renderer3D::RenderWithAntialiasing()
+	{
+		m_data->taa->Update();
+	}
 	void Renderer3D::RenderScene_Deferred(Scene* scene)
 	{
 		SkyRenderer::RenderSky(*scene->GetCamera());
 		DefferedRenderer::DeferredRenderPass();
+		m_oldProjectionView = scene->GetCamera()->GetProjectionView(); //update the old projection-view matrix after every thing is rendered
 	}
 
 	void Renderer3D::ForwardRenderPass(Scene* scene)
 	{
-		DefferedRenderer::GenerateGBuffers(scene);
+		DefferedRenderer::GenerateGBuffers(scene);	
 		RenderShadows(*scene, *scene->GetCamera());
 		AmbiantOcclusion(*scene, *scene->GetCamera());
 	}

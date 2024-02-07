@@ -22,7 +22,7 @@ namespace Hazel
 		tile_size = { 128,128 };
 		tile_index = { 0,0 };
 		Init(512,512);
-		bvh = std::make_shared<BVH>(Scene::Sphere);
+		bvh = std::make_shared<BVH>(Scene::Sponza);
 		StartTime = std::chrono::high_resolution_clock::now();
 
 		glGenFramebuffers(1, &m_fbo); //create framebuffer object to copy the final rendered image
@@ -184,7 +184,7 @@ namespace Hazel
 	{
 		if (Denoise && (tile_index.x == image_width / tile_size.x - 1) && (tile_index.y == image_height / tile_size.y-1))
 		{
-			if (sample_count % 15 == 0)
+			if (sample_count % 15 == 0) //after 15 sample denoise
 			{
 				// Create an Open Image Denoise device
 				oidn::DeviceRef device = oidn::newDevice(oidn::DeviceType::CUDA); // CPU or GPU if available

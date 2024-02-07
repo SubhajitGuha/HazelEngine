@@ -12,7 +12,6 @@
 #define PI 3.14159265359
 
 layout (local_size_x = 8, local_size_y = 8) in;
-layout(bindless_sampler) uniform sampler2D tex;
 
 struct LinearBVHNode
 {
@@ -110,7 +109,7 @@ vec4 SkyColourZenith = vec4(0.1,0.4,0.89,1.0);
 float SunFocus=20.0;
 float SunIntensity=10;
 
-int numLights = 2; //needs to be an uniform
+int numLights = 1; //needs to be an uniform
 
 Material defaultMat;
 struct Sphere
@@ -145,7 +144,7 @@ struct Light
     vec3 v;
     //float type;
 };
-Light lights[2];
+Light lights[1];
 
 struct LightInfo
 {
@@ -516,18 +515,18 @@ HitInfo ClosestHit(Ray ray, inout LightInfo light_info)
 	vec2 uv = uv1*u + uv2*v + uv0*(1.0-u-v);
 
 	//multiply texture with material color(tint);
-	//sampler2D albedo = sampler2D(nearestTriangle.tex_albedo);
-	//sampler2D roughness = sampler2D(nearestTriangle.tex_roughness);
-	//
-	//vec4 tex_albedo = texture(albedo, uv); //load the bindless textures
-	//vec4 tex_roughness = texture(roughness, uv);
-	//
-	//info.material.color[0] *= tex_albedo.r;
-	//info.material.color[1] *= tex_albedo.g; 
-	//info.material.color[2] *= tex_albedo.b;
-	////info.material.color[3] *= tex_albedo.a; 
-	//info.material.roughness *= tex_roughness.g;
-	////info.material.metalness = tex_roughness.b;
+	sampler2D albedo = sampler2D(nearestTriangle.tex_albedo);
+	sampler2D roughness = sampler2D(nearestTriangle.tex_roughness);
+	
+	vec4 tex_albedo = texture(albedo, uv); //load the bindless textures
+	vec4 tex_roughness = texture(roughness, uv);
+	
+	info.material.color[0] *= tex_albedo.r;
+	info.material.color[1] *= tex_albedo.g; 
+	info.material.color[2] *= tex_albedo.b;
+	info.material.color[3] *= tex_albedo.a; 
+	info.material.roughness *= tex_roughness.g;
+	//info.material.metalness = tex_roughness.b;
 
 	vec3 n0 = vec3(nearestTriangle.n0[0],nearestTriangle.n0[1],nearestTriangle.n0[2]);
 	vec3 n1 = vec3(nearestTriangle.n1[0],nearestTriangle.n1[1],nearestTriangle.n1[2]);
@@ -772,23 +771,6 @@ vec3 perPixel(int numBounces, Ray ray)
 	return incommingLight;
 }
 
-vec3 ColorCorrection(vec3 color)
-{
-	//color = clamp(color,0,1);
-	color = pow(color, vec3(1.0/2.2)); //Gamma space
-
-	//color = clamp(color,0,1);
-	color = vec3(1.0) - exp(-color * 2);//exposure
-
-	//color = clamp(color,0,1);
-	//color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.0);//saturation
-
-	//color = clamp(color,0,1);
-	//color = 1.00*(color-0.5) + 0.5 + 0.00 ; //contrast
-
-	return color;
-}
-
 void main()
 {
 	seed = uvec4(gl_GlobalInvocationID.xy, uint(frame_num + sample_count), uint(gl_GlobalInvocationID.x) + uint(gl_GlobalInvocationID.y));
@@ -805,11 +787,11 @@ void main()
 	ray.origin = camera_pos;//in world space
 	ray.dir = normalize(vec3(inverse(mat_view)*vec4(target.xyz/target.w,0))); //ray dir in world space
 
-	for(int i=0;i<numLights-1;i++)
+	for(int i=0;i<numLights;i++)
 	{
-		lights[i] = Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(i*6,0,0), vec3(50,0,0), vec3(0,0,150)); //fow now there is only one light
+		lights[i] = Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(i*6,0,0), vec3(20,0,0), vec3(0,0,20)); //fow now there is only one light
 	}
-	lights[numLights-1] =  Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(100,0,0), vec3(0,-50,0), vec3(0,0,150));
+	//lights[numLights-1] =  Light(vec3(1.0,1.0,1.0), u_LightStrength, LightPos + vec3(100,0,0), vec3(0,-50,0), vec3(0,0,150));
 	for(int i=0; i<samplesPerPixel; i++)
 		color += perPixel(num_bounces, ray); //10 bounces per ray
 	color /= samplesPerPixel;

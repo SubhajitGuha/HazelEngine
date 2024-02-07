@@ -12,7 +12,7 @@ namespace Hazel {
 	{
 	}
 	OpenGlShadows::OpenGlShadows(const float& width, const float& height)
-		:m_width(width),m_height(height)
+		:m_width(width/ MAX_CASCADES),m_height(height/MAX_CASCADES)
 	{
 		shadow_shader = Shader::Create("Assets/Shaders/ShadowShader.glsl");//shadow shader
 		terrain_shadowShader = Shader::Create("Assets/Shaders/TerrainShadowShader.glsl");
@@ -98,7 +98,7 @@ namespace Hazel {
 			terrain_shadowShader->SetMat4("u_View", cam.GetViewMatrix());
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
-			glViewport(0, 0, m_width, m_height);
+			glViewport(0, 0, m_width*(i+1), m_height*(i+1));
 			//glClear(GL_DEPTH_BUFFER_BIT);
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_id[i], 0);
@@ -114,7 +114,8 @@ namespace Hazel {
 			//scene entity shadow caster
 			shadow_shader->Bind();
 			shadow_shader->SetMat4("LightProjection", LightProjection);
-			shadow_shader->SetInt("u_Alpha", ROUGHNESS_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
+
+			shadow_shader->SetInt("u_Alpha", ALBEDO_SLOT);//'2' is the slot for roughness map (alpha, roughness , AO in RGB) I have explicitely defined it for now
 
 			scene.getRegistry().each([&](auto m_entity)//iterate through every entities and render them
 				{
@@ -142,15 +143,12 @@ namespace Hazel {
 			shadow_shaderInstanced->Bind();
 			shadow_shaderInstanced->SetMat4("LightProjection", LightProjection);
 			shadow_shaderInstanced->SetMat4("u_Model", Terrain::m_terrainModelMat);
-			shadow_shaderInstanced->SetInt("u_Albedo", ALBEDO_SLOT); //alpha channel is being used
 			for (Foliage* foliage : Foliage::foliageObjects)
 			{
 				if (foliage->bCanCastShadow) 
 				{
 					glDisable(GL_CULL_FACE);
-					uint32_t bufferID = foliage->GetBufferID_LOD0();
-					Renderer3D::InstancedFoliageData(*foliage->GetMesh(), bufferID);
-					Renderer3D::DrawFoliageInstanced(*foliage->GetMesh(), glm::mat4(1.0), foliage->NumLOD0);
+					foliage->RenderFoliage(shadow_shaderInstanced);
 					glEnable(GL_CULL_FACE);
 					glCullFace(GL_BACK);
 				}
@@ -190,7 +188,7 @@ namespace Hazel {
 
 			//Renderer3D::BeginSceneFoliage(cam);
 			//Renderer3D::DrawFoliageInstanced(*mesh, glm::mat4(1.0), numMeshes, { 1,1,1,1 }, Terrain::time);
-			Renderer3D::DrawFoliageInstanced(*mesh, glm::mat4(1.0), numMeshes);
+			//Renderer3D::DrawFoliageInstanced(*mesh, glm::mat4(1.0), numMeshes);
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glViewport(0, 0, size.x, size.y);
@@ -227,10 +225,10 @@ namespace Hazel {
 		{
 			glBindTexture(GL_TEXTURE_2D, depth_id[i]);
 
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, m_width*(i+1), m_height*(i+1), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 

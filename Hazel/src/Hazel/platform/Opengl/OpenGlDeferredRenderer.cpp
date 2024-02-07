@@ -3,12 +3,13 @@
 #include "Hazel/Physics/Physics3D.h"
 #include "OpenGlDeferredRenderer.h"
 #include "Hazel/Renderer/Terrain.h"
+#include "Hazel/Renderer/Antialiasing.h"
 
 namespace Hazel
 {
 	uint32_t OpenGlDeferredRenderer::m_framebufferID, OpenGlDeferredRenderer::m_RenderBufferID,
 		OpenGlDeferredRenderer::m_PositionBufferID, OpenGlDeferredRenderer::m_NormalBufferID, OpenGlDeferredRenderer::m_AlbedoBufferID,
-		OpenGlDeferredRenderer::m_RoughnessMetallicBufferID;
+		OpenGlDeferredRenderer::m_RoughnessMetallicBufferID, OpenGlDeferredRenderer::m_VelocityBufferID;
 
 	ref<Shader> OpenGlDeferredRenderer::m_ForwardPassShader;
 	ref<Shader> OpenGlDeferredRenderer::m_DefferedPassShader;
@@ -26,34 +27,42 @@ namespace Hazel
 
 		glGenTextures(1, &m_PositionBufferID);
 		glBindTexture(GL_TEXTURE_2D, m_PositionBufferID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_PositionBufferID, 0);
 
 		glGenTextures(1, &m_NormalBufferID);
 		glBindTexture(GL_TEXTURE_2D, m_NormalBufferID);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_NormalBufferID, 0);
 
 		glGenTextures(1, &m_AlbedoBufferID);
 		glBindTexture(GL_TEXTURE_2D, m_AlbedoBufferID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 16.0f);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_AlbedoBufferID, 0);
 
 		glGenTextures(1, &m_RoughnessMetallicBufferID);
 		glBindTexture(GL_TEXTURE_2D, m_RoughnessMetallicBufferID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, m_RoughnessMetallicBufferID, 0);
 
-		GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-		glDrawBuffers(4, buffers);
+		glGenTextures(1, &m_VelocityBufferID);
+		glBindTexture(GL_TEXTURE_2D, m_VelocityBufferID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, width, height, 0, GL_RG, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, m_VelocityBufferID, 0);
+
+		GLenum buffers[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
+		glDrawBuffers(5, buffers);
 
 		//capture the depth of the scene on to a texture this will later be used for render the sky
 		glGenTextures(1, &m_RenderBufferID);
@@ -71,21 +80,21 @@ namespace Hazel
 		glBindTextureUnit(G_NORMAL_TEXTURE_SLOT, m_NormalBufferID);
 		glBindTextureUnit(G_COLOR_TEXTURE_SLOT, m_AlbedoBufferID);
 		glBindTextureUnit(G_ROUGHNESS_METALLIC_TEXTURE_SLOT, m_RoughnessMetallicBufferID);
+		glBindTextureUnit(G_VELOCITY_BUFFER_SLOT, m_VelocityBufferID);
 		glBindTextureUnit(SCENE_DEPTH_SLOT, m_RenderBufferID);
 	}
+	
 	void OpenGlDeferredRenderer::CreateBuffers(Scene* scene)
 	{
 		auto viewport_size = RenderCommand::GetViewportSize();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferID);
-		glViewport(0, 0, m_width, m_height);
+		glViewport(0, 0, m_width, m_height); //set the viewport resolution same as gbuffer texture resolution
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		scene->m_Terrain->RenderTerrain(*scene->GetCamera());
 
-		m_ForwardPassShader->Bind();
-		m_ForwardPassShader->SetMat4("u_ProjectionView", scene->GetCamera()->GetProjectionView());//here the projection is ProjectionView
-		m_ForwardPassShader->SetMat4("u_View", scene->GetCamera()->GetViewMatrix());//here the projection is ProjectionView
+		Renderer3D::BeginScene(*scene->GetCamera(), m_ForwardPassShader);
 		scene->getRegistry().each([&](auto m_entity)
 			{
 				Entity Entity(scene, m_entity);
@@ -123,12 +132,19 @@ namespace Hazel
 	}
 	void OpenGlDeferredRenderer::DeferredPass()
 	{
+		glm::vec2 jitter = Antialiasing::GetJitterOffset();
+
 		m_DefferedPassShader->Bind();
+		m_DefferedPassShader->SetFloat("jitterX", jitter.x);
+		m_DefferedPassShader->SetFloat("jitterY", jitter.y);
+
 		m_DefferedPassShader->SetInt("gPosition", G_POSITION_TEXTURE_SLOT);
 		m_DefferedPassShader->SetInt("gNormal", G_NORMAL_TEXTURE_SLOT);
 		m_DefferedPassShader->SetInt("gColor", G_COLOR_TEXTURE_SLOT);
 		m_DefferedPassShader->SetInt("gRoughnessMetallic", G_ROUGHNESS_METALLIC_TEXTURE_SLOT);
+		m_DefferedPassShader->SetInt("gVelocity", G_VELOCITY_BUFFER_SLOT);
 		m_DefferedPassShader->SetInt("u_DepthTexture", SCENE_DEPTH_SLOT);
+		m_DefferedPassShader->SetInt("History_Buffer", ORIGINAL_SCENE_TEXTURE_SLOT);
 		//other uniforms are passed in the Renderer3D.cpp class
 
 		//this function renders a quad infront of the camera
@@ -172,6 +188,6 @@ namespace Hazel
 		if (bufferInd == 3)
 			return m_RoughnessMetallicBufferID;
 		if (bufferInd == 4)
-			return m_RenderBufferID;
+			return m_VelocityBufferID;
 	}
 }

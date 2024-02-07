@@ -173,4 +173,8 @@
       <Filter>Assets\Textures</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\TAA_Shader.glsl" />
+    <None Include="Assets\Shaders\cs_CopyIndirectBufferData.glsl" />
+  </ItemGroup>
 </Project>

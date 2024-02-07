@@ -76,8 +76,16 @@ uniform sampler2D u_Albedo; // multiple material slots can be present so a textu
 
 void main()
 {
-	float alpha = texture(u_Albedo , tcord).r;
+	vec4 albedo = texture(u_Albedo, tcord);
+	mat4x4 thresholdMatrix = mat4x4(
 	
-	if(alpha < 0.4 ) // check if the tex value is less than a certain threshold then discard
+		1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
+		13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
+		4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
+		16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
+	);
+	float alpha = albedo.a;
+	float val = thresholdMatrix[int(gl_FragCoord.x) % 4][int(gl_FragCoord.y) % 4];
+	if(alpha < val)
 		discard;
 }

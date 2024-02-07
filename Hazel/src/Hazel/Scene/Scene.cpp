@@ -37,9 +37,9 @@ namespace Hazel {
 		//framebuffer = FrameBuffer::Create({ 2048,2048 });
 		//Physics3D::Initilize();
 		SkyRenderer::SetSkyType(SkyType::PROCEDURAL_SKY);
-		SkyRenderer::Initilize("Assets/Textures/HDR/autumn_forest_04_4k.hdr");
+		SkyRenderer::Initilize("Assets/Textures/HDR/rainforest_trail_4k.hdr");
 
-		Renderer3D::Init();
+		Renderer3D::Init(1920,1080); //set up the renderer
 		Renderer2D::Init();
 
 		auto viewportSize = { 1920,1080 };// RenderCommand::GetViewportSize();
@@ -163,7 +163,7 @@ namespace Hazel {
 
 		Renderer3D::SetSunLightDirection(Renderer3D::m_SunLightDir);
 		Renderer3D::SetSunLightColorAndIntensity(Renderer3D::m_SunColor, Renderer3D::m_SunIntensity);
-		m_rayTracer->RenderImage(*MainCamera);
+		//m_rayTracer->RenderImage(*MainCamera);
 	}
 	void Scene::OnCreate()
 	{

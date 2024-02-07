@@ -1245,6 +1245,8 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlAntialiasing.h" />
+    <ClInclude Include="src\Hazel\Renderer\Antialiasing.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1436,5 +1438,7 @@
     <ClCompile Include="vendor\stb_image\stb_image_resize.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlAntialiasing.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\Antialiasing.cpp" />
   </ItemGroup>
 </Project>

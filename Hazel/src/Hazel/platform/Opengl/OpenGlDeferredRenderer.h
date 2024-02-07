@@ -12,7 +12,8 @@ namespace Hazel
 		static uint32_t GetBuffers(int bufferInd);
 
 	private:
-		static uint32_t m_framebufferID, m_RenderBufferID, m_AlbedoBufferID, m_NormalBufferID , m_PositionBufferID, m_RoughnessMetallicBufferID;
+		static uint32_t m_framebufferID, m_RenderBufferID, m_AlbedoBufferID,
+			m_NormalBufferID , m_PositionBufferID, m_RoughnessMetallicBufferID, m_VelocityBufferID;
 		static ref<Shader> m_ForwardPassShader;
 		static ref<Shader> m_DefferedPassShader;
 	};

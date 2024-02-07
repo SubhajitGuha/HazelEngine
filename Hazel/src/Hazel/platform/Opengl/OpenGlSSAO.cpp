@@ -5,7 +5,6 @@
 
 namespace Hazel {
 	OpenGlSSAO::OpenGlSSAO(int width, int height)
-		:m_height(width),m_width(height)
 	{
 		SSAOShader = Shader::Create("Assets/Shaders/SSAOShader.glsl");
 		GbufferPosition = Shader::Create("Assets/Shaders/gBuffersShader.glsl");
@@ -15,7 +14,7 @@ namespace Hazel {
 		SSAOblurShader = Shader::Create("Assets/Shaders/SSAOblurShader.glsl");
 		SSAOShader_Instanced = Shader::Create("Assets/Shaders/SSAOShader_Instanced.glsl");
 
-		CreateSSAOTexture();
+		CreateSSAOTexture(width,height);
 		Init();
 	}
 	OpenGlSSAO::~OpenGlSSAO()
@@ -45,7 +44,6 @@ namespace Hazel {
 			float scale = (float)i / RANDOM_SAMPLES_SIZE;
 			float val = 0.1 * scale * scale + (1.0 - 0.1) * scale * scale;
 			samples[i] *= val;
-			//HAZEL_CORE_ERROR("random float {} {} {}",samples[i].x, samples[i].y, samples[i].z);
 		}
 
 
@@ -94,8 +92,10 @@ namespace Hazel {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, viewport_size.x, viewport_size.y);
 	}
-	void OpenGlSSAO::CreateSSAOTexture()
+	void OpenGlSSAO::CreateSSAOTexture(int width, int height)
 	{
+		m_width = width;
+		m_height = height;
 		auto size = RenderCommand::GetViewportSize();
 		//create framebuffer and texture to store Ambiant occlusion texture
 		glCreateFramebuffers(1, &SSAOframebuffer_id);
@@ -135,7 +135,7 @@ namespace Hazel {
 		std::vector<glm::vec3> noisetexture;
 		for (int i = 0; i < 16; i++)
 		{
-			noisetexture.push_back(glm::vec3(RandomFloats(generator) * 2.0 - 1.0, RandomFloats(generator) * 2.0 - 1.0, 0.0));
+			noisetexture.push_back(glm::vec3(RandomFloats(generator) * 2.0 - 1.0, RandomFloats(generator) * 2.0 - 1.0, 0.0f));
 		}
 		glCreateTextures(GL_TEXTURE_2D, 1, &noisetex_id);
 		glBindTexture(GL_TEXTURE_2D, noisetex_id);
@@ -199,10 +199,6 @@ namespace Hazel {
 		GbufferPositionInstanced->SetMat4("u_Projection", scene.GetCamera()->GetProjectionMatrix());
 		GbufferPositionInstanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
 		GbufferPositionInstanced->SetFloat("u_Time", Terrain::time);
-		glDisable(GL_CULL_FACE);
-		//render terrain grass
-		scene.m_Terrain->RenderTerrainGrass();
-		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 	}
 }

@@ -1,9 +1,9 @@
 Material ID: 10037397377370350158
-Color: [1, 0.8, 0, 1]
+Color: [1, 1, 1, 1]
 Roughness: 1
 Metallic: 0
 Normal Strength: 1
-Emission: 5
+Emission: 0
 Albedo Map: Assets/Textures/MeshTextures/miniHouse_Part1.png
 Normal Map: ""
 Roughness Map: ""

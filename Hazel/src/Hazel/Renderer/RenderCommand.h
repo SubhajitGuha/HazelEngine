@@ -30,6 +30,13 @@ namespace Hazel {
 		{
 			m_RendererAPI->DrawInstancedArrays(vertexarray, count,instance_count, first);
 		}
+		//indirectBufferID is bound to GL_DRAW_INDIRECT_BUFFER before the glDrawIndirect draw call to pass information to the gpu
+		//this is used when the number of instances to draw is unknown in the cpu side but gpu produces the num instances to draw
+		//so without copying the data from the gpu->cpu directly use gpu data to draw. 
+		inline static void DrawArraysIndirect(VertexArray& vertexarray, uint32_t& indirectBufferID)
+		{
+			m_RendererAPI->DrawArraysIndirect(vertexarray, indirectBufferID);
+		}
 		inline static void DrawLine(VertexArray& vertexarray,uint32_t& count) {
 			m_RendererAPI->DrawLine(vertexarray,count);
 		}

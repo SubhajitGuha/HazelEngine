@@ -81,8 +81,6 @@ out GS_Data
 }gs_data;
 
 uniform sampler2D u_HeightMap;
-uniform mat4 u_ProjectionView;
-uniform mat4 u_Model;
 uniform float HEIGHT_SCALE;
 
 vec2 texture_size;
@@ -120,6 +118,7 @@ layout (triangles) in;
 layout (triangle_strip,max_vertices = 3) out;
 
 uniform mat4 u_ProjectionView;
+uniform mat4 u_oldProjectionView;
 uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform float HEIGHT_SCALE;
@@ -141,34 +140,11 @@ out FS_Data
 out Grass
 {
 	vec4 Pos;
+	vec4 m_curPos;
+	vec4 m_oldPos;
 	vec3 Normal;
 }grass_data;
 
-
-uint hash( uint x ) {
-    x += ( x << 10u );
-    x ^= ( x >>  6u );
-    x += ( x <<  3u );
-    x ^= ( x >> 11u );
-    x += ( x << 15u );
-    return x;
-}
-
-// Construct a float with half-open range [0:1] using low 23 bits.
-// All zeroes yields 0.0, all ones yields the next smallest representable value below 1.0.
-float floatConstruct( uint m ) {
-    const uint ieeeMantissa = 0x007FFFFFu; // binary32 mantissa bitmask
-    const uint ieeeOne      = 0x3F800000u; // 1.0 in IEEE binary32
-
-    m &= ieeeMantissa;                     // Keep only mantissa bits (fractional part)
-    m |= ieeeOne;                          // Add fractional part to 1.0
-
-    float  f = uintBitsToFloat( m );       // Range [1:2]
-    return f - 1.0;                        // Range [0:1]
-}
-
-// Pseudo-random value in half-open range [0:1].
-float random( float x ) { return floatConstruct(hash(floatBitsToUint(x))); }
 
 void main()
 {
@@ -176,22 +152,30 @@ void main()
 	vec4 VertexPos1 = u_Model * gl_in[1].gl_Position; // in world space
 	vec4 VertexPos2 = u_Model * gl_in[2].gl_Position; // in world space
 
-
-	gl_Position = u_ProjectionView * VertexPos0;
+	vec4 clip_space;
+	clip_space = u_ProjectionView * VertexPos0;
+	gl_Position = clip_space;
 	fs_data.TexCoord = gs_data[0].TexCoord;
+	grass_data.m_curPos = clip_space;
+	grass_data.m_oldPos = u_oldProjectionView * VertexPos0; //oldPos to create the velocity buffer
 	grass_data.Pos = u_View * VertexPos0; //view space
 	EmitVertex();
 
-	gl_Position = u_ProjectionView * VertexPos1;
+	clip_space = u_ProjectionView * VertexPos1;
+	gl_Position = clip_space;
 	fs_data.TexCoord = gs_data[1].TexCoord;
+	grass_data.m_curPos = clip_space;
+	grass_data.m_oldPos = u_oldProjectionView * VertexPos1; //oldPos to create the velocity buffer
 	grass_data.Pos = u_View * VertexPos1; //view space
 	EmitVertex();
 
-	gl_Position = u_ProjectionView * VertexPos2;
+	clip_space = u_ProjectionView * VertexPos2;
+	gl_Position = clip_space;
 	fs_data.TexCoord = gs_data[2].TexCoord;
+	grass_data.m_curPos = clip_space;
+	grass_data.m_oldPos = u_oldProjectionView * VertexPos2; //oldPos to create the velocity buffer
 	grass_data.Pos = u_View * VertexPos2; //view space
-	EmitVertex();
-	
+	EmitVertex();	
 }
 
 
@@ -202,6 +186,7 @@ layout (location = 0) out vec4 gPosition;
 layout (location = 1) out vec4 gNormal;
 layout (location = 2) out vec4 gColor;
 layout (location = 3) out vec4 gRoughnessMetallic;
+layout (location = 4) out vec4 gVelocity;
 
 in FS_Data
 {
@@ -211,7 +196,9 @@ in FS_Data
 in Grass
 {
 	vec4 Pos;
-	vec3 Normal;
+	vec4 m_curPos;
+	vec4 m_oldPos;
+	vec3 Normal;	
 }grass_data;
 
 uniform float WaterLevel;
@@ -256,6 +243,24 @@ mat3 TBN(vec2 texCoord , vec2 texelSize)
 	return mat3(T,B,N);
 }
 
+vec3 GammaCorrection(in vec3 color)
+{
+	return pow(color, vec3(2.2)); //Gamma space
+}
+
+vec2 CalculateVelocity(in vec4 curPos,in vec4 oldPos)
+{
+	curPos /= curPos.w;
+	curPos.xy = (curPos.xy+1.0) * 0.5;
+	//curPos.y = 1.0 - curPos.y;
+
+	oldPos /= oldPos.w;
+	oldPos.xy = (oldPos.xy+1.0) * 0.5;
+	//oldPos.y = 1.0 - oldPos.y;
+
+	return (curPos - oldPos).xy;
+}
+
 void main()
 {
 	vec2 texture_size = textureSize(u_HeightMap,0);	//get texture dimension
@@ -265,6 +270,7 @@ void main()
 	
 	gPosition = vec4(grass_data.Pos.xyz , 1.0);
 	gNormal = vec4(Normal.xyz,1.0);
-	gColor = vec4(texture(u_Albedo,fs_data.TexCoord * u_Tiling).xyz , 1.0);
+	gColor = vec4(GammaCorrection(texture(u_Albedo,fs_data.TexCoord * u_Tiling).xyz) , 1.0);
 	gRoughnessMetallic = vec4(texture(u_Roughness,fs_data.TexCoord * u_Tiling).x,0,0 , 1.0);
+	gVelocity = vec4(CalculateVelocity(grass_data.m_curPos,grass_data.m_oldPos),0,1.0);
 }

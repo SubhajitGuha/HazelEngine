@@ -58,6 +58,8 @@ LoadMesh* mesh;
 	auto viewportSize = RenderCommand::GetViewportSize();
 	m_FrameBuffer = FrameBuffer::Create({ (unsigned int)viewportSize.x,(unsigned int)viewportSize .y});//create a frame buffer object
 	m_FrameBuffer2 = FrameBuffer::Create({ (unsigned int)viewportSize.x,(unsigned int)viewportSize.y });
+	m_FrameBuffer3 = FrameBuffer::Create({ (unsigned int)viewportSize.x,(unsigned int)viewportSize.y });
+
 }
 
  void  HazelEditor::OnAttach()
@@ -100,29 +102,31 @@ void  HazelEditor::OnDetach()
 
 void  HazelEditor::OnUpdate(float deltatime )
 {
+	numFrame++;
 	frame_time = deltatime;
 	m_scene->OnUpdate(deltatime);
-	//Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
+	Renderer3D::ForwardRenderPass(m_scene.get());//forward pass for later deferred stage
 
 	m_FrameBuffer2->Bind();//Bind the frame buffer so that it can store the pixel data to a texture
 	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
-	//Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
+	Renderer3D::RenderScene_Deferred(m_scene.get()); //only do the deferred rendering here to capture it in fb
 	m_scene->Resize(m_ViewportSize.x, m_ViewportSize.y);
 	m_FrameBuffer2->UnBind();
 
 	m_FrameBuffer2->BindFramebufferTexture(ORIGINAL_SCENE_TEXTURE_SLOT); //copy the rendered image to these slots
 	m_FrameBuffer2->BindFramebufferTexture(SCENE_TEXTURE_SLOT);
+	Renderer3D::RenderWithAntialiasing();
 
 	//do post processing stuff here
-	//m_scene->m_Fog->RenderFog(*m_scene->GetCamera(), RenderCommand::GetViewportSize());
-	//m_scene->m_Bloom->GetFinalImage(m_FrameBuffer2->GetSceneTextureID(), RenderCommand::GetViewportSize());	
-	//m_scene->m_Bloom->RenderBloomTexture();
+	m_scene->m_Fog->RenderFog(*m_scene->GetCamera(), RenderCommand::GetViewportSize());
+	m_scene->m_Bloom->GetFinalImage(m_FrameBuffer2->GetSceneTextureID(), RenderCommand::GetViewportSize());	
+	m_scene->m_Bloom->RenderBloomTexture();
 	
 	m_FrameBuffer->Bind();
 	RenderCommand::ClearColor({ 0,0,0,1 });
 	RenderCommand::Clear();
-	//m_scene->m_Bloom->Update(deltatime);
+	m_scene->m_Bloom->Update(deltatime);
 	m_FrameBuffer->UnBind();
 }
 
@@ -139,7 +143,9 @@ void  HazelEditor::OnImGuiRender()
 	{
 		m_ViewportSize = { Size.x,Size.y };
 		m_FrameBuffer2->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		m_FrameBuffer3->Resize(m_ViewportSize.x, m_ViewportSize.y);
 		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		numFrame = 0;
 		m_camera.onResize(Size.x, Size.y);
 	}
 	ImGui::Image(reinterpret_cast<void*>(m_FrameBuffer->GetSceneTextureID()), *(ImVec2*)&m_ViewportSize);
@@ -221,19 +227,21 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Begin("Shadow Map and SSAO map");
 	ImGui::Text("SHADOW MAP");
 	ImGui::DragInt("Index", &Renderer3D::index, 1.0, 0, 3);
-	ImGui::Image((void*)Renderer3D::depth_id[Renderer3D::index], ImVec2(512, 512));
+	ImGui::Image((void*)Renderer3D::depth_id[Renderer3D::index], ImVec2(512, 512), { 0,1 }, { 1,0 });
 	ImGui::DragInt("Cascade Level", &Shadows::Cascade_level, 1, 0, 100);
 	ImGui::DragFloat("lamda", &Shadows::m_lamda, 0.00001, 0, 1,"%8f");
 	ImGui::Text("SSAO MAP");
-	ImGui::Image((void*)Renderer3D::ssao_id, ImVec2(512, 512));
+	ImGui::Image((void*)Renderer3D::ssao_id, ImVec2(512, 512), { 0,1 }, {1,0});
 	ImGui::Text("World Space Position");
-	ImGui::Image((void*)DefferedRenderer::GetBuffers(0), ImVec2(512, 512));
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(0), ImVec2(512, 512), { 0, 1 }, { 1,0 });
 	ImGui::Text("Normal map");
-	ImGui::Image((void*)DefferedRenderer::GetBuffers(1), ImVec2(512, 512));
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(1), ImVec2(512, 512), { 0, 1 }, { 1,0 });
 	ImGui::Text("diffuse");
-	ImGui::Image((void*)DefferedRenderer::GetBuffers(2), ImVec2(512, 512));
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(2), ImVec2(512, 512), { 0, 1 }, { 1,0 });
 	ImGui::Text("Roughness metallic");
-	ImGui::Image((void*)DefferedRenderer::GetBuffers(3), ImVec2(512, 512));
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(3), ImVec2(512, 512), { 0, 1 }, { 1,0 });
+	ImGui::Text("Velocity");
+	ImGui::Image((void*)DefferedRenderer::GetBuffers(4), ImVec2(512, 512), { 0, 1 }, { 1,0 });
 	ImGui::End();
 
 	ImGui::Begin("Benchmark");
