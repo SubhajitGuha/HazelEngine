@@ -35,7 +35,7 @@ uniform float u_LOD0Distance;
 void main()
 {
 	int index = int(gl_GlobalInvocationID.x);
-	if(index > inTotalPrefixSum.totalPrefixSum)				
+	if(index >= inTotalPrefixSum.totalPrefixSum)				
 		return;
 	
 	uint initilize = 0;

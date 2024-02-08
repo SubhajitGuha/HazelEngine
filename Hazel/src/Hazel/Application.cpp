@@ -22,7 +22,7 @@ namespace Hazel {
 		getApplication = this;
 		m_window = std::unique_ptr<Window>(Window::Create());
 		m_window->SetCallbackEvent(HZ_BIND_FN(OnEvent));
-
+		//m_window->SetVsync(true);
 		Renderer::Init();//initilize the scene , enable blending,get gpu info,set culling dist
 
 		m_ImGuiLayer = new ImGuiLayer();

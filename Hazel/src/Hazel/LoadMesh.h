@@ -10,6 +10,36 @@ struct aiScene;
 namespace Hazel {
 	class Texture2DArray;
 	class Material;
+	struct Bounds
+	{
+		glm::vec3 aabbMax, aabbMin;
+		Bounds() {
+			float minNum = std::numeric_limits<float>::lowest();
+			float maxNum = std::numeric_limits<float>::max();
+			aabbMin = glm::vec3(maxNum, maxNum, maxNum);
+			aabbMax = glm::vec3(minNum, minNum, minNum);
+		}
+		Bounds(glm::vec3& p)
+		{
+			aabbMax = glm::max(aabbMax, p);
+			aabbMin = glm::min(aabbMin, p);
+		}
+		Bounds(glm::vec3& a, glm::vec3& b, glm::vec3& c)
+		{
+			aabbMax = glm::max(glm::max(a, b), c);
+			aabbMin = glm::min(glm::min(a, b), c);
+		}
+		void Union(const Bounds& bounds)
+		{
+			aabbMax = glm::max(aabbMax, bounds.aabbMax);
+			aabbMin = glm::min(aabbMin, bounds.aabbMin);
+		}
+		float area() //get surface area of the box
+		{
+			glm::vec3 e = aabbMax - aabbMin; // box extent
+			return e.x * e.y + e.y * e.z + e.z * e.x;
+		}
+	};
 	struct SubMesh
 	{
 		std::vector<glm::vec3> Vertices;
@@ -20,6 +50,7 @@ namespace Hazel {
 		ref<VertexArray> VertexArray;
 		uint64_t m_MaterialID;
 		uint32_t numVertices;
+		Bounds mesh_bounds;
 	};
 	class LoadMesh
 	{
@@ -28,7 +59,6 @@ namespace Hazel {
 		{
 			IMPORT_MESH, LOAD_MESH
 		};
-		
 	public:
 		LoadMesh();
 		LoadMesh(const std::string& Path, LoadType type = LoadType::LOAD_MESH);

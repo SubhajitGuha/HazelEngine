@@ -256,7 +256,7 @@ namespace Hazel {
 		}
 	}
 
-	void Renderer3D::DrawFoliageInstanced(SubMesh& sub_mesh, glm::mat4& transform, uint32_t& indirectBufferID, float TimeElapsed)
+	void Renderer3D::DrawFoliageInstanced(SubMesh& sub_mesh, glm::mat4& transform, uint32_t& indirectBufferID, float TimeElapsed, bool applyGradientMask, bool enableWind)
 	{
 		m_data->foliageShader_instanced->Bind();
 		glDisable(GL_CULL_FACE);
@@ -278,8 +278,12 @@ namespace Hazel {
 		m_data->foliageShader_instanced->SetInt("u_NormalMap", NORMAL_SLOT);
 		m_data->foliageShader_instanced->SetMat4("u_Model", transform);
 		m_data->foliageShader_instanced->SetFloat4("m_color", material->GetColor());
+		m_data->foliageShader_instanced->SetFloat3("u_BoundsExtent", (sub_mesh.mesh_bounds.aabbMax-sub_mesh.mesh_bounds.aabbMin));
 		m_data->foliageShader_instanced->SetFloat("u_Time", TimeElapsed);
 		m_data->foliageShader_instanced->SetInt("Noise", PERLIN_NOISE_TEXTURE_SLOT);
+		m_data->foliageShader_instanced->SetInt("applyGradientMask", applyGradientMask);
+		m_data->foliageShader_instanced->SetInt("enableWind", enableWind);
+
 		RenderCommand::DrawArraysIndirect(*sub_mesh.VertexArray, indirectBufferID);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);		

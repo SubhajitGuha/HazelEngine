@@ -155,7 +155,7 @@ void main()
 		if((1.0 - CalculateNormal(uv,texelSize).y)> 0.4)
 			pos = pos + CalculateNormal(uv,texelSize)*2; 
 		inBuffer.trans[m_index] = CreateTranslationMatrix(pos)
-		* CreateRotationMatrix(randomInRange(5.0,10.0,m_index + 2),randomInRange(5.0,10.0,m_index + 3),randomInRange(5.0,10.0,m_index + 6)) * CreateScaleMatrix(randomInRange(1.0,3.0,m_index + 4));		
+		* CreateRotationMatrix(randomInRange(0.0,5.0,m_index + 2),randomInRange(5.0,10.0,m_index + 3),randomInRange(0.0,5.0,m_index + 6)) * CreateScaleMatrix(randomInRange(1.0,3.0,m_index + 4));		
 	}
 	
 }

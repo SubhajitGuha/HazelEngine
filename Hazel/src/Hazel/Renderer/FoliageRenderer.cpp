@@ -10,8 +10,10 @@ namespace Hazel {
 	glm::vec3 Foliage::Showcase_camRotation = { 0,0,0 };
 
 	std::vector<Foliage*> Foliage::foliageObjects;
-	Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, float cullDistance, bool canCastShadow, float LOD_Distance)
-		:m_foliageMesh(mesh), m_instanceCount(numInstances), m_cullDistance(cullDistance), bCanCastShadow(canCastShadow), lod0Distance(LOD_Distance)
+	Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, float cullDistance,
+		bool canCastShadow, float LOD_Distance, bool bapplyGradientMask, bool benableWind)
+		:m_foliageMesh(mesh), m_instanceCount(numInstances), m_cullDistance(cullDistance), 
+		bCanCastShadow(canCastShadow), lod0Distance(LOD_Distance), applyGradientMask(bapplyGradientMask), enableWind(benableWind)
 	{
 		m_coverage = glm::ivec2(coverageX, coverageY);
 		camera = new EditorCamera(16, 9);
@@ -91,8 +93,8 @@ namespace Hazel {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 			glDispatchCompute(1, 1, 1);
-			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD0, Terrain::time);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD0, Terrain::time, applyGradientMask, enableWind);
 		}
 		//LOD 1
 		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(1), ssbo_outTransformsLOD1);	//render lod1 elements
@@ -109,7 +111,7 @@ namespace Hazel {
 				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD1);
 				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 			}
-			else 
+			else
 			{
 				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD1);
 				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD1);
@@ -120,8 +122,8 @@ namespace Hazel {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 			glDispatchCompute(1, 1, 1);
-			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD1, Terrain::time);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD1, Terrain::time, applyGradientMask, enableWind);
 		}
 	}
 
@@ -145,7 +147,7 @@ namespace Hazel {
 		Renderer3D::BeginSceneFoliage(cam);
 		//LOD 0
 		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);	//render lod0 elements
-		for (auto sub_mesh : m_foliageMesh->GetLOD(0)->m_subMeshes) 
+		for (auto sub_mesh : m_foliageMesh->GetLOD(0)->m_subMeshes)
 		{
 			cs_CopyIndirectBufferData->Bind();
 			cs_CopyIndirectBufferData->SetInt("VertexBufferSize", sub_mesh.numVertices);
@@ -158,7 +160,7 @@ namespace Hazel {
 				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD0);
 				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 			}
-			else 
+			else
 			{
 				glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_indirectBuffer_LOD0);
 				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_indirectBuffer_LOD0);
@@ -169,9 +171,9 @@ namespace Hazel {
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, atomicCounter_lod0);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-			glDispatchCompute(1,1,1);
-			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD0, Terrain::time);
+			glDispatchCompute(1, 1, 1);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD0, Terrain::time, applyGradientMask, enableWind);
 		}
 		//LOD 1
 		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(1), ssbo_outTransformsLOD1);	//render lod1 elements
@@ -200,8 +202,8 @@ namespace Hazel {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 			glDispatchCompute(1, 1, 1);
-			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD1, Terrain::time);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD1, Terrain::time, applyGradientMask, enableWind);
 		}
 	}
 	void Foliage::RenderFoliage(ref<Shader>& shadow_shader)
@@ -256,7 +258,7 @@ namespace Hazel {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		}
 		glDispatchCompute(1, 1, 1);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 	void Foliage::Scan(int offset)
 	{
@@ -295,7 +297,7 @@ namespace Hazel {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		}
 		glDispatchCompute(1, 1, 1);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 	}
 	void Foliage::Compact(int offset)
@@ -342,7 +344,7 @@ namespace Hazel {
 		}
 
 		glDispatchCompute(1, 1, 1);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 	void Foliage::CreateLODs(Camera& cam)
 	{
@@ -373,13 +375,13 @@ namespace Hazel {
 			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_lod0);
 			glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(uint32_t), &x, GL_DYNAMIC_DRAW);
 			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 3, atomicCounter_lod0);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 
 			glGenBuffers(1, &atomicCounter_lod1);
 			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_lod1);
 			glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(uint32_t), &x, GL_DYNAMIC_DRAW);
 			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 4, atomicCounter_lod1);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 
 			//pass the prefix sum (total amount of foliage to be rendered after frustum culling)
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_totalPrefixSum);
@@ -462,7 +464,7 @@ namespace Hazel {
 		}
 
 		glDispatchCompute(m_coverage.x / 32, m_coverage.y / 32, 1);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 
 	void Foliage::SpawnFoliage(glm::vec3 playerPos)
@@ -497,7 +499,7 @@ namespace Hazel {
 		}
 
 		glDispatchCompute(m_coverage.x / 32, m_coverage.y / 32, 1);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 
 	auto IsValid = [&](glm::vec2 candidate, glm::vec2 sampleRegionSize, float cellSize, float radius, std::vector<glm::vec2> points, const std::vector<std::vector<int>>& grid)

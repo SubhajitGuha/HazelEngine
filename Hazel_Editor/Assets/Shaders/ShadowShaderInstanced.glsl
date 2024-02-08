@@ -9,6 +9,7 @@ layout (location = 5) in mat4 instance_mm;
 
 out vec2 tcord;
 out vec4 m_pos;
+out vec3 objSpacePos;
 out vec3 m_Normal;
 out vec3 m_Tangent;
 out vec3 m_BiTangent;
@@ -63,8 +64,9 @@ mat4 CreateScaleMatrix(float scale)
 }
 void main()
 {	
-	mat4 wsGrass = u_Model * instance_mm;
-	gl_Position = LightProjection * wsGrass * pos;
+	vec4 wsGrass = u_Model * instance_mm * pos;
+	objSpacePos = wsGrass.xyz/wsGrass.w;
+	gl_Position = LightProjection * wsGrass ;
 	tcord = cord;
 }
 
@@ -72,20 +74,53 @@ void main()
 #version 410 core
 
 in vec2 tcord;
+in vec3 objSpacePos;
+const float g_HashedScale = 1.0;
 uniform sampler2D u_Albedo; // multiple material slots can be present so a texture array is used
+
+float hash(vec2 val)
+{
+	return fract(1.0e4 * sin(17.0*val.x + 0.1*val.y) * 
+			(0.1+abs(sin(13.0*val.y + val.x))));
+}
+float hash3D(vec3 val)
+{
+	return hash(vec2(hash(val.xy),val.z));
+}
+
+float HashedAlphaThreshold()
+{
+	float maxDeriv = max(length(dFdx(objSpacePos)), length(dFdy(objSpacePos)));
+	float pixScale = 1.0/(g_HashedScale * maxDeriv);
+
+	vec2 pixScales = vec2(exp2(floor(log2(pixScale))), exp2(ceil(log2(pixScale))) );
+
+	vec2 alpha = vec2(hash3D(floor(pixScales.x*objSpacePos)), 
+					hash3D(floor(pixScales.y*objSpacePos)));
+
+	float lerpFactor = fract(log2(pixScale));
+
+	float x = (1.0-lerpFactor)*alpha.x + lerpFactor*alpha.y;
+
+	float a = min(lerpFactor, 1.0-lerpFactor);
+	vec3 cases = vec3(x*x/(2.0*a*(1.0-a)), 
+					(x-0.5*a)/(1.0-a), 
+					1.0-((1.0-x)*(1.0-x)/(2.0*a*(1.0-a))) );
+	
+	float alpha_f = (x<(1.0-a)) ? 
+					((x<a) ? cases.x : cases.y): 
+					cases.z;
+
+	alpha_f = clamp(alpha_f, 1.0e-6, 1.0);
+
+	return alpha_f;
+}
 
 void main()
 {
 	vec4 albedo = texture(u_Albedo, tcord);
-	mat4x4 thresholdMatrix = mat4x4(
 	
-		1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
-		13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
-		4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
-		16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
-	);
 	float alpha = albedo.a;
-	float val = thresholdMatrix[int(gl_FragCoord.x) % 4][int(gl_FragCoord.y) % 4];
-	if(alpha < val)
+	if(alpha < HashedAlphaThreshold())
 		discard;
 }

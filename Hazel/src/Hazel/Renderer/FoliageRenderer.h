@@ -21,8 +21,10 @@ namespace Hazel
 		cullDistance : defines the maximum distance at which the foliage will be rendered
 		castShadow : Will this foliage object cast shadow (turning it off will give performance)
 		LOD_Distance : max distance after which lower LOD will replace the higher ones (as this engine has 2 lods)
+		applyGradientMask : applies a grigent (dark color at bottom bright color at top)
 		*/
-		Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, float cullDistance=100, bool canCastShadow = false, float LOD_Distance = 50.0f);
+		Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, 
+			float cullDistance=100, bool canCastShadow = false, float LOD_Distance = 50.0f, bool applyGradientMask = false, bool enableWind = false);
 		~Foliage();
 		//For foliage placement in cpu side (not in use)
 		void addInstance(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale);
@@ -60,6 +62,8 @@ namespace Hazel
 	private:
 		Camera* camera;
 		bool bHasSpawnned = false;
+		bool applyGradientMask = false;
+		bool enableWind = false;
 		float m_Spacing = 1.0;
 		float m_cullDistance;
 		bool bIsComputed = false;

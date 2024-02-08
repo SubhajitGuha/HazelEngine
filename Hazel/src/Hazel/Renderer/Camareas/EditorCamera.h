@@ -9,6 +9,7 @@ namespace Hazel {
 	class EditorCamera :public Camera
 	{
 	public:
+		static float camera_MovementSpeed;
 		EditorCamera();
 		EditorCamera(float width, float Height);
 		~EditorCamera() = default;

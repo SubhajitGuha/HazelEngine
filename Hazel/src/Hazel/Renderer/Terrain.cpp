@@ -25,10 +25,10 @@ namespace Hazel
 
 	Terrain::Terrain(float width, float height)
 	{
-		grass = std::make_shared<Foliage>(Scene::Grass, std::ceil(1024*1024/4),512,512,300,false,50);
+		grass = std::make_shared<Foliage>(Scene::Grass, std::ceil(1024*1024/4),512,512,300,false,50,true,true);
 		Tree = std::make_shared<Foliage>(Scene::Tree, 128 * 128, 2048, 2048, 800,true,150);
 		Flower = std::make_shared<Foliage>(Scene::Flower, 128 * 128*4, 512, 512, 400,false,100);
-		Fern = std::make_shared<Foliage>(Scene::Fern, std::ceil(512*512/8 ), 512, 512, 100);
+		Fern = std::make_shared<Foliage>(Scene::Fern, std::ceil(512*512/8 ), 512, 512, 100, false,50,false,true);
 
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2*RadiusOfSpawn+1,2));//radius of spawn defines how many tiles to cover from the centre
 		StartTime = std::chrono::high_resolution_clock::now();
@@ -198,7 +198,7 @@ namespace Hazel
 			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
 
 		Tree->RenderFoliage(cam,30);
-		grass->SetFoliageSpacing(2.0);//space between foliages
+		grass->SetFoliageSpacing(3.0);//space between foliages
 		grass->RenderFoliage(cam);
 		Fern->SetFoliageSpacing(12.0f);
 		Fern->RenderFoliage(cam);

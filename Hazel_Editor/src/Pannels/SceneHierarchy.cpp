@@ -453,7 +453,7 @@ void SceneHierarchyPannel::DrawStaticMeshComponentUI()
 		}
 		if (ImGui::Button("Fern plant", { 100,30 }))
 		{
-			m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Fern);
+			m_selected_entity->ReplaceComponent<StaticMeshComponent>(Scene::Grass);
 			m_selected_entity->GetComponent<StaticMeshComponent>().isFoliage = true;
 		}
 		if (ImGui::Button("Sponza", { 100,30 }))

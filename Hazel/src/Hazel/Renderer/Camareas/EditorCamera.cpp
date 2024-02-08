@@ -6,20 +6,21 @@
 #include "Hazel/Renderer/CubeMapEnvironment.h"
 
 namespace Hazel {
+	float EditorCamera::camera_MovementSpeed = 10;
 	EditorCamera::EditorCamera()
 		:m_View(1.0)
 	{
 		RightVector = glm::normalize(glm::cross(m_ViewDirection, Up));
 		m_Projection = glm::perspective(glm::radians(m_verticalFOV), m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		m_ProjectionView = m_Projection * m_View;
-		m_movespeed = 50;
+		m_movespeed = camera_MovementSpeed;
 	}
 	EditorCamera::EditorCamera(float width, float Height)
 	{
 		bIsMainCamera = true;
 		RightVector = glm::cross(m_ViewDirection, Up);
 		SetViewportSize(width/Height);
-		m_movespeed = 50;
+		m_movespeed = camera_MovementSpeed;
 
 	}
 
@@ -71,6 +72,7 @@ namespace Hazel {
 
 	void EditorCamera::OnUpdate(TimeStep deltatime)
 	{
+		m_movespeed = camera_MovementSpeed;
 		RightVector  = glm::cross(m_ViewDirection, Up);//we get the right vector (as it is always perpendicular to up and m_ViewDirection)
 		
 		if (Input::IsKeyPressed(HZ_KEY_W))

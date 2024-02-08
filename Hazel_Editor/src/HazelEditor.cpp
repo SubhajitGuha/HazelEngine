@@ -202,6 +202,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Light controller");
+	ImGui::DragFloat("Camera Speed", &EditorCamera::camera_MovementSpeed);
 	ImGui::DragFloat3("Sun Direction", (float*)&Renderer3D::m_SunLightDir,0.01);
 	ImGui::ColorEdit3("Sun Light Color", glm::value_ptr(Renderer3D::m_SunColor));
 	ImGui::DragFloat("Sun Intensity", &Renderer3D::m_SunIntensity, 0.01);
@@ -240,7 +241,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Image((void*)DefferedRenderer::GetBuffers(2), ImVec2(512, 512), { 0, 1 }, { 1,0 });
 	ImGui::Text("Roughness metallic");
 	ImGui::Image((void*)DefferedRenderer::GetBuffers(3), ImVec2(512, 512), { 0, 1 }, { 1,0 });
-	ImGui::Text("Velocity");
+	ImGui::Text("Velocity Buffer For TAA");
 	ImGui::Image((void*)DefferedRenderer::GetBuffers(4), ImVec2(512, 512), { 0, 1 }, { 1,0 });
 	ImGui::End();
 

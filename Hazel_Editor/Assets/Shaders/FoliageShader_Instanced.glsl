@@ -1,5 +1,7 @@
 #shader vertex
 #version 410 core
+#define PI 3.14159265359
+
 layout (location = 0) in vec4 pos;
 layout (location = 1) in vec2 cord;
 layout (location = 2) in vec3 Normal;
@@ -8,6 +10,7 @@ layout (location = 4) in vec3 BiTangent;
 layout (location = 5) in mat4 instance_mm;
 
 out vec2 tcord;
+out vec3 objSpacePos;
 out vec4 m_pos;
 out vec4 m_curPos; //current clip-space position
 out vec4 m_oldPos; //previous clip-space position
@@ -25,9 +28,12 @@ uniform vec3 u_cameraPos;
 uniform float u_Time;
 uniform vec4 m_color;
 uniform sampler2D Noise;
+uniform int applyGradientMask;
+uniform int enableWind;
 
-float amplitude=0;
-float wsAmplitude=0.0;
+uniform vec3 u_BoundsExtent;
+float amplitude=2.0;
+float wsAmplitude=0.3;
 
 mat4 CreateRotationMat(float x, float y, float z)
 {
@@ -69,42 +75,44 @@ void main()
 {	
 	mat4 wsGrass = u_Model * instance_mm;
 	vec4 wsVertexPos = wsGrass * pos;
-	vec4 vsVertexPos = u_View * wsVertexPos;
-	vec3 plane_normal = normalize(wsVertexPos.xyz - u_cameraPos);
+	objSpacePos = wsVertexPos.xyz/wsVertexPos.w;	
 
 	vec3 origin = vec3(wsGrass[3][0],wsGrass[3][1],wsGrass[3][2]);
-
 	//wind system
-	float factor = distance(wsVertexPos.xyz , origin)/3;	//bottom part of foliage is not affected by wind
-	if(factor<0)
+	float factor = pos.y/u_BoundsExtent.y;	//gradient calculated at object space by dividing with the bounds
+
+	if(factor<0.2)
 		factor = 0;
 	
-	vec3 coord = mod(abs(wsVertexPos.xyz),256);
-	coord/=vec3(256); //256 is the size of noise texture
+	vec2 size = textureSize(Noise,0);
+	vec2 coord = mod(wsVertexPos.xz,size);
+	coord = coord*0.5 + 0.5;
 
-	vec3 noise = texture(Noise , coord.xz*2 ).rgb*2;
-	vec3 rotVal = vec3(sin(u_Time + noise.r)*0.5+0.5+1) *factor*amplitude;
-	vec3 ws_rotVal = vec3(noise.r*sin(u_Time)*0.5+0.5) *factor*wsAmplitude;
-
-	mat4 ws_rot = CreateRotationMat(0, 0, ws_rotVal.y);
-	mat4 rot = CreateRotationMat(0, rotVal.y, 0);
-
-	float val = texture(Noise,coord.xz*10).r;
-
-	//gl_Position = u_ProjectionView * ws_rot * wsGrass * rot * CreateScaleMatrix(val*2) * pos;
-	vec4 clip_space = u_ProjectionView * ws_rot * wsGrass * rot * pos;
+	if(enableWind == 1)
+	{
+		vec3 noise = texture(Noise , coord*20.0 ).rgb;
+		float rotVal = (cos(u_Time * PI * noise.r) * cos(u_Time *0.2* PI)) * wsAmplitude;
+		float ws_rotVal = (cos(u_Time * PI * 0.8) * cos(u_Time *0.2* PI)) * wsAmplitude + sin(PI*u_Time*noise.r)*1;
+		
+		wsVertexPos.x += ws_rotVal * factor;
+		wsVertexPos.z += rotVal * factor;
+	}
+	vec4 clip_space = u_ProjectionView * wsVertexPos;
 	m_curPos = clip_space;
-	m_oldPos = u_oldProjectionView * ws_rot * wsGrass * rot * pos; //required for the velocity buffer
+	m_oldPos = u_oldProjectionView * wsVertexPos; //required for the velocity buffer
 	gl_Position = clip_space;
 
-	m_VertexColor = clamp(factor,0.0,1.0) * m_color.xyz;
-	//m_VertexColor = m_color.xyz;
+	if(applyGradientMask == 1)
+		m_VertexColor = clamp(factor,0.2,1.0) * m_color.xyz;
+	else
+		m_VertexColor = m_color.xyz;
+		
 	tcord = cord;
 	m_Normal = normalize(mat3(u_View * wsGrass ) * Normal );
 	m_Tangent = normalize(mat3(u_View * wsGrass ) * Tangent );
 	m_BiTangent = normalize(mat3(u_View * wsGrass ) * BiTangent );
 
-	m_pos = u_View * wsGrass * pos;
+	m_pos = u_View * wsVertexPos;
 
 }
 
@@ -120,6 +128,7 @@ layout (location = 4) out vec4 gVelocity;
 //the u_Roughness texture contains "opacity map" on R-channel "Roughness map" on G-channel and "Ambient occlusion" on B-channel
 
 in vec4 m_pos;
+in vec3 objSpacePos;
 in vec4 m_curPos; //current clip-space position
 in vec4 m_oldPos; //previous clip-space position
 in vec3 m_Normal;
@@ -128,7 +137,7 @@ in vec3 m_BiTangent;
 in vec3 m_VertexColor;
 in vec2 tcord;
 
-
+const float g_HashedScale = 1.0;
 uniform samplerCube diffuse_env;
 uniform samplerCube specular_env;
 
@@ -178,20 +187,49 @@ vec2 CalculateVelocity(in vec4 curPos,in vec4 oldPos)
 	return (curPos - oldPos).xy;
 }
 
+float hash(vec2 val)
+{
+	return fract(1.0e4 * sin(17.0*val.x + 0.1*val.y) * 
+			(0.1+abs(sin(13.0*val.y + val.x))));
+}
+float hash3D(vec3 val)
+{
+	return hash(vec2(hash(val.xy),val.z));
+}
+
+float HashedAlphaThreshold()
+{
+	float maxDeriv = max(length(dFdx(objSpacePos)), length(dFdy(objSpacePos)));
+	float pixScale = 1.0/(g_HashedScale * maxDeriv);
+
+	vec2 pixScales = vec2(exp2(floor(log2(pixScale))), exp2(ceil(log2(pixScale))) );
+
+	vec2 alpha = vec2(hash3D(floor(pixScales.x*objSpacePos)), 
+					hash3D(floor(pixScales.y*objSpacePos)));
+
+	float lerpFactor = fract(log2(pixScale));
+
+	float x = (1.0-lerpFactor)*alpha.x + lerpFactor*alpha.y;
+
+	float a = min(lerpFactor, 1.0-lerpFactor);
+	vec3 cases = vec3(x*x/(2.0*a*(1.0-a)), 
+					(x-0.5*a)/(1.0-a), 
+					1.0-((1.0-x)*(1.0-x)/(2.0*a*(1.0-a))) );
+	
+	float alpha_f = (x<(1.0-a)) ? 
+					((x<a) ? cases.x : cases.y): 
+					cases.z;
+
+	alpha_f = clamp(alpha_f, 1.0e-6, 1.0);
+
+	return alpha_f;
+}
 float ao = 1.0;
 void main()
 {
 	vec4 albedo = texture(u_Albedo, tcord);
-	mat4x4 thresholdMatrix = mat4x4(
-	
-		1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
-		13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
-		4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
-		16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
-	);
-	float alpha = albedo.a;
-	float val = thresholdMatrix[int(gl_FragCoord.x) % 4][int(gl_FragCoord.y) % 4];
-	if(alpha < 0.5f)
+	float alpha = albedo.a;	
+	if(alpha < HashedAlphaThreshold())
 		discard;
 	gPosition = vec4(m_pos.xyz,1.0);
 	gNormal = vec4(NormalMapping(),1.0);
