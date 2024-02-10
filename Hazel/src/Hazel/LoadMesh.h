@@ -21,8 +21,8 @@ namespace Hazel {
 		}
 		Bounds(glm::vec3& p)
 		{
-			aabbMax = glm::max(aabbMax, p);
-			aabbMin = glm::min(aabbMin, p);
+			aabbMax = p;
+			aabbMin = p;
 		}
 		Bounds(glm::vec3& a, glm::vec3& b, glm::vec3& c)
 		{

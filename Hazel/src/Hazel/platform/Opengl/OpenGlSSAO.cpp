@@ -59,12 +59,12 @@ namespace Hazel {
 		SSAOShader->Bind();
 		SSAOShader->SetFloat("ScreenWidth", viewport_size.x);
 		SSAOShader->SetFloat("ScreenHeight", viewport_size.y);
-		SSAOShader->SetMat4("u_ProjectionView", cam.GetProjectionView());
-		SSAOShader->SetMat4("u_View", cam.GetViewMatrix());
+		SSAOShader->SetMat4("u_ProjectionView", cam.GetProjectionView());		
 		SSAOShader->SetFloat3Array("Samples", &samples[0].x, RANDOM_SAMPLES_SIZE);
 		SSAOShader->SetMat4("u_projection", cam.GetProjectionMatrix());
 		SSAOShader->SetInt("noisetex", NOISE_SLOT);
 		SSAOShader->SetInt("gPosition", G_POSITION_TEXTURE_SLOT);
+		SSAOShader->SetInt("depthBuffer", SCENE_DEPTH_SLOT);
 		SSAOShader->SetInt("gNormal", G_NORMAL_TEXTURE_SLOT);
 		//SSAOShader->SetInt("alpha_texture", G_ROUGHNESS_METALLIC_TEXTURE_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
 		SSAOShader->SetFloat3("u_CamPos", cam.GetCameraPosition());

@@ -216,6 +216,9 @@
     <ClInclude Include="src\Hazel\RayTracer\RayTracer.h">
       <Filter>src\Hazel\RayTracer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Renderer\Antialiasing.h">
+      <Filter>src\Hazel\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Hazel\Renderer\Atmosphere.h">
       <Filter>src\Hazel\Renderer</Filter>
     </ClInclude>
@@ -320,6 +323,9 @@
     </ClInclude>
     <ClInclude Include="src\Hazel\Window.h">
       <Filter>src\Hazel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlAntialiasing.h">
+      <Filter>src\Hazel\platform\Opengl</Filter>
     </ClInclude>
     <ClInclude Include="src\Hazel\platform\Opengl\OpenGlBloom.h">
       <Filter>src\Hazel\platform\Opengl</Filter>
@@ -1245,8 +1251,6 @@
     <ClInclude Include="vendor\stb_image\stb_image_resize.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hazel\platform\Opengl\OpenGlAntialiasing.h" />
-    <ClInclude Include="src\Hazel\Renderer\Antialiasing.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
@@ -1281,6 +1285,9 @@
     </ClCompile>
     <ClCompile Include="src\Hazel\RayTracer\RayTracer.cpp">
       <Filter>src\Hazel\RayTracer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hazel\Renderer\Antialiasing.cpp">
+      <Filter>src\Hazel\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Hazel\Renderer\Atmosphere.cpp">
       <Filter>src\Hazel\Renderer</Filter>
@@ -1378,6 +1385,9 @@
     <ClCompile Include="src\Hazel\Window.cpp">
       <Filter>src\Hazel</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlAntialiasing.cpp">
+      <Filter>src\Hazel\platform\Opengl</Filter>
+    </ClCompile>
     <ClCompile Include="src\Hazel\platform\Opengl\OpenGlBloom.cpp">
       <Filter>src\Hazel\platform\Opengl</Filter>
     </ClCompile>
@@ -1438,7 +1448,5 @@
     <ClCompile Include="vendor\stb_image\stb_image_resize.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hazel\platform\Opengl\OpenGlAntialiasing.cpp" />
-    <ClCompile Include="src\Hazel\Renderer\Antialiasing.cpp" />
   </ItemGroup>
 </Project>

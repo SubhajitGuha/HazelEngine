@@ -86,16 +86,9 @@ namespace Hazel {
 
 		PrepareShadowProjectionMatrix(cam, LightPosition);//CREATE THE orthographic projection matrix
 
-		terrain_shadowShader->Bind();
 		for (int i = 0; i < MAX_CASCADES; i++)
 		{
 			glm::mat4 LightProjection = m_ShadowProjection[i] * LightView[i]; //placing a orthographic camera on the light position(i.e position at centroid of each frustum)
-
-			terrain_shadowShader->SetMat4("LightProjection", LightProjection);
-			terrain_shadowShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
-			terrain_shadowShader->SetFloat("HEIGHT_SCALE", Terrain::HeightScale);
-			terrain_shadowShader->SetMat4("u_Model", Terrain::m_terrainModelMat);
-			terrain_shadowShader->SetMat4("u_View", cam.GetViewMatrix());
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer_id);
 			glViewport(0, 0, m_width*(i+1), m_height*(i+1));
@@ -104,12 +97,22 @@ namespace Hazel {
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_id[i], 0);
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 				HAZEL_CORE_INFO("shadow map FrameBuffer compleate!!");
-
 			glClear(GL_DEPTH_BUFFER_BIT);
 
+			//terrain_shadowShader->Bind();
+			//terrain_shadowShader->SetMat4("LightProjection", LightProjection);
+			//terrain_shadowShader->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
+			//terrain_shadowShader->SetFloat("HEIGHT_SCALE", Terrain::HeightScale);
+			//terrain_shadowShader->SetMat4("u_Model", Terrain::m_terrainModelMat);
+			//terrain_shadowShader->SetMat4("u_View", cam.GetViewMatrix());
+
 			//render terrain
-			//Needs change as I cannot just make terrain vertex array and terrain data public static		
-			RenderCommand::DrawArrays(*Terrain::m_terrainVertexArray, Terrain::terrainData.size(), GL_PATCHES, 0);
+			//Needs change as I cannot just make terrain vertex array and terrain data public static
+			//glDisable(GL_CULL_FACE);
+			//glCullFace(GL_FRONT);
+			//RenderCommand::DrawArrays(*Terrain::m_terrainVertexArray, Terrain::terrainData.size(), GL_PATCHES, 0);
+			//glEnable(GL_CULL_FACE);
+			//glCullFace(GL_BACK);
 
 			//scene entity shadow caster
 			shadow_shader->Bind();
@@ -212,7 +215,8 @@ namespace Hazel {
 		unsigned int arr[] = { SHDOW_MAP1,SHDOW_MAP2,SHDOW_MAP3,SHDOW_MAP4 };//these slots are explicitly used for all 4 seperate shadow maps
 		rendering_shader->SetIntArray("ShadowMap", MAX_CASCADES, arr);
 		rendering_shader->SetFloatArray("Ranges", Ranges[0], MAX_CASCADES);
-		rendering_shader->SetMat4("view", cam.GetViewMatrix());//we need the camera's view matrix so that we can compute the distance comparison in view space
+		rendering_shader->SetMat4("u_View", cam.GetViewMatrix());//we need the camera's view matrix so that we can compute the distance comparison in view space
+		rendering_shader->SetMat4("u_Projection", cam.GetProjectionMatrix());
 	}
 
 	void OpenGlShadows::CreateShdowMap()

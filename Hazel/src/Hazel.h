@@ -44,7 +44,7 @@
 #include "Hazel/Renderer/Camareas/SceneCamera.h"
 #include "Hazel/Renderer/Camareas/EditorCamera.h"
 #include "Hazel/Renderer/Bloom.h"
-
+#include "Hazel/LoadMesh.h"
 // -----------------------------------
 // 
 //----------features------------------

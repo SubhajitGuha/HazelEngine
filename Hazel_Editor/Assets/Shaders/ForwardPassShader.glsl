@@ -35,11 +35,10 @@ void main()
 
 #shader fragment
 #version 410 core
-layout (location = 0) out vec4 gPosition;
-layout (location = 1) out vec4 gNormal;
+layout (location = 0) out vec4 gNormal;
+layout (location = 1) out vec4 gVelocity;
 layout (location = 2) out vec4 gColor;
 layout (location = 3) out vec4 gRoughnessMetallic;
-layout (location = 4) out vec4 gVelocity;
 
 in vec4 m_pos;
 in vec4 m_curPos; //current clip-space position
@@ -102,11 +101,10 @@ void main()
 
 	float val = thresholdMatrix[int(gl_FragCoord.x) % 4][int(gl_FragCoord.y) % 4];
 	if(albedo.a < val)
-		discard;
-	gPosition = vec4(m_pos.xyz,1.0);
+		discard;	
 	gNormal = vec4(NormalMapping(),1.0);
+	gVelocity = vec4(CalculateVelocity(m_curPos, m_oldPos),0,1.0);
 	gColor = vec4(GammaCorrection(albedo.rgb), 1.0);
 	vec3 roughnessMetallic = texture(u_Roughness, tcord).xyz;
 	gRoughnessMetallic = vec4(roughnessMetallic.r * Roughness,roughnessMetallic.g * Metallic,1,1);
-	gVelocity = vec4(CalculateVelocity(m_curPos, m_oldPos),0,1.0);
 }

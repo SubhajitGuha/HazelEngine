@@ -22,7 +22,7 @@ namespace Hazel
 		tile_size = { 128,128 };
 		tile_index = { 0,0 };
 		Init(512,512);
-		bvh = std::make_shared<BVH>(Scene::Sponza);
+		bvh = std::make_shared<BVH>(Scene::plant);
 		StartTime = std::chrono::high_resolution_clock::now();
 
 		glGenFramebuffers(1, &m_fbo); //create framebuffer object to copy the final rendered image

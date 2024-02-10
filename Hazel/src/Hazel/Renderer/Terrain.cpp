@@ -152,8 +152,8 @@ namespace Hazel
 		int CamX = cam.GetCameraPosition().x;
 		int CamZ = cam.GetCameraPosition().z;
 
-		glDisable(GL_CULL_FACE);
-		//glCullFace(GL_FRONT);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
 		m_terrainModelMat = glm::mat4(1.0);
 
 		TerrainTex_Albedo->Bind(ALBEDO_SLOT);
@@ -198,7 +198,7 @@ namespace Hazel
 			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
 
 		Tree->RenderFoliage(cam,30);
-		grass->SetFoliageSpacing(3.0);//space between foliages
+		grass->SetFoliageSpacing(2.0);//space between foliages
 		grass->RenderFoliage(cam);
 		Fern->SetFoliageSpacing(12.0f);
 		Fern->RenderFoliage(cam);

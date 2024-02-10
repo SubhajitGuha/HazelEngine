@@ -182,11 +182,10 @@ void main()
 
 #shader fragment
 #version 410 core
-layout (location = 0) out vec4 gPosition;
-layout (location = 1) out vec4 gNormal;
+layout (location = 0) out vec4 gNormal;
+layout (location = 1) out vec4 gVelocity;
 layout (location = 2) out vec4 gColor;
 layout (location = 3) out vec4 gRoughnessMetallic;
-layout (location = 4) out vec4 gVelocity;
 
 in FS_Data
 {
@@ -268,9 +267,8 @@ void main()
 	
 	Normal = normalize(Normal);
 	
-	gPosition = vec4(grass_data.Pos.xyz , 1.0);
 	gNormal = vec4(Normal.xyz,1.0);
+	gVelocity = vec4(CalculateVelocity(grass_data.m_curPos,grass_data.m_oldPos),0,1.0);
 	gColor = vec4(GammaCorrection(texture(u_Albedo,fs_data.TexCoord * u_Tiling).xyz) , 1.0);
 	gRoughnessMetallic = vec4(texture(u_Roughness,fs_data.TexCoord * u_Tiling).x,0,0 , 1.0);
-	gVelocity = vec4(CalculateVelocity(grass_data.m_curPos,grass_data.m_oldPos),0,1.0);
 }

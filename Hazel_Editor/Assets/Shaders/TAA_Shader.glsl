@@ -23,7 +23,7 @@ uniform sampler2D Current_Buffer;
 uniform sampler2D gVelocity;
 uniform sampler2D Depth_Buffer;
 
-vec2 ClosestFragment()
+vec2 ClosestFragment() //returns the coordinate having lowest depth value in a 3x3 neighbour pixels
 {
 	float depth = texture(Depth_Buffer, tex_coord).x;
 	vec2 pixelDist = 1.0 / vec2(textureSize(Depth_Buffer,0));

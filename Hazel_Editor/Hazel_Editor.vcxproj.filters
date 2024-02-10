@@ -58,6 +58,9 @@
     <Image Include="Assets\Textures\MeshTextures\AK_103_Normal.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
+    <Image Include="Assets\Textures\MeshTextures\Albedo_packed.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
     <Image Include="Assets\Textures\MeshTextures\BarkAI_Spec.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
@@ -172,9 +175,5 @@
     <Image Include="Assets\Textures\rickshaw.png">
       <Filter>Assets\Textures</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\TAA_Shader.glsl" />
-    <None Include="Assets\Shaders\cs_CopyIndirectBufferData.glsl" />
   </ItemGroup>
 </Project>

@@ -23,7 +23,7 @@ layout (location = 0) out vec4 color;
 
 in vec2 tcord;
 
-uniform sampler2D gPosition;
+uniform sampler2D depthBuffer;
 uniform sampler2D gNormal;
 uniform sampler2D gColor;
 uniform sampler2D gRoughnessMetallic;
@@ -36,8 +36,8 @@ vec4 VertexPosition_LightSpace;
 uniform mat4 MatrixShadow[4];
 uniform sampler2D ShadowMap[4];
 uniform float Ranges[5];
-uniform mat4 view;
-uniform mat4 u_ProjectionView;
+uniform mat4 u_View;
+uniform mat4 u_Projection;
 
 //IBL
 uniform samplerCube diffuse_env;
@@ -55,9 +55,7 @@ uniform vec3 PointLight_Position[MAX_LIGHTS];
 uniform vec3 PointLight_Color[MAX_LIGHTS];
 uniform int Num_PointLights;
 
-uniform sampler2D u_DepthTexture;
-
-//
+//TAA history buffer
 uniform sampler2D History_Buffer;
 
 vec3 PBR_Color = vec3(0.0);
@@ -91,9 +89,7 @@ float CalculateShadow(int cascade_level)
 			if(depth + bias > p.z)
 				ShadowSum+=1;
 		}
-	}
-	//depth < p.z - bias? 0:1;// sample the depth map and check the p.xy coordinate of depth map with the p.z value
-	
+	}	
 	return pow(ShadowSum/9.0,16);
 }
 
@@ -153,7 +149,9 @@ vec3 ColorCorrection(vec3 color)
 	return color;
 }
 
-vec3 aces(vec3 x) {
+vec3 aces(vec3 x) 
+{
+	//x = ColorCorrection(x);
   const float a = 2.51;
   const float b = 0.03;
   const float c = 2.43;
@@ -164,11 +162,17 @@ vec3 aces(vec3 x) {
 
 void main()
 {
-	if(texture(u_DepthTexture,tcord).r == 1.0 ) //to blend in the sky
+	float z = texture(depthBuffer,tcord).r; //in range 0-1
+	if(z == 1.0 ) //to blend in the sky
        discard;
 
-	vec3 Modified_Normal = normalize(mat3(inverse(view)) * texture(gNormal,tcord).xyz); //in ws
-	vec4 m_pos = inverse(view) * vec4(texture(gPosition,tcord).xyz , 1.0); //in ws
+	vec4 clip_space = vec4(tcord*2.0-1.0,z*2.0-1.0,1.0); //construct clip-space by converting tex-coord and depth values form 0-1 to -1-1
+	vec4 view_space = inverse(u_Projection) * clip_space;
+	view_space /= view_space.w; //perspective divide
+	vec4 world_space = inverse(u_View)*view_space; //recreate world-space pos from depthBuffer
+
+	vec3 Modified_Normal = normalize(mat3(inverse(u_View)) * texture(gNormal,tcord).xyz); //in ws
+	vec4 m_pos = world_space;//in ws
 	m_pos = vec4(m_pos.xyz, 1.0);
 
 	vec4 m_Color = texture(gColor , tcord);
@@ -177,8 +181,7 @@ void main()
 	alpha = RoughnessMetallic.r;
 	Metallic = RoughnessMetallic.g;
 
-	vec4 vert_pos = view * m_pos; //get depth value(z value) in the camera-view space
-	vec3 v_position = vert_pos.xyz/vert_pos.w;
+	vec3 v_position = view_space.xyz;
 	float depth = abs(v_position.z);
 
 	for(int i=0;i<4;i++)

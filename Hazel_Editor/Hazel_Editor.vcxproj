@@ -147,6 +147,7 @@
   <ItemGroup>
     <Image Include="Assets\Textures\MeshTextures\AK_103_Base_Color.png" />
     <Image Include="Assets\Textures\MeshTextures\AK_103_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\Albedo_packed.png" />
     <Image Include="Assets\Textures\MeshTextures\BarkAI_Spec.png" />
     <Image Include="Assets\Textures\MeshTextures\Billboard_2K_Albedo_packed.png" />
     <Image Include="Assets\Textures\MeshTextures\ForestFern_2K_Albedo_packed.png" />
@@ -190,10 +191,6 @@
     <ProjectReference Include="..\Hazel\Hazel.vcxproj">
       <Project>{99294D0D-053E-75BE-CEBF-181E3A9371EF}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\cs_CopyIndirectBufferData.glsl" />
-    <None Include="Assets\Shaders\TAA_Shader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

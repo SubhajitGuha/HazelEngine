@@ -109,8 +109,9 @@ namespace Hazel
 			for (int k = 0; k < m_Mesh[i]->mNumVertices; k++) 
 			{				
 				aiVector3D aivertices = m_Mesh[i]->mVertices[k];
-				glm::vec4 pos = GlobalTransform * glm::vec4(aivertices.x, aivertices.y, aivertices.z, 1.0);				
-				m_subMeshes[material_ind].mesh_bounds.Union(glm::vec3(pos.x, pos.y, pos.z));
+				glm::vec4 pos = GlobalTransform * glm::vec4(aivertices.x, aivertices.y, aivertices.z, 1.0);
+				Bounds mesh_bounds(glm::vec3(pos.x, pos.y, pos.z));
+				m_subMeshes[material_ind].mesh_bounds.Union(mesh_bounds);
 				m_subMeshes[material_ind].Vertices.push_back({ pos.x,pos.y,pos.z });
 
 				if (m_Mesh[i]->HasNormals()) {

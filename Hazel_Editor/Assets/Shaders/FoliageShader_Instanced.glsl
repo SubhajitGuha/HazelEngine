@@ -35,42 +35,6 @@ uniform vec3 u_BoundsExtent;
 float amplitude=2.0;
 float wsAmplitude=0.3;
 
-mat4 CreateRotationMat(float x, float y, float z)
-{
-	x= radians(x);
-	y= radians(y);
-	z= radians(z);
-
-	mat4 aroundX = mat4(
-	1,0,0,0,
-	0,cos(x),sin(x),0,
-	0,-sin(x),cos(x),0,
-	0,0,0,1);
-
-	mat4 aroundY = mat4(
-	cos(y),0,-sin(y),0,
-	0,1,0,0,
-	sin(y),0,cos(y),0,
-	0,0,0,1);
-
-	mat4 aroundZ = mat4(
-	cos(z),sin(z),0,0,
-	-sin(z),cos(z),0,0,
-	0,0,1,0,
-	0,0,0,1);
-
-	return aroundX * aroundY * aroundZ;
-}
-
-mat4 CreateScaleMatrix(float scale)
-{
-	return mat4(
-	scale,0,0,0,
-	0,scale,0,0,
-	0,0,scale,0,
-	0,0,0,1
-	);
-}
 void main()
 {	
 	mat4 wsGrass = u_Model * instance_mm;
@@ -118,11 +82,10 @@ void main()
 
 #shader fragment
 #version 410 core
-layout (location = 0) out vec4 gPosition;
-layout (location = 1) out vec4 gNormal;
+layout (location = 0) out vec4 gNormal;
+layout (location = 1) out vec4 gVelocity;
 layout (location = 2) out vec4 gColor;
 layout (location = 3) out vec4 gRoughnessMetallic;
-layout (location = 4) out vec4 gVelocity;
 
 //pbr mapping
 //the u_Roughness texture contains "opacity map" on R-channel "Roughness map" on G-channel and "Ambient occlusion" on B-channel
@@ -153,7 +116,6 @@ uniform float Metallic;
 vec3 PBR_Color = vec3(0.0);
 
 float alpha = Roughness; //Roughness value
-const float PI = 3.14159265359;
 #define MAX_MIP_LEVEL 28
 int level = 3; // cascade levels
 float NdotL = 1.0;
@@ -178,12 +140,10 @@ vec2 CalculateVelocity(in vec4 curPos,in vec4 oldPos)
 {
 	curPos /= curPos.w;
 	curPos.xy = (curPos.xy+1.0) * 0.5; //convert to 0-1
-	//curPos.y = 1.0 - curPos.y;
-
+	
 	oldPos /= oldPos.w;
 	oldPos.xy = (oldPos.xy+1.0) * 0.5;
-	//oldPos.y = 1.0 - oldPos.y;
-
+	
 	return (curPos - oldPos).xy;
 }
 
@@ -196,7 +156,7 @@ float hash3D(vec3 val)
 {
 	return hash(vec2(hash(val.xy),val.z));
 }
-
+//hached alpha testing, code used from https://developer.download.nvidia.com/assets/gameworks/downloads/regular/GDC17/RealTimeRenderingAdvances_HashedAlphaTesting_GDC2017_FINAL.pdf?t=eyJscyI6ImdzZW8iLCJsc2QiOiJodHRwczovL3d3dy5nb29nbGUuY28uaW4vIn0=
 float HashedAlphaThreshold()
 {
 	float maxDeriv = max(length(dFdx(objSpacePos)), length(dFdy(objSpacePos)));
@@ -224,16 +184,16 @@ float HashedAlphaThreshold()
 
 	return alpha_f;
 }
+
 float ao = 1.0;
 void main()
 {
 	vec4 albedo = texture(u_Albedo, tcord);
 	float alpha = albedo.a;	
 	if(alpha < HashedAlphaThreshold())
-		discard;
-	gPosition = vec4(m_pos.xyz,1.0);
+		discard;	
 	gNormal = vec4(NormalMapping(),1.0);
+	gVelocity = vec4(CalculateVelocity(m_curPos,m_oldPos),0,1.0);
 	gColor = vec4(GammaCorrection(albedo.rgb * m_VertexColor), 1.0);
 	gRoughnessMetallic = vec4(texture(u_Roughness,tcord).r*Roughness,Metallic,1,1.0);
-	gVelocity = vec4(CalculateVelocity(m_curPos,m_oldPos),0,1.0);
 }
