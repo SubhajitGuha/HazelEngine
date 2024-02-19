@@ -148,6 +148,7 @@ namespace Hazel
 					m_subMeshes[material_ind].BiTangent.push_back({ 0,0,0 });
 				}
 			}
+			total_bounds.Union(m_subMeshes[material_ind].mesh_bounds);
 			//for (int k = 0; k < m_Mesh[i]->mNumFaces; k++)
 			//{
 			//	aiFace face = m_Mesh[i]->mFaces[k];
@@ -179,7 +180,7 @@ namespace Hazel
 		{
 			aiMaterial* scene_material = scene->mMaterials[i];
 			std::string materialName = objectName + std::string("_") + std::string(scene_material->GetName().C_Str());
-			ref<Material> material = Material::Create(materialName, ""); //create a material in the default storage directory
+			ref<Material> material = Material::Create(materialName, ""); //create a material and set the default storage directory
 			m_subMeshes[i].m_MaterialID = material->materialID;
 
 			//if material cannot be found then create and serialize the material

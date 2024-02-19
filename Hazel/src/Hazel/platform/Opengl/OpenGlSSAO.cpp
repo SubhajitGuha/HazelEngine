@@ -63,7 +63,6 @@ namespace Hazel {
 		SSAOShader->SetFloat3Array("Samples", &samples[0].x, RANDOM_SAMPLES_SIZE);
 		SSAOShader->SetMat4("u_projection", cam.GetProjectionMatrix());
 		SSAOShader->SetInt("noisetex", NOISE_SLOT);
-		SSAOShader->SetInt("gPosition", G_POSITION_TEXTURE_SLOT);
 		SSAOShader->SetInt("depthBuffer", SCENE_DEPTH_SLOT);
 		SSAOShader->SetInt("gNormal", G_NORMAL_TEXTURE_SLOT);
 		//SSAOShader->SetInt("alpha_texture", G_ROUGHNESS_METALLIC_TEXTURE_SLOT);//for foliage if the isFoliage flag is set to 1 then render the foliage with the help of opacity texture
@@ -149,7 +148,6 @@ namespace Hazel {
 		glBindTextureUnit(NOISE_SLOT, noisetex_id);
 		glBindTextureUnit(SSAO_BLUR_SLOT, SSAOblur_id);
 		glBindTextureUnit(SSAO_SLOT, SSAOtexture_id);
-		glBindTextureUnit(DEPTH_SLOT, GBufferPos_id);
 	}
 	void OpenGlSSAO::RenderScene(Scene& scene , ref<Shader>& current_shader)
 	{

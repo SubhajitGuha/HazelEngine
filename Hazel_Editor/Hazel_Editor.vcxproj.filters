@@ -176,4 +176,7 @@
       <Filter>Assets\Textures</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\cs_ResetDensityMap.glsl" />
+  </ItemGroup>
 </Project>

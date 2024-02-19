@@ -130,8 +130,7 @@ namespace Hazel
 		m_DefferedPassShader->Bind();
 		m_DefferedPassShader->SetFloat("jitterX", jitter.x);
 		m_DefferedPassShader->SetFloat("jitterY", jitter.y);
-
-		m_DefferedPassShader->SetInt("gPosition", G_POSITION_TEXTURE_SLOT);
+	
 		m_DefferedPassShader->SetInt("depthBuffer", SCENE_DEPTH_SLOT);
 		m_DefferedPassShader->SetInt("gNormal", G_NORMAL_TEXTURE_SLOT);
 		m_DefferedPassShader->SetInt("gColor", G_COLOR_TEXTURE_SLOT);

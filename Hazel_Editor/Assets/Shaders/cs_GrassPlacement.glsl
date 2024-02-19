@@ -8,41 +8,33 @@ layout (std430, binding = 0) buffer in_Buffer
 	mat4 trans[];
 }inBuffer;
 
+layout (binding = 1) uniform atomic_uint counter_instances;
+
 uniform sampler2D u_DensityMap;
 uniform sampler2D u_HeightMap;
+uniform sampler2D u_BlueNoise;
 uniform float u_HeightMapScale;
 uniform vec3 u_PlayerPos;
 uniform float u_instanceCount;
 //uniform float u_radius;
 uniform float u_spacing;
 
-uint hash( uint x ) {
-    x += ( x << 10u );
-    x ^= ( x >>  6u );
-    x += ( x <<  3u );
-    x ^= ( x >> 11u );
-    x += ( x << 15u );
-    return x;
-}
-
-// Construct a float with half-open range [0:1] using low 23 bits.
-// All zeroes yields 0.0, all ones yields the next smallest representable value below 1.0.
-float floatConstruct( uint m ) {
-    const uint ieeeMantissa = 0x007FFFFFu; // binary32 mantissa bitmask
-    const uint ieeeOne      = 0x3F800000u; // 1.0 in IEEE binary32
-
-    m &= ieeeMantissa;                     // Keep only mantissa bits (fractional part)
-    m |= ieeeOne;                          // Add fractional part to 1.0
-
-    float  f = uintBitsToFloat( m );       // Range [1:2]
-    return f - 1.0;                        // Range [0:1]
-}
-
-// Pseudo-random value in half-open range [0:1].
-float random( float x ) { return floatConstruct(hash(floatBitsToUint(x))); }
-float randomInRange (float min, float max, float seed)
+uvec4 seed;
+void pcg4d(inout uvec4 v)
 {
-	return random(seed) * (max-min) + min;
+    v = v * 1664525u + 1013904223u;
+    v.x += v.y * v.w; v.y += v.z * v.x; v.z += v.x * v.y; v.w += v.y * v.z;
+    v = v ^ (v >> 16u);
+    v.x += v.y * v.w; v.y += v.z * v.x; v.z += v.x * v.y; v.w += v.y * v.z;
+}
+
+float random() //in 0-1 range
+{
+	 pcg4d(seed); return float(seed.x) / float(0xffffffffu);
+}
+float randomInRange(float _min,float _max)
+{
+	return random()*(_max -_min)+_min;
 }
 
 //column major format
@@ -133,29 +125,27 @@ void main()
 {
 	int m_index = int(gl_GlobalInvocationID.y * gl_NumWorkGroups.x * gl_WorkGroupSize.x + gl_GlobalInvocationID.x);
 
-	//int density = int(texture(u_DensityMap,uv).x * 10);
-	//if(density <= 3)
-	//{
-	//	inBuffer.trans[m_index] = mat4(1.0,0,0,0, 0,1.0,0,0, 0,0,1.0,0, -1000,-1000,-1000,1);
-	//	return;
-	//}
-
-	//barrier();
-	//do wind here
-
-	if(m_index < u_instanceCount)
+	uint initilize = 0;
+	if(m_index == 0)
 	{
-		vec2 foliagePos = vec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y) * u_spacing; //2.0 is the spacing that I need for certain foliage
-		foliagePos = max(foliagePos + u_PlayerPos.xz - vec2(gl_NumWorkGroups.x*32/2), foliagePos); //offset by player position
-		vec2 texelSize = 1.0/textureSize(u_HeightMap,0);
-		vec2 uv = foliagePos * texelSize; // convert to 0-1 range
-		float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
-
-		vec3 pos = vec3(foliagePos.x + randomInRange(1.0,5.0,m_index) , height, foliagePos.y + randomInRange(1.0,5.0,m_index + 1));
-		if((1.0 - CalculateNormal(uv,texelSize).y)> 0.4)
-			pos = pos + CalculateNormal(uv,texelSize)*2; 
-		inBuffer.trans[m_index] = CreateTranslationMatrix(pos)
-		* CreateRotationMatrix(randomInRange(0.0,5.0,m_index + 2),randomInRange(5.0,10.0,m_index + 3),randomInRange(0.0,5.0,m_index + 6)) * CreateScaleMatrix(randomInRange(1.0,3.0,m_index + 4));		
+		atomicCounterExchange(counter_instances, initilize);
 	}
+
 	
+	vec2 foliagePos = vec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y) * u_spacing; //2.0 is the spacing that I need for certain foliage
+	foliagePos = max(foliagePos + u_PlayerPos.xz - vec2(gl_NumWorkGroups.x*32/2), foliagePos); //offset by player position
+	vec2 texelSize = 1.0/textureSize(u_HeightMap,0);
+	vec2 uv = foliagePos * texelSize; // convert to 0-1 range
+	float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
+	seed = uvec4(foliagePos.x,height,foliagePos.y,m_index);
+	vec3 pos = vec3(foliagePos.x + randomInRange(1.0,5.0) , height, foliagePos.y + randomInRange(1.0,5.0));
+	if((1.0 - CalculateNormal(uv,texelSize).y)> 0.4)
+		pos = pos + CalculateNormal(uv,texelSize)*2; 
+	if(random() < texture(u_DensityMap,pos.xz/2048.0).x)
+	{
+
+		uint index = atomicCounterIncrement(counter_instances);
+		inBuffer.trans[m_index] = CreateTranslationMatrix(pos)
+		* CreateRotationMatrix(randomInRange(0.0,5.0),randomInRange(5.0,10.0),randomInRange(0.0,5.0)) * CreateScaleMatrix(randomInRange(1.0,2.0));		
+	}
 }

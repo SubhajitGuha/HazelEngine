@@ -51,7 +51,7 @@ struct Material
 	float emissive_strength;
 };
 
-uniform layout(binding = 1, rgba32f) image2D FinalImage;
+uniform layout(binding = 1, rgba16f) image2D FinalImage;
 
 layout (std430, binding = 2) buffer layoutLinearBVHNode
 {
@@ -515,18 +515,18 @@ HitInfo ClosestHit(Ray ray, inout LightInfo light_info)
 	vec2 uv = uv1*u + uv2*v + uv0*(1.0-u-v);
 
 	//multiply texture with material color(tint);
-	sampler2D albedo = sampler2D(nearestTriangle.tex_albedo);
-	sampler2D roughness = sampler2D(nearestTriangle.tex_roughness);
-	
-	vec4 tex_albedo = texture(albedo, uv); //load the bindless textures
-	vec4 tex_roughness = texture(roughness, uv);
-	
-	info.material.color[0] *= tex_albedo.r;
-	info.material.color[1] *= tex_albedo.g; 
-	info.material.color[2] *= tex_albedo.b;
-	info.material.color[3] *= tex_albedo.a; 
-	info.material.roughness *= tex_roughness.g;
-	//info.material.metalness = tex_roughness.b;
+	//sampler2D albedo = sampler2D(nearestTriangle.tex_albedo);
+	//sampler2D roughness = sampler2D(nearestTriangle.tex_roughness);
+	//
+	//vec4 tex_albedo = texture(albedo, uv); //load the bindless textures
+	//vec4 tex_roughness = texture(roughness, uv);
+	//
+	//info.material.color[0] *= tex_albedo.r;
+	//info.material.color[1] *= tex_albedo.g; 
+	//info.material.color[2] *= tex_albedo.b;
+	//info.material.color[3] *= tex_albedo.a; 
+	//info.material.roughness *= tex_roughness.g;
+	////info.material.metalness = tex_roughness.b;
 
 	vec3 n0 = vec3(nearestTriangle.n0[0],nearestTriangle.n0[1],nearestTriangle.n0[2]);
 	vec3 n1 = vec3(nearestTriangle.n1[0],nearestTriangle.n1[1],nearestTriangle.n1[2]);
@@ -687,7 +687,7 @@ vec3 DirectLight(HitInfo hit_info, in Ray ray)
     light_info.direction /= light_info.LightDist;
     light_info.normal = cross(light.u,light.v);
 	light_info.area = length(light_info.normal);
-	 light_info.normal /=  light_info.area;
+	light_info.normal /=  light_info.area;
 	light_info.emission_color = light.emission_color;
     light_info.emission_strength = light.emission_strength;
     light_info.pdf = distSq / (light_info.area * abs(dot(light_info.normal, light_info.direction)));
@@ -740,9 +740,9 @@ vec3 perPixel(int numBounces, Ray ray)
 				break;
 			}
 
-			if(random() > info.material.color[3])
+			if(random() > info.material.color[3]) //transparency check using the alpha channel
 			{
-				nextDirection = ray.dir;
+				nextDirection = ray.dir; //do not redirect the ray
 				k--;
 				ray.dir = nextDirection;
 				ray.origin = info.HitPos + ray.dir*0.003;

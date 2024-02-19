@@ -241,6 +241,9 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Image((void*)DefferedRenderer::GetBuffers(2), ImVec2(512, 512), { 0, 1 }, { 1,0 });
 	ImGui::Text("Roughness metallic");
 	ImGui::Image((void*)DefferedRenderer::GetBuffers(3), ImVec2(512, 512), { 0, 1 }, { 1,0 });
+	ImGui::Text("Density Map");
+	ImGui::Image((void*)Foliage::m_DensityMapID, ImVec2(512, 512), { 0, 1 }, { 1,0 });
+
 	ImGui::End();
 
 	ImGui::Begin("Benchmark");

@@ -6,15 +6,20 @@
 #include "Hazel/ResourceManager.h"
 
 namespace Hazel {
+	float data[2048 * 2048] = { 0.0f };
+	bool resetDensityMap = true;
 	glm::vec3 Foliage::Showcase_camPosition = { 300,10,300 };
 	glm::vec3 Foliage::Showcase_camRotation = { 0,0,0 };
-
+	uint32_t Foliage::m_DensityMapID; //
+	uint32_t Foliage::class_ID = 0;
 	std::vector<Foliage*> Foliage::foliageObjects;
+
 	Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, float cullDistance,
 		bool canCastShadow, float LOD_Distance, bool bapplyGradientMask, bool benableWind)
 		:m_foliageMesh(mesh), m_instanceCount(numInstances), m_cullDistance(cullDistance), 
 		bCanCastShadow(canCastShadow), lod0Distance(LOD_Distance), applyGradientMask(bapplyGradientMask), enableWind(benableWind)
 	{
+		class_ID++;
 		m_coverage = glm::ivec2(coverageX, coverageY);
 		camera = new EditorCamera(16, 9);
 		camera->SetCameraPosition(Showcase_camPosition);
@@ -26,10 +31,21 @@ namespace Hazel {
 		cs_FrustumCullCompact = Shader::Create("Assets/Shaders/cs_FrustumCullCompact.glsl");
 		cs_FoliageSpawn = Shader::Create("Assets/Shaders/cs_ProceduralFoliagePlacement.glsl");
 		cs_GrassPlacement = Shader::Create("Assets/Shaders/cs_GrassPlacement.glsl");
-		cs_FoliageBuffersInit = Shader::Create("Assets/Shaders/cs_FoliageBufferInit.glsl");
 		cs_createLod = Shader::Create("Assets/Shaders/cs_CreateLODs.glsl");
 		cs_CopyIndirectBufferData = Shader::Create("Assets/Shaders/cs_CopyIndirectBufferData.glsl");
+		cs_ResetDensityMap = Shader::Create("Assets/Shaders/cs_ResetDensityMap.glsl");
 
+		blueNoiseTexture = Texture2D::Create("Assets/Textures/Blue_Noise.png");
+		blueNoiseTexture->Bind(BLUE_NOISE_TEXTURE_SLOT);
+
+		glGenTextures(1, &m_DensityMapID);
+		glBindTexture(GL_TEXTURE_2D, m_DensityMapID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, 2048, 2048, 0, GL_RED, GL_FLOAT, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		foliage_positions.resize(numInstances,glm::vec2(0.0,0.0));
 		foliageObjects.push_back(this);//this is a static vector that keeps track of all foliage objects created
 	}
 
@@ -67,7 +83,7 @@ namespace Hazel {
 
 		Renderer3D::BeginSceneFoliage(cam);
 		//LOD 0
-		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);	//render lod0 elements
+		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);//render lod0 elements
 		for (auto sub_mesh : m_foliageMesh->GetLOD(0)->m_subMeshes)
 		{
 			cs_CopyIndirectBufferData->Bind();
@@ -102,7 +118,7 @@ namespace Hazel {
 		{
 			cs_CopyIndirectBufferData->Bind();
 			cs_CopyIndirectBufferData->SetInt("VertexBufferSize", sub_mesh.numVertices);
-
+		
 			if (ssbo_indirectBuffer_LOD1 == -1)
 			{
 				glGenBuffers(1, &ssbo_indirectBuffer_LOD1);
@@ -120,7 +136,7 @@ namespace Hazel {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, atomicCounter_lod1);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, atomicCounter_lod1);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
+		
 			glDispatchCompute(1, 1, 1);
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
 			Renderer3D::DrawFoliageInstanced(sub_mesh, Terrain::m_terrainModelMat, ssbo_indirectBuffer_LOD1, Terrain::time, applyGradientMask, enableWind);
@@ -131,7 +147,7 @@ namespace Hazel {
 	{
 		float fov = cam.GetVerticalFOV();
 		cam.SetVerticalFOV(fov * 2);
-		//choose LOD here;
+		//choose LOD here;		
 		SpawnFoliage(cam.GetCameraPosition());
 
 		//Frustum cull and distance cull 
@@ -146,7 +162,7 @@ namespace Hazel {
 
 		Renderer3D::BeginSceneFoliage(cam);
 		//LOD 0
-		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);	//render lod0 elements
+		Renderer3D::InstancedFoliageData(*m_foliageMesh->GetLOD(0), ssbo_outTransformsLOD0);//render lod0 elements
 		for (auto sub_mesh : m_foliageMesh->GetLOD(0)->m_subMeshes)
 		{
 			cs_CopyIndirectBufferData->Bind();
@@ -234,6 +250,8 @@ namespace Hazel {
 		cs_FrustumCullVote->SetMat4("u_ViewProjection", cam.GetProjectionView());
 		cs_FrustumCullVote->SetInt("offset", offset);
 		cs_FrustumCullVote->SetFloat("u_cullDistance", m_cullDistance);
+		cs_FrustumCullVote->SetFloat3("aabb_min", m_foliageMesh->total_bounds.aabbMin);
+		cs_FrustumCullVote->SetFloat3("aabb_max", m_foliageMesh->total_bounds.aabbMax);
 
 		if (ssbo_voteIndices == -1)
 		{
@@ -257,6 +275,10 @@ namespace Hazel {
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_voteIndices);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		}
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, atomicCounter_numInstances);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, atomicCounter_numInstances);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 		glDispatchCompute(1, 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
@@ -361,13 +383,13 @@ namespace Hazel {
 
 			glGenBuffers(1, &ssbo_outTransformsLOD0);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_outTransformsLOD0);
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::mat4) * m_instanceCount*0.3, nullptr, GL_DYNAMIC_DRAW);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::mat4) * m_instanceCount*0.5, nullptr, GL_DYNAMIC_DRAW);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_outTransformsLOD0);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 			glGenBuffers(1, &ssbo_outTransformsLOD1);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_outTransformsLOD1);
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::mat4) * m_instanceCount * 0.7, nullptr, GL_DYNAMIC_DRAW);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::mat4) * m_instanceCount * 0.5, nullptr, GL_DYNAMIC_DRAW);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_outTransformsLOD1);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -423,7 +445,49 @@ namespace Hazel {
 			glDispatchCompute((int)std::ceil(m_instanceCount/64.0), 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
-	
+
+	void Foliage::GenerateFoliagePositions(float radius, Bounds& bounds)
+	{
+		//if (PDD_values.size() == 0)
+			PDD_values = GeneratePoints(radius, bounds, 10); //use poisson disk distribution to populate
+
+		if (PDD_values.size() < m_instanceCount && total_instanceCount < m_instanceCount)
+		{
+			for (uint32_t i = 0; i < PDD_values.size(); i++)
+			{
+				if ((total_instanceCount + i) < m_instanceCount)
+					foliage_positions[total_instanceCount + i] = glm::vec2(bounds.aabbMin.x, bounds.aabbMin.z) + PDD_values[i];
+			}
+			total_instanceCount += PDD_values.size();
+		}
+	}
+
+	void Foliage::RemoveFoliagePositions(Bounds& bounds)
+	{
+		//delete positions which are not in between the bounds
+		auto newEnd = std::remove_if(std::execution::par, foliage_positions.begin(), foliage_positions.begin() + total_instanceCount,
+			[bounds](glm::vec2& cur_val) {return (cur_val.x >= bounds.aabbMin.x && cur_val.x <= bounds.aabbMax.x&&
+				cur_val.y >= bounds.aabbMin.z && cur_val.y <= bounds.aabbMax.z); });
+		//fill the remaining positions with zero
+		//std::fill(std::execution::par, newEnd, foliage_positions.end(), glm::vec2(0.0, 0.0));
+		total_instanceCount = newEnd - foliage_positions.begin(); // update the total instance count (true if PDD_values is constant size)
+		
+		//when a terrain chunk is deleted re-calculate the density map by drawing all foliage-objects again
+		for (Foliage*& foliage : foliageObjects) 
+		{
+			foliage->bHasSpawnned = false; //respawn the foliage to update the buffers on the gpu side
+			foliage->bResetGpuInstanceCount = true; //reset the instance counter on gpu
+		}
+
+		//this compute shader outputs a black density map (actually resetting it)
+		//this works and performs much better than using "glTexSubImage2D"
+		cs_ResetDensityMap->Bind();
+		glBindImageTexture(0, m_DensityMapID, 0, 0, 0, GL_WRITE_ONLY, GL_R16F);
+		glDispatchCompute(2048/32, 2048/32, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		
+	}
+
 	void Foliage::SpawnFoliage(glm::vec3 playerPos, float radius)
 	{
 		bHasSpawnned = true;
@@ -432,11 +496,10 @@ namespace Hazel {
 		cs_FoliageSpawn->SetInt("u_DensityMap", FOLIAGE_DENSITY_TEXTURE_SLOT);
 		cs_FoliageSpawn->SetFloat3("u_PlayerPos", playerPos);
 		cs_FoliageSpawn->SetFloat("u_HeightMapScale", Terrain::HeightScale);
-
-
-		auto m_foliagePos = GeneratePoints(radius, { m_coverage.x,m_coverage.y}, 10); //use poisson disk distribution to populate
-		cs_FoliageSpawn->SetFloat("u_instanceCount", m_foliagePos.size());
-		m_instanceCount = m_foliagePos.size();
+		cs_FoliageSpawn->SetInt("u_nearestDistance", radius);
+		cs_FoliageSpawn->SetFloat("u_zoi", zoi);
+		cs_FoliageSpawn->SetFloat("u_trunk_radius", trunk_radius);		
+		cs_FoliageSpawn->SetInt("u_instanceCount", total_instanceCount);
 
 		if (ssbo_inTransforms == -1)
 		{
@@ -448,35 +511,57 @@ namespace Hazel {
 
 			glGenBuffers(1, &ssbo_foliagePos);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_foliagePos);
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec2) * m_instanceCount, &m_foliagePos[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec2) * m_instanceCount, &foliage_positions[0], GL_DYNAMIC_DRAW);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_foliagePos);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			glGenBuffers(1, &atomicCounter_numInstances);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_numInstances);
+			glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(uint32_t), &x, GL_DYNAMIC_DRAW);
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 2, atomicCounter_numInstances);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+
+			glBindImageTexture(3, m_DensityMapID, 0, 0, 0, GL_READ_WRITE, GL_R16F);
 		}
 		else
 		{
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_inTransforms);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		
 
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_foliagePos);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec2) * total_instanceCount, &foliage_positions[0]);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_foliagePos);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_numInstances);
+			if (bResetGpuInstanceCount) //only reset the total instance count when deleting quad-tree nodes in the terrain
+			{
+				glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(uint32_t), &x);
+				bResetGpuInstanceCount = false;
+			}
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 2, atomicCounter_numInstances);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+		
+			glBindImageTexture(3, m_DensityMapID, 0, 0, 0, GL_READ_WRITE, GL_R16F);
 		}
 
-		glDispatchCompute(m_coverage.x / 32, m_coverage.y / 32, 1);
+		glDispatchCompute(std::ceil(total_instanceCount / 1024.0), 1 , 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 
 	void Foliage::SpawnFoliage(glm::vec3 playerPos)
 	{
-		float dist = glm::distance(glm::vec2(playerPos.x, playerPos.z), oldPlayerPos);
-		HAZEL_CORE_ERROR("{}{}", "Distance is = ", dist);
-		if (dist < m_coverage.x-100)
+		glm::vec2 dist = glm::vec2(abs(playerPos.x - oldPlayerPos.x), abs(playerPos.z - oldPlayerPos.y));
+		//HAZEL_CORE_ERROR("{}{}", "Distance is = ", dist);
+		if ((dist.x > 100 || dist.y > 100))
 			return;
 		oldPlayerPos = glm::vec2(playerPos.x, playerPos.z);
 		cs_GrassPlacement->Bind();
 		cs_GrassPlacement->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);
 		cs_GrassPlacement->SetInt("u_DensityMap", FOLIAGE_DENSITY_TEXTURE_SLOT);
+		cs_GrassPlacement->SetInt("u_BlueNoise", BLUE_NOISE_TEXTURE_SLOT);
 		cs_GrassPlacement->SetFloat3("u_PlayerPos", playerPos);
 		cs_GrassPlacement->SetFloat("u_HeightMapScale", Terrain::HeightScale);
 		cs_GrassPlacement->SetFloat("u_instanceCount", m_instanceCount);
@@ -490,12 +575,21 @@ namespace Hazel {
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
+			glGenBuffers(1, &atomicCounter_numInstances);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_numInstances);
+			glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(uint32_t), &x, GL_DYNAMIC_DRAW);
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 1, atomicCounter_numInstances);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 		}
 		else
 		{
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_inTransforms);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicCounter_numInstances);			
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 1, atomicCounter_numInstances);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 		}
 
 		glDispatchCompute(m_coverage.x / 32, m_coverage.y / 32, 1);
@@ -528,15 +622,19 @@ namespace Hazel {
 		return false;
 	};
 
-	std::vector<glm::vec2> Foliage::GeneratePoints(float radius, glm::vec2 sampleRegionSize, int numSamplesBeforeRejection )
+	std::vector<glm::vec2> Foliage::GeneratePoints(float radius, Bounds& bounds, int numSamplesBeforeRejection )
 	{
 		float cellSize = radius / 1.41421356237;
+		auto extent = bounds.aabbMax - bounds.aabbMin;
+		glm::vec2 sampleRegionSize = glm::vec2(extent.x, extent.z);//get the box size
+		uint32_t seed = bounds.aabbMin.x + bounds.aabbMin.z + bounds.aabbMax.x + bounds.aabbMax.z;
+
 		std::vector<std::vector<int>> grid((int)glm::ceil(sampleRegionSize.x / cellSize), std::vector<int>((int)glm::ceil(sampleRegionSize.y / cellSize)));
 		std::vector<glm::vec2> points;
 		std::vector<glm::vec2> spawnPoints;
 
-		std::uniform_real_distribution<float> dist(0, 1.0);
-		std::default_random_engine generator;
+		std::uniform_real_distribution<float> dist(0.0, 1.0);
+		std::default_random_engine generator(seed + class_ID);
 
 		spawnPoints.push_back({ sampleRegionSize.x / 2,sampleRegionSize.y / 2 });
 		while (spawnPoints.size() > 0) {
@@ -552,7 +650,7 @@ namespace Hazel {
 				glm::vec2 dir = { glm::sin(angle), glm::cos(angle) };
 				glm::vec2 candidate = spawnCentre + dir * (dist(generator) * radius + radius);
 				if (IsValid(candidate, sampleRegionSize, cellSize, radius, points, grid)) {
-					points.push_back(candidate);
+					points.push_back(candidate); //add the point position in the world space
 					spawnPoints.push_back(candidate);
 					grid[(int)(candidate.x / cellSize)][(int)(candidate.y / cellSize)] = (int)points.size();
 					candidateAccepted = true;

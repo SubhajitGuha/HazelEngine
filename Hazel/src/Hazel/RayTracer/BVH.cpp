@@ -40,11 +40,12 @@ namespace Hazel
 			ref<Texture2D> albedoTexture = Texture2D::Create(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetAlbedoPath());
 			ref<Texture2D> roughnessTexture = Texture2D::Create(ResourceManager::allMaterials[sub_mesh.m_MaterialID]->GetRoughnessPath());
 
-			uint64_t albedo_handle = glGetTextureHandleARB(albedoTexture->GetID()); //get a handle from the gpu
-			glMakeTextureHandleResidentARB(albedo_handle); //load the texture into gpu memory using the handle
-			uint64_t roughness_handle = glGetTextureHandleARB(roughnessTexture->GetID());
+			//Enabling bindless textures causes render-doc to crash so disable them
+			uint64_t albedo_handle;// = glGetTextureHandleARB(albedoTexture->GetID()); //get a handle from the gpu
+			//glMakeTextureHandleResidentARB(albedo_handle); //load the texture into gpu memory using the handle
+			uint64_t roughness_handle;// = glGetTextureHandleARB(roughnessTexture->GetID());
 			//if(albedo_handle!=roughness_handle)
-			glMakeTextureHandleResidentARB(roughness_handle);
+			//glMakeTextureHandleResidentARB(roughness_handle);
 
 			for (int i = 0; i < sub_mesh.Vertices.size(); i+=3)
 			{

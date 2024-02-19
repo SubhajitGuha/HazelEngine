@@ -24,6 +24,11 @@ namespace Hazel {
 			aabbMax = p;
 			aabbMin = p;
 		}
+		Bounds(glm::vec3& min, glm::vec3& max)
+		{
+			aabbMax = max;
+			aabbMin = min;
+		}
 		Bounds(glm::vec3& a, glm::vec3& b, glm::vec3& c)
 		{
 			aabbMax = glm::max(glm::max(a, b), c);
@@ -39,6 +44,10 @@ namespace Hazel {
 			glm::vec3 e = aabbMax - aabbMin; // box extent
 			return e.x * e.y + e.y * e.z + e.z * e.x;
 		}
+		glm::vec3 GetMidPoint()
+		{
+			return (aabbMax + aabbMin) / glm::vec3(2.0);
+		}
 	};
 	struct SubMesh
 	{
@@ -50,7 +59,7 @@ namespace Hazel {
 		ref<VertexArray> VertexArray;
 		uint64_t m_MaterialID;
 		uint32_t numVertices;
-		Bounds mesh_bounds;
+		Bounds mesh_bounds; //sub_mesh bounds
 	};
 	class LoadMesh
 	{
@@ -68,7 +77,8 @@ namespace Hazel {
 
 	public:
 		std::string m_path;
-		std::vector<SubMesh> m_subMeshes;		
+		std::vector<SubMesh> m_subMeshes;
+		Bounds total_bounds; //total mesh bounds
 		glm::mat4 GlobalTransform;
 		uint64_t uuid;
 	private:

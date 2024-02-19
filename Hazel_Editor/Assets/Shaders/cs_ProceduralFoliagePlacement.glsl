@@ -1,7 +1,7 @@
 //#shader compute
 #version 460 core
 
-layout (local_size_x = 32, local_size_y = 32 ,local_size_z = 1) in;
+layout (local_size_x = 1024) in;
 
 layout (std430, binding = 0) buffer in_Buffer
 {
@@ -13,50 +13,44 @@ layout (std430, binding = 1) buffer pos_Buffer
 	vec2 pos[];
 }posBuffer;
 
+layout (binding = 2) uniform atomic_uint Count_Instances;
+
+layout (binding = 3, r16f) uniform image2D densityMap;
+
 uniform sampler2D u_DensityMap;
 uniform sampler2D u_HeightMap;
 uniform float u_HeightMapScale;
 uniform vec3 u_PlayerPos;
-uniform float u_instanceCount;
-//uniform float u_radius;
+uniform int u_instanceCount;
+uniform int u_nearestDistance;
+uniform float u_zoi;
+uniform float u_trunk_radius;
 uniform int offset;
 
-uint hash( uint x ) {
-    x += ( x << 10u );
-    x ^= ( x >>  6u );
-    x += ( x <<  3u );
-    x ^= ( x >> 11u );
-    x += ( x << 15u );
-    return x;
-}
-
-// Construct a float with half-open range [0:1] using low 23 bits.
-// All zeroes yields 0.0, all ones yields the next smallest representable value below 1.0.
-float floatConstruct( uint m ) {
-    const uint ieeeMantissa = 0x007FFFFFu; // binary32 mantissa bitmask
-    const uint ieeeOne      = 0x3F800000u; // 1.0 in IEEE binary32
-
-    m &= ieeeMantissa;                     // Keep only mantissa bits (fractional part)
-    m |= ieeeOne;                          // Add fractional part to 1.0
-
-    float  f = uintBitsToFloat( m );       // Range [1:2]
-    return f - 1.0;                        // Range [0:1]
-}
-
-// Pseudo-random value in half-open range [0:1].
-float random( float x ) { return floatConstruct(hash(floatBitsToUint(x))); }
-float randomInRange (float min, float max, float seed)
+uvec4 seed;
+void pcg4d(inout uvec4 v)
 {
-	return random(seed) * (max-min) + min;
+    v = v * 1664525u + 1013904223u;
+    v.x += v.y * v.w; v.y += v.z * v.x; v.z += v.x * v.y; v.w += v.y * v.z;
+    v = v ^ (v >> 16u);
+    v.x += v.y * v.w; v.y += v.z * v.x; v.z += v.x * v.y; v.w += v.y * v.z;
 }
 
+float random() //in 0-1 range
+{
+	 pcg4d(seed); return float(seed.x) / float(0xffffffffu);
+}
+float randomInRange(float _min,float _max)
+{
+	return random()*(_max -_min)+_min;
+}
 //column major format
-mat4 CreateTranslationMatrix(float x, float y, float z)
+mat4 CreateTranslationMatrix(vec3 pos)
 {
 	return mat4(1,0,0,0,
 				0,1,0,0,
 				0,0,1,0,
-				x,y,z,1);
+				pos.x,pos.y,pos.z,1);
 }
 
 mat4 CreateRotationMatrix(float x, float y, float z)
@@ -96,28 +90,53 @@ mat4 CreateScaleMatrix(float scale)
 	);
 }
 
+const int dist = u_nearestDistance;
+const float trunk_radius = u_trunk_radius;
+const float zoi = u_zoi;
+
+void CreateDensity(ivec2 coord)
+{
+	for(int i=-dist; i<=dist;i++)
+	{
+		for(int j=-dist; j<=dist; j++)
+		{
+			float distanceField = 1.0 - clamp( (distance(coord,coord + ivec2(i,j)) - trunk_radius) / (zoi-trunk_radius),0.0,1.0);
+			vec3 color = imageLoad(densityMap, coord + ivec2(i,j)).rgb;
+			vec3 combined = clamp(vec3(distanceField) + color,0.0,1.0);
+			imageStore(densityMap,coord + ivec2(i,j), vec4(combined,1.0));
+		}
+	}
+}
+
 void main()
 {
-	int m_index = int(gl_GlobalInvocationID.y * gl_NumWorkGroups.x * gl_WorkGroupSize.x + gl_GlobalInvocationID.x);
-
-	//int density = int(texture(u_DensityMap,uv).x * 10);
-	//if(density <= 3)
-	//{
-	//	inBuffer.trans[m_index] = mat4(1.0,0,0,0, 0,1.0,0,0, 0,0,1.0,0, -1000,-1000,-1000,1);
-	//	return;
-	//}
-
-	//barrier();
+	int m_index = int(gl_GlobalInvocationID.x);
+	uint prev_count = 0;
+	//uint initilize = 0;
+	if(m_index == 0)
+	{
+		prev_count = atomicCounter(Count_Instances);
+	}
+	//m_index += u_instanceCountOffset;
 
 	if(m_index < u_instanceCount)
 	{
+		float P = 1.0; //probability of spawnning a foliage
+		
 		vec2 foliagePos = posBuffer.pos[m_index];
-		foliagePos = max(foliagePos + u_PlayerPos.xz - vec2(gl_NumWorkGroups.x*32/2), foliagePos); //offset by player position
-		vec2 uv = foliagePos / textureSize(u_HeightMap,0).x; // convert to 0-1 range
+		//foliagePos = max(foliagePos + u_PlayerPos.xz - vec2(gl_NumWorkGroups.x*32/2), foliagePos); //offset by player position
+		vec2 uv = foliagePos / textureSize(u_HeightMap,0).xy; // convert to 0-1 range
 		float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
+		seed = uvec4(foliagePos.x,height,foliagePos.y, 1);
+		vec3 jitter_pos = vec3(foliagePos.x + randomInRange(1.0,5.0) , height, foliagePos.y + randomInRange(1.0,5.0));
 
-		inBuffer.trans[m_index] = CreateTranslationMatrix(foliagePos.x + randomInRange(1.0,5.0,m_index) , height, foliagePos.y + randomInRange(1.0,5.0,m_index + 1)) 
-		* CreateRotationMatrix(0,randomInRange(5.0,180.0,m_index + 3),0.0) * CreateScaleMatrix(randomInRange(1.0,2.0,m_index + 4));
-	}
-	
+		P = P * (1.0 - imageLoad(densityMap,ivec2( jitter_pos.xz)).r); //load the density map
+		if(random() < P)
+		{
+			uint index = atomicCounterIncrement(Count_Instances); //count the total instances that are spawnning
+			inBuffer.trans[index] = CreateTranslationMatrix(jitter_pos) 
+			* CreateRotationMatrix(0,randomInRange(5.0,180.0),0.0) * CreateScaleMatrix(randomInRange(1.0,2.0));
+			CreateDensity(ivec2( jitter_pos.xz));
+		}
+	}	
 }

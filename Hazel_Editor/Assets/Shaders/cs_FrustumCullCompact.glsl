@@ -32,7 +32,7 @@ void main()
 
 	if(voteBuffer.vote[index] == 1)
 	{
-		int outIndex = scanBuffer.scan[index];
+		int outIndex = scanBuffer.scan[index]; //scan array contains the indices that we get after prefix sum
 		outBuffer.out_trans[outIndex] = inBuffer.trans[index];
 	}
 	
