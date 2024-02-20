@@ -29,23 +29,24 @@ namespace Hazel
 		//For foliage placement in cpu side (not in use)
 		void addInstance(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale);
 		//This version distributes foliage across the bounds area using poisson distribution
-		void RenderFoliage(Camera& cam, float radius);
-		//this version spawns foliage in everry area(per pixel)
 		void RenderFoliage(Camera& cam);
+		//this version spawns foliage in everry area(per pixel)
+		//void RenderFoliage(Camera& cam);
 		//this version is used by the shadows renderer to cast shadows
 		void RenderFoliage(ref<Shader>& shadow_shader);
 		//What will be the space between each foliage object
 		inline void SetFoliageSpacing(float spacing) { m_Spacing = spacing; }
 		glm::mat4 getTransform(int index);
-		//set the foliage "zone of influence" and "trunk radius"
-		void SetFoliageDistributionParam(float _zoi, float _trunk_radius) { zoi = _zoi, trunk_radius = _trunk_radius; }
+		//set the foliage "zone of influence" , "trunk radius" , "predominance value" (must be in-between 0-1 and defines the chance of getting spawnned)
+		void SetFoliageDistributionParam(float spacing, float _zoi, float _trunk_radius, float _predominanceVal);
 		//Get BufferID of the transform matrix after the culling
 		inline uint32_t GetBufferID() { return ssbo_outTransforms; }
 		inline uint32_t GetBufferID_LOD0() { return ssbo_outTransformsLOD0; }
 		inline uint32_t GetBufferID_LOD1() { return ssbo_outTransformsLOD1; }
 		inline LoadMesh* GetMesh() { return m_foliageMesh; }
-		//Generate foliage ponitions in a chunk of bounds. startID and endID are for chunk(quad tree node) to know the positions of foliage in the foliage_positions array
-		void GenerateFoliagePositions(float radius, Bounds& bounds);
+		//Generate foliage ponitions in a chunk of bounds.
+		void GenerateFoliagePositions(Bounds& bounds);
+		//Remove foliage positions from foliage_positions array if the position is inbetween the bounds
 		void RemoveFoliagePositions(Bounds& bounds);
 	public:
 		static uint32_t m_DensityMapID; //testing
@@ -63,7 +64,7 @@ namespace Hazel
 		void Compact(int offset);
 
 		void CreateLODs(Camera& cam);
-		void SpawnFoliage(glm::vec3 playerPos, float);
+		void SpawnFoliage();
 		void SpawnFoliage(glm::vec3 playerPos);
 		std::vector<glm::vec2> GeneratePoints(float radius, Bounds& bounds, int numSamplesBeforeRejection = 10);
 	private:
@@ -73,13 +74,17 @@ namespace Hazel
 		std::vector<glm::vec2> foliage_positions;
 		std::vector<glm::vec2> PDD_values;
 		bool bResetGpuInstanceCount = false;
+
+		//foliage attributes
 		bool applyGradientMask = false;
 		bool enableWind = false;
+		float spacing; //tells how-much apart the foliage are
 		float zoi; //zone of influence of the foliage (must be less than the spawn radius)
 		float trunk_radius;//radius of the trunk
+		float predominanceValue = 0.0; //must be in between 0.0-1.0
 		float m_Spacing = 1.0;
 		float m_cullDistance;
-		bool bIsComputed = false;
+
 		int totalSum = 0, instanceCount = 0; //accmulated result of prefix sum for each 1024 dispatch units
 		uint32_t ssbo_inTransforms = -1, ssbo_outTransforms = -1, ssbo_voteIndices = -1, ssbo_PrefixSum=-1, ssbo_totalPrefixSum = -1;//shader storage buffer
 		uint32_t ssbo_foliagePos = -1;

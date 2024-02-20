@@ -34,7 +34,8 @@ namespace Hazel
 		ref<QuadTree> qtree;
 		glm::vec2 m_dimension;
 		ref<BufferLayout> bl;
-		ref<Texture2D> m_HeightMap, m_perlinNoise, TerrainTex_Albedo, TerrainTex_Roughness, TerratinTex_Normal;
+		ref<Texture2D> m_HeightMap, m_perlinNoise;
+		ref<Texture2DArray> TerrainTex_Albedo, TerrainTex_Roughness, TerratinTex_Normal;
 		int m_Height, m_Width, m_Channels,m_Channels1;
 		float m_maxTerrainHeight;
 		float max_height;
@@ -46,7 +47,11 @@ namespace Hazel
 		uint32_t foliageBufferIndex;
 	private:
 		uint32_t frame_counter = 0;
-		ref<Foliage> grass, Tree, Flower, Fern;
+		ref<Foliage> grass, Tree1,Tree2,Tree3, Bush1, Bush2, rock1, Flower, Fern;
+		std::vector<ref<Foliage>> topFoliageLayer;
+		std::vector<ref<Foliage>> middleFoliageLayer;
+		std::vector<ref<Foliage>> bottomFoliageLayer;
+
 		int GetChunkIndex(int PosX,int PosZ);
 	};
 

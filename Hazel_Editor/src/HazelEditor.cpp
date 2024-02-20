@@ -225,7 +225,7 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::Text(std::to_string(Terrain::ChunkIndex).c_str());
 	ImGui::End();
 
-	ImGui::Begin("Shadow Map and SSAO map");
+	ImGui::Begin("Buffers");
 	ImGui::Text("SHADOW MAP");
 	ImGui::DragInt("Index", &Renderer3D::index, 1.0, 0, 3);
 	ImGui::Image((void*)Renderer3D::depth_id[Renderer3D::index], ImVec2(512, 512), { 0,1 }, { 1,0 });

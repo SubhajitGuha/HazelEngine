@@ -32,6 +32,7 @@ namespace Hazel {
 
 		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 	public:
+		static TimeStep deltaTime;
 		glm::vec3 v3;
 		float v=0;
 		float r = 0;

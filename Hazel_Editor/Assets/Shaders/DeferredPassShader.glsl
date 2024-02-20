@@ -89,8 +89,10 @@ float CalculateShadow(int cascade_level)
 			if(depth + bias > p.z)
 				ShadowSum+=1;
 		}
-	}	
-	return pow(ShadowSum/9.0,16);
+	}
+	float totalShadow = ShadowSum/9.0;
+	totalShadow = pow(totalShadow,16.0);
+	return totalShadow;
 }
 
 float NormalDistribution_GGX(float NdotH)
@@ -144,20 +146,19 @@ vec3 ColorCorrection(vec3 color)
 	color = mix(vec3(dot(color,vec3(0.299,0.587,0.114))), color,1.0);//saturation
 
 	//color = clamp(color,0,1);
-	color = 1.00*(color-0.5) + 0.5 + 0.00 ; //contrast
+	color = 1.03*(color-0.5) + 0.5 + 0.00 ; //contrast
 
 	return color;
 }
 
-vec3 aces(vec3 x) 
+vec3 ACESFilm(vec3 x)
 {
-	//x = ColorCorrection(x);
-  const float a = 2.51;
-  const float b = 0.03;
-  const float c = 2.43;
-  const float d = 0.59;
-  const float e = 0.14;
-  return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+	float a = 2.51;
+	float b = 0.03;
+	float c = 2.43;
+	float d = 0.59;
+	float e = 0.14;
+	return clamp((x*(a*x+b))/(x*(c*x+d)+e),0.0,1.0);
 }
 
 void main()
@@ -253,7 +254,5 @@ void main()
 
 	PBR_Color += ambiant;
 
-	PBR_Color = clamp(aces(PBR_Color),0.0,1.0);
-
-	color = vec4(PBR_Color,1.0);
+	color = vec4(ACESFilm(PBR_Color),1.0);
 }

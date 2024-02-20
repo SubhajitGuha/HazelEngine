@@ -20,12 +20,11 @@ layout (binding = 3, r16f) uniform image2D densityMap;
 uniform sampler2D u_DensityMap;
 uniform sampler2D u_HeightMap;
 uniform float u_HeightMapScale;
-uniform vec3 u_PlayerPos;
 uniform int u_instanceCount;
 uniform int u_nearestDistance;
 uniform float u_zoi;
 uniform float u_trunk_radius;
-uniform int offset;
+uniform float u_predominanceValue;
 
 uvec4 seed;
 void pcg4d(inout uvec4 v)
@@ -44,6 +43,7 @@ float randomInRange(float _min,float _max)
 {
 	return random()*(_max -_min)+_min;
 }
+
 //column major format
 mat4 CreateTranslationMatrix(vec3 pos)
 {
@@ -94,6 +94,18 @@ const int dist = u_nearestDistance;
 const float trunk_radius = u_trunk_radius;
 const float zoi = u_zoi;
 
+//https://media.contentapi.ea.com/content/dam/eacom/frostbite/files/chapter5-andersson-terrain-rendering-in-frostbite.pdf
+float CalculateSlope(vec2 texCoord , vec2 texelSize)
+{
+	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * u_HeightMapScale  *2.0 - u_HeightMapScale;
+	float right = texture(u_HeightMap,texCoord + vec2(texelSize.x,0.0)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+	float up = texture(u_HeightMap,texCoord + vec2(0.0 , texelSize.y)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+	float down = texture(u_HeightMap,texCoord + vec2(0.0 , -texelSize.y)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
+	vec3 normal = normalize(vec3(down-up,2.0,left-right));
+
+	return 1.0-normal.y; //slope is 1.0-normal.y as suggested by the dice-terrainRendering paper page 43
+}
+
 void CreateDensity(ivec2 coord)
 {
 	for(int i=-dist; i<=dist;i++)
@@ -111,25 +123,25 @@ void CreateDensity(ivec2 coord)
 void main()
 {
 	int m_index = int(gl_GlobalInvocationID.x);
-	uint prev_count = 0;
-	//uint initilize = 0;
-	if(m_index == 0)
-	{
-		prev_count = atomicCounter(Count_Instances);
-	}
-	//m_index += u_instanceCountOffset;
 
 	if(m_index < u_instanceCount)
 	{
 		float P = 1.0; //probability of spawnning a foliage
 		
 		vec2 foliagePos = posBuffer.pos[m_index];
-		//foliagePos = max(foliagePos + u_PlayerPos.xz - vec2(gl_NumWorkGroups.x*32/2), foliagePos); //offset by player position
-		vec2 uv = foliagePos / textureSize(u_HeightMap,0).xy; // convert to 0-1 range
-		float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
-		seed = uvec4(foliagePos.x,height,foliagePos.y, 1);
-		vec3 jitter_pos = vec3(foliagePos.x + randomInRange(1.0,5.0) , height, foliagePos.y + randomInRange(1.0,5.0));
+		seed = uvec4(foliagePos.x,5,foliagePos.y, 1);
+		vec3 jitter_pos = vec3(foliagePos.x + randomInRange(1.0,5.0) , 0.0, foliagePos.y + randomInRange(1.0,5.0)); //jitter the foliage position for randomness
 
+		vec2 texelSize = 1.0/textureSize(u_HeightMap,0).xy;
+		vec2 uv = jitter_pos.xz * texelSize; // convert to 0-1 range (calculate the uv using the jittered position)
+		float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
+		float slope = CalculateSlope(uv,texelSize);
+		slope = clamp((slope-0.5)*10.0+0.5,0.0,1.0); //add contrast to the slope value
+		jitter_pos.y = height; //add the height to the jitter position
+
+		//combine the probability
+		P = P * (1.0 - slope); //dont grow on steep slopes
+		P = P * u_predominanceValue;
 		P = P * (1.0 - imageLoad(densityMap,ivec2( jitter_pos.xz)).r); //load the density map
 		if(random() < P)
 		{

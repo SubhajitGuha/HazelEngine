@@ -26,10 +26,43 @@ namespace Hazel
 
 	Terrain::Terrain(float width, float height)
 	{
-		grass = std::make_shared<Foliage>(Scene::Grass, 125000, 64, 64, 300, false, 50, true, true);
-		Tree = std::make_shared<Foliage>(Scene::Tree, 8000, 64, 64, 800, false, 150);
+		grass = std::make_shared<Foliage>(Scene::Grass, 125000, 64, 64, 300, false, 150, true, true);
+		Tree1 = std::make_shared<Foliage>(Scene::Tree1, 8000, 64, 64, 800, true, 250);
+		Tree2 = std::make_shared<Foliage>(Scene::Tree2, 8000, 64, 64, 800, true, 250);
+		Tree3 = std::make_shared<Foliage>(Scene::Tree3, 8000, 64, 64, 800, true, 250);
+
+		Bush1 = std::make_shared<Foliage>(Scene::Bush1, 15000, 64, 64, 500, true, 100);
+		Bush2 = std::make_shared<Foliage>(Scene::Bush2, 15000, 64, 64, 500, false, 100);
+		rock1 = std::make_shared<Foliage>(Scene::Rock1, 15000, 64, 64, 800, true, 100);
+
 		Flower = std::make_shared<Foliage>(Scene::Flower, 15000, 64, 64, 400, false, 100);
-		Fern = std::make_shared<Foliage>(Scene::Fern, 15000, 64, 64, 100, false, 50, false, true);
+		Fern = std::make_shared<Foliage>(Scene::Fern, 125000, 64, 64, 100, false, 80, false, false);
+
+		//set distribution parameters on foliage
+		Tree1->SetFoliageDistributionParam(20.0, 5, 1, 0.7);
+		Tree2->SetFoliageDistributionParam(20.0, 5, 1, 0.1);
+		Tree3->SetFoliageDistributionParam(35.0, 8, 1.8, 0.2);
+
+		rock1->SetFoliageDistributionParam(20, 3, 1.0, 0.2);
+		Bush1->SetFoliageDistributionParam(10, 1.0, 0.3, 0.4);
+		Bush2->SetFoliageDistributionParam(10, 1.0, 0.3, 0.4);
+
+		Flower->SetFoliageDistributionParam(3, 0.5, 0.08, 0.4);
+		Fern->SetFoliageDistributionParam(2.0, 0.3, 0.06, 0.4);
+		grass->SetFoliageDistributionParam(2.0, 0.3, 0.06, 0.6);
+
+		//top layer
+		topFoliageLayer.push_back(Tree1);
+		topFoliageLayer.push_back(Tree2);
+		topFoliageLayer.push_back(Tree3);
+
+		middleFoliageLayer.push_back(rock1);
+		middleFoliageLayer.push_back(Bush1);
+		middleFoliageLayer.push_back(Bush2);
+
+		bottomFoliageLayer.push_back(Fern);
+		//bottomFoliageLayer.push_back(Flower);
+		bottomFoliageLayer.push_back(grass);
 
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2 * RadiusOfSpawn + 1, 2));//radius of spawn defines how many tiles to cover from the centre
 		StartTime = std::chrono::high_resolution_clock::now();
@@ -53,9 +86,21 @@ namespace Hazel
 
 		m_HeightMap = Texture2D::Create("Assets/Textures/Terrain_Height_Map2.png", true);
 		m_perlinNoise = Texture2D::Create("Assets/Textures/PerlinTexture.png");
-		TerrainTex_Albedo = Texture2D::Create("Assets/Textures/forrest_ground_01_diff_2k.jpg");
-		TerrainTex_Roughness = Texture2D::Create("Assets/Textures/forrest_ground_01_rough_2k.jpg");
-		TerratinTex_Normal = Texture2D::Create("Assets/Textures/forrest_ground_01_nor_gl_2k.jpg");
+
+		/*
+			Terrain Layer Format:
+			Layer0: Grass Texture;
+			Layer1: Cliff/Rock Texture;
+			Layer2: Another Grass;
+		*/
+		//get all textures for the terrain layers
+		std::vector<std::string> albedo_paths = { "Assets/Textures/forrest_ground_01_diff_2k.jpg", "Assets/Textures/xccibbi_2K_Albedo.jpg" };
+		std::vector<std::string> roughness_paths = { "Assets/Textures/forrest_ground_01_rough_2k.jpg", "Assets/Textures/xccibbi_2K_Roughness.jpg" };
+		std::vector<std::string> normal_paths = { "Assets/Textures/forrest_ground_01_nor_gl_2k.jpg", "Assets/Textures/xccibbi_2K_Normal.jpg"};
+
+		TerrainTex_Albedo = Texture2DArray::Create(albedo_paths);
+		TerrainTex_Roughness = Texture2DArray::Create(roughness_paths);
+		TerratinTex_Normal = Texture2DArray::Create(normal_paths);
 
 		//Renderer3D::AllocateInstancedFoliageData(maxGrassAmount * GrassDensity, foliageBufferIndex);
 
@@ -150,6 +195,7 @@ namespace Hazel
 	}
 	void Terrain::RenderTerrain(Camera& cam)
 	{
+		
 		++frame_counter;
 		player_camera_pos = cam.GetCameraPosition();
 		if (qtree == nullptr)
@@ -158,7 +204,7 @@ namespace Hazel
 			rootNode = NodePool::GetNode(Bounds(glm::vec3(0, 0, 0), glm::vec3(m_dimension.x, 0, m_dimension.y)));
 		
 		qtree->Insert(rootNode, cam);
-		if (frame_counter % 10 == 0)
+		if (frame_counter % 10*Application::deltaTime == 0)
 			qtree->DeleteNodesIfNotInScope(rootNode, cam);
 
 		int CamX = cam.GetCameraPosition().x;
@@ -173,7 +219,7 @@ namespace Hazel
 		TerratinTex_Normal->Bind(NORMAL_SLOT);
 
 		m_terrainShader->Bind();
-		m_terrainShader->SetFloat("u_Tiling", 40);//Tiling factor for all terrain textures (not for height map)
+		m_terrainShader->SetFloat("u_Tiling", 100);//Tiling factor for all terrain textures (not for height map)
 		m_terrainShader->SetFloat("HEIGHT_SCALE", HeightScale);
 		m_terrainShader->SetFloat("FoliageHeight", FoliageHeight);
 		m_terrainShader->SetFloat3("DirectionalLight_Direction", Renderer3D::m_SunLightDir);
@@ -209,14 +255,12 @@ namespace Hazel
 		if (bShowWireframeTerrain)
 			RenderCommand::DrawArrays(*m_terrainVertexArray, terrainData.size(), GL_PATCHES, 0);
 
-		//Tree->SetFoliageDistributionParam(5, 1);
-		Tree->RenderFoliage(cam, 30);
-		//Fern->SetFoliageDistributionParam(1, 0.2);
-		Fern->RenderFoliage(cam, 6.0);
-		//Flower->SetFoliageDistributionParam(1, 0.3);
-		Flower->RenderFoliage(cam, 10.0);
-		//grass->SetFoliageDistributionParam(0.3, 0.06);
-		grass->RenderFoliage(cam, 2);
+		for(auto topLayerFoliage:topFoliageLayer)
+			topLayerFoliage->RenderFoliage(cam);
+		for (auto middleLayerFoliage : middleFoliageLayer)
+			middleLayerFoliage->RenderFoliage(cam);
+		for (auto bottomLayerFoliage : bottomFoliageLayer)
+			bottomLayerFoliage->RenderFoliage(cam);
 	}
 
 	QuadTree::QuadTree(Terrain* _terrain)
@@ -236,29 +280,29 @@ namespace Hazel
 		if (chunk_size.x == 256)
 		{
 			//load the top level of foliage
-			terrain->Tree->bHasSpawnned = false;
-			terrain->Tree->SetFoliageDistributionParam(20, 1);
-			terrain->Tree->GenerateFoliagePositions(30.0f, node->chunk_bounds);
+			for (auto topPlant : terrain->topFoliageLayer)
+			{
+				topPlant->bHasSpawnned = false;
+				topPlant->GenerateFoliagePositions(node->chunk_bounds);
+			}
 		}
 		if (chunk_size.x == 128)
 		{
-
-			//load the middle level of foliage			
-			terrain->Fern->bHasSpawnned = false;
-			terrain->Fern->SetFoliageDistributionParam(1, 0.3);
-			terrain->Fern->GenerateFoliagePositions(6.0f, node->chunk_bounds);
-
-			
-			terrain->Flower->bHasSpawnned = false;
-			terrain->Flower->SetFoliageDistributionParam(1.5, 0.3);
-			terrain->Flower->GenerateFoliagePositions(10.0f, node->chunk_bounds);
+			//load the middle level of foliage
+			for (auto middlePlant : terrain->middleFoliageLayer)
+			{
+				middlePlant->bHasSpawnned = false;
+				middlePlant->GenerateFoliagePositions(node->chunk_bounds);
+			}
 		}
 		if (chunk_size.x == 64)
 		{
 			//load the bottom level of foliage			
-			terrain->grass->bHasSpawnned = false;
-			terrain->grass->SetFoliageDistributionParam(0.3, 0.06);
-			terrain->grass->GenerateFoliagePositions(2.0, node->chunk_bounds);
+			for (auto bottomPlant : terrain->bottomFoliageLayer)
+			{
+				bottomPlant->bHasSpawnned = false;
+				bottomPlant->GenerateFoliagePositions(node->chunk_bounds);
+			}
 		}
 	}
 
@@ -353,16 +397,18 @@ namespace Hazel
 			glm::vec3 chunk_size = bounds_max - bounds_min;
 			if (chunk_size.x == 256)
 			{
-				terrain->Tree->RemoveFoliagePositions(child->chunk_bounds);
+				for (auto topPlant : terrain->topFoliageLayer)
+					topPlant->RemoveFoliagePositions(child->chunk_bounds);
 			}
 			if (chunk_size.x == 128)
 			{
-				terrain->Fern->RemoveFoliagePositions(child->chunk_bounds);
-				terrain->Flower->RemoveFoliagePositions(child->chunk_bounds);
+				for (auto middlePlant : terrain->middleFoliageLayer)
+					middlePlant->RemoveFoliagePositions(child->chunk_bounds);
 			}
 			if (chunk_size.x == 64)
 			{
-				terrain->grass->RemoveFoliagePositions(child->chunk_bounds);
+				for (auto bottoPlant : terrain->bottomFoliageLayer)
+					bottoPlant->RemoveFoliagePositions(child->chunk_bounds);
 			}
 			DeleteNode(child);
 			NodePool::RecycleMemory(child); //delete the node by resetting the reference and recycling the allocated memory
@@ -372,10 +418,10 @@ namespace Hazel
 
 	bool QuadTree::aabbIntersection(Bounds& box1, Bounds& box2)
 	{
-		bool doesIntersect = box1.aabbMin.x < box2.aabbMax.x &&
-							box1.aabbMax.x > box2.aabbMin.x &&
-							box1.aabbMin.z < box2.aabbMax.z &&
-							box1.aabbMax.z > box2.aabbMin.z;
+		bool doesIntersect = box1.aabbMin.x <= box2.aabbMax.x &&
+							box1.aabbMax.x >= box2.aabbMin.x &&
+							box1.aabbMin.z <= box2.aabbMax.z &&
+							box1.aabbMax.z >= box2.aabbMin.z;
 		return doesIntersect;
 	}
 	

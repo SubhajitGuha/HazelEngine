@@ -17,8 +17,8 @@ void main()
 #shader tessellation control
 #version 410 core
 layout (vertices = 4) out;
-const float MAX_TESS_LEVEL = 64;
-const float MIN_TESS_LEVEL = 4;
+const float MAX_TESS_LEVEL = 128;
+const float MIN_TESS_LEVEL = 16;
 const float MAX_CAM_DIST = 1000;
 const float MIN_CAM_DIST = 0;
 
@@ -41,10 +41,10 @@ void main()
 		vec4 p3 = u_View * u_Model * gl_in[2].gl_Position;
 		vec4 p4 = u_View * u_Model * gl_in[3].gl_Position;
 		
-		float dist01 = clamp( (abs(p1.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
-		float dist02 = clamp( (abs(p2.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
-		float dist03 = clamp( (abs(p3.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
-		float dist04 = clamp( (abs(p4.z) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
+		float dist01 = clamp( (abs(p1.z/p1.w) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
+		float dist02 = clamp( (abs(p2.z/p2.w) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
+		float dist03 = clamp( (abs(p3.z/p3.w) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
+		float dist04 = clamp( (abs(p4.z/p4.w) - MIN_CAM_DIST) / (MAX_CAM_DIST-MIN_CAM_DIST), 0.0, 1.0);
 
 		float TessValue01 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(dist01,dist03));
 		float TessValue02 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(dist01,dist02));
@@ -208,11 +208,12 @@ uniform float HEIGHT_SCALE = 1000;
 uniform float u_Tiling;
 
 uniform sampler2D u_HeightMap;
-uniform sampler2D u_Albedo;
-uniform sampler2D u_Roughness;
-uniform sampler2D u_Normal;
+uniform sampler2DArray u_Albedo;
+uniform sampler2DArray u_Roughness;
+uniform sampler2DArray u_Normal;
 uniform mat4 u_View;
 
+//https://media.contentapi.ea.com/content/dam/eacom/frostbite/files/chapter5-andersson-terrain-rendering-in-frostbite.pdf
 vec3 CalculateNormal(vec2 texCoord , vec2 texelSize)
 {
 	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * HEIGHT_SCALE  *2.0 - HEIGHT_SCALE;
@@ -233,11 +234,12 @@ vec3 CalculateTangent(vec2 texCoord , vec2 texelSize)
 	return normalize(vec3(2.0,0.0,left-right));
 }
 
-mat3 TBN(vec2 texCoord , vec2 texelSize)
+mat3 TBN(vec2 texCoord , vec2 texelSize,out float slope)
 {
 	vec3 N = CalculateNormal(texCoord , texelSize);
 	vec3 T = CalculateTangent(texCoord , texelSize);
 	vec3 B = cross(T,N);
+	slope = 1.0 - N.y; //slope is 1.0-normal.y as suggested by the dice-terrainRendering paper page 43
 
 	return mat3(T,B,N);
 }
@@ -262,13 +264,35 @@ vec2 CalculateVelocity(in vec4 curPos,in vec4 oldPos)
 
 void main()
 {
+	/*
+		Terrain Layer Format:
+		Layer0: Grass Texture;
+		Layer1: Cliff/Rock Texture;
+		Layer2: Another Grass;
+	*/
+	vec3 grass_normal = texture(u_Normal, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
+	vec3 grass_albedo = texture(u_Albedo, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
+	vec3 grass_roughness = texture(u_Roughness, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
+
+	vec3 rock_normal = texture(u_Normal, vec3(fs_data.TexCoord * u_Tiling,1)).rgb;
+	vec3 rock_albedo = texture(u_Albedo, vec3(fs_data.TexCoord * u_Tiling,1)).rgb;
+	vec3 rock_roughness = texture(u_Roughness, vec3(fs_data.TexCoord * u_Tiling,1)).rgb;
+
 	vec2 texture_size = textureSize(u_HeightMap,0);	//get texture dimension
-	vec3 Normal = mat3(u_View) * TBN(fs_data.TexCoord , vec2(1/texture_size.x)) * texture(u_Normal , fs_data.TexCoord * u_Tiling).rgb;
+
+	float slope;
+	mat3 tbn = TBN(fs_data.TexCoord , vec2(1.0/texture_size.x),slope); //slope is calculated in the tbn function
+	slope = clamp((slope-0.5)*10.0+0.5,0.0,1.0);
+	vec3 ts_Normal = mix(grass_normal,rock_normal,slope);
+	vec3 Normal = mat3(u_View) * tbn * ts_Normal;
 	
+	vec3 terrain_color = mix(grass_albedo,rock_albedo,slope);
+	float terrain_roughness = mix(grass_roughness,rock_roughness,slope).r;
+
 	Normal = normalize(Normal);
 	
 	gNormal = vec4(Normal.xyz,1.0);
 	gVelocity = vec4(CalculateVelocity(grass_data.m_curPos,grass_data.m_oldPos),0,1.0);
-	gColor = vec4(GammaCorrection(texture(u_Albedo,fs_data.TexCoord * u_Tiling).xyz) , 1.0);
-	gRoughnessMetallic = vec4(texture(u_Roughness,fs_data.TexCoord * u_Tiling).x,0,0 , 1.0);
+	gColor = vec4(GammaCorrection(terrain_color) , 1.0);
+	gRoughnessMetallic = vec4(terrain_roughness,0,0 , 1.0);
 }

@@ -29,7 +29,9 @@ namespace Hazel {
 	//std::vector<PointLight*> Scene::m_PointLights;
 	EditorCamera editor_cam;
 	 LoadMesh* Scene::Sphere=nullptr, *Scene::Sphere_simple = nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr
-		 , *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern, *Scene::Sponza, *Scene::Grass, *Scene::Flower, *Scene::Tree;
+		 , *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern,
+		 *Scene::Sponza, *Scene::Grass, *Scene::Flower, *Scene::Tree1, *Scene::Tree2, *Scene::Tree3,
+		 *Scene::Bush1, *Scene::Bush2, *Scene::Rock1;
 	 bool capture = false;
 	 glm::vec3 camloc = { 0,0,0 }, camrot = {0,0,0};
 	Scene::Scene()
@@ -52,8 +54,20 @@ namespace Hazel {
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
 		//Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
-		Tree = new LoadMesh("Assets/Meshes/HZ_Pine1.fbx");
-		Tree->CreateLOD("Assets/Meshes/HZ_Pine1_LOD1.fbx");
+		//Trees
+		Tree1 = new LoadMesh("Assets/Meshes/forest_PineTree1.fbx");
+		Tree1->CreateLOD("Assets/Meshes/forest_PineTree1_LOD1.fbx");
+		Tree2 = new LoadMesh("Assets/Meshes/forest_PineTree2.fbx");
+		Tree3 = new LoadMesh("Assets/Meshes/forest_PineTree3.fbx");
+		Tree3->CreateLOD("Assets/Meshes/forest_PineTree3_LOD1.fbx");
+
+		//Bushes
+		Bush1 = new LoadMesh("Assets/Meshes/forest_Bush1.fbx");
+		Bush1->CreateLOD("Assets/Meshes/forest_Bush1_LOD1.fbx");
+		Bush2 = new LoadMesh("Assets/Meshes/forest_Bush2.fbx");
+
+		//Rock
+		Rock1 = new LoadMesh("Assets/Meshes/forest_rock1.fbx");
 		Grass = new LoadMesh("Assets/Meshes/grass3.fbx");
 		Grass->CreateLOD("Assets/Meshes/grass3_LOD1.fbx");
 		plant = new LoadMesh("Assets/Meshes/dragon.fbx", LoadMesh::IMPORT_MESH);

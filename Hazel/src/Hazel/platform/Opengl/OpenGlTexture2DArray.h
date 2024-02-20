@@ -23,8 +23,8 @@ namespace Hazel {
 		unsigned char* pixel_data_8 = nullptr;
 	private:
 		void Resize_Image(const float& width, const float& height, bool bUse16BitTexture = false);
-		void Create16BitTextures(const std::vector<std::string>& paths,int numMaterials, int numChannels = 3);
-		void Create8BitsTextures(const std::vector<std::string>& paths,int numMaterials, int numChannels = 3);
+		void Create16BitTextures(const std::vector<std::string>& paths, int numMaterials);
+		void Create8BitsTextures(const std::vector<std::string>& paths, int numMaterials);
 		void CreateWhiteTextureArray(int numMat);
 	};
 }

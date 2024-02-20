@@ -17,6 +17,7 @@ with out std::bind it is not possible to call OnEvent with an argument while als
 namespace Hazel {
 	
 	Application* Application::getApplication;
+	TimeStep Application::deltaTime(0.0);
 	Application::Application()
 	{
 		getApplication = this;
@@ -76,12 +77,12 @@ namespace Hazel {
 			m_window->OnUpdate();
 
 			float time = glfwGetTime();
-			TimeStep ts = time - m_LastFrameTime;//this is the delta time (time btn last and present frame or time required to render a frame)
+			deltaTime = time - m_LastFrameTime;//this is the delta time (time btn last and present frame or time required to render a frame)
 			m_LastFrameTime = time;
 			
 			//layers render layer and game layers
 			for (Layer* layer : m_layerstack)
-				layer->OnUpdate(ts);
+				layer->OnUpdate(deltaTime);
 
 			//for ImguiLayers
 			m_ImGuiLayer->Begin();

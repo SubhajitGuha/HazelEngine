@@ -6,8 +6,8 @@
 #include "stb_image_resize.h"
 
 namespace Hazel {
-	OpenGlTexture2D::OpenGlTexture2D(const std::string& path,bool bUse16BitTexture)
-		:m_Height(0),m_Width(0)
+	OpenGlTexture2D::OpenGlTexture2D(const std::string& path, bool bUse16BitTexture)
+		:m_Height(0), m_Width(0)
 	{
 		uuid = UUID(path);
 		if (bUse16BitTexture)
@@ -16,8 +16,8 @@ namespace Hazel {
 			Create8BitsTexture(path);
 	}
 
-		//glDeleteTextures(1, &m_Renderid);
-	OpenGlTexture2D::OpenGlTexture2D(const unsigned int Width=1,const  unsigned int Height=1, unsigned int data= 0xffffffff)//for making a custom texture(white,black,red..)
+	//glDeleteTextures(1, &m_Renderid);
+	OpenGlTexture2D::OpenGlTexture2D(const unsigned int Width = 1, const  unsigned int Height = 1, unsigned int data = 0xffffffff)//for making a custom texture(white,black,red..)
 		:m_Height(Height), m_Width(Width)//default texture is white of height and width = 1
 	{
 		//uuid = UUID(data);
@@ -104,7 +104,7 @@ namespace Hazel {
 		pixel_data_8 = stbi_load(path.c_str(), &m_Width, &m_Height, &channels, 0);
 
 		if (pixel_data_8 == nullptr) {
-			HAZEL_CORE_ERROR("{}{}",path,"2D Image not found!!");
+			HAZEL_CORE_ERROR("{}{}", path, "2D Image not found!!");
 			CreateWhiteTexture();
 		}
 		else //if the image is loaded
