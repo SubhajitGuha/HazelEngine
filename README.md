@@ -5,6 +5,7 @@ HazelEngine is a 3D and 2D Rendering engine that is capable of making 2D and 3D 
 
 Features:  
 
+*Temporal Antialiasing
 *deferred rendering  
 *physically based rendering (cook-torrance BRDF)  
 *image based lighting  
@@ -47,7 +48,9 @@ then launch the .sln file and then build and run the application using vs2019.
 
 Some Screen shots of PBR rendering in my engine.
 TERRAIN with FOLIAGE
-![Screenshot (2953)](https://github.com/SubhajitGuha/HazelEngine/assets/102531274/29d2d029-1cbd-4536-918f-2d60ae450c82)
+![Screenshot (3664)](https://github.com/SubhajitGuha/HazelEngine/assets/102531274/8ff4ffcc-3513-415c-8794-79a6c954d6d1)
+![Screenshot (3667)](https://github.com/SubhajitGuha/HazelEngine/assets/102531274/af440ade-3da7-4482-8274-2f6601e104b1)
+
 
 ![Screenshot (2239)](https://user-images.githubusercontent.com/102531274/230664441-498f418d-9bb1-472f-98d7-2b574f9b454b.png)
 With Ambiant occlusion(SSAO) Applied:
