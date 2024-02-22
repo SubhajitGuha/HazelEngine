@@ -5,7 +5,7 @@ HazelEngine is a 3D and 2D Rendering engine that is capable of making 2D and 3D 
 
 Features:  
 
-*Temporal Antialiasing
+*Temporal Antialiasing  
 *deferred rendering  
 *physically based rendering (cook-torrance BRDF)  
 *image based lighting  
@@ -35,6 +35,7 @@ There is also a path-tracer which runs individually for now has features like:
 *physically based rendering using cook-torrance BRDF, support for metallic and non metallic objects(WIP)  
 
 Image of path-tracer  
+![Screenshot (3623)](https://github.com/SubhajitGuha/HazelEngine/assets/102531274/b426d4c3-b93d-4c83-ba8c-4969064abdaf)
 ![Screenshot (3525)](https://github.com/SubhajitGuha/HazelEngine/assets/102531274/a67d0d68-ed7b-4328-9d95-9f897570efa8)  
 
 follow path-tracer showcase videos here:-  
