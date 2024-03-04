@@ -14,18 +14,16 @@ namespace Hazel {
 	uint32_t Foliage::class_ID = 0;
 	std::vector<Foliage*> Foliage::foliageObjects;
 
-	Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, float cullDistance,
-		bool canCastShadow, float LOD_Distance, bool bapplyGradientMask, bool benableWind)
+	Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, float cullDistance,	bool canCastShadow,
+		float LOD_Distance, bool bapplyGradientMask, bool benableWind, const std::string& densityMapPath)
 		:m_foliageMesh(mesh), m_instanceCount(numInstances), m_cullDistance(cullDistance), 
 		bCanCastShadow(canCastShadow), lod0Distance(LOD_Distance), applyGradientMask(bapplyGradientMask), enableWind(benableWind)
 	{
 		class_ID++;
-		m_coverage = glm::ivec2(coverageX, coverageY);
+		//m_coverage = glm::ivec2(coverageX, coverageY);
 		camera = new EditorCamera(16, 9);
 		camera->SetCameraPosition(Showcase_camPosition);
-		FoliageDensityMap = Texture2D::Create("Assets/Textures/PerlinTexture.png");
-		FoliageDensityMap->Bind(FOLIAGE_DENSITY_TEXTURE_SLOT);
-
+		
 		cs_FrustumCullVote = Shader::Create("Assets/Shaders/cs_FrustumCullVote.glsl");
 		cs_PrefixSum = Shader::Create("Assets/Shaders/cs_FrustumCullPrefixSum.glsl");
 		cs_FrustumCullCompact = Shader::Create("Assets/Shaders/cs_FrustumCullCompact.glsl");
@@ -44,6 +42,8 @@ namespace Hazel {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
+		foliageDensityMap = Texture2D::Create(densityMapPath);//custom density map provided to individual foliage assets for controlled growth
 
 		foliage_positions.resize(numInstances,glm::vec2(0.0,0.0));
 		foliageObjects.push_back(this);//this is a static vector that keeps track of all foliage objects created
@@ -456,7 +456,7 @@ namespace Hazel {
 
 	void Foliage::GenerateFoliagePositions(Bounds& bounds)
 	{
-		//if (PDD_values.size() == 0)
+		if (PDD_values.size() == 0) //store the points once generated
 			PDD_values = GeneratePoints(spacing, bounds, 10); //use poisson disk distribution to populate
 
 		if (PDD_values.size() < m_instanceCount && total_instanceCount < m_instanceCount)
@@ -476,8 +476,7 @@ namespace Hazel {
 		auto newEnd = std::remove_if(std::execution::par, foliage_positions.begin(), foliage_positions.begin() + total_instanceCount,
 			[bounds](glm::vec2& cur_val) {return (cur_val.x >= bounds.aabbMin.x && cur_val.x <= bounds.aabbMax.x&&
 				cur_val.y >= bounds.aabbMin.z && cur_val.y <= bounds.aabbMax.z); });
-		//fill the remaining positions with zero
-		//std::fill(std::execution::par, newEnd, foliage_positions.end(), glm::vec2(0.0, 0.0));
+
 		total_instanceCount = newEnd - foliage_positions.begin(); // update the total instance count (true if PDD_values is constant size)
 		
 		//when a terrain chunk is deleted re-calculate the density map by drawing all foliage-objects again
@@ -498,6 +497,7 @@ namespace Hazel {
 
 	void Foliage::SpawnFoliage()
 	{
+		foliageDensityMap->Bind(FOLIAGE_DENSITY_TEXTURE_SLOT); //custom foliage density
 		bHasSpawnned = true;
 		cs_FoliageSpawn->Bind();
 		cs_FoliageSpawn->SetInt("u_HeightMap", HEIGHT_MAP_TEXTURE_SLOT);

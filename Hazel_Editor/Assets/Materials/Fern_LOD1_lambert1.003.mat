@@ -1,0 +1,10 @@
+Material ID: 5074185023028110781
+Color: [1, 1, 1, 1]
+Roughness: 1
+Metallic: 0
+Normal Strength: 1
+Emission: 0
+Albedo Map: Assets/Textures/MeshTextures/ForestFern_2K_Albedo_packed.png
+Normal Map: Assets/Textures/MeshTextures/ForestFern_2K_Normal.jpg
+Roughness Map: Assets/Textures/MeshTextures/ForestFern_2K_Roughness.jpg
+Shader Path: TODO

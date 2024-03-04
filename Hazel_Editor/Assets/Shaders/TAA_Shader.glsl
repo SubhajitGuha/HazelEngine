@@ -74,6 +74,6 @@ void main()
 	vec2 closestFragCoord = ClosestFragment();
 	vec2 prevPixel = tex_coord - texture(gVelocity,closestFragCoord).xy; //sample velocity from closest depth fragment
 	float mixfactor = 0.9;
-	vec3 old_image = clamp(texture(History_Buffer,prevPixel).rgb,min_color,max_color);
+	vec3 old_image = clamp(texture(History_Buffer,prevPixel).rgb,min_color,max_color); //box-clamp to reduce ghosting
 	color = vec4(mix(current_image,old_image,mixfactor),1.0);
 }

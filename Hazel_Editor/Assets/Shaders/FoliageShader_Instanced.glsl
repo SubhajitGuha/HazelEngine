@@ -39,24 +39,24 @@ void main()
 {	
 	mat4 wsGrass = u_Model * instance_mm;
 	vec4 wsVertexPos = wsGrass * pos;
-	objSpacePos = wsVertexPos.xyz/wsVertexPos.w;	
+	objSpacePos = pos.xyz;
 
 	vec3 origin = vec3(wsGrass[3][0],wsGrass[3][1],wsGrass[3][2]);
 	//wind system
 	float factor = pos.y/u_BoundsExtent.y;	//gradient calculated at object space by dividing with the bounds
 
-	if(factor<0.2)
+	if(factor<0.05)
 		factor = 0;
 	
 	vec2 size = textureSize(Noise,0);
-	vec2 coord = mod(wsVertexPos.xz,size);
-	coord = coord*0.5 + 0.5;
+	vec2 coord = mod(origin.xz,size);
+	coord /= size;
 
 	if(enableWind == 1)
 	{
-		vec3 noise = texture(Noise , coord*20.0 ).rgb;
-		float rotVal = (cos(u_Time * PI * noise.r) * cos(u_Time *0.2* PI)) * wsAmplitude;
-		float ws_rotVal = (cos(u_Time * PI * 0.8) * cos(u_Time *0.2* PI)) * wsAmplitude + sin(PI*u_Time*noise.r)*1;
+		float noise = texture(Noise , coord ).r;
+		float rotVal = (cos(u_Time * PI * noise) * cos(u_Time *0.2* PI)) * wsAmplitude;
+		float ws_rotVal = (cos(u_Time * PI * 0.8) * cos(u_Time *0.2* PI)) * wsAmplitude + sin(PI*u_Time*noise)*1;
 		
 		wsVertexPos.x += ws_rotVal * factor;
 		wsVertexPos.z += rotVal * factor;
@@ -101,8 +101,6 @@ in vec3 m_VertexColor;
 in vec2 tcord;
 
 const float g_HashedScale = 1.0;
-uniform samplerCube diffuse_env;
-uniform samplerCube specular_env;
 
 uniform sampler2D u_Albedo;
 uniform sampler2D u_Roughness;

@@ -46,12 +46,25 @@ void main()
     vec4 l = texture(inputImage, vec2(tcord.x - x, tcord.y - y));
     vec4 m = texture(inputImage, vec2(tcord.x + x, tcord.y - y));
 
+    // Apply weighted distribution:
+    // 0.5 + 0.125 + 0.125 + 0.125 + 0.125 = 1
+    // a,b,d,e * 0.125
+    // b,c,e,f * 0.125
+    // d,e,g,h * 0.125
+    // e,f,h,i * 0.125
+    // j,k,l,m * 0.5
+    // This shows 5 square areas that are being sampled. But some of them overlap,
+    // so to have an energy preserving downsample we need to make some adjustments.
+    // The weights are the distributed, so that the sum of j,k,l,m (e.g.)
+    // contribute 0.5 to the final color output. The code below is written
+    // to effectively yield this sum. We get:
+    // 0.125*5 + 0.03125*4 + 0.0625*4 = 1
 
     vec4 calculated_color = vec4(0);
     calculated_color = e*0.125;
-    calculated_color += (a+c+g+i)*0.03125;
-    calculated_color += (b+d+f+h)*0.0625;
-    calculated_color += (j+k+l+m)*0.125;
+    calculated_color += (a+c+g+i)*0.03125;//0.125
+    calculated_color += (b+d+f+h)*0.0625;//0.25
+    calculated_color += (j+k+l+m)*0.125;//0.5
 
     color = vec4(calculated_color.xyz,1.0);
 }

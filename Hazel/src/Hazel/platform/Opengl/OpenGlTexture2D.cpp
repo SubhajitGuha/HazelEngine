@@ -73,7 +73,6 @@ namespace Hazel {
 				HAZEL_CORE_ERROR("Invalid Texture format");
 
 			glCreateTextures(GL_TEXTURE_2D, 1, &m_Renderid);
-			//glGenTextures(1, &m_Renderid);
 			glTextureStorage2D(m_Renderid, 1, InternalFormat, m_Width, m_Height);//immutable texture storage
 
 			glGenerateTextureMipmap(m_Renderid);

@@ -91,7 +91,7 @@ float CalculateShadow(int cascade_level)
 		}
 	}
 	float totalShadow = ShadowSum/9.0;
-	totalShadow = pow(totalShadow,16.0);
+	//totalShadow = pow(totalShadow,16.0);
 	return totalShadow;
 }
 

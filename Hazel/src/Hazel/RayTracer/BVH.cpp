@@ -166,14 +166,14 @@ namespace Hazel
 		if (node->triangleCount>0)
 		{
 			linearNode->triangleStartID = node->triangleStartID;
-			linearNode->triangleCount = node->triangleCount;		
+			linearNode->triangleCount = node->triangleCount;
 		}
 		else {
 			linearNode->triangleStartID = node->triangleStartID;
 			linearNode->triangleCount = node->triangleCount;
 
-			BVH::FlattenBVH(node->leftChild,offset);	
-			linearNode->rightChild = BVH::FlattenBVH(node->rightChild,offset);			
+			BVH::FlattenBVH(node->leftChild,offset);
+			linearNode->rightChild = BVH::FlattenBVH(node->rightChild,offset);
 		}
 		return myOffset;
 	}

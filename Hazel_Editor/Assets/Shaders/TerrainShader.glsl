@@ -216,12 +216,12 @@ uniform mat4 u_View;
 //https://media.contentapi.ea.com/content/dam/eacom/frostbite/files/chapter5-andersson-terrain-rendering-in-frostbite.pdf
 vec3 CalculateNormal(vec2 texCoord , vec2 texelSize)
 {
-	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * HEIGHT_SCALE  *2.0 - HEIGHT_SCALE;
+	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * HEIGHT_SCALE  *2.0 - HEIGHT_SCALE; //-height to +height
 	float right = texture(u_HeightMap,texCoord + vec2(texelSize.x,0.0)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
 	float up = texture(u_HeightMap,texCoord + vec2(0.0 , texelSize.y)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
 	float down = texture(u_HeightMap,texCoord + vec2(0.0 , -texelSize.y)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
 
-	return normalize(vec3(down-up,2.0,left-right));
+	return normalize(vec3(left-right,2.0,down-up));
 }
 
 vec3 CalculateTangent(vec2 texCoord , vec2 texelSize)
@@ -237,8 +237,13 @@ vec3 CalculateTangent(vec2 texCoord , vec2 texelSize)
 mat3 TBN(vec2 texCoord , vec2 texelSize,out float slope)
 {
 	vec3 N = CalculateNormal(texCoord , texelSize);
-	vec3 T = CalculateTangent(texCoord , texelSize);
-	vec3 B = cross(T,N);
+	vec3 up = vec3(1.0, 0.0, 0.0);
+	if(abs(N.x)>0.99)
+		up = vec3(0.0, 0.0, 1.0);
+	vec3 T = normalize(cross(up,N));
+	vec3 B = cross(N,T);
+	//vec3 T = CalculateTangent(texCoord , texelSize);
+	//vec3 B = cross(T,N);
 	slope = 1.0 - N.y; //slope is 1.0-normal.y as suggested by the dice-terrainRendering paper page 43
 
 	return mat3(T,B,N);

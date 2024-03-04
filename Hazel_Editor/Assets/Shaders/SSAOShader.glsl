@@ -65,7 +65,7 @@ void main()
 		vec4 SamplePoint = vec4(FragPos + TBN * Samples[i] * vec3(radius),1.0);
 
 		vec4 offset = u_projection * SamplePoint;
-		offset.xyz = offset.xyz/offset.w;		
+		offset.xyz = offset.xyz/offset.w;
 		offset.xyz = offset.xyz*0.5 + vec3(0.5); // 0 - 1 range
 
 		vec3 depth = GetViewSpacePosition(offset.xy).xyz; //sample position from the offset coord.

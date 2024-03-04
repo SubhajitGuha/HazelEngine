@@ -53,31 +53,40 @@ mat4 CreateTranslationMatrix(vec3 pos)
 				pos.x,pos.y,pos.z,1);
 }
 
-mat4 CreateRotationMatrix(float x, float y, float z)
+mat4 CreateRotationMatrix(vec3 rotation)
 {
-	x= radians(x);
-	y= radians(y);
-	z= radians(z);
-
 	mat4 aroundX = mat4(
 	1,0,0,0,
-	0,cos(x),sin(x),0,
-	0,-sin(x),cos(x),0,
+	0,cos(rotation.x),-sin(rotation.x),0,
+	0,sin(rotation.x),cos(rotation.x),0,
 	0,0,0,1);
 
 	mat4 aroundY = mat4(
-	cos(y),0,-sin(y),0,
+	cos(rotation.y),0,sin(rotation.y),0,
 	0,1,0,0,
-	sin(y),0,cos(y),0,
+	-sin(rotation.y),0,cos(rotation.y),0,
 	0,0,0,1);
 
 	mat4 aroundZ = mat4(
-	cos(z),sin(z),0,0,
-	-sin(z),cos(z),0,0,
+	cos(rotation.z),-sin(rotation.z),0,0,
+	sin(rotation.z),cos(rotation.z),0,0,
 	0,0,1,0,
 	0,0,0,1);
 
-	return aroundX * aroundY * aroundZ;
+	return aroundZ * aroundY * aroundX;
+}
+
+//construct rotation matrix using axis of rotation and rotation angle
+mat4 CreateRotationMatrix_AngleAxis(float angle, vec3 axis)
+{
+	mat4 rotMat = mat4(
+	cos(angle) + axis.x*axis.x*(1.0-cos(angle)), axis.x*axis.y*(1.0-cos(angle))-axis.z*sin(angle), axis.x*axis.z*(1.0-cos(angle))+axis.y*sin(angle), 0.0,
+	axis.x*axis.y*(1.0-cos(angle))+axis.z*sin(angle), cos(angle) + axis.y*axis.y*(1.0-cos(angle)),  axis.y*axis.z*(1.0-cos(angle))-axis.x*sin(angle), 0.0,
+	axis.x*axis.z*(1.0-cos(angle))-axis.y*sin(angle), axis.z*axis.y*(1.0-cos(angle))+axis.x*sin(angle), cos(angle) + axis.z*axis.z*(1.0-cos(angle)), 0.0,
+	0 , 0, 0, 1
+	);
+
+	return rotMat;
 }
 
 mat4 CreateScaleMatrix(float scale)
@@ -95,18 +104,21 @@ const float trunk_radius = u_trunk_radius;
 const float zoi = u_zoi;
 
 //https://media.contentapi.ea.com/content/dam/eacom/frostbite/files/chapter5-andersson-terrain-rendering-in-frostbite.pdf
-float CalculateSlope(vec2 texCoord , vec2 texelSize)
+
+vec3 TerrainNormal(vec2 texCoord , vec2 texelSize)
 {
 	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * u_HeightMapScale  *2.0 - u_HeightMapScale;
 	float right = texture(u_HeightMap,texCoord + vec2(texelSize.x,0.0)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
 	float up = texture(u_HeightMap,texCoord + vec2(0.0 , texelSize.y)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
 	float down = texture(u_HeightMap,texCoord + vec2(0.0 , -texelSize.y)).r * u_HeightMapScale *2.0 - u_HeightMapScale;
-	vec3 normal = normalize(vec3(down-up,2.0,left-right));
-
+	return normalize(vec3(left-right,2.0,down-up));
+}
+float CalculateSlope(vec3 normal)
+{	
 	return 1.0-normal.y; //slope is 1.0-normal.y as suggested by the dice-terrainRendering paper page 43
 }
 
-void CreateDensity(ivec2 coord)
+void CreateDensity(ivec2 coord)//iterates the neighbourhood pixels and assigns the density value
 {
 	for(int i=-dist; i<=dist;i++)
 	{
@@ -135,19 +147,26 @@ void main()
 		vec2 texelSize = 1.0/textureSize(u_HeightMap,0).xy;
 		vec2 uv = jitter_pos.xz * texelSize; // convert to 0-1 range (calculate the uv using the jittered position)
 		float height = texture(u_HeightMap, uv).x * u_HeightMapScale; //need the height map scale
-		float slope = CalculateSlope(uv,texelSize);
+		
+		vec3 terrainNormal = TerrainNormal(uv,texelSize); //get the terrain normal
+		float slope = CalculateSlope(terrainNormal); //get slope from terrain normal
 		slope = clamp((slope-0.5)*10.0+0.5,0.0,1.0); //add contrast to the slope value
 		jitter_pos.y = height; //add the height to the jitter position
 
 		//combine the probability
 		P = P * (1.0 - slope); //dont grow on steep slopes
 		P = P * u_predominanceValue;
+		P = P * texture(u_DensityMap,uv).x;
 		P = P * (1.0 - imageLoad(densityMap,ivec2( jitter_pos.xz)).r); //load the density map
+
 		if(random() < P)
 		{
 			uint index = atomicCounterIncrement(Count_Instances); //count the total instances that are spawnning
+			vec3 rotationAxis = -cross(vec3(0,1.0,0),terrainNormal); //get in which axis to rotate
+			float rotationAngle = acos(dot(vec3(0,1.0,0),terrainNormal)); //get rotation amount
+
 			inBuffer.trans[index] = CreateTranslationMatrix(jitter_pos) 
-			* CreateRotationMatrix(0,randomInRange(5.0,180.0),0.0) * CreateScaleMatrix(randomInRange(1.0,2.0));
+			* CreateRotationMatrix(rotationAngle* rotationAxis) * CreateScaleMatrix(randomInRange(1.0,2.0));
 			CreateDensity(ivec2( jitter_pos.xz));
 		}
 	}	

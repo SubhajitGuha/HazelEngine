@@ -26,43 +26,50 @@ namespace Hazel
 
 	Terrain::Terrain(float width, float height)
 	{
-		grass = std::make_shared<Foliage>(Scene::Grass, 125000, 64, 64, 300, false, 150, true, true);
-		Tree1 = std::make_shared<Foliage>(Scene::Tree1, 8000, 64, 64, 800, true, 250);
-		Tree2 = std::make_shared<Foliage>(Scene::Tree2, 8000, 64, 64, 800, true, 250);
-		Tree3 = std::make_shared<Foliage>(Scene::Tree3, 8000, 64, 64, 800, true, 250);
+		grass = std::make_shared<Foliage>(Scene::Grass, 125000, 100, false, 80, false, true);
+		Tree1 = std::make_shared<Foliage>(Scene::Tree1, 8000, 800, true, 350, false, true);
+		Tree2 = std::make_shared<Foliage>(Scene::Tree2, 5000, 800, true, 350, false, true);
+		Tree3 = std::make_shared<Foliage>(Scene::Tree3, 5000, 800, true, 350, false, true);
+		Tree4 = std::make_shared<Foliage>(Scene::Tree4, 5000, 800, true, 350, false, true, "Assets/Textures/Fern_Mask.png");
+		Tree5 = std::make_shared<Foliage>(Scene::Tree5, 5000, 800, true, 350, false, true, "Assets/Textures/Fern_Mask.png");
 
-		Bush1 = std::make_shared<Foliage>(Scene::Bush1, 15000, 64, 64, 500, true, 100);
-		Bush2 = std::make_shared<Foliage>(Scene::Bush2, 15000, 64, 64, 500, false, 100);
-		rock1 = std::make_shared<Foliage>(Scene::Rock1, 15000, 64, 64, 800, true, 100);
+		Bush1 = std::make_shared<Foliage>(Scene::Bush1, 15000, 500, true, 100, false, true);
+		Bush2 = std::make_shared<Foliage>(Scene::Bush2, 15000, 500, false, 100, false, true);
+		rock1 = std::make_shared<Foliage>(Scene::Rock1, 15000, 800, true, 100);
 
-		Flower = std::make_shared<Foliage>(Scene::Flower, 15000, 64, 64, 400, false, 100);
-		Fern = std::make_shared<Foliage>(Scene::Fern, 125000, 64, 64, 100, false, 80, false, false);
+		GroundPlant = std::make_shared<Foliage>(Scene::GroundPlant, 125000, 200, false, 80, false, true);
+		Fern = std::make_shared<Foliage>(Scene::Fern, 125000, 100, false, 80, false, true, "Assets/Textures/Fern_Mask.png");
 
 		//set distribution parameters on foliage
-		Tree1->SetFoliageDistributionParam(20.0, 5, 1, 0.7);
-		Tree2->SetFoliageDistributionParam(20.0, 5, 1, 0.1);
-		Tree3->SetFoliageDistributionParam(35.0, 8, 1.8, 0.2);
+		Tree1->SetFoliageDistributionParam(30.0, 5, 1, 0.6);
+		Tree2->SetFoliageDistributionParam(30.0, 5, 1, 0.4);
+		Tree3->SetFoliageDistributionParam(35.0, 5, 1, 0.0);
+		Tree4->SetFoliageDistributionParam(35.0, 5, 2, 1.0);
+		Tree5->SetFoliageDistributionParam(35.0, 5, 2, 0.0);
+
 
 		rock1->SetFoliageDistributionParam(20, 3, 1.0, 0.2);
-		Bush1->SetFoliageDistributionParam(10, 1.0, 0.3, 0.4);
-		Bush2->SetFoliageDistributionParam(10, 1.0, 0.3, 0.4);
+		Bush1->SetFoliageDistributionParam(10, 1.0, 0.3, 0.6);
+		Bush2->SetFoliageDistributionParam(10, 1.0, 0.3, 0.2);
 
-		Flower->SetFoliageDistributionParam(3, 0.5, 0.08, 0.4);
-		Fern->SetFoliageDistributionParam(2.0, 0.3, 0.06, 0.4);
-		grass->SetFoliageDistributionParam(2.0, 0.3, 0.06, 0.6);
+		GroundPlant->SetFoliageDistributionParam(3.0, 0.3, 0.08, 0.7);
+		Fern->SetFoliageDistributionParam(3.0, 1.2, 0.5, 1.0);
+		grass->SetFoliageDistributionParam(2.0, 0.3, 0.06, 0.3);
 
 		//top layer
-		topFoliageLayer.push_back(Tree1);
+		topFoliageLayer.push_back(Tree4);
+		topFoliageLayer.push_back(Tree5);
 		topFoliageLayer.push_back(Tree2);
+		topFoliageLayer.push_back(Tree1);
 		topFoliageLayer.push_back(Tree3);
 
 		middleFoliageLayer.push_back(rock1);
-		middleFoliageLayer.push_back(Bush1);
 		middleFoliageLayer.push_back(Bush2);
+		middleFoliageLayer.push_back(Bush1);
 
 		bottomFoliageLayer.push_back(Fern);
-		//bottomFoliageLayer.push_back(Flower);
 		bottomFoliageLayer.push_back(grass);
+		bottomFoliageLayer.push_back(GroundPlant);
 
 		maxGrassAmount = ChunkSize * ChunkSize * (pow(2 * RadiusOfSpawn + 1, 2));//radius of spawn defines how many tiles to cover from the centre
 		StartTime = std::chrono::high_resolution_clock::now();
@@ -94,9 +101,9 @@ namespace Hazel
 			Layer2: Another Grass;
 		*/
 		//get all textures for the terrain layers
-		std::vector<std::string> albedo_paths = { "Assets/Textures/forrest_ground_01_diff_2k.jpg", "Assets/Textures/xccibbi_2K_Albedo.jpg" };
-		std::vector<std::string> roughness_paths = { "Assets/Textures/forrest_ground_01_rough_2k.jpg", "Assets/Textures/xccibbi_2K_Roughness.jpg" };
-		std::vector<std::string> normal_paths = { "Assets/Textures/forrest_ground_01_nor_gl_2k.jpg", "Assets/Textures/xccibbi_2K_Normal.jpg"};
+		std::vector<std::string> albedo_paths = { "Assets/Textures/xiboab2r_2K_Albedo.jpg", "Assets/Textures/xccibbi_2K_Albedo.jpg" };
+		std::vector<std::string> roughness_paths = { "Assets/Textures/xiboab2r_2K_Roughness.jpg", "Assets/Textures/xccibbi_2K_Roughness.jpg" };
+		std::vector<std::string> normal_paths = { "Assets/Textures/xiboab2r_2K_Normal.jpg", "Assets/Textures/xccibbi_2K_Normal.jpg"};
 
 		TerrainTex_Albedo = Texture2DArray::Create(albedo_paths);
 		TerrainTex_Roughness = Texture2DArray::Create(roughness_paths);
@@ -204,7 +211,7 @@ namespace Hazel
 			rootNode = NodePool::GetNode(Bounds(glm::vec3(0, 0, 0), glm::vec3(m_dimension.x, 0, m_dimension.y)));
 		
 		qtree->Insert(rootNode, cam);
-		if (frame_counter % 10*Application::deltaTime == 0)
+		if (frame_counter % 10 == 0) //check to delete after every 10th frame
 			qtree->DeleteNodesIfNotInScope(rootNode, cam);
 
 		int CamX = cam.GetCameraPosition().x;
@@ -377,7 +384,6 @@ namespace Hazel
 		{
 			DeleteNode(node);
 			node->childrens.clear();
-			//return;
 		}
 
 		for (QNode*& x : node->childrens)

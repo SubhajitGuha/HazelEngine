@@ -23,8 +23,8 @@ namespace Hazel
 		LOD_Distance : max distance after which lower LOD will replace the higher ones (as this engine has 2 lods)
 		applyGradientMask : applies a grigent (dark color at bottom bright color at top)
 		*/
-		Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, uint32_t coverageX, uint32_t coverageY, 
-			float cullDistance=100, bool canCastShadow = false, float LOD_Distance = 50.0f, bool applyGradientMask = false, bool enableWind = false);
+		Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances,	float cullDistance=100, bool canCastShadow = false,
+			float LOD_Distance = 50.0f, bool applyGradientMask = false, bool enableWind = false, const std::string& densityMap_Path = "");
 		~Foliage();
 		//For foliage placement in cpu side (not in use)
 		void addInstance(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale);
@@ -75,6 +75,9 @@ namespace Hazel
 		std::vector<glm::vec2> PDD_values;
 		bool bResetGpuInstanceCount = false;
 
+		//foliage object density map
+		ref<Texture2D> foliageDensityMap; //custom foliage density map
+
 		//foliage attributes
 		bool applyGradientMask = false;
 		bool enableWind = false;
@@ -102,7 +105,6 @@ namespace Hazel
 		ref<Texture2D> blueNoiseTexture;
 		uint32_t m_instanceCount; //atomic counter to count the number of instances
 		
-		ref<Texture2D> FoliageDensityMap; //custom density map
 		ref<Shader> cs_FrustumCullVote, cs_PrefixSum, cs_FrustumCullCompact, cs_FoliageSpawn,
 			cs_GrassPlacement, cs_CopyIndirectBufferData, cs_ResetDensityMap;
 		glm::vec2 oldPlayerPos = {0,0}; //needs refactoring

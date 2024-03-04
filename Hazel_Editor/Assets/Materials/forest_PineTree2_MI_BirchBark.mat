@@ -1,0 +1,10 @@
+Material ID: 9038710839002841587
+Color: [1, 1, 1, 1]
+Roughness: 1
+Metallic: 0
+Normal Strength: 1
+Emission: 0
+Albedo Map: Assets/Textures/MeshTextures/MI_BirchBark_BaseColor.png
+Normal Map: Assets/Textures/MeshTextures/MI_BirchBark_Normal.png
+Roughness Map: Assets/Textures/MeshTextures/MI_BirchBark_MetallicRoughness.png
+Shader Path: TODO

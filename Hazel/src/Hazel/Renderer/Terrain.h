@@ -47,7 +47,7 @@ namespace Hazel
 		uint32_t foliageBufferIndex;
 	private:
 		uint32_t frame_counter = 0;
-		ref<Foliage> grass, Tree1,Tree2,Tree3, Bush1, Bush2, rock1, Flower, Fern;
+		ref<Foliage> grass, Tree1,Tree2,Tree3,Tree4,Tree5, Bush1, Bush2, rock1, GroundPlant, Fern;
 		std::vector<ref<Foliage>> topFoliageLayer;
 		std::vector<ref<Foliage>> middleFoliageLayer;
 		std::vector<ref<Foliage>> bottomFoliageLayer;

@@ -30,7 +30,7 @@ namespace Hazel {
 	EditorCamera editor_cam;
 	 LoadMesh* Scene::Sphere=nullptr, *Scene::Sphere_simple = nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr
 		 , *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern,
-		 *Scene::Sponza, *Scene::Grass, *Scene::Flower, *Scene::Tree1, *Scene::Tree2, *Scene::Tree3,
+		 *Scene::Sponza, *Scene::Grass, *Scene::GroundPlant, *Scene::Tree1, *Scene::Tree2, *Scene::Tree3, *Scene::Tree4, *Scene::Tree5,
 		 *Scene::Bush1, *Scene::Bush2, *Scene::Rock1;
 	 bool capture = false;
 	 glm::vec3 camloc = { 0,0,0 }, camrot = {0,0,0};
@@ -48,8 +48,8 @@ namespace Hazel {
 
 		Material::DeserializeMaterial();// load all materials from the disc
 
-		Flower = new LoadMesh("Assets/Meshes/flower.fbx");
-		Flower->CreateLOD("Assets/Meshes/flower_LOD1.fbx");
+		GroundPlant = new LoadMesh("Assets/Meshes/forest_grass1.fbx");
+		//GroundPlant->CreateLOD("Assets/Meshes/flower_LOD1.fbx");
 		Sphere = new LoadMesh("Assets/Meshes/10-Car.fbx");
 		Sphere_simple = new LoadMesh("Assets/Meshes/sphere_simple.fbx");
 		//Plane = new LoadMesh("Assets/Meshes/Plane.fbx");
@@ -58,22 +58,27 @@ namespace Hazel {
 		Tree1 = new LoadMesh("Assets/Meshes/forest_PineTree1.fbx");
 		Tree1->CreateLOD("Assets/Meshes/forest_PineTree1_LOD1.fbx");
 		Tree2 = new LoadMesh("Assets/Meshes/forest_PineTree2.fbx");
+		Tree2->CreateLOD("Assets/Meshes/forest_PineTree2_LOD1.fbx");
 		Tree3 = new LoadMesh("Assets/Meshes/forest_PineTree3.fbx");
 		Tree3->CreateLOD("Assets/Meshes/forest_PineTree3_LOD1.fbx");
+		Tree4 = new LoadMesh("Assets/Meshes/forest_Tree.fbx");
+		Tree4->CreateLOD("Assets/Meshes/forest_Tree_LOD1.fbx");
+		Tree5 = new LoadMesh("Assets/Meshes/forest_Tree2.fbx");
 
 		//Bushes
 		Bush1 = new LoadMesh("Assets/Meshes/forest_Bush1.fbx");
 		Bush1->CreateLOD("Assets/Meshes/forest_Bush1_LOD1.fbx");
 		Bush2 = new LoadMesh("Assets/Meshes/forest_Bush2.fbx");
+		Bush2->CreateLOD("Assets/Meshes/forest_Bush2_LOD1.fbx");
 
 		//Rock
 		Rock1 = new LoadMesh("Assets/Meshes/forest_rock1.fbx");
-		Grass = new LoadMesh("Assets/Meshes/grass3.fbx");
-		Grass->CreateLOD("Assets/Meshes/grass3_LOD1.fbx");
-		plant = new LoadMesh("Assets/Meshes/dragon.fbx", LoadMesh::IMPORT_MESH);
+		Grass = new LoadMesh("Assets/Meshes/forest_grass.fbx");
+		//Grass->CreateLOD("Assets/Meshes/grass3_LOD1.fbx");
+		plant = new LoadMesh("Assets/Meshes/dragon.fbx");
 		House = new LoadMesh("Assets/Meshes/house.fbx");
 		Fern = new LoadMesh("Assets/Meshes/Fern.fbx");
-		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.fbx", LoadMesh::IMPORT_MESH);
+		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.fbx");
 
 		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx", LoadMesh::IMPORT_MESH);

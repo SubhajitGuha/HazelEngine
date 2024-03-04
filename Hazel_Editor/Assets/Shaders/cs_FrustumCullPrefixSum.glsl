@@ -23,6 +23,8 @@ shared int tmp[1024];
 
 void main()
 {
+	//parallel algorithm taken from
+	//https://users.umiacs.umd.edu/~ramani/cmsc828e_gpusci/ScanTalk.pdf
 	if(stride == 0)
 		totalSum.TotSum = 0;
 	int index = int(gl_GlobalInvocationID.x);

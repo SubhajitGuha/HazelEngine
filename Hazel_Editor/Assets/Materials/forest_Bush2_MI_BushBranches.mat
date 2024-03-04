@@ -1,0 +1,10 @@
+Material ID: 13680649673905607003
+Color: [1, 1, 1, 1]
+Roughness: 1
+Metallic: 0
+Normal Strength: 1
+Emission: 0
+Albedo Map: Assets/Textures/MeshTextures/MI_BushBranches_BaseColor.png
+Normal Map: Assets/Textures/MeshTextures/MI_BushBranches_Normal.png
+Roughness Map: Assets/Textures/MeshTextures/MI_BushBranches_MetallicRoughness.png
+Shader Path: TODO

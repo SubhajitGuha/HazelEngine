@@ -147,7 +147,6 @@ namespace Hazel {
 
 	void Renderer3D::SetSunLightDirection(const glm::vec3& pos)
 	{
-		m_SunLightDir = pos;
 		m_data->shader->Bind();
 		m_data->shader->SetFloat3("DirectionalLight_Direction", pos);
 

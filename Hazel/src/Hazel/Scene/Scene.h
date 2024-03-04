@@ -42,7 +42,7 @@ namespace Hazel {
 	public:
 		std::vector<PointLight*> m_PointLights;
 		static LoadMesh* Sphere, *Sphere_simple, *Cube , *Plane,*plant,*House,* Windmill ,
-			*Fern, *Sponza,*Grass,*Flower,*Tree1, *Tree2, *Tree3, *Bush1, *Bush2, *Rock1;
+			*Fern, *Sponza,*Grass,*GroundPlant,*Tree1, *Tree2, *Tree3, *Tree4, *Tree5, *Bush1, *Bush2, *Rock1;
 		static unsigned int m_Scene_tex_id;
 		static unsigned int m_Scene_depth_id;
 		ref<FrameBuffer> framebuffer;

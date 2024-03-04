@@ -1,0 +1,10 @@
+Material ID: 5121389806493001174
+Color: [1, 1, 1, 1]
+Roughness: 1
+Metallic: 0
+Normal Strength: 1
+Emission: 0
+Albedo Map: Assets/Textures/MeshTextures/MI_ConiferLeafs_A_BaseColor.png
+Normal Map: Assets/Textures/MeshTextures/MI_ConiferLeafs_A_Normal.png
+Roughness Map: ""
+Shader Path: TODO

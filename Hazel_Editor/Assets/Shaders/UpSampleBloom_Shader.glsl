@@ -40,7 +40,10 @@ void main()
 	vec4 g = texture(inputImage , vec2(tcord.x - x, tcord.y - y));
 	vec4 h = texture(inputImage , vec2(tcord.x , tcord.y - y));
 	vec4 i = texture(inputImage , vec2(tcord.x + x, tcord.y - y));
-
+	//weighted box Filter
+	//  1   | 1 2 1 |
+    // -- * | 2 4 2 |
+    // 16   | 1 2 1 |
 	vec4 calculated_color;
 	calculated_color = e * 4.0;
 	calculated_color += (b+d+f+h) * 2.0;
