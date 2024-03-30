@@ -6,5 +6,5 @@ Normal Strength: 1
 Emission: 0
 Albedo Map: Assets/Textures/MeshTextures/MI_BirchLeafs01_BaseColor.png
 Normal Map: Assets/Textures/MeshTextures/MI_BirchLeafs01_Normal.png
-Roughness Map: ""
+Roughness Map: Assets/Textures/MeshTextures/MI_BirchLeafs02_MetallicRoughness.png
 Shader Path: TODO

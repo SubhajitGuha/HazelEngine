@@ -121,6 +121,6 @@ void main()
 	vec4 albedo = texture(u_Albedo, tcord);
 	
 	float alpha = albedo.a;
-	if(alpha < HashedAlphaThreshold())
-		discard;
+	//if(alpha < 0.8)
+		//discard;
 }

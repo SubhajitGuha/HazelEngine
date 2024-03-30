@@ -24,7 +24,7 @@ namespace Hazel
 		applyGradientMask : applies a grigent (dark color at bottom bright color at top)
 		*/
 		Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances,	float cullDistance=100, bool canCastShadow = false,
-			float LOD_Distance = 50.0f, bool applyGradientMask = false, bool enableWind = false, const std::string& densityMap_Path = "");
+			float LOD_Distance = 50.0f, bool applyGradientMask = false, bool enableWind = false, bool alignToTerrainNormal = false, float min_scale = 1, float max_scale=2, const std::string & densityMap_Path = "");
 		~Foliage();
 		//For foliage placement in cpu side (not in use)
 		void addInstance(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale);
@@ -59,9 +59,7 @@ namespace Hazel
 		bool bHasSpawnned = false;
 	private:
 		//frustum cull is divided in 3 stages
-		void Vote(Camera&,int offset);
-		void Scan(int offset);
-		void Compact(int offset);
+		void FrustumCull(Camera&);		
 
 		void CreateLODs(Camera& cam);
 		void SpawnFoliage();
@@ -81,15 +79,17 @@ namespace Hazel
 		//foliage attributes
 		bool applyGradientMask = false;
 		bool enableWind = false;
+		bool alignToTerrainNormal = false;
 		float spacing; //tells how-much apart the foliage are
 		float zoi; //zone of influence of the foliage (must be less than the spawn radius)
 		float trunk_radius;//radius of the trunk
 		float predominanceValue = 0.0; //must be in between 0.0-1.0
 		float m_Spacing = 1.0;
 		float m_cullDistance;
+		float m_minScale, m_maxScale;
 
 		int totalSum = 0, instanceCount = 0; //accmulated result of prefix sum for each 1024 dispatch units
-		uint32_t ssbo_inTransforms = -1, ssbo_outTransforms = -1, ssbo_voteIndices = -1, ssbo_PrefixSum=-1, ssbo_totalPrefixSum = -1;//shader storage buffer
+		uint32_t ssbo_inTransforms = -1, ssbo_outTransforms = -1, ssbo_totalPrefixSum = -1;//shader storage buffer
 		uint32_t ssbo_foliagePos = -1;
 		
 		//for LODs........................................................................
@@ -105,7 +105,7 @@ namespace Hazel
 		ref<Texture2D> blueNoiseTexture;
 		uint32_t m_instanceCount; //atomic counter to count the number of instances
 		
-		ref<Shader> cs_FrustumCullVote, cs_PrefixSum, cs_FrustumCullCompact, cs_FoliageSpawn,
+		ref<Shader> cs_FrustumCull, cs_FoliageSpawn,
 			cs_GrassPlacement, cs_CopyIndirectBufferData, cs_ResetDensityMap;
 		glm::vec2 oldPlayerPos = {0,0}; //needs refactoring
 		//void* gpuData;

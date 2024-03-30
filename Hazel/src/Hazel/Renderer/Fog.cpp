@@ -4,14 +4,14 @@
 
 namespace Hazel
 {
-	ref<Fog> Fog::Create(float density, float gradient, float fogStart, float fogEnd, glm::vec2 ScreenSize)
+	ref<Fog> Fog::Create(float density, float fogStart, float fogEnd, float fogTop, float fogBottom, glm::vec2 ScreenSize)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case GraphicsAPI::None:
 			return nullptr;
 		case GraphicsAPI::OpenGL:
-			return std::make_shared<OpenGlFog>(density, gradient, fogStart, fogEnd, ScreenSize);
+			return std::make_shared<OpenGlFog>(density, fogStart, fogEnd, fogTop, fogBottom, ScreenSize);
 		default:
 			return nullptr;
 		}

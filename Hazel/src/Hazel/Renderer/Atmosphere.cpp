@@ -4,17 +4,14 @@
 
 namespace Hazel {
 	ref<Shader> Atmosphere::atmosphere_shader;
+	ref<Texture2DArray> Atmosphere::skyGradients;
+
 	void Atmosphere::RenderAtmosphere(Camera& camera,const float& atmosphere_radius)
 	{
+		skyGradients->Bind(ALBEDO_SLOT);
 		atmosphere_shader->Bind();
-		atmosphere_shader->SetFloat("atmosphere_radius", 6471e3);
-		atmosphere_shader->SetFloat("densityFalloff", 6);
 		atmosphere_shader->SetFloat3("sun_direction", Renderer3D::m_SunLightDir);
-		atmosphere_shader->SetFloat("planetRadius", 6371e3);
-		atmosphere_shader->SetFloat("ScatteringStrength", 1);
-		atmosphere_shader->SetFloat3("RayOrigin", glm::vec3(0, 6372e3, 0));
-		atmosphere_shader->SetFloat3("view_dir", camera.GetViewDirection());
-		atmosphere_shader->SetInt("u_DepthTexture", SCENE_DEPTH_SLOT); //used as a mask to render only the areas which are valid
+		atmosphere_shader->SetInt("Sky_Gradient", ALBEDO_SLOT);
 
 		glm::vec3 wavelength = glm::vec3(700, 530, 440);
 		glm::vec3 ScatteringCoeff = glm::vec3(0.00000519673, 0.0000121427, 0.0000296453);//glm::vec3(pow(200 / wavelength.x, 4), pow(200 / wavelength.y, 4), pow(200 / wavelength.z, 4));
@@ -24,6 +21,10 @@ namespace Hazel {
 	void Atmosphere::InitilizeAtmosphere()
 	{
 		atmosphere_shader = Shader::Create("Assets/Shaders/Atmosphere_Shader.glsl");
+
+		std::vector<std::string> gradientTex_paths = {"Assets/Textures/Sky_Gradient_Textures/SunZenith_Gradient.png",
+			"Assets/Textures/Sky_Gradient_Textures/ViewZenith_Gradient.png", "Assets/Textures/Sky_Gradient_Textures/SunView_Gradient.png"};
+		skyGradients = Texture2DArray::Create(gradientTex_paths);
 	}
 	void Atmosphere::RenderQuad(const glm::mat4& view, const glm::mat4& proj)
 	{

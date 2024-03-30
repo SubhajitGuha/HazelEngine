@@ -1,0 +1,10 @@
+Material ID: 13565675761230769812
+Color: [1, 1, 1, 1]
+Roughness: 1
+Metallic: 0
+Normal Strength: 1
+Emission: 0
+Albedo Map: Assets/Textures/MeshTextures/t-sbark-01-bc.png
+Normal Map: Assets/Textures/MeshTextures/t-sbark-01-n.png
+Roughness Map: Assets/Textures/MeshTextures/t-sbark-01-raos.png
+Shader Path: TODO

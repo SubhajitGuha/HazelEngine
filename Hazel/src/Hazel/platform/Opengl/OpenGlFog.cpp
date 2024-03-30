@@ -9,8 +9,8 @@ namespace Hazel
 	{
 		m_fogShader = Shader::Create("Assets/Shaders/pp_fogShader.glsl");
 	}
-	OpenGlFog::OpenGlFog(float density, float gradient, float fogStart, float fogEnd, glm::vec2 ScreenSize)
-		: m_density(density), m_gradient(gradient), m_fogStart(fogStart), m_fogEnd(fogEnd), m_screenSize(ScreenSize)
+	OpenGlFog::OpenGlFog(float density, float fogStart, float fogEnd, float fogTop, float fogBottom, glm::vec2 ScreenSize)
+		: m_density(density), m_gradient(1), m_fogStart(fogStart), m_fogEnd(fogEnd), m_screenSize(ScreenSize)
 	{
 		m_fogShader = Shader::Create("Assets/Shaders/pp_fogShader.glsl");
 
@@ -42,6 +42,13 @@ namespace Hazel
 		m_fogShader->SetFloat("u_density", m_density);
 		m_fogShader->SetFloat("u_gradient", m_gradient);
 		m_fogShader->SetFloat3("u_fogColor", m_fogColor);
+		m_fogShader->SetFloat("u_fogTop", m_fogTop);
+		m_fogShader->SetFloat("u_fogEnd", m_fogEnd);
+		m_fogShader->SetFloat3("u_sunDir", Renderer3D::m_SunLightDir);
+		m_fogShader->SetFloat3("u_ViewDir", cam.GetViewDirection());
+		m_fogShader->SetFloat3("u_CamPos", cam.GetCameraPosition());
+		m_fogShader->SetMat4("u_Projection", cam.GetProjectionMatrix());
+		m_fogShader->SetMat4("u_View", cam.GetViewMatrix());
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferID);
 		glViewport(0, 0, m_screenSize.x, m_screenSize.y);

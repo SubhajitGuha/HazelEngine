@@ -19,12 +19,15 @@ layout (binding = 3, r16f) uniform image2D densityMap;
 
 uniform sampler2D u_DensityMap;
 uniform sampler2D u_HeightMap;
-uniform float u_HeightMapScale;
 uniform int u_instanceCount;
 uniform int u_nearestDistance;
+uniform int u_alignToTerrainNormal;
+uniform float u_HeightMapScale;
 uniform float u_zoi;
 uniform float u_trunk_radius;
 uniform float u_predominanceValue;
+uniform float u_minScale;
+uniform float u_maxScale;
 
 uvec4 seed;
 void pcg4d(inout uvec4 v)
@@ -74,19 +77,6 @@ mat4 CreateRotationMatrix(vec3 rotation)
 	0,0,0,1);
 
 	return aroundZ * aroundY * aroundX;
-}
-
-//construct rotation matrix using axis of rotation and rotation angle
-mat4 CreateRotationMatrix_AngleAxis(float angle, vec3 axis)
-{
-	mat4 rotMat = mat4(
-	cos(angle) + axis.x*axis.x*(1.0-cos(angle)), axis.x*axis.y*(1.0-cos(angle))-axis.z*sin(angle), axis.x*axis.z*(1.0-cos(angle))+axis.y*sin(angle), 0.0,
-	axis.x*axis.y*(1.0-cos(angle))+axis.z*sin(angle), cos(angle) + axis.y*axis.y*(1.0-cos(angle)),  axis.y*axis.z*(1.0-cos(angle))-axis.x*sin(angle), 0.0,
-	axis.x*axis.z*(1.0-cos(angle))-axis.y*sin(angle), axis.z*axis.y*(1.0-cos(angle))+axis.x*sin(angle), cos(angle) + axis.z*axis.z*(1.0-cos(angle)), 0.0,
-	0 , 0, 0, 1
-	);
-
-	return rotMat;
 }
 
 mat4 CreateScaleMatrix(float scale)
@@ -159,14 +149,19 @@ void main()
 		P = P * texture(u_DensityMap,uv).x;
 		P = P * (1.0 - imageLoad(densityMap,ivec2( jitter_pos.xz)).r); //load the density map
 
+		vec3 rotationAxis = vec3(0);
+		float rotationAngle = 0;
 		if(random() < P)
 		{
 			uint index = atomicCounterIncrement(Count_Instances); //count the total instances that are spawnning
-			vec3 rotationAxis = -cross(vec3(0,1.0,0),terrainNormal); //get in which axis to rotate
-			float rotationAngle = acos(dot(vec3(0,1.0,0),terrainNormal)); //get rotation amount
+			if(u_alignToTerrainNormal==1)
+			{
+				rotationAxis = -cross(vec3(0,1.0,0),terrainNormal); //get in which axis to rotate
+				rotationAngle = acos(dot(vec3(0,1.0,0),terrainNormal)); //get rotation amount
+			}
 
-			inBuffer.trans[index] = CreateTranslationMatrix(jitter_pos) 
-			* CreateRotationMatrix(rotationAngle* rotationAxis) * CreateScaleMatrix(randomInRange(1.0,2.0));
+			inBuffer.trans[index] = CreateTranslationMatrix(jitter_pos)	* CreateRotationMatrix(rotationAngle* rotationAxis)
+			* CreateRotationMatrix(vec3(0,randomInRange(-80,70),0)) * CreateScaleMatrix(randomInRange(max(u_minScale,1.0),max(u_maxScale,2.0)));
 			CreateDensity(ivec2( jitter_pos.xz));
 		}
 	}	

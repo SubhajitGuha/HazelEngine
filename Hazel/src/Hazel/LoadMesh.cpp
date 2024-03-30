@@ -9,7 +9,7 @@
 #include "Hazel/Scene/SceneSerializer.h"
 #include "Hazel/ResourceManager.h"
 
-namespace Hazel 
+namespace Hazel
 {
 	LoadMesh::LoadMesh()
 	{
@@ -45,7 +45,7 @@ namespace Hazel
 	{
 		Assimp::Importer importer;
 
-		const aiScene* scene = importer.ReadFile(Path, aiProcess_OptimizeGraph | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace );
+		const aiScene* scene = importer.ReadFile(Path, aiProcess_OptimizeGraph | aiProcess_FixInfacingNormals | aiProcess_SplitLargeMeshes | aiProcess_CalcTangentSpace);
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HAZEL_CORE_ERROR("ERROR::ASSIMP::");
@@ -64,15 +64,15 @@ namespace Hazel
 
 	void LoadMesh::CreateLOD(const std::string& Path, LoadType type)
 	{
-		m_LOD.push_back(new LoadMesh(Path,type));
+		m_LOD.push_back(new LoadMesh(Path, type));
 	}
 
 	LoadMesh* LoadMesh::GetLOD(int lodIndex)
 	{
-		if (lodIndex < m_LOD.size() && lodIndex >=0)
+		if (lodIndex < m_LOD.size() && lodIndex >= 0)
 			return m_LOD[lodIndex];
 		else
-			return m_LOD[m_LOD.size()-1]; //if lod not available give the highest LOD
+			return m_LOD[m_LOD.size() - 1]; //if lod not available give the highest LOD
 	}
 
 	auto AssimpToGlmMatrix = [&](const aiMatrix4x4& from) {
@@ -106,8 +106,8 @@ namespace Hazel
 			unsigned int material_ind = m_Mesh[i]->mMaterialIndex;
 			m_subMeshes[material_ind].numVertices = m_Mesh[i]->mNumVertices;
 
-			for (int k = 0; k < m_Mesh[i]->mNumVertices; k++) 
-			{				
+			for (int k = 0; k < m_Mesh[i]->mNumVertices; k++)
+			{
 				aiVector3D aivertices = m_Mesh[i]->mVertices[k];
 				glm::vec4 pos = GlobalTransform * glm::vec4(aivertices.x, aivertices.y, aivertices.z, 1.0);
 				Bounds mesh_bounds(glm::vec3(pos.x, pos.y, pos.z));
@@ -163,7 +163,7 @@ namespace Hazel
 		m_subMeshes.resize(NumMaterials);
 
 		std::string relative_path = "Assets/Textures/MeshTextures/";
-		auto GetTexturePath = [&](aiMaterial*& material,aiTextureType type)
+		auto GetTexturePath = [&](aiMaterial*& material, aiTextureType type)
 		{
 			auto x = material->GetTextureCount(type);
 			if (x > 0)
@@ -171,8 +171,8 @@ namespace Hazel
 				aiString str;
 				material->GetTexture(type, 0, &str);
 				std::string absolute_path = str.data;
-				
-				return (relative_path + absolute_path.substr(absolute_path.find_last_of("\\")+1));
+
+				return (relative_path + absolute_path.substr(absolute_path.find_last_of("\\") + 1));
 			}
 			return std::string("");
 		};
@@ -184,7 +184,7 @@ namespace Hazel
 			m_subMeshes[i].m_MaterialID = material->materialID;
 
 			//if material cannot be found then create and serialize the material
-			if (ResourceManager::allMaterials.find(material->materialID) == ResourceManager::allMaterials.end())			
+			if (ResourceManager::allMaterials.find(material->materialID) == ResourceManager::allMaterials.end())
 			{
 				std::string diffuse_path = GetTexturePath(scene_material, aiTextureType_DIFFUSE);
 				std::string normal_path = GetTexturePath(scene_material, aiTextureType_NORMALS);

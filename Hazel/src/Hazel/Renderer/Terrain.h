@@ -36,6 +36,7 @@ namespace Hazel
 		ref<BufferLayout> bl;
 		ref<Texture2D> m_HeightMap, m_perlinNoise;
 		ref<Texture2DArray> TerrainTex_Albedo, TerrainTex_Roughness, TerratinTex_Normal;
+		ref<Texture2DArray> TerrainTex_Masks;
 		int m_Height, m_Width, m_Channels,m_Channels1;
 		float m_maxTerrainHeight;
 		float max_height;
@@ -47,7 +48,9 @@ namespace Hazel
 		uint32_t foliageBufferIndex;
 	private:
 		uint32_t frame_counter = 0;
-		ref<Foliage> grass, Tree1,Tree2,Tree3,Tree4,Tree5, Bush1, Bush2, rock1, GroundPlant, Fern;
+		ref<Foliage> grass,grass2, grass3,
+			Tree1,Tree2,Tree3,Tree4,Tree5,
+			Bush1, Bush2, rock1, rock2, GroundPlant, Fern, flower1, flower2;
 		std::vector<ref<Foliage>> topFoliageLayer;
 		std::vector<ref<Foliage>> middleFoliageLayer;
 		std::vector<ref<Foliage>> bottomFoliageLayer;

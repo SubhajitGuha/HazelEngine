@@ -17,8 +17,8 @@ void main()
 #shader tessellation control
 #version 410 core
 layout (vertices = 4) out;
-const float MAX_TESS_LEVEL = 128;
-const float MIN_TESS_LEVEL = 16;
+const float MAX_TESS_LEVEL = 32;
+const float MIN_TESS_LEVEL = 4;
 const float MAX_CAM_DIST = 1000;
 const float MIN_CAM_DIST = 0;
 
@@ -28,7 +28,6 @@ out TCS_Data
 	vec2 TexCoord_TCS;
 } tcs_data[];
 
-uniform vec3 camPos; //in ws
 uniform mat4 u_Model;
 uniform mat4 u_View;
 
@@ -122,10 +121,7 @@ uniform mat4 u_oldProjectionView;
 uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform float HEIGHT_SCALE;
-uniform float HillLevel;
-uniform sampler2D u_perlinNoise;
-uniform float FoliageHeight;
-uniform float Time;
+uniform vec3 camPos; //in ws
 
 in GS_Data
 {
@@ -137,45 +133,25 @@ out FS_Data
 	vec2 TexCoord;
 }fs_data;
 
-out Grass
+out vertexAttrib
 {
-	vec4 Pos;
 	vec4 m_curPos;
 	vec4 m_oldPos;
-	vec3 Normal;
-}grass_data;
+}vertex_data;
 
 
 void main()
 {
-	vec4 VertexPos0 = u_Model * gl_in[0].gl_Position; // in world space
-	vec4 VertexPos1 = u_Model * gl_in[1].gl_Position; // in world space
-	vec4 VertexPos2 = u_Model * gl_in[2].gl_Position; // in world space
-
-	vec4 clip_space;
-	clip_space = u_ProjectionView * VertexPos0;
-	gl_Position = clip_space;
-	fs_data.TexCoord = gs_data[0].TexCoord;
-	grass_data.m_curPos = clip_space;
-	grass_data.m_oldPos = u_oldProjectionView * VertexPos0; //oldPos to create the velocity buffer
-	grass_data.Pos = u_View * VertexPos0; //view space
-	EmitVertex();
-
-	clip_space = u_ProjectionView * VertexPos1;
-	gl_Position = clip_space;
-	fs_data.TexCoord = gs_data[1].TexCoord;
-	grass_data.m_curPos = clip_space;
-	grass_data.m_oldPos = u_oldProjectionView * VertexPos1; //oldPos to create the velocity buffer
-	grass_data.Pos = u_View * VertexPos1; //view space
-	EmitVertex();
-
-	clip_space = u_ProjectionView * VertexPos2;
-	gl_Position = clip_space;
-	fs_data.TexCoord = gs_data[2].TexCoord;
-	grass_data.m_curPos = clip_space;
-	grass_data.m_oldPos = u_oldProjectionView * VertexPos2; //oldPos to create the velocity buffer
-	grass_data.Pos = u_View * VertexPos2; //view space
-	EmitVertex();	
+	for(int i=0;i<3;i++)
+	{
+		vec4 VertexPos = u_Model * gl_in[i].gl_Position; // in world space		
+		vec4 clip_space = u_ProjectionView * VertexPos;
+		gl_Position = clip_space;
+		fs_data.TexCoord = gs_data[i].TexCoord;
+		vertex_data.m_curPos = clip_space;
+		vertex_data.m_oldPos = u_oldProjectionView * VertexPos; //oldPos to create the velocity buffer
+		EmitVertex();
+	}
 }
 
 
@@ -192,13 +168,11 @@ in FS_Data
 	vec2 TexCoord;
 }fs_data;
 
-in Grass
+in vertexAttrib
 {
-	vec4 Pos;
 	vec4 m_curPos;
-	vec4 m_oldPos;
-	vec3 Normal;	
-}grass_data;
+	vec4 m_oldPos;	
+}vertex_data;
 
 uniform float WaterLevel;
 uniform float HillLevel;
@@ -211,7 +185,11 @@ uniform sampler2D u_HeightMap;
 uniform sampler2DArray u_Albedo;
 uniform sampler2DArray u_Roughness;
 uniform sampler2DArray u_Normal;
+uniform sampler2DArray u_Masks;
+
 uniform mat4 u_View;
+
+const int MaxNumTextures = 5; //defines the total number of textures that I can pass and store
 
 //https://media.contentapi.ea.com/content/dam/eacom/frostbite/files/chapter5-andersson-terrain-rendering-in-frostbite.pdf
 vec3 CalculateNormal(vec2 texCoord , vec2 texelSize)
@@ -224,28 +202,10 @@ vec3 CalculateNormal(vec2 texCoord , vec2 texelSize)
 	return normalize(vec3(left-right,2.0,down-up));
 }
 
-vec3 CalculateTangent(vec2 texCoord , vec2 texelSize)
-{
-	float left = texture(u_HeightMap,texCoord + vec2(-texelSize.x,0.0)).r * HEIGHT_SCALE  *2.0 - HEIGHT_SCALE;
-	float right = texture(u_HeightMap,texCoord + vec2(texelSize.x,0.0)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
-	float up = texture(u_HeightMap,texCoord + vec2(0.0 , texelSize.y)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
-	float down = texture(u_HeightMap,texCoord + vec2(0.0 , -texelSize.y)).r * HEIGHT_SCALE *2.0 - HEIGHT_SCALE;
-
-	return normalize(vec3(2.0,0.0,left-right));
-}
-
-mat3 TBN(vec2 texCoord , vec2 texelSize,out float slope)
-{
-	vec3 N = CalculateNormal(texCoord , texelSize);
-	vec3 up = vec3(1.0, 0.0, 0.0);
-	if(abs(N.x)>0.99)
-		up = vec3(0.0, 0.0, 1.0);
-	vec3 T = normalize(cross(up,N));
-	vec3 B = cross(N,T);
-	//vec3 T = CalculateTangent(texCoord , texelSize);
-	//vec3 B = cross(T,N);
-	slope = 1.0 - N.y; //slope is 1.0-normal.y as suggested by the dice-terrainRendering paper page 43
-
+mat3 TBN(vec3 N)
+{	
+	vec3 T = cross(vec3(1.0,0.0,0.0),N); //tangent of terrain wrt height map aligned with terrain
+	vec3 B = cross(T,N);
 	return mat3(T,B,N);
 }
 
@@ -267,37 +227,74 @@ vec2 CalculateVelocity(in vec4 curPos,in vec4 oldPos)
 	return (curPos - oldPos).xy;
 }
 
+vec3 albedo_maps[MaxNumTextures];
+vec3 normal_maps[MaxNumTextures];
+vec3 roughness_maps[MaxNumTextures];
 void main()
 {
 	/*
 		Terrain Layer Format:
-		Layer0: Grass Texture;
-		Layer1: Cliff/Rock Texture;
-		Layer2: Another Grass;
+		Layer0: Grass Texture; //base texture
+		Layer1: Another Grass1; //masked texture
+		Layer2: Another Grass2; //masked texture
+		Layer3: Another Grass3; //masked texture
+		......
+		Layer(K): Cliff/Rock Texture //procedural masked textures(created/masked based on terrain data like slope);
+		Layer(K+1): procedural masked Texture2 //procedural masked textures(created/masked based on terrain data like slope);
+		.......
 	*/
-	vec3 grass_normal = texture(u_Normal, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
-	vec3 grass_albedo = texture(u_Albedo, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
-	vec3 grass_roughness = texture(u_Roughness, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
+	vec3 total_albedo;
+	vec3 total_normal;
+	vec3 total_roughness;
 
-	vec3 rock_normal = texture(u_Normal, vec3(fs_data.TexCoord * u_Tiling,1)).rgb;
-	vec3 rock_albedo = texture(u_Albedo, vec3(fs_data.TexCoord * u_Tiling,1)).rgb;
-	vec3 rock_roughness = texture(u_Roughness, vec3(fs_data.TexCoord * u_Tiling,1)).rgb;
+	int numMaskMaps = textureSize(u_Masks,0).z;
+	int numTextureMaps = textureSize(u_Albedo,0).z;
+
+	//initilize the albedo, normal, roughness with the first texture in the array
+	total_albedo  = texture(u_Albedo, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
+	total_normal  = texture(u_Normal, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
+	total_normal = total_normal*2.0 - 1.0;
+	total_roughness  = texture(u_Roughness, vec3(fs_data.TexCoord * u_Tiling,0)).rgb;
+
+	//collect the other textures and save them
+	for(int i=0;i<numTextureMaps-1;i++)
+	{
+		albedo_maps[i]  = texture(u_Albedo, vec3(fs_data.TexCoord * u_Tiling,i+1)).rgb;
+		normal_maps[i]  = texture(u_Normal, vec3(fs_data.TexCoord * u_Tiling,i+1)).rgb;
+		normal_maps[i] = normal_maps[i]*2.0 - 1.0; //convert to -1.0 - 1.0
+		roughness_maps[i]  = texture(u_Roughness, vec3(fs_data.TexCoord * u_Tiling,i+1)).rgb;
+	}
+
+	//blend the textures based on masks using linear-Interpolate
+	for(int i=0;i<numMaskMaps;i++)
+	{
+		float weight = texture(u_Masks, vec3(fs_data.TexCoord ,i)).r;
+		total_albedo = mix(total_albedo, albedo_maps[i], weight);
+		total_normal = mix(total_normal,normal_maps[i], weight);
+		total_roughness = mix(total_roughness, roughness_maps[i], weight);
+	}
 
 	vec2 texture_size = textureSize(u_HeightMap,0);	//get texture dimension
 
-	float slope;
-	mat3 tbn = TBN(fs_data.TexCoord , vec2(1.0/texture_size.x),slope); //slope is calculated in the tbn function
+	vec3 Normal = CalculateNormal(fs_data.TexCoord , vec2(1.0/texture_size.x));
+	float slope = 1.0-Normal.y; //slope is 1.0-normal.y as suggested by the dice-terrainRendering paper page 43
+	mat3 tbn = TBN(Normal);
 	slope = clamp((slope-0.5)*10.0+0.5,0.0,1.0);
-	vec3 ts_Normal = mix(grass_normal,rock_normal,slope);
-	vec3 Normal = mat3(u_View) * tbn * ts_Normal;
+
+	//for the procedural masked textures (for now there is only slope)
+	for(int i=numMaskMaps;i<numTextureMaps-1.0;i++)
+	{
+		total_normal = mix(total_normal,normal_maps[i],slope);
+		total_albedo = mix(total_albedo,albedo_maps[i],slope);
+		total_roughness = mix(total_roughness,roughness_maps[i],slope);
+	}
+	Normal = mat3(u_View) * tbn * total_normal;
 	
-	vec3 terrain_color = mix(grass_albedo,rock_albedo,slope);
-	float terrain_roughness = mix(grass_roughness,rock_roughness,slope).r;
 
 	Normal = normalize(Normal);
 	
 	gNormal = vec4(Normal.xyz,1.0);
-	gVelocity = vec4(CalculateVelocity(grass_data.m_curPos,grass_data.m_oldPos),0,1.0);
-	gColor = vec4(GammaCorrection(terrain_color) , 1.0);
-	gRoughnessMetallic = vec4(terrain_roughness,0,0 , 1.0);
+	gVelocity = vec4(CalculateVelocity(vertex_data.m_curPos,vertex_data.m_oldPos),0,1.0);
+	gColor = vec4(GammaCorrection(total_albedo) , 1.0);
+	gRoughnessMetallic = vec4(total_roughness.r,0,0 , 1.0);
 }

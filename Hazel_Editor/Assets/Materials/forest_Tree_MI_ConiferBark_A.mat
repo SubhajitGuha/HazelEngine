@@ -6,5 +6,5 @@ Normal Strength: 1
 Emission: 0
 Albedo Map: Assets/Textures/MeshTextures/t-sbark-01-bc.png
 Normal Map: Assets/Textures/MeshTextures/t-sbark-01-n.png
-Roughness Map: ""
+Roughness Map: Assets/Textures/MeshTextures/t-sbark-01-raos.png
 Shader Path: TODO

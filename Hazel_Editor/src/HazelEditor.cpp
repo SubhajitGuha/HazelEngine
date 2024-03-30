@@ -255,11 +255,10 @@ void  HazelEditor::OnImGuiRender()
 	ImGui::SameLine();
 	ImGui::TextColored({ 0,1,0,1 }, std::to_string(frame_time).c_str());
 	ImGui::Checkbox("Simulate Physics", &Physics3D::SimulatePhysics);
-	//ImGui::DragFloat("Foliage Coverage", &Scene::foliage_dist, 100, 0, 100000, "%8f");
-	//ImGui::DragFloat("Foliage Density", &Scene::num_foliage, 100, 0, 100000, "%8f");
 	
 	ImGui::DragFloat("FOG DENSITY", &m_scene->fogDensity, 0.00001);
-	ImGui::DragFloat("FOG GRADIENT", &m_scene->fogGradient, 0.01);
+	ImGui::DragFloat("FOG END", &m_scene->fogEnd, 0.1);
+	ImGui::DragFloat("FOG TOP", &m_scene->fogTop, 0.1);
 	ImGui::ColorEdit3("FOG COLOR", glm::value_ptr(m_scene->fogColor));
 
 	ImGui::End();

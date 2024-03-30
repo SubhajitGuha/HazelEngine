@@ -78,7 +78,7 @@ namespace Hazel {
 		//m_data->reflection = CubeMapReflection::Create();
 		m_data->taa = Antialiasing::Create(width,height);
 		m_data->ssao = std::make_shared<OpenGlSSAO>(width/2,height/2);
-		m_data->shadow_map = Shadows::Create(2048, 2048);//create a 2048x2048 shadow map
+		m_data->shadow_map = Shadows::Create(2048*2.0, 2048*2.0);//create a 2048x2048 shadow map
 		for (int i = 0; i < 4; i++)
 			depth_id[i] = m_data->shadow_map->GetDepth_ID(i);
 		ssao_id = m_data->ssao->GetSSAOid();

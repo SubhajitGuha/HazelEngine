@@ -254,5 +254,7 @@ void main()
 
 	PBR_Color += ambiant;
 
-	color = vec4(ACESFilm(PBR_Color),1.0);
+	//color = vec4(ACESFilm(PBR_Color),1.0);
+	color = vec4((PBR_Color),1.0);
+
 }

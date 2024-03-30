@@ -6,5 +6,5 @@ Normal Strength: 1
 Emission: 0
 Albedo Map: Assets/Textures/MeshTextures/MI_ConiferBranches_A_BaseColor.png
 Normal Map: Assets/Textures/MeshTextures/MI_ConiferBranches_A_Normal.png
-Roughness Map: ""
+Roughness Map: Assets/Textures/MeshTextures/MI_ConiferBranches_A_MetallicRoughness.png
 Shader Path: TODO

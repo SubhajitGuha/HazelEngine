@@ -186,7 +186,7 @@ void Hazel::OpenGlTexture2DArray::Create8BitsTextures(const std::vector<std::str
 		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_Renderid);
 		glTextureStorage3D(m_Renderid, 1, InternalFormat, m_Width, m_Height, paths.size());
 
-		glGenerateTextureMipmap(m_Renderid);
+		//glGenerateTextureMipmap(m_Renderid);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureParameteri(m_Renderid, GL_TEXTURE_WRAP_S, GL_REPEAT);

@@ -4,7 +4,7 @@ Roughness: 1
 Metallic: 0
 Normal Strength: 1
 Emission: 0
-Albedo Map: Assets/Textures/MeshTextures/German_license_plate.jpg
+Albedo Map: Assets/Textures/MeshTextures/German_license_plate.svg.png
 Normal Map: ""
 Roughness Map: ""
 Shader Path: TODO

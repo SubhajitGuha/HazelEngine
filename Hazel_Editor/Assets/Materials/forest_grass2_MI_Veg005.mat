@@ -1,0 +1,10 @@
+Material ID: 2307499502658531646
+Color: [1, 1, 1, 1]
+Roughness: 1
+Metallic: 0
+Normal Strength: 1
+Emission: 0
+Albedo Map: Assets/Textures/MeshTextures/MI_Veg005_BaseColor.png
+Normal Map: Assets/Textures/MeshTextures/MI_Veg005_Normal.png
+Roughness Map: Assets/Textures/MeshTextures/MI_Veg005_Roughness.png
+Shader Path: TODO

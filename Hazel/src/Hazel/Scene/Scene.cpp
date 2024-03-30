@@ -30,8 +30,9 @@ namespace Hazel {
 	EditorCamera editor_cam;
 	 LoadMesh* Scene::Sphere=nullptr, *Scene::Sphere_simple = nullptr, *Scene::Cube= nullptr, *Scene::Plane= nullptr
 		 , *Scene::plant, *Scene::House,*Scene::Windmill, *Scene::Fern,
-		 *Scene::Sponza, *Scene::Grass, *Scene::GroundPlant, *Scene::Tree1, *Scene::Tree2, *Scene::Tree3, *Scene::Tree4, *Scene::Tree5,
-		 *Scene::Bush1, *Scene::Bush2, *Scene::Rock1;
+		 *Scene::Sponza, *Scene::Grass, *Scene::Grass2, *Scene::Grass3, *Scene::GroundPlant,
+		 *Scene::Tree1, *Scene::Tree2, *Scene::Tree3, *Scene::Tree4, *Scene::Tree5,
+		 *Scene::Bush1, *Scene::Bush2, *Scene::Rock1, *Scene::Rock2, *Scene::Flower1, *Scene::Flower2;
 	 bool capture = false;
 	 glm::vec3 camloc = { 0,0,0 }, camrot = {0,0,0};
 	Scene::Scene()
@@ -56,30 +57,40 @@ namespace Hazel {
 		Cube = new LoadMesh("Assets/Meshes/Cube.fbx");
 		//Trees
 		Tree1 = new LoadMesh("Assets/Meshes/forest_PineTree1.fbx");
-		Tree1->CreateLOD("Assets/Meshes/forest_PineTree1_LOD1.fbx");
+		//Tree1->CreateLOD("Assets/Meshes/forest_PineTree1_LOD1.fbx");
 		Tree2 = new LoadMesh("Assets/Meshes/forest_PineTree2.fbx");
-		Tree2->CreateLOD("Assets/Meshes/forest_PineTree2_LOD1.fbx");
+		//Tree2->CreateLOD("Assets/Meshes/forest_PineTree2_LOD1.fbx");
 		Tree3 = new LoadMesh("Assets/Meshes/forest_PineTree3.fbx");
 		Tree3->CreateLOD("Assets/Meshes/forest_PineTree3_LOD1.fbx");
 		Tree4 = new LoadMesh("Assets/Meshes/forest_Tree.fbx");
 		Tree4->CreateLOD("Assets/Meshes/forest_Tree_LOD1.fbx");
 		Tree5 = new LoadMesh("Assets/Meshes/forest_Tree2.fbx");
-
+		Tree5->CreateLOD("Assets/Meshes/forest_Tree2_LOD1.fbx");
+		
 		//Bushes
 		Bush1 = new LoadMesh("Assets/Meshes/forest_Bush1.fbx");
 		Bush1->CreateLOD("Assets/Meshes/forest_Bush1_LOD1.fbx");
 		Bush2 = new LoadMesh("Assets/Meshes/forest_Bush2.fbx");
 		Bush2->CreateLOD("Assets/Meshes/forest_Bush2_LOD1.fbx");
-
+		
 		//Rock
 		Rock1 = new LoadMesh("Assets/Meshes/forest_rock1.fbx");
+		Rock2 = new LoadMesh("Assets/Meshes/forest_rock2.fbx");
+		Rock2->CreateLOD("Assets/Meshes/forest_rock2_LOD1.fbx");
+		
 		Grass = new LoadMesh("Assets/Meshes/forest_grass.fbx");
+		Grass2 = new LoadMesh("Assets/Meshes/forest_grass2.fbx");
+		Grass2->CreateLOD("Assets/Meshes/forest_grass2_LOD1.fbx");
+		Grass3 = new LoadMesh("Assets/Meshes/forest_grass3.fbx");
+		Flower1 = new LoadMesh("Assets/Meshes/forest_flower1.fbx");
+		Flower2 = new LoadMesh("Assets/Meshes/forest_flower2.fbx");
+		
 		//Grass->CreateLOD("Assets/Meshes/grass3_LOD1.fbx");
 		plant = new LoadMesh("Assets/Meshes/dragon.fbx");
 		House = new LoadMesh("Assets/Meshes/house.fbx");
-		Fern = new LoadMesh("Assets/Meshes/Fern.fbx");
+		Fern = new LoadMesh("Assets/Meshes/forest_Fern.fbx");
 		//Fern->CreateLOD("Assets/Meshes/Fern_LOD1.fbx");
-
+		
 		//Windmill = new LoadMesh("Assets/Meshes/Windmill.fbx");
 		Sponza = new LoadMesh("Assets/Meshes/Sponza.fbx", LoadMesh::IMPORT_MESH);
 		Renderer3D::SetUpCubeMapReflections(*this);
@@ -92,7 +103,7 @@ namespace Hazel {
 		m_Bloom->GetFinalImage(0, { 1920,1080 });
 		m_Bloom->InitBloom();
 
-		m_Fog = Fog::Create(fogDensity, fogGradient, 30, 5000, { 1920,1080 });
+		m_Fog = Fog::Create(fogDensity,30, 5000, 100,10, { 1920,1080 });
 		m_rayTracer = std::make_shared<RayTracer>();
 	}
 	Scene::~Scene()
@@ -119,7 +130,7 @@ namespace Hazel {
 	void Scene::OnUpdate(TimeStep ts)
 	{
 		MainCamera = nullptr;//if there is no main camera Then dont render
-		m_Fog->SetFogParameters(fogDensity, fogGradient, fogColor);
+		m_Fog->SetFogParameters(fogDensity, fogTop,fogEnd, fogColor);
 
 		//update camera , Mesh Forward vectors....
 		auto view = m_registry.view<CameraComponent>();

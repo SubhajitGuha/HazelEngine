@@ -15,18 +15,17 @@ namespace Hazel {
 	std::vector<Foliage*> Foliage::foliageObjects;
 
 	Foliage::Foliage(LoadMesh* mesh, uint32_t numInstances, float cullDistance,	bool canCastShadow,
-		float LOD_Distance, bool bapplyGradientMask, bool benableWind, const std::string& densityMapPath)
+		float LOD_Distance, bool bapplyGradientMask, bool benableWind, bool _alignToTerrainNormal, float min_scale, float max_scale, const std::string& densityMapPath)
 		:m_foliageMesh(mesh), m_instanceCount(numInstances), m_cullDistance(cullDistance), 
-		bCanCastShadow(canCastShadow), lod0Distance(LOD_Distance), applyGradientMask(bapplyGradientMask), enableWind(benableWind)
+		bCanCastShadow(canCastShadow), lod0Distance(LOD_Distance), applyGradientMask(bapplyGradientMask), 
+		enableWind(benableWind), alignToTerrainNormal(_alignToTerrainNormal), m_minScale(min_scale), m_maxScale(max_scale)
 	{
 		class_ID++;
 		//m_coverage = glm::ivec2(coverageX, coverageY);
 		camera = new EditorCamera(16, 9);
 		camera->SetCameraPosition(Showcase_camPosition);
 		
-		cs_FrustumCullVote = Shader::Create("Assets/Shaders/cs_FrustumCullVote.glsl");
-		cs_PrefixSum = Shader::Create("Assets/Shaders/cs_FrustumCullPrefixSum.glsl");
-		cs_FrustumCullCompact = Shader::Create("Assets/Shaders/cs_FrustumCullCompact.glsl");
+		cs_FrustumCull = Shader::Create("Assets/Shaders/cs_FrustumCull.glsl");
 		cs_FoliageSpawn = Shader::Create("Assets/Shaders/cs_ProceduralFoliagePlacement.glsl");
 		cs_GrassPlacement = Shader::Create("Assets/Shaders/cs_GrassPlacement.glsl");
 		cs_createLod = Shader::Create("Assets/Shaders/cs_CreateLODs.glsl");
@@ -72,12 +71,8 @@ namespace Hazel {
 			SpawnFoliage();
 
 		//Frustum cull and distance cull 
-		for (int i = 0; i < m_instanceCount; i += 1024)
-		{
-			Vote(cam, i);
-			Scan(i);
-			Compact(i);
-		}
+		FrustumCull(cam);
+
 		CreateLODs(cam);
 		cam.SetVerticalFOV(fov);
 
@@ -251,108 +246,32 @@ namespace Hazel {
 		predominanceValue = _predominanceVal;
 	}
 
-	void Foliage::Vote(Camera& cam, int offset)
+	void Foliage::FrustumCull(Camera& cam)
 	{
-		cs_FrustumCullVote->Bind();
-		cs_FrustumCullVote->SetFloat3("camPos", cam.GetCameraPosition());
-		cs_FrustumCullVote->SetMat4("u_ViewProjection", cam.GetProjectionView());
-		cs_FrustumCullVote->SetInt("offset", offset);
-		cs_FrustumCullVote->SetFloat("u_cullDistance", m_cullDistance);
-		cs_FrustumCullVote->SetFloat3("aabb_min", m_foliageMesh->total_bounds.aabbMin);
-		cs_FrustumCullVote->SetFloat3("aabb_max", m_foliageMesh->total_bounds.aabbMax);
+		cs_FrustumCull->Bind();
+		cs_FrustumCull->SetFloat3("camPos", cam.GetCameraPosition());
+		cs_FrustumCull->SetMat4("u_ViewProjection", cam.GetProjectionView());
+		cs_FrustumCull->SetFloat("u_cullDistance", m_cullDistance);
+		cs_FrustumCull->SetFloat3("aabb_min", m_foliageMesh->total_bounds.aabbMin);
+		cs_FrustumCull->SetFloat3("aabb_max", m_foliageMesh->total_bounds.aabbMax);
 
-		if (ssbo_voteIndices == -1)
-		{
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_inTransforms);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-			glGenBuffers(1, &ssbo_voteIndices);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_voteIndices);
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * m_instanceCount, nullptr, GL_DYNAMIC_DRAW);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_voteIndices);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-		}
-		else
-		{
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_inTransforms);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_voteIndices);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_voteIndices);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-		}
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, atomicCounter_numInstances);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, atomicCounter_numInstances);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-		glDispatchCompute(1, 1, 1);
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-	}
-	void Foliage::Scan(int offset)
-	{
-		cs_PrefixSum->Bind();
-		cs_PrefixSum->SetInt("stride", offset / 2); //must be half the original offset value because of the way the algo works
-		if (ssbo_PrefixSum == -1)
-		{
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_voteIndices);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_voteIndices);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-			glGenBuffers(1, &ssbo_PrefixSum);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_PrefixSum);
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * m_instanceCount, nullptr, GL_DYNAMIC_DRAW);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_PrefixSum);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-			glGenBuffers(1, &ssbo_totalPrefixSum);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_totalPrefixSum);
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int), &totalSum, GL_DYNAMIC_DRAW);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_totalPrefixSum);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-		}
-		else
-		{
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_voteIndices);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_voteIndices);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_PrefixSum);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_PrefixSum);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_totalPrefixSum);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_totalPrefixSum);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-		}
-		glDispatchCompute(1, 1, 1);
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-	}
-	void Foliage::Compact(int offset)
-	{
-		cs_FrustumCullCompact->Bind();
-		cs_FrustumCullCompact->SetInt("offset", offset);
 		if (ssbo_outTransforms == -1)
 		{
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_inTransforms);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_voteIndices);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_voteIndices);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_PrefixSum);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_PrefixSum);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
 			glGenBuffers(1, &ssbo_outTransforms);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_outTransforms);
 			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::mat4) * m_instanceCount, nullptr, GL_DYNAMIC_DRAW);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo_outTransforms);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_outTransforms);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			glGenBuffers(1, &ssbo_totalPrefixSum);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, ssbo_totalPrefixSum);
+			glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(int), &totalSum, GL_DYNAMIC_DRAW);
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 3, ssbo_totalPrefixSum);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 		}
 		else
 		{
@@ -360,22 +279,22 @@ namespace Hazel {
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_inTransforms);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_voteIndices);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_voteIndices);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_PrefixSum);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_PrefixSum);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_outTransforms);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo_outTransforms);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo_outTransforms);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-		}
 
-		glDispatchCompute(1, 1, 1);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, ssbo_totalPrefixSum);
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 3, ssbo_totalPrefixSum);
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+		}
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, atomicCounter_numInstances);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, atomicCounter_numInstances);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		glDispatchCompute(m_instanceCount/1024, 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
+
 	void Foliage::CreateLODs(Camera& cam)
 	{
 		cs_createLod->Bind();
@@ -456,7 +375,7 @@ namespace Hazel {
 
 	void Foliage::GenerateFoliagePositions(Bounds& bounds)
 	{
-		if (PDD_values.size() == 0) //store the points once generated
+		//if (PDD_values.size() == 0) //store the points once generated
 			PDD_values = GeneratePoints(spacing, bounds, 10); //use poisson disk distribution to populate
 
 		if (PDD_values.size() < m_instanceCount && total_instanceCount < m_instanceCount)
@@ -508,6 +427,9 @@ namespace Hazel {
 		cs_FoliageSpawn->SetFloat("u_trunk_radius", trunk_radius);		
 		cs_FoliageSpawn->SetInt("u_instanceCount", total_instanceCount);
 		cs_FoliageSpawn->SetFloat("u_predominanceValue", predominanceValue);
+		cs_FoliageSpawn->SetInt("u_alignToTerrainNormal", alignToTerrainNormal);
+		cs_FoliageSpawn->SetFloat("u_minScale", m_minScale);
+		cs_FoliageSpawn->SetFloat("u_maxScale", m_maxScale);
 
 		if (ssbo_inTransforms == -1)
 		{

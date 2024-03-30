@@ -6,5 +6,5 @@ Normal Strength: 1
 Emission: 0
 Albedo Map: Assets/Textures/MeshTextures/MI_Veg005_BaseColor.png
 Normal Map: Assets/Textures/MeshTextures/MI_Veg005_Normal.png
-Roughness Map: ""
+Roughness Map: Assets/Textures/MeshTextures/MI_Veg005_Roughness.png
 Shader Path: TODO

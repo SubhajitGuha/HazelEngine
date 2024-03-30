@@ -41,8 +41,10 @@ namespace Hazel {
 
 	public:
 		std::vector<PointLight*> m_PointLights;
-		static LoadMesh* Sphere, *Sphere_simple, *Cube , *Plane,*plant,*House,* Windmill ,
-			*Fern, *Sponza,*Grass,*GroundPlant,*Tree1, *Tree2, *Tree3, *Tree4, *Tree5, *Bush1, *Bush2, *Rock1;
+		static LoadMesh* Sphere, *Sphere_simple, *Cube , *Plane,*plant,*House,* Windmill , *Sponza,
+			*Fern, *Grass, *Grass2, *Grass3,*GroundPlant,
+			*Tree1, *Tree2, *Tree3, *Tree4, *Tree5, *TreeDead,
+			*Bush1, *Bush2, *Rock1, *Rock2, *Flower1, *Flower2;
 		static unsigned int m_Scene_tex_id;
 		static unsigned int m_Scene_depth_id;
 		ref<FrameBuffer> framebuffer;
@@ -50,7 +52,7 @@ namespace Hazel {
 		static float foliage_dist, num_foliage;
 		ref<Bloom> m_Bloom;
 		ref<Fog> m_Fog;
-		float fogDensity=0.00002, fogGradient=1.3;
+		float fogDensity=0.00002, fogTop=100, fogEnd=300;
 		glm::vec3 fogColor = glm::vec3(1,1,1);
 		ref<Terrain> m_Terrain;
 		ref<RayTracer> m_rayTracer;

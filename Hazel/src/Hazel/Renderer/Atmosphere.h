@@ -8,5 +8,6 @@ namespace Hazel {
 		static void Atmosphere::RenderQuad(const glm::mat4& view, const glm::mat4& proj);
 	private:
 		static ref<Shader> atmosphere_shader;
+		static ref<Texture2DArray> skyGradients;
 	};
 }
