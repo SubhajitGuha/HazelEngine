@@ -40,6 +40,7 @@ public:
 	static std::vector<float> ClosingPrices;
 	std::vector<float> FuturePrices;
 	MonteCarloSim MCSim;
+	std::string key;
 private:
 	News* news;
 	OrthographicCameraController m_camera;

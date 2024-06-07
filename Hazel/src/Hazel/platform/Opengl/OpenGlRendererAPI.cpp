@@ -60,8 +60,8 @@ namespace Hazel {
 		//glEnable(GL_DEBUG_OUTPUT);
 		//glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		//glDebugMessageCallback(glDebugOutput, nullptr);
-		glEnable(GL_MULTISAMPLE);
-		glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+		//glEnable(GL_MULTISAMPLE);
+		//glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);

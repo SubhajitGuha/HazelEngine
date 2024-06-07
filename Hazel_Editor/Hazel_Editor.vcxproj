@@ -145,6 +145,10 @@
     <ClCompile Include="src\SandboxApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Textures\Blue_Noise.png" />
+    <Image Include="Assets\Textures\Fern_Mask.png" />
+    <Image Include="Assets\Textures\FlowerMask.png" />
+    <Image Include="Assets\Textures\ForestMask.png" />
     <Image Include="Assets\Textures\MeshTextures\AK_103_Base_Color.png" />
     <Image Include="Assets\Textures\MeshTextures\AK_103_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\Albedo_packed.png" />
@@ -155,16 +159,71 @@
     <Image Include="Assets\Textures\MeshTextures\GrassUE5_D.png" />
     <Image Include="Assets\Textures\MeshTextures\GrassUE5_N.png" />
     <Image Include="Assets\Textures\MeshTextures\GrassUE5_ORA.png" />
+    <Image Include="Assets\Textures\MeshTextures\Grass_Clumps_C_2_png-Grass_Clumps_C_3_png.png" />
+    <Image Include="Assets\Textures\MeshTextures\Grass_Clumps_C_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\Grass_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\Grass_ORA.png" />
-    <Image Include="Assets\Textures\MeshTextures\RoughnessMat.png" />
-    <Image Include="Assets\Textures\MeshTextures\bark.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchBark_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchBark_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchBark_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs01_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs01_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs02_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs02_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs02_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchTree_G_Bill_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchTree_G_Bill_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchTree_Y_Bill_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchTree_Y_Bill_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBark01_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBark01_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBark01_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBranches_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBranches_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBranches_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushLeafs02_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushLeafs02_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_BushLeafs02_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferBranches_A_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferBranches_A_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferBranches_A_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferLeafs_A_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferLeafs_A_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferLeafs_A_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Conifer_Bill01_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Conifer_Bill01_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Grass_01_StaticMeshActor_15_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Grass_01_StaticMeshActor_15_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_OakBark_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_OakBark_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_OakBark_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_OakLeafs_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_OakLeafs_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_OakLeafs_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg005_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg005_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg005_Roughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg011_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg011_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg011_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg031_BaseColor.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg031_MetallicRoughness.png" />
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg031_Normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\SpruceLeaves_Diffuse.png" />
+    <Image Include="Assets\Textures\MeshTextures\SpruceTrunk_Albedo.png" />
+    <Image Include="Assets\Textures\MeshTextures\Twig_Leaf_Long_Diffuse_C1-Twig_Leaf_Long_Opacity.png" />
+    <Image Include="Assets\Textures\MeshTextures\Twig_Leaf_Long_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\bark01.png" />
     <Image Include="Assets\Textures\MeshTextures\bark01_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\bark02.png" />
     <Image Include="Assets\Textures\MeshTextures\bark_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\bark_willow_nor_gl_2k.png" />
+    <Image Include="Assets\Textures\MeshTextures\bark_willow_rough_2k@channels=G.png" />
     <Image Include="Assets\Textures\MeshTextures\brake_di.png" />
     <Image Include="Assets\Textures\MeshTextures\flower daisy.png" />
     <Image Include="Assets\Textures\MeshTextures\flower daisy_normal.png" />
+    <Image Include="Assets\Textures\MeshTextures\flowers-02.png" />
+    <Image Include="Assets\Textures\MeshTextures\grass-02.png" />
     <Image Include="Assets\Textures\MeshTextures\grass_texture.png" />
     <Image Include="Assets\Textures\MeshTextures\leaf daisy.png" />
     <Image Include="Assets\Textures\MeshTextures\leaf daisy_normal.png" />
@@ -179,11 +238,20 @@
     <Image Include="Assets\Textures\MeshTextures\pine leaf_Normal.png" />
     <Image Include="Assets\Textures\MeshTextures\plant05.png" />
     <Image Include="Assets\Textures\MeshTextures\sidewall.png" />
+    <Image Include="Assets\Textures\MeshTextures\t-sbark-01-bc.png" />
+    <Image Include="Assets\Textures\MeshTextures\t-sbark-01-n.png" />
+    <Image Include="Assets\Textures\MeshTextures\t-sbark-01-raos.png" />
+    <Image Include="Assets\Textures\MeshTextures\wfzobb2ia_2K_Albedo.png" />
+    <Image Include="Assets\Textures\MeshTextures\wk1ncbxja_2K_Albedo.png" />
     <Image Include="Assets\Textures\PerlinTexture.png" />
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png" />
+    <Image Include="Assets\Textures\Sky_Gradient_Textures\SunView_Gradient.png" />
+    <Image Include="Assets\Textures\Sky_Gradient_Textures\SunZenith_Gradient.png" />
+    <Image Include="Assets\Textures\Sky_Gradient_Textures\ViewZenith_Gradient.png" />
     <Image Include="Assets\Textures\Terrain_Height_Map.png" />
     <Image Include="Assets\Textures\Terrain_Height_Map2.png" />
     <Image Include="Assets\Textures\Test.png" />
+    <Image Include="Assets\Textures\ValleyMask.png" />
     <Image Include="Assets\Textures\grass_mask.png" />
     <Image Include="Assets\Textures\rickshaw.png" />
   </ItemGroup>
@@ -191,9 +259,6 @@
     <ProjectReference Include="..\Hazel\Hazel.vcxproj">
       <Project>{99294D0D-053E-75BE-CEBF-181E3A9371EF}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\cs_ResetDensityMap.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

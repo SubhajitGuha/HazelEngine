@@ -11,6 +11,7 @@ std::vector<float> SandBox2dApp::ClosingPrices;
 SandBox2dApp::SandBox2dApp()
 	:Layer("Renderer2D layer"), m_camera(1366 / 768)
 {
+	key = "HZ6MXGUCREUBAXHT"; //default api key
 	news = new News();
 
 	//HZ_PROFILE_SCOPE("SandBox2dApp::SandBox2dApp()");
@@ -40,7 +41,7 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 
 	CURL* curl;
 	CURLcode res;
-	std::string api = "https://www.alphavantage.co/query?function=" + DataInterval + "&symbol=" + CompanyName + "&outputsize=full&interval="+std::to_string(interval_in_min)+"min&apikey=4NT07D3RF1DRQBSL";
+	std::string api = "https://www.alphavantage.co/query?function=" + DataInterval + "&symbol=" + CompanyName + "&outputsize=full&interval="+std::to_string(interval_in_min)+"min&apikey=HZ6MXGUCREUBAXHT";
 	curl = curl_easy_init();
 	if (curl) {
 		fp = fopen("trading_data.json", "wb");
@@ -57,7 +58,9 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 	}
 	curl_global_cleanup();
 	//std::cout << result << "\n\n";
-	std::ifstream file("default_trading_data.json");
+
+	auto lamda_fn = [&](const std::string& file_name) {
+	std::ifstream file(file_name);
 	std::string line;
 	Json::Value jsonData;//json file parser
 	Json::Reader jsonReader;
@@ -66,7 +69,8 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 	if (Json::parseFromStream(rbuilder,file, &jsonData,&errs))
 	{
 		uint32_t JsonSize = jsonData[interval].size();
-
+		if (JsonSize == 0)
+			return false;
 		for (auto it = jsonData[interval].begin(); it != jsonData[interval].end(); it++)
 		{
 			std::string Xstring = it.name();
@@ -97,7 +101,6 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 			ClosingPrices.push_back(y);
 		}
 		
-		
 		HAZEL_CORE_WARN(max_volume);
 		HAZEL_CORE_INFO(min_volume);
 
@@ -107,6 +110,10 @@ void SandBox2dApp::FetchData()//fetch data from the server and push that data to
 		//	val.erase(val.begin(), val.end() - NumPoints);
 		//}
 	}
+
+	};
+	if (!lamda_fn("trading_data.json"))
+		lamda_fn("default_trading_data.json");
 	HAZEL_CORE_ERROR(result);
 	if(m_Points.size()>0)
 	m_camera.SetCameraPosition({ normalize_data(m_Points[0],0),0 });
@@ -671,22 +678,22 @@ void SandBox2dApp::drawCurve()
 	//draw the curves from the coordinates of the array m_Points
 	Renderer2D::LineBeginScene(m_camera.GetCamera());
 	{
-		if (factor == 0)//if factor is ==0 no need to draw curved lines 
+		//if (factor == 0)//if factor is ==0 no need to draw curved lines 
 			for (int i = 0; i < m_Points.size() - 1; i++) {
 				//std::cout << normalize_data(m_Points[i], i).y;
 				Renderer2D::DrawLine(glm::vec3(normalize_data(m_Points[i], i), 0), glm::vec3(normalize_data(m_Points[i + 1], i + 1), 0), color);
 			}
-		else {
-			for (int i = 0; i < m_Points.size() - 1; i++) 
-			{
-				auto x = velocity(tmp_point, normalize_data(m_Points[i + 1], i + 1), factor);
-				if (tmp_point.x > 0)
-				Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i], i), tmp_vel, x, color);//drawing a hermitian curve
-				tmp_point = normalize_data(m_Points[i], i);
-				tmp_vel = x;
-			}
-			Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
-		}
+		//else {
+		//	for (int i = 0; i < m_Points.size() - 1; i++) 
+		//	{
+		//		auto x = velocity(tmp_point, normalize_data(m_Points[i + 1], i + 1), factor);
+		//		if (tmp_point.x > 0)
+		//		Renderer2D::DrawCurve(tmp_point, normalize_data(m_Points[i], i), tmp_vel, x, color);//drawing a hermitian curve
+		//		tmp_point = normalize_data(m_Points[i], i);
+		//		tmp_vel = x;
+		//	}
+		//	Renderer2D::DrawCurve(normalize_data(m_Points[m_Points.size() - 2], m_Points.size() - 2), normalize_data(m_Points[m_Points.size()-1], m_Points.size() - 1), tmp_vel, tmp_vel,color);
+		//}
 	Renderer2D::LineEndScene();
 	}
 }

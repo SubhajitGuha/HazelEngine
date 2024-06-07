@@ -1,3 +1,2025 @@
 {
-    "Information": "Thank you for using Alpha Vantage! Our standard API rate limit is 25 requests per day. Please subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantly remove all daily rate limits."
+    "items": "50",
+    "sentiment_score_definition": "x <= -0.35: Bearish; -0.35 < x <= -0.15: Somewhat-Bearish; -0.15 < x < 0.15: Neutral; 0.15 <= x < 0.35: Somewhat_Bullish; x >= 0.35: Bullish",
+    "relevance_score_definition": "0 < x <= 1, with a higher score indicating higher relevance.",
+    "feed": [
+        {
+            "title": "Edelson Lechtzin LLP Reminds Investors of Looming Deadline in the Inari Medical, Inc.  ( NASDAQ: NARI )  Securities Fraud Class Action - Inari Medical  ( NASDAQ:NARI ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39077118/edelson-lechtzin-llp-reminds-investors-of-looming-deadline-in-the-inari-medical-inc-nasdaq-nari-se",
+            "time_published": "20240530T015551",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEWTOWN, Pa., May 29, 2024 ( GLOBE NEWSWIRE ) -- Edelson Lechtzin LLP, a leading class action law firm, reminds investors who purchased Inari Medical, Inc. NARI stock between February 24, 2022, and February 28, 2024 ( the \"Class Period\" ) of the July 12, 2024, deadline to move the U.S.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Life Sciences",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.316726"
+                }
+            ],
+            "overall_sentiment_score": -0.051248,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "NARI",
+                    "relevance_score": "0.149192",
+                    "ticker_sentiment_score": "0.009221",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "STT",
+                    "relevance_score": "0.074926",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Stock Market LIVE: India stocks fall amid global weakness, poll uncertainty",
+            "url": "https://www.business-standard.com/markets/news/stock-market-live-updates-may-30-nifty-sensex-nse-bse-nifty50-q4-results-ipo-listing-today-124053000067_1.html",
+            "time_published": "20240530T014832",
+            "authors": [
+                "SI Reporter"
+            ],
+            "summary": "Stock Market LIVE: Nifty, Sensex, NSE, BSE, GIFT Nifty, Nikkei Business Standard ...",
+            "banner_image": "https://bsmedia.business-standard.com/_media/bs/img/article/2021-09/12/full/1631463208-1967.jpg?im=FeatureCrop,size=(803,452)",
+            "source": "Business Standard",
+            "category_within_source": "GoogleRSS",
+            "source_domain": "www.business-standard.com",
+            "topics": [
+                {
+                    "topic": "Economy - Monetary",
+                    "relevance_score": "0.158519"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.538269"
+                }
+            ],
+            "overall_sentiment_score": -0.064343,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "AWON",
+                    "relevance_score": "0.194242",
+                    "ticker_sentiment_score": "-0.372289",
+                    "ticker_sentiment_label": "Bearish"
+                }
+            ]
+        },
+        {
+            "title": "Will Nifty hold 22,650 or more downfall in store? See GIFT Nifty, FII data, F&O ban, crude, more before market opens",
+            "url": "https://www.financialexpress.com/market/will-nifty-hold-the-22650-levels-or-more-downfall-in-store-see-gift-nifty-fii-data-fampo-ban-crude-more-before-market-opens-3506608/",
+            "time_published": "20240530T014043",
+            "authors": [
+                "Dev Sethia"
+            ],
+            "summary": "Will Nifty hold the 22,650 levels or more downfall in store? See GIFT Nifty, FII data, F&O ban, crude, more before market opens The Financial Express ...",
+            "banner_image": "https://www.financialexpress.com/wp-content/uploads/2024/05/Stocks-edited-1.jpg",
+            "source": "The Financial Express",
+            "category_within_source": "n/a",
+            "source_domain": "www.financialexpress.com",
+            "topics": [
+                {
+                    "topic": "Economy - Monetary",
+                    "relevance_score": "0.158519"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.989041"
+                },
+                {
+                    "topic": "Technology",
+                    "relevance_score": "1.0"
+                },
+                {
+                    "topic": "Economy - Macro",
+                    "relevance_score": "0.158519"
+                }
+            ],
+            "overall_sentiment_score": 0.051646,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "VOD",
+                    "relevance_score": "0.060388",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "FOREX:USD",
+                    "relevance_score": "0.120431",
+                    "ticker_sentiment_score": "0.111135",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Stocks To Watch: Banking Stocks, Tata Steel, Cummimns, RR Kabel, Emami, GMR Airports, SVJN",
+            "url": "https://www.financialexpress.com/market/stocks-to-watch-banking-stocks-tata-steel-cummimns-rr-kabel-emami-gmr-airports-svjn-3506604/",
+            "time_published": "20240530T013245",
+            "authors": [
+                "Dev Sethia"
+            ],
+            "summary": "GIFT Nifty indicated that Indian equity indices BSE Sensex and NSE Nifty 50 may see a lacklustre opening on Thursday. Here's a look at the key stocks to watch in trade. Stocks in Focus: GIFT Nifty traded up by 15 points or 0.07% at 22,735 indicating a lacklustre opening for domestic indices NSE ...",
+            "banner_image": "https://www.financialexpress.com/wp-content/uploads/2024/05/Stocks-detail-on-screens-1.jpg",
+            "source": "The Financial Express",
+            "category_within_source": "n/a",
+            "source_domain": "www.financialexpress.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.266143"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.990786"
+                },
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.5"
+                }
+            ],
+            "overall_sentiment_score": 0.194522,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "SPGI",
+                    "relevance_score": "0.055881",
+                    "ticker_sentiment_score": "0.161928",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "IBN",
+                    "relevance_score": "0.111488",
+                    "ticker_sentiment_score": "0.17883",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "SBKFF",
+                    "relevance_score": "0.055881",
+                    "ticker_sentiment_score": "0.161928",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "HDB",
+                    "relevance_score": "0.055881",
+                    "ticker_sentiment_score": "0.161928",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Meta's AI Chief Yann LeCun Reflects On The Time When He And Elon Musk Used To Be Friends: 'Fun Memories'",
+            "url": "https://www.benzinga.com/news/24/05/39077054/metas-ai-chief-yann-lecun-reflects-on-the-time-when-he-and-elon-musk-used-to-be-friends-fun-memories",
+            "time_published": "20240530T013132",
+            "authors": [
+                "Ananya Gairola"
+            ],
+            "summary": "Meta Platforms, Inc.'s AI chief Yann LeCun looked back on his previous camaraderie with Tesla and SpaceX CEO Elon Musk, as many people on social media urged the tech behemoths to end this feud.",
+            "banner_image": "https://cdn.benzinga.com/files/images/story/2024/05/29/Yann-Lecun.jpeg?width=1200&height=800&fit=crop",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "0.5"
+                }
+            ],
+            "overall_sentiment_score": 0.040712,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "GOOG",
+                    "relevance_score": "0.246582",
+                    "ticker_sentiment_score": "-0.104354",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "META",
+                    "relevance_score": "0.124809",
+                    "ticker_sentiment_score": "-0.09089",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "TSLA",
+                    "relevance_score": "0.246582",
+                    "ticker_sentiment_score": "-0.083523",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Huawei races to fill void left by Nvidia in China's AI chip market",
+            "url": "https://www.scmp.com/tech/tech-war/article/3264575/tech-war-huawei-races-fill-void-left-nvidia-china-home-grown-chips-becoming-popular-components-ai",
+            "time_published": "20240530T013017",
+            "authors": [
+                "Che Pan"
+            ],
+            "summary": "Huawei's chips are becoming default components in Chinese-made AI boxes, but the pace of its ascendancy will depend on how quickly it can ramp up production.",
+            "banner_image": "https://cdn.i-scmp.com/sites/default/files/d8/images/canvas/2024/05/29/b4fdfdb9-5aa2-41e6-9b99-f0c218b88833_ccf2e8d2.jpg",
+            "source": "South China Morning Post",
+            "category_within_source": "Money",
+            "source_domain": "www.scmp.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.158519"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": 0.176371,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "NVDA",
+                    "relevance_score": "0.319488",
+                    "ticker_sentiment_score": "0.126442",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Merus Announces Pricing of Upsized Public Offering of Common Shares",
+            "url": "https://www.globenewswire.com/news-release/2024/05/30/2890383/37568/en/Merus-Announces-Pricing-of-Upsized-Public-Offering-of-Common-Shares.html",
+            "time_published": "20240530T013000",
+            "authors": [
+                "Merus N.V."
+            ],
+            "summary": "UTRECHT, The Netherlands and CAMBRIDGE, Mass., May 29, 2024 ( GLOBE NEWSWIRE ) -- Merus N.V. ( Nasdaq: MRUS ) ( \"Merus\", the \"Company,\" \"we\" and \"our\" ) , a clinical-stage oncology company developing innovative, full-length multispecific antibodies ( Biclonics® and Triclonics® ) , today ...",
+            "banner_image": "https://ml.globenewswire.com/Resource/Download/4a4a06e3-96f9-480f-8610-e954552b070b",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Life Sciences",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "IPO",
+                    "relevance_score": "0.451494"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.986564"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.5"
+                }
+            ],
+            "overall_sentiment_score": 0.155843,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "STT",
+                    "relevance_score": "0.021601",
+                    "ticker_sentiment_score": "0.055162",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "MRUS",
+                    "relevance_score": "0.043186",
+                    "ticker_sentiment_score": "0.131244",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Valtech Valuation Actively Provides Business Valuations for Notifiable Transactions in Hong Kong",
+            "url": "https://www.prnewswire.com/apac/news-releases/valtech-valuation-actively-provides-business-valuations-for-notifiable-transactions-in-hong-kong-302157848.html",
+            "time_published": "20240530T013000",
+            "authors": [
+                "Valtech Valuation Advisory Ltd"
+            ],
+            "summary": "HONG KONG, May 30, 2024 /PRNewswire/ -- Valtech Valuation has established a solid track record in helping clients in alignment with the Securities and Futures Commission ( SFC ) and The Stock Exchange of Hong Kong Limited ( HKEx ) requirements for more transparent, fair, and reasonable ...",
+            "banner_image": "https://mma.prnewswire.com/media/2294018/Valtech_Valuation_Consulting_logo.jpg?p=facebook",
+            "source": "PR Newswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.prnewswire.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.77141"
+                }
+            ],
+            "overall_sentiment_score": 0.2851,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "Pluribus Technologies Corp. Announces Further Amendment to Forbearance Agreement",
+            "url": "https://www.newswire.ca/news-releases/pluribus-technologies-corp-announces-further-amendment-to-forbearance-agreement-849782613.html",
+            "time_published": "20240530T012800",
+            "authors": [
+                "Pluribus Technologies Corp."
+            ],
+            "summary": "TORONTO, May 29, 2024 /CNW/ - Pluribus Technologies Corp. ( TSXV: PLRB ) ( \"Pluribus\" or the \"Company\" ) announces a further amendment ( the \"Amendment\" ) to the previously-announced forbearance agreement ( the \"Forbearance Agreement\" ) dated January 18, 2024, between the Company and National ...",
+            "banner_image": "https://mma.prnewswire.com/media/2425393/Pluribus_Technologies_Corp__Pluribus_Technologies_Corp__Announce.jpg?p=facebook",
+            "source": "Canada Newswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.newswire.ca",
+            "topics": [
+                {
+                    "topic": "Mergers & Acquisitions",
+                    "relevance_score": "0.158519"
+                }
+            ],
+            "overall_sentiment_score": 0.320511,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "NTIOF",
+                    "relevance_score": "0.054114",
+                    "ticker_sentiment_score": "0.252919",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "U.S., allies arrest Chinese national behind global 911 S5 botnet - .com",
+            "url": "https://www.upi.com/Top_News/US/2024/05/29/911-s5-botnet-arrest-yunhe-wang/4601717027910/",
+            "time_published": "20240530T012416",
+            "authors": [],
+            "summary": "U.S., allies arrest Chinese national behind global 911 S5 botnet UPI News ...",
+            "banner_image": "https://cdnph.upi.com/sv/ph/og/upi/4601717027910/2024/1/7146b2830f6d8e33133a034d0992b45b/v1.5/US-allies-arrest-Chinese-national-behind-global-911-S5-botnet.jpg",
+            "source": "UPI Business",
+            "category_within_source": "n/a",
+            "source_domain": "www.upi.com",
+            "topics": [],
+            "overall_sentiment_score": -0.081333,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "WBD",
+                    "relevance_score": "0.078099",
+                    "ticker_sentiment_score": "-0.063928",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Apple Stock Will Outperform Nvidia Over The Next Year, Says Gene Munster: Investors Are 'Largely In Denial' About iPhone Maker's AI Opportunity - Meta Platforms  ( NASDAQ:META ) , Apple  ( NASDAQ:AAPL ) ",
+            "url": "https://www.benzinga.com/analyst-ratings/analyst-color/24/05/39077003/apple-stock-will-outperform-nvidia-over-the-next-year-says-gene-munster-investors-a",
+            "time_published": "20240530T012102",
+            "authors": [
+                "Benzinga Neuro"
+            ],
+            "summary": "Gene Munster, a notable industry analyst, has forecasted that Apple Inc. AAPL will surpass Nvidia Corporation NVDA in performance due to its AI initiatives. What Happened: Munster, a leading voice in tech analysis, shared his perspective on the future of Apple. and Nvidia.",
+            "banner_image": "https://cdn.benzinga.com/files/images/story/2024/05/29/Chengdu--China---Mar-10--2020-Apple-Stor.jpeg?width=1200&height=800&fit=crop",
+            "source": "Benzinga",
+            "category_within_source": "Markets",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.108179"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "0.5"
+                }
+            ],
+            "overall_sentiment_score": 0.283356,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "NVDA",
+                    "relevance_score": "0.733479",
+                    "ticker_sentiment_score": "0.556067",
+                    "ticker_sentiment_label": "Bullish"
+                },
+                {
+                    "ticker": "AAPL",
+                    "relevance_score": "0.733479",
+                    "ticker_sentiment_score": "0.461365",
+                    "ticker_sentiment_label": "Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Three Stocks: American Airlines, Mind Medicine, and GameStop",
+            "url": "https://moneymorning.com/2024/05/29/three-stocks-american-airlines-mind-medicine-and-gamestop/",
+            "time_published": "20240530T011643",
+            "authors": [
+                "Chris Johnson"
+            ],
+            "summary": "American Airlines ( AAL ) shares closed the day 13% lower after the company adjusted their upcoming quarterly earnings expectations lower. The stock was the worst performer of all the S&P 500 stocks today.",
+            "banner_image": "https://moneymorning.com/wp-content/blogs.dir/1/files/2024/05/aal.png",
+            "source": "Money Morning",
+            "category_within_source": "RSS",
+            "source_domain": "moneymorning.com",
+            "topics": [
+                {
+                    "topic": "Retail & Wholesale",
+                    "relevance_score": "0.333333"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.989041"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.576289"
+                },
+                {
+                    "topic": "Energy & Transportation",
+                    "relevance_score": "0.333333"
+                },
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.333333"
+                }
+            ],
+            "overall_sentiment_score": -0.01235,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "AAL",
+                    "relevance_score": "0.342803",
+                    "ticker_sentiment_score": "-0.200916",
+                    "ticker_sentiment_label": "Somewhat-Bearish"
+                },
+                {
+                    "ticker": "MNMD",
+                    "relevance_score": "0.140896",
+                    "ticker_sentiment_score": "0.246814",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "GME",
+                    "relevance_score": "0.277433",
+                    "ticker_sentiment_score": "0.216297",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "After dwindling flock catches Xi's eye, China's unicorns set for capital boost",
+            "url": "https://www.scmp.com/economy/china-economy/article/3264606/chinas-unicorns-set-capital-boost-after-dwindling-flock-catches-xi-jinpings-eye",
+            "time_published": "20240530T011511",
+            "authors": [
+                "Frank Chen"
+            ],
+            "summary": "Analysts say China needs to mobilise venture capital and resources, while reducing reliance on foreign venture capital, having fallen further behind the US in terms of the number of start-ups valued at more than US$1 billion.",
+            "banner_image": "https://cdn.i-scmp.com/sites/default/files/styles/wide_landscape/public/d8/video/thumbnail/2023/08/10/Clean.jpg?itok=enfwk-lD",
+            "source": "South China Morning Post",
+            "category_within_source": "Money",
+            "source_domain": "www.scmp.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.214378"
+                }
+            ],
+            "overall_sentiment_score": 0.150324,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "Bridging hearts: how blockchain enhances transparency in philanthropic donations",
+            "url": "https://www.scmp.com/presented/business/topics/hong-kong-fintech-startup/article/3263722/bridging-hearts-how-blockchain-enhances-transparency-philanthropic-donations",
+            "time_published": "20240530T010723",
+            "authors": [
+                "Advertising partner"
+            ],
+            "summary": "[The content of this article has been produced by our advertising partner.] For donors, whether they are corporations giving back to society, family offices engaged in philanthropy or individuals making monthly contributions, it is vitally important for charities to provide tangible evidence ...",
+            "banner_image": "https://cdn.i-scmp.com/sites/default/files/styles/660w/public/d8/images/2024/05/23/DSC09492.jpg?itok=PPIb16On",
+            "source": "South China Morning Post",
+            "category_within_source": "Business",
+            "source_domain": "www.scmp.com",
+            "topics": [
+                {
+                    "topic": "Economy - Monetary",
+                    "relevance_score": "0.158519"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.108179"
+                },
+                {
+                    "topic": "Blockchain",
+                    "relevance_score": "0.972193"
+                }
+            ],
+            "overall_sentiment_score": 0.41355,
+            "overall_sentiment_label": "Bullish",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "ECOPETROL ALERT: Bragar Eagel & Squire, P.C. is Investigating Ecopetrol S.A. on Behalf of Ecopetrol Stockholders and Encourages Investors to Contact the Firm - Ecopetrol  ( NYSE:EC ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076898/ecopetrol-alert-bragar-eagel-squire-p-c-is-investigating-ecopetrol-s-a-on-behalf-of-ecopetrol-stoc",
+            "time_published": "20240530T010000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEW YORK, May 29, 2024 ( GLOBE NEWSWIRE ) -- Bragar Eagel & Squire, P.C., a nationally recognized stockholder rights law firm, is investigating potential claims against Ecopetrol S.A. ( \"Ecopetrol\" or the \"Company\" ) EC on behalf of Ecopetrol stockholders.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Energy & Transportation",
+                    "relevance_score": "1.0"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.360215"
+                }
+            ],
+            "overall_sentiment_score": 0.041021,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "EC",
+                    "relevance_score": "0.678102",
+                    "ticker_sentiment_score": "0.053242",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "TREACE ALERT: Bragar Eagel & Squire, P.C. is Investigating Treace Medical Concepts, Inc. on Behalf of Treace Stockholders and Encourages Investors to Contact the Firm - Treace Medical Concepts  ( NASDAQ:TMCI ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076891/treace-alert-bragar-eagel-squire-p-c-is-investigating-treace-medical-concepts-inc-on-behalf-of-tre",
+            "time_published": "20240530T010000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEW YORK, May 29, 2024 ( GLOBE NEWSWIRE ) -- Bragar Eagel & Squire, P.C., a nationally recognized stockholder rights law firm, is investigating potential claims against Treace Medical Concepts, Inc. ( \"Treace\" or the \"Company\" ) TMCI on behalf of Treace stockholders.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Life Sciences",
+                    "relevance_score": "1.0"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.538269"
+                }
+            ],
+            "overall_sentiment_score": 0.141233,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "TMCI",
+                    "relevance_score": "0.201523",
+                    "ticker_sentiment_score": "-0.090095",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "CAE ALERT: Bragar Eagel & Squire, P.C. is Investigating CAE Inc. on Behalf of CAE Stockholders and Encourages Investors to Contact the Firm - CAE  ( NYSE:CAE ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076893/cae-alert-bragar-eagel-squire-p-c-is-investigating-cae-inc-on-behalf-of-cae-stockholders-and-encou",
+            "time_published": "20240530T010000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEW YORK, May 29, 2024 ( GLOBE NEWSWIRE ) -- Bragar Eagel & Squire, P.C., a nationally recognized stockholder rights law firm, is investigating potential claims against CAE Inc. ( \"CAE\" or the \"Company\" ) CAE on behalf of CAE stockholders.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.360215"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": 0.062845,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "CAE",
+                    "relevance_score": "0.779232",
+                    "ticker_sentiment_score": "0.04452",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Bragar Eagel & Squire, P.C. Reminds Investors That Class Action Lawsuits Have Been Filed Against Perion, SpaceMobile, Sharecare, and Rivian and Encourages Investors to Contact the Firm - Perion Network  ( NASDAQ:PERI ) , AST SpaceMobile  ( NASDAQ:ASTS ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076897/bragar-eagel-squire-p-c-reminds-investors-that-class-action-lawsuits-have-been-filed-against-perio",
+            "time_published": "20240530T010000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEW YORK, May 29, 2024 ( GLOBE NEWSWIRE ) -- Bragar Eagel & Squire, P.C., a nationally recognized shareholder rights law firm, reminds investors that class actions have been commenced on behalf of stockholders of Perion Network Ltd. PERI, AST SpaceMobile, Inc. ASTS, Sharecare, Inc.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.955357"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "0.333333"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.891286"
+                },
+                {
+                    "topic": "Real Estate & Construction",
+                    "relevance_score": "0.333333"
+                },
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.333333"
+                }
+            ],
+            "overall_sentiment_score": -0.07722,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "MSFT",
+                    "relevance_score": "0.173084",
+                    "ticker_sentiment_score": "0.020927",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "PERI",
+                    "relevance_score": "0.138863",
+                    "ticker_sentiment_score": "0.036988",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "RIVN",
+                    "relevance_score": "0.273552",
+                    "ticker_sentiment_score": "-0.090499",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "SHCR",
+                    "relevance_score": "0.173084",
+                    "ticker_sentiment_score": "-0.100912",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "ASTS",
+                    "relevance_score": "0.104379",
+                    "ticker_sentiment_score": "0.02571",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Bragar Eagel & Squire, P.C. Reminds Investors That Class Action Lawsuits Have Been Filed Against Equinix, Harbor Diversified, Altimmune, and UnitedHealth and Encourages Investors to Contact the Firm - Altimmune  ( NASDAQ:ALT ) , Equinix  ( NASDAQ:EQIX ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076895/bragar-eagel-squire-p-c-reminds-investors-that-class-action-lawsuits-have-been-filed-against-equin",
+            "time_published": "20240530T010000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEW YORK, May 29, 2024 ( GLOBE NEWSWIRE ) -- Bragar Eagel & Squire, P.C., a nationally recognized shareholder rights law firm, reminds investors that class actions have been commenced on behalf of stockholders of Equinix EQIX, Harbor Diversified, Inc. HRBR, Altimmune, Inc.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Life Sciences",
+                    "relevance_score": "0.333333"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.992549"
+                },
+                {
+                    "topic": "Mergers & Acquisitions",
+                    "relevance_score": "0.360215"
+                },
+                {
+                    "topic": "Real Estate & Construction",
+                    "relevance_score": "0.333333"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.333333"
+                }
+            ],
+            "overall_sentiment_score": 0.029099,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "ALT",
+                    "relevance_score": "0.208689",
+                    "ticker_sentiment_score": "0.013468",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "EQIX",
+                    "relevance_score": "0.183099",
+                    "ticker_sentiment_score": "-0.108841",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "HRBR",
+                    "relevance_score": "0.131355",
+                    "ticker_sentiment_score": "-0.106677",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "UNH",
+                    "relevance_score": "0.332796",
+                    "ticker_sentiment_score": "0.17835",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Bragar Eagel & Squire, P.C. Reminds Investors That Class Action Lawsuits Have Been Filed Against Vestis, and Teladoc and Encourages Investors to Contact the Firm - Teladoc Health  ( NYSE:TDOC ) , Vestis  ( NYSE:VSTS ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076896/bragar-eagel-squire-p-c-reminds-investors-that-class-action-lawsuits-have-been-filed-against-vesti",
+            "time_published": "20240530T010000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEW YORK, May 29, 2024 ( GLOBE NEWSWIRE ) -- Bragar Eagel & Squire, P.C., a nationally recognized shareholder rights law firm, reminds investors that class actions have been commenced on behalf of stockholders of Vestis Corporation VSTS, and Teladoc Health, Inc.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Life Sciences",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Retail & Wholesale",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.986714"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.986714"
+                }
+            ],
+            "overall_sentiment_score": 0.066803,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "VSTS",
+                    "relevance_score": "0.556687",
+                    "ticker_sentiment_score": "0.202994",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "ARMK",
+                    "relevance_score": "0.081414",
+                    "ticker_sentiment_score": "-0.006211",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "TDOC",
+                    "relevance_score": "0.121856",
+                    "ticker_sentiment_score": "0.028344",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Bragar Eagel & Squire, P.C. Reminds Investors That Class Action Lawsuits Have Been Filed Against GoodRx, Exscientia, Malibu Boats, and Globe Life and Encourages Investors to Contact the Firm - GoodRx Holdings  ( NASDAQ:GDRX ) , Exscientia  ( NASDAQ:EXAI ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076890/bragar-eagel-squire-p-c-reminds-investors-that-class-action-lawsuits-have-been-filed-against-goodr",
+            "time_published": "20240530T010000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEW YORK, May 29, 2024 ( GLOBE NEWSWIRE ) -- Bragar Eagel & Squire, P.C., a nationally recognized shareholder rights law firm, reminds investors that class actions have been commenced on behalf of stockholders of GoodRx Holdings, Inc. GDRX, Exscientia plc. EXAI, Malibu Boats, Inc.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.25"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.25"
+                },
+                {
+                    "topic": "IPO",
+                    "relevance_score": "0.158519"
+                },
+                {
+                    "topic": "Retail & Wholesale",
+                    "relevance_score": "0.25"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "1.0"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "0.25"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.998356"
+                }
+            ],
+            "overall_sentiment_score": -0.055602,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "MBUU",
+                    "relevance_score": "0.178753",
+                    "ticker_sentiment_score": "-0.004512",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "GDRX",
+                    "relevance_score": "0.293506",
+                    "ticker_sentiment_score": "0.055034",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "EXAI",
+                    "relevance_score": "0.119731",
+                    "ticker_sentiment_score": "0.044583",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "GL",
+                    "relevance_score": "0.139496",
+                    "ticker_sentiment_score": "-0.132108",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "KR",
+                    "relevance_score": "0.020028",
+                    "ticker_sentiment_score": "0.014322",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Kunming Flower Expo 2024: Asia's Premier Floral Trade Event Returns This September",
+            "url": "https://www.benzinga.com/pressreleases/24/05/n39076901/kunming-flower-expo-2024-asias-premier-floral-trade-event-returns-this-september",
+            "time_published": "20240530T010000",
+            "authors": [
+                "PRNewswire"
+            ],
+            "summary": "KUNMING, China, May 29, 2024 /PRNewswire/ -- The 22nd Kunming International Flower Expo of China and Kunming International Flowers & Plants Expo ( \"Kunming Flower Expo\" ) , China's top floral industry trade show, is set to take place from September 20 to 22 at the Kunming Dianchi International ...",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "General",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Retail & Wholesale",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": 0.349919,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "GLP",
+                    "relevance_score": "0.068698",
+                    "ticker_sentiment_score": "0.116155",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Bragar Eagel & Squire, P.C. Reminds Investors That Class Action Lawsuits Have Been Filed Against HireRight, Ocugen, Sonder, and QuidelOrtho Innovations and Encourages Investors to Contact the Firm - HireRight Holdings  ( NYSE:HRT ) , Ocugen  ( NASDAQ:OCGN ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076892/bragar-eagel-squire-p-c-reminds-investors-that-class-action-lawsuits-have-been-filed-against-hirer",
+            "time_published": "20240530T010000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "NEW YORK, May 29, 2024 ( GLOBE NEWSWIRE ) -- Bragar Eagel & Squire, P.C., a nationally recognized shareholder rights law firm, reminds investors that class actions have been commenced on behalf of stockholders of HireRight Holdings Corporation HRT, Ocugen, Inc. OCGN, Sonder Holdings Inc.",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Life Sciences",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "IPO",
+                    "relevance_score": "0.838487"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.99999"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.980716"
+                },
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.5"
+                }
+            ],
+            "overall_sentiment_score": -0.019243,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "HRT",
+                    "relevance_score": "0.317947",
+                    "ticker_sentiment_score": "0.032675",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "SOND",
+                    "relevance_score": "0.174587",
+                    "ticker_sentiment_score": "-0.104594",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "OCGN",
+                    "relevance_score": "0.125199",
+                    "ticker_sentiment_score": "-0.085826",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "QDEL",
+                    "relevance_score": "0.294682",
+                    "ticker_sentiment_score": "-0.02838",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Crypto Industry Cheers As SEC Must Pay $1.8 Million for 'Gross Abuse' of Power",
+            "url": "https://decrypt.co/232902/sec-sanction-gross-abuse-power-judge-win-for-industry",
+            "time_published": "20240530T005423",
+            "authors": [
+                "Mat Di Salvo"
+            ],
+            "summary": "A judge has sanctioned the SEC for its failed case against DEBT Box-and made sure he gets the case if it returns to court.",
+            "banner_image": "https://cdn.decrypt.co/resize/1024/height/512/wp-content/uploads/2023/10/SEC-Crypto-shutterstock_2346339641-16x9-1-gID_7.jpg",
+            "source": "Decrypt.co",
+            "category_within_source": "n/a",
+            "source_domain": "decrypt.co",
+            "topics": [
+                {
+                    "topic": "Blockchain",
+                    "relevance_score": "0.158519"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.158519"
+                }
+            ],
+            "overall_sentiment_score": -0.233404,
+            "overall_sentiment_label": "Somewhat-Bearish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "CRYPTO:BTC",
+                    "relevance_score": "0.093289",
+                    "ticker_sentiment_score": "-0.287084",
+                    "ticker_sentiment_label": "Somewhat-Bearish"
+                },
+                {
+                    "ticker": "CRYPTO:ETH",
+                    "relevance_score": "0.093289",
+                    "ticker_sentiment_score": "-0.287084",
+                    "ticker_sentiment_label": "Somewhat-Bearish"
+                }
+            ]
+        },
+        {
+            "title": "Salesforce  ( CRM )  Q1 2025 Earnings Call Transcript",
+            "url": "https://www.fool.com/earnings/call-transcripts/2024/05/29/salesforce-crm-q1-2025-earnings-call-transcript/",
+            "time_published": "20240530T004513",
+            "authors": [
+                "Motley Fool Transcribing"
+            ],
+            "summary": "CRM earnings call for the period ending March 31, 2024.",
+            "banner_image": "https://g.foolcdn.com/misc-assets/fool-transcripts-logo.png",
+            "source": "Motley Fool",
+            "category_within_source": "n/a",
+            "source_domain": "www.fool.com",
+            "topics": [
+                {
+                    "topic": "Energy & Transportation",
+                    "relevance_score": "0.2"
+                },
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.2"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.2"
+                },
+                {
+                    "topic": "Retail & Wholesale",
+                    "relevance_score": "0.2"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.995973"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "0.2"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "1.0"
+                },
+                {
+                    "topic": "Mergers & Acquisitions",
+                    "relevance_score": "0.996718"
+                }
+            ],
+            "overall_sentiment_score": 0.245794,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "EVR",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "GOOG",
+                    "relevance_score": "0.012101",
+                    "ticker_sentiment_score": "0.100291",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "CRWD",
+                    "relevance_score": "0.020167",
+                    "ticker_sentiment_score": "0.050533",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "BAC",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "HTHIF",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.254511",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "RDDT",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.105289",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "ADSK",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.126106",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "MS",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "NYT",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.105289",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "AWON",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.054996",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "GS",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "MSFT",
+                    "relevance_score": "0.008067",
+                    "ticker_sentiment_score": "0.110071",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "BCS",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "TGHI",
+                    "relevance_score": "0.008067",
+                    "ticker_sentiment_score": "0.090497",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "SBUX",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.145734",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "PAYX",
+                    "relevance_score": "0.016134",
+                    "ticker_sentiment_score": "0.10217",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "CIOXY",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.254511",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "TEAM",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.254511",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "FDX",
+                    "relevance_score": "0.032262",
+                    "ticker_sentiment_score": "0.116737",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "BNXYF",
+                    "relevance_score": "0.004034",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "AltaGas and Vopak reach positive final investment decision on Ridley Island Energy Export Facility",
+            "url": "https://www.globenewswire.com/news-release/2024/05/30/2890373/0/en/AltaGas-and-Vopak-reach-positive-final-investment-decision-on-Ridley-Island-Energy-Export-Facility.html",
+            "time_published": "20240530T003200",
+            "authors": [
+                "Koninklijke Vopak N.V."
+            ],
+            "summary": "29 May 2023 - 6:30pm Mountain Standard Time / 30 May 2023 - 3:30 Central European Time. All figures contained in the press release are in Canadian dollars unless otherwise stated.",
+            "banner_image": "https://ml-eu.globenewswire.com/Resource/Download/0eb05610-06f6-4087-b41b-62cabd00ecab",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.316726"
+                }
+            ],
+            "overall_sentiment_score": 0.335746,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "VTLE",
+                    "relevance_score": "0.017048",
+                    "ticker_sentiment_score": "0.05812",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Exclusive | Hong Kong body to launch exam to certify ESG professionals specifically for HKEX",
+            "url": "https://www.scmp.com/business/banking-finance/article/3264616/hong-kong-body-launch-exam-certify-esg-professionals-tailored-specifically-hkex-needs",
+            "time_published": "20240530T003010",
+            "authors": [
+                "Martin Choi"
+            ],
+            "summary": "A new certification course will be launched in Hong Kong in July, focusing on the ESG requirements of bourse operator Hong Kong Exchanges and Clearing to ensure the quality of local practitioners.",
+            "banner_image": "https://cdn.i-scmp.com/sites/default/files/d8/images/canvas/2024/05/29/aca5c7d7-1931-4bd2-975e-aa770d6f08d2_f74c0ddf.jpg",
+            "source": "South China Morning Post",
+            "category_within_source": "Business",
+            "source_domain": "www.scmp.com",
+            "topics": [],
+            "overall_sentiment_score": 0.182273,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "HKXCF",
+                    "relevance_score": "0.06697",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Compared to Estimates, American Eagle  ( AEO )  Q1 Earnings: A Look at Key Metrics",
+            "url": "https://www.zacks.com/stock/news/2280963/compared-to-estimates-american-eagle-aeo-q1-earnings-a-look-at-key-metrics",
+            "time_published": "20240530T003002",
+            "authors": [
+                "Zacks Equity Research"
+            ],
+            "summary": "While the top- and bottom-line numbers for American Eagle (AEO) give a sense of how the business performed in the quarter ended April 2024, it could be worth looking at how some of its key metrics compare to Wall Street estimates and year-ago values.",
+            "banner_image": null,
+            "source": "Zacks Commentary",
+            "category_within_source": "n/a",
+            "source_domain": "www.zacks.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.360215"
+                }
+            ],
+            "overall_sentiment_score": 0.222791,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "Poet Technologies Announces the Amendment and Acceleration of Warrants",
+            "url": "https://www.globenewswire.com/news-release/2024/05/30/2890372/0/en/Poet-Technologies-Announces-the-Amendment-and-Acceleration-of-Warrants.html",
+            "time_published": "20240530T003000",
+            "authors": [
+                "POET Technologies Inc."
+            ],
+            "summary": "TORONTO, May 29, 2024 ( GLOBE NEWSWIRE ) -- POET Technologies Inc. ( \"POET\" or the \"Corporation\" ) ( TSXV: PTK. NASDAQ: POET ) , the designer and developer of the POET Optical Interposer™, Photonic Integrated Circuits ( PICs ) and light sources for the data center, tele-communication and ...",
+            "banner_image": "https://ml.globenewswire.com/Resource/Download/c90ecc6e-9475-47bb-9baa-b92e4d296625",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Technology",
+                    "relevance_score": "1.0"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.839681"
+                }
+            ],
+            "overall_sentiment_score": 0.183031,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "POET",
+                    "relevance_score": "0.43303",
+                    "ticker_sentiment_score": "0.298594",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "SZIHF",
+                    "relevance_score": "0.045655",
+                    "ticker_sentiment_score": "0.08529",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Christina Lake Cannabis Provides Bi-Weekly Update on Status of MCTO",
+            "url": "https://www.globenewswire.com/news-release/2024/05/30/2890371/0/en/Christina-Lake-Cannabis-Provides-Bi-Weekly-Update-on-Status-of-MCTO.html",
+            "time_published": "20240530T002000",
+            "authors": [
+                "Christina Lake Cannabis Corp."
+            ],
+            "summary": "VANCOUVER, British Columbia, May 29, 2024 ( GLOBE NEWSWIRE ) -- Christina Lake Cannabis Corp. ( \"CLC\" or the \"Company\" ) ( CSE: CLC ) is providing an update with respect to the expected timeline for filing its audited financial statements for the fiscal year ended November 30, 2023, the related ...",
+            "banner_image": "https://ml.globenewswire.com/Resource/Download/a90964d7-e3fa-4a98-a666-ce2307d8be30",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.495866"
+                }
+            ],
+            "overall_sentiment_score": 0.023897,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "Donald Trump's jury ends its first day of deliberations deep in the hush-money conspiracy weeds",
+            "url": "https://www.businessinsider.com/trump-jury-dives-deep-in-the-hush-money-conspiracy-weeds-2024-5",
+            "time_published": "20240530T001900",
+            "authors": [
+                "Jacob Shamsian",
+                "Laura Italiano"
+            ],
+            "summary": "Trump jury dives deep in the hush-money conspiracy weeds - Business Insider ...",
+            "banner_image": null,
+            "source": "Business Insider",
+            "category_within_source": "GoogleRSS",
+            "source_domain": "www.businessinsider.com",
+            "topics": [
+                {
+                    "topic": "IPO",
+                    "relevance_score": "0.158519"
+                }
+            ],
+            "overall_sentiment_score": -0.01466,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "LNG Energy Group Reports Financial and Operating Results for the First Quarter of 2024",
+            "url": "https://www.globenewswire.com/news-release/2024/05/30/2890370/0/en/LNG-Energy-Group-Reports-Financial-and-Operating-Results-for-the-First-Quarter-of-2024.html",
+            "time_published": "20240530T000500",
+            "authors": [
+                "LNG Energy Group Corp."
+            ],
+            "summary": "Key Highlights: ...",
+            "banner_image": "https://ml.globenewswire.com/Resource/Download/8ae040b8-59f1-4456-bd61-7bcfcefb8709",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.495866"
+                }
+            ],
+            "overall_sentiment_score": 0.194625,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "Com2uS Brings 'Walking Dead' and 'Summoner's War' Games to Oasys Network",
+            "url": "https://decrypt.co/232953/com2us-walking-dead-summoners-war-games-oasys",
+            "time_published": "20240530T000105",
+            "authors": [
+                "Andrew Hayward"
+            ],
+            "summary": "The XPLA crypto gaming ecosystem has expanded onto the Oasys chain via the new Com2uS layer-2 network, along with two big franchise games.",
+            "banner_image": "https://cdn.decrypt.co/resize/1024/height/512/wp-content/uploads/2024/05/walking-dead-all-stars-gID_7.jpeg",
+            "source": "Decrypt.co",
+            "category_within_source": "n/a",
+            "source_domain": "decrypt.co",
+            "topics": [
+                {
+                    "topic": "Mergers & Acquisitions",
+                    "relevance_score": "0.158519"
+                },
+                {
+                    "topic": "Blockchain",
+                    "relevance_score": "0.158519"
+                }
+            ],
+            "overall_sentiment_score": 0.057404,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "NCBDF",
+                    "relevance_score": "0.150592",
+                    "ticker_sentiment_score": "0.194972",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Dayforce Continues Global Momentum with Launch of Dayforce Payroll in Singapore - Dayforce  ( NYSE:DAY ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076632/dayforce-continues-global-momentum-with-launch-of-dayforce-payroll-in-singapore",
+            "time_published": "20240530T000000",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "MINNEAPOLIS and SINGAPORE, May 29, 2024 ( GLOBE NEWSWIRE ) -- Dayforce, Inc. DAYDAY, a global human capital management ( HCM ) leader that makes work life better, today announced the introduction of its industry-leading payroll capabilities to the Singapore market with the launch of Dayforce ...",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "General",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.495866"
+                }
+            ],
+            "overall_sentiment_score": 0.248159,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "Dayforce Continues Global Momentum with Launch of Dayforce Payroll in Singapore",
+            "url": "https://www.globenewswire.com/news-release/2024/05/30/2890369/0/en/Dayforce-Continues-Global-Momentum-with-Launch-of-Dayforce-Payroll-in-Singapore.html",
+            "time_published": "20240530T000000",
+            "authors": [
+                "Inc.",
+                "Dayforce"
+            ],
+            "summary": "Single platform for pay and time streamlines payroll, drives efficiency, and strengthens compliance Single platform for pay and time streamlines payroll, drives efficiency, and strengthens compliance ...",
+            "banner_image": "https://ml.globenewswire.com/Resource/Download/4f431793-10ad-4514-b175-71f1bca24c47",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.310843"
+                }
+            ],
+            "overall_sentiment_score": 0.234496,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "Gen Zs are spending big to travel this summer - even if it means going into debt",
+            "url": "https://www.cnbc.com/2024/05/30/gens-zs-are-traveling-this-summer-and-going-into-debt-to-pay-for-trips.html",
+            "time_published": "20240529T234510",
+            "authors": [
+                "Monica Pitrelli"
+            ],
+            "summary": "Some 42% of Gen Zs and 47% of millennials say they're willing to go into debt to pay for their summer vacations, according to Bankrate.",
+            "banner_image": "https://image.cnbcfm.com/api/v1/image/107420346-17168202171716820215-34704200947-1080pnbcnews.jpg?v=1716820216&w=750&h=422&vtcrop=y",
+            "source": "CNBC",
+            "category_within_source": "Top News",
+            "source_domain": "www.cnbc.com",
+            "topics": [
+                {
+                    "topic": "Finance",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": -0.019118,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "BAC",
+                    "relevance_score": "0.065327",
+                    "ticker_sentiment_score": "-0.131216",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Ethereum ETF June launch 'legit possibility' as BlackRock files amended S-1",
+            "url": "https://cointelegraph.com/news/ether-etf-launch-june-possible-blackrock-amended-s-1",
+            "time_published": "20240529T233915",
+            "authors": [
+                "Jesse Coghlan"
+            ],
+            "summary": "BlackRock updated its Form S-1 for its spot Ether ETF, which analysts say is a \"good sign\" that issuers and the SEC are working on ETF launches.",
+            "banner_image": "https://images.cointelegraph.com/cdn-cgi/image/format=auto,onerror=redirect,quality=90,width=1200/https://s3.cointelegraph.com/uploads/2024-05/8c546b00-ce94-40bd-8493-eee25557c31f.jpg",
+            "source": "Cointelegraph",
+            "category_within_source": "n/a",
+            "source_domain": "cointelegraph.com",
+            "topics": [
+                {
+                    "topic": "Finance",
+                    "relevance_score": "1.0"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.967321"
+                }
+            ],
+            "overall_sentiment_score": 0.341359,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "BLK",
+                    "relevance_score": "0.44622",
+                    "ticker_sentiment_score": "0.469177",
+                    "ticker_sentiment_label": "Bullish"
+                },
+                {
+                    "ticker": "CRYPTO:ETH",
+                    "relevance_score": "0.570165",
+                    "ticker_sentiment_score": "0.564885",
+                    "ticker_sentiment_label": "Bullish"
+                }
+            ]
+        },
+        {
+            "title": "After revenue miss, Salesforce CEO details the 'measured' buying environment for enterprise software companies",
+            "url": "https://www.cnbc.com/2024/05/29/after-revenue-miss-salesforce-ceo-details-enterprise-software-landscape.html",
+            "time_published": "20240529T233411",
+            "authors": [
+                "Julie Coleman"
+            ],
+            "summary": "Salesforce CEO Marc Benioff told CNBC's Jim Cramer how the market for enterprise software companies has changed since the pandemic.",
+            "banner_image": "https://image.cnbcfm.com/api/v1/image/107421668-1717023957MM-B-052924-short.jpg?v=1717023956&w=750&h=422&vtcrop=y",
+            "source": "CNBC",
+            "category_within_source": "Top News",
+            "source_domain": "www.cnbc.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.744043"
+                },
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.538269"
+                },
+                {
+                    "topic": "Energy & Transportation",
+                    "relevance_score": "0.333333"
+                },
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.333333"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.333333"
+                }
+            ],
+            "overall_sentiment_score": 0.201963,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "META",
+                    "relevance_score": "0.100308",
+                    "ticker_sentiment_score": "-0.096762",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "MS",
+                    "relevance_score": "0.100308",
+                    "ticker_sentiment_score": "0.388264",
+                    "ticker_sentiment_label": "Bullish"
+                },
+                {
+                    "ticker": "FDX",
+                    "relevance_score": "0.100308",
+                    "ticker_sentiment_score": "0.183613",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "A Devil's Bargain With OpenAI",
+            "url": "https://www.theatlantic.com/technology/archive/2024/05/a-devils-bargain-with-openai/678537/",
+            "time_published": "20240529T232700",
+            "authors": [
+                "Damon Beres"
+            ],
+            "summary": "Earlier today, The Atlantic's CEO, Nicholas Thompson, announced in an internal email that the company has entered into a business partnership with OpenAI, the creator of ChatGPT. ( The news was made public via a press release shortly thereafter. ) Editorial content from this publication will ...",
+            "banner_image": "https://cdn.theatlantic.com/thumbor/g75pPlM9y8JZ4vXQlIwSswk5cnI=/0x0:2000x1125/960x540/media/img/mt/2024/05/open_ai/original.jpg",
+            "source": "The Atlantic",
+            "category_within_source": "n/a",
+            "source_domain": "www.theatlantic.com",
+            "topics": [
+                {
+                    "topic": "Technology",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "0.5"
+                }
+            ],
+            "overall_sentiment_score": 0.036118,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "NYT",
+                    "relevance_score": "0.031907",
+                    "ticker_sentiment_score": "0.021469",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "BZFD",
+                    "relevance_score": "0.127119",
+                    "ticker_sentiment_score": "0.022306",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "GOOG",
+                    "relevance_score": "0.063763",
+                    "ticker_sentiment_score": "-0.023188",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "META",
+                    "relevance_score": "0.095517",
+                    "ticker_sentiment_score": "0.021212",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Billionaire Activist Investor Nelson Peltz Sells Full Disney Stake",
+            "url": "https://www.forbes.com/sites/antoniopequenoiv/2024/05/29/billionaire-activist-investor-nelson-peltz-sells-full-disney-stake/",
+            "time_published": "20240529T232639",
+            "authors": [
+                "Antonio Pequeño IV"
+            ],
+            "summary": "Billionaire Nelson Peltz Sells Full Disney Stake After Losing Proxy Battle Forbes ...",
+            "banner_image": "https://imageio.forbes.com/specials-images/imageserve/6657b8601839a41fcc4ca947/0x0.jpg?format=jpg&crop=3000,1999,x0,y143,safe&height=900&width=1600&fit=bounds",
+            "source": "Forbes",
+            "category_within_source": "n/a",
+            "source_domain": "www.forbes.com",
+            "topics": [
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.310843"
+                },
+                {
+                    "topic": "Mergers & Acquisitions",
+                    "relevance_score": "0.310843"
+                },
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.495866"
+                }
+            ],
+            "overall_sentiment_score": -0.067955,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "Dividend Watch: 3 Companies Boosting Payouts",
+            "url": "https://www.zacks.com/stock/news/2280962/dividend-watch-3-companies-boosting-payouts",
+            "time_published": "20240529T232300",
+            "authors": [
+                "Derek Lewis"
+            ],
+            "summary": "Dividends soften the blow from drawdowns in other positions, provide more than one way to reap a return from an investment, and allow maximum returns through dividend reinvestment.",
+            "banner_image": "https://staticx-tuner.zacks.com/images/articles/main/6e/50121.jpg",
+            "source": "Zacks Commentary",
+            "category_within_source": "n/a",
+            "source_domain": "www.zacks.com",
+            "topics": [
+                {
+                    "topic": "Earnings",
+                    "relevance_score": "0.95493"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": 0.439804,
+            "overall_sentiment_label": "Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "WMS",
+                    "relevance_score": "0.49637",
+                    "ticker_sentiment_score": "0.492155",
+                    "ticker_sentiment_label": "Bullish"
+                },
+                {
+                    "ticker": "NOC",
+                    "relevance_score": "0.55533",
+                    "ticker_sentiment_score": "0.380351",
+                    "ticker_sentiment_label": "Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Alterity Therapeutics to Host Webcast Today on New Data from the bioMUSE Natural History Study - Alterity Therapeutics  ( NASDAQ:ATHE ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076461/alterity-therapeutics-to-host-webcast-today-on-new-data-from-the-biomuse-natural-history-study",
+            "time_published": "20240529T232124",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "- New bioMUSE Data Informs ATH434-202 Study Endpoints - - Webcast to Include Key Opinion Leader, Daniel Claassen, M.D., M.S., Vanderbilt University -",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Life Sciences",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": 0.187411,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "ATHE",
+                    "relevance_score": "0.308246",
+                    "ticker_sentiment_score": "0.219862",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Alterity Therapeutics to Host Webcast Today on New Data from the bioMUSE Natural History Study",
+            "url": "https://www.globenewswire.com/news-release/2024/05/29/2890368/0/en/Alterity-Therapeutics-to-Host-Webcast-Today-on-New-Data-from-the-bioMUSE-Natural-History-Study.html",
+            "time_published": "20240529T232100",
+            "authors": [
+                "ALTERITY THERAPEUTICS LIMITED"
+            ],
+            "summary": "- New bioMUSE Data Informs ATH434-202 Study Endpoints ...",
+            "banner_image": "https://ml.globenewswire.com/Resource/Download/0771a9a2-2ac1-4a63-9767-a2b1df74af27",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Life Sciences",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": 0.182622,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "ATHE",
+                    "relevance_score": "0.492659",
+                    "ticker_sentiment_score": "0.314739",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "At Sen. Bob Menendez's bribery trial, prosecutors highlight his wife's desperate finances",
+            "url": "https://apnews.com/article/bob-menendez-bribery-trial-40308e1397c3e40ba71dbb41f899569e",
+            "time_published": "20240529T231400",
+            "authors": [
+                "LARRY NEUMEISTER"
+            ],
+            "summary": "NEW YORK ( AP ) - Prosecutors at Sen. bribery trial showed jurors hundreds of texts, emails and phone calls over two days that show his desperate financial situation before New Jersey businessmen she had long known came to the rescue.",
+            "banner_image": "https://dims.apnews.com/dims4/default/8619c86/2147483647/strip/true/crop/2161x1439+0+1/resize/599x399!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2Fc8%2F2f%2Fc3a0e287e0de2764e39e1e6660c8%2F3f0efe793073453a8e62508a21d84747",
+            "source": "Associated Press",
+            "category_within_source": "Markets",
+            "source_domain": "apnews.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.158519"
+                }
+            ],
+            "overall_sentiment_score": 0.068186,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": []
+        },
+        {
+            "title": "After joint 108 years on remand, Hong Kong 47 face security trial verdict",
+            "url": "https://www.aljazeera.com/news/2024/5/29/after-joint-108-years-on-remand-hong-kong-47-face-security-trial-verdict",
+            "time_published": "20240529T231007",
+            "authors": [
+                "Erin Hale"
+            ],
+            "summary": "The trial of prominent democracy activists and politicians, who were arrested in 2021, is the largest under the security law.",
+            "banner_image": "https://www.aljazeera.com/wp-content/uploads/2020/07/25a6e97eb6ed432eadfc73fff0f7eac2_18.jpeg?w=770&resize=770%2C434",
+            "source": "Al Jareeza",
+            "category_within_source": "n/a",
+            "source_domain": "www.aljazeera.com",
+            "topics": [],
+            "overall_sentiment_score": -0.112441,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "FOREX:HKD",
+                    "relevance_score": "0.023767",
+                    "ticker_sentiment_score": "0.035747",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Monster Beverage Corporation Waives Financing Condition for Modified Dutch Auction Tender Offer to Purchase Up to $3.0 Billion of Its Outstanding Common Stock - Monster Beverage  ( NASDAQ:MNST ) ",
+            "url": "https://www.benzinga.com/pressreleases/24/05/g39076355/monster-beverage-corporation-waives-financing-condition-for-modified-dutch-auction-tender-offer-to",
+            "time_published": "20240529T230857",
+            "authors": [
+                "Globe Newswire"
+            ],
+            "summary": "CORONA, Calif., May 29, 2024 ( GLOBE NEWSWIRE ) -- Monster Beverage Corporation ( \"Monster\" ) MNST today announced that it is amending its previously announced modified \"Dutch auction\" tender offer to purchase shares of its common stock for cash at a price per share of not less than $53.00 and ...",
+            "banner_image": "https://www.benzinga.com/next-assets/images/schema-image-default.png",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.980716"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Mergers & Acquisitions",
+                    "relevance_score": "0.9973"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.5"
+                }
+            ],
+            "overall_sentiment_score": 0.217717,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "EVR",
+                    "relevance_score": "0.064018",
+                    "ticker_sentiment_score": "0.147173",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "MNST",
+                    "relevance_score": "0.095899",
+                    "ticker_sentiment_score": "0.093235",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "FOREX:GBP",
+                    "relevance_score": "0.032035",
+                    "ticker_sentiment_score": "0.173642",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Monster Beverage Corporation Waives Financing Condition for Modified Dutch Auction Tender Offer to Purchase Up to $3.0 Billion of Its Outstanding Common Stock",
+            "url": "https://www.globenewswire.com/news-release/2024/05/29/2890367/10193/en/Monster-Beverage-Corporation-Waives-Financing-Condition-for-Modified-Dutch-Auction-Tender-Offer-to-Purchase-Up-to-3-0-Billion-of-Its-Outstanding-Common-Stock.html",
+            "time_published": "20240529T230800",
+            "authors": [
+                "Monster Beverage Corporation"
+            ],
+            "summary": "CORONA, Calif., May 29, 2024 ( GLOBE NEWSWIRE ) -- Monster Beverage Corporation ( \"Monster\" ) ( NASDAQ: MNST ) today announced that it is amending its previously announced modified \"Dutch auction\" tender offer to purchase shares of its common stock for cash at a price per share of not less than ...",
+            "banner_image": "https://ml.globenewswire.com/Resource/Download/b94e27d0-b76d-4c84-8e68-dc508643b8b6",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.961735"
+                },
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "0.5"
+                },
+                {
+                    "topic": "Mergers & Acquisitions",
+                    "relevance_score": "0.9973"
+                },
+                {
+                    "topic": "Finance",
+                    "relevance_score": "0.5"
+                }
+            ],
+            "overall_sentiment_score": 0.227324,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "EVR",
+                    "relevance_score": "0.068016",
+                    "ticker_sentiment_score": "0.153567",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                },
+                {
+                    "ticker": "MNST",
+                    "relevance_score": "0.101869",
+                    "ticker_sentiment_score": "0.096458",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "FOREX:GBP",
+                    "relevance_score": "0.034039",
+                    "ticker_sentiment_score": "0.174533",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Stellantis CEO says low-cost electric Jeep will hit U.S. market 'very soon' - .com",
+            "url": "https://www.upi.com/Top_News/US/2024/05/29/stellantis-jeep-low-cost-electric-vehicle/6251717019269/",
+            "time_published": "20240529T230720",
+            "authors": [],
+            "summary": "Stellantis CEO says low-cost electric Jeep will hit U.S. market 'very soon' UPI News ...",
+            "banner_image": "https://cdnph.upi.com/sv/ph/og/upi/6251717019269/2024/1/96ef42057bbc5340a4dcfad31f7ee1ca/v1.5/Stellantis-CEO-says-low-cost-electric-Jeep-will-hit-US-market-very-soon.jpg",
+            "source": "UPI Business",
+            "category_within_source": "n/a",
+            "source_domain": "www.upi.com",
+            "topics": [
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": 0.073169,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "TSLA",
+                    "relevance_score": "0.175859",
+                    "ticker_sentiment_score": "0.05431",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "FOREX:EUR",
+                    "relevance_score": "0.088472",
+                    "ticker_sentiment_score": "0.0",
+                    "ticker_sentiment_label": "Neutral"
+                }
+            ]
+        },
+        {
+            "title": "Tesla Owners Could Soon Play Video Games At Supercharger Stations - Tesla  ( NASDAQ:TSLA ) ",
+            "url": "https://www.benzinga.com/general/gaming/24/05/39076303/tesla-owners-could-soon-play-video-games-at-supercharger-stations",
+            "time_published": "20240529T230243",
+            "authors": [
+                "Chris Katje"
+            ],
+            "summary": "Electric vehicle leader Tesla Inc TSLA launched several video game initiatives over the years, which shouldn't be a surprise given CEO Elon Musk's love of video games. Tesla owners could have a new competitive video game feature. What Happened: Tesla is one of the leaders in electric vehicle ...",
+            "banner_image": "https://cdn.benzinga.com/files/images/story/2024/05/29/Kettleman-City--Ca---Jan-29--2022-Many-C.jpeg?width=1200&height=800&fit=crop",
+            "source": "Benzinga",
+            "category_within_source": "News",
+            "source_domain": "www.benzinga.com",
+            "topics": [
+                {
+                    "topic": "Manufacturing",
+                    "relevance_score": "1.0"
+                }
+            ],
+            "overall_sentiment_score": 0.248342,
+            "overall_sentiment_label": "Somewhat-Bullish",
+            "ticker_sentiment": [
+                {
+                    "ticker": "BNXYF",
+                    "relevance_score": "0.102888",
+                    "ticker_sentiment_score": "0.060928",
+                    "ticker_sentiment_label": "Neutral"
+                },
+                {
+                    "ticker": "TSLA",
+                    "relevance_score": "0.879272",
+                    "ticker_sentiment_score": "0.287838",
+                    "ticker_sentiment_label": "Somewhat-Bullish"
+                }
+            ]
+        },
+        {
+            "title": "Fountain Asset Corp. Announces Its Financial Results for the Quarter Ended March 31, 2024",
+            "url": "https://www.globenewswire.com/news-release/2024/05/29/2890366/0/en/Fountain-Asset-Corp-Announces-Its-Financial-Results-for-the-Quarter-Ended-March-31-2024.html",
+            "time_published": "20240529T230100",
+            "authors": [
+                "Fountain Asset Corp."
+            ],
+            "summary": "TORONTO, May 29, 2024 ( GLOBE NEWSWIRE ) -- Fountain Asset Corp. ( TSXV:FA ) ( \"Fountain\" or the \"Company\" ) would like to announce its financial results for the three months ended March 31, 2024 ( \"Q1/24\" ) .",
+            "banner_image": "https://ml.globenewswire.com/Resource/Download/d1c16398-6934-455a-badb-794723f13402",
+            "source": "GlobeNewswire",
+            "category_within_source": "n/a",
+            "source_domain": "www.globenewswire.com",
+            "topics": [
+                {
+                    "topic": "Financial Markets",
+                    "relevance_score": "0.658903"
+                }
+            ],
+            "overall_sentiment_score": 0.040635,
+            "overall_sentiment_label": "Neutral",
+            "ticker_sentiment": [
+                {
+                    "ticker": "SRGMF",
+                    "relevance_score": "0.053629",
+                    "ticker_sentiment_score": "-0.181771",
+                    "ticker_sentiment_label": "Somewhat-Bearish"
+                },
+                {
+                    "ticker": "HMDPF",
+                    "relevance_score": "0.053629",
+                    "ticker_sentiment_score": "-0.181771",
+                    "ticker_sentiment_label": "Somewhat-Bearish"
+                },
+                {
+                    "ticker": "PSIX",
+                    "relevance_score": "0.053629",
+                    "ticker_sentiment_score": "-0.181771",
+                    "ticker_sentiment_label": "Somewhat-Bearish"
+                }
+            ]
+        }
+    ]
 }

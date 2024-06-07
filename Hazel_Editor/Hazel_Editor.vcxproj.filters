@@ -10,6 +10,9 @@
     <Filter Include="Assets\Textures\MeshTextures">
       <UniqueIdentifier>{4B5330C7-370E-2073-E0C5-98BDCC5F6A03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Textures\Sky_Gradient_Textures">
+      <UniqueIdentifier>{C11D7977-2DE2-7767-F647-A83162CB139D}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
@@ -52,6 +55,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Textures\Blue_Noise.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Fern_Mask.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\FlowerMask.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\ForestMask.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
     <Image Include="Assets\Textures\MeshTextures\AK_103_Base_Color.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
@@ -82,16 +97,166 @@
     <Image Include="Assets\Textures\MeshTextures\GrassUE5_ORA.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
+    <Image Include="Assets\Textures\MeshTextures\Grass_Clumps_C_2_png-Grass_Clumps_C_3_png.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\Grass_Clumps_C_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
     <Image Include="Assets\Textures\MeshTextures\Grass_Normal.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\Grass_ORA.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\MeshTextures\RoughnessMat.png">
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchBark_BaseColor.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
-    <Image Include="Assets\Textures\MeshTextures\bark.png">
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchBark_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchBark_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs01_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs01_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs02_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs02_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchLeafs02_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchTree_G_Bill_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchTree_G_Bill_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchTree_Y_Bill_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BirchTree_Y_Bill_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBark01_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBark01_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBark01_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBranches_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBranches_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushBranches_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushLeafs02_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushLeafs02_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_BushLeafs02_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferBranches_A_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferBranches_A_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferBranches_A_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferLeafs_A_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferLeafs_A_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_ConiferLeafs_A_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Conifer_Bill01_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Conifer_Bill01_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Grass_01_StaticMeshActor_15_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Grass_01_StaticMeshActor_15_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_OakBark_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_OakBark_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_OakBark_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_OakLeafs_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_OakLeafs_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_OakLeafs_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg005_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg005_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg005_Roughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg011_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg011_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg011_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg031_BaseColor.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg031_MetallicRoughness.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\MI_Veg031_Normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\SpruceLeaves_Diffuse.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\SpruceTrunk_Albedo.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\Twig_Leaf_Long_Diffuse_C1-Twig_Leaf_Long_Opacity.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\Twig_Leaf_Long_Normal.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\bark01.png">
@@ -100,7 +265,16 @@
     <Image Include="Assets\Textures\MeshTextures\bark01_normal.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
+    <Image Include="Assets\Textures\MeshTextures\bark02.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
     <Image Include="Assets\Textures\MeshTextures\bark_normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\bark_willow_nor_gl_2k.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\bark_willow_rough_2k@channels=G.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\brake_di.png">
@@ -110,6 +284,12 @@
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\flower daisy_normal.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\flowers-02.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\grass-02.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
     <Image Include="Assets\Textures\MeshTextures\grass_texture.png">
@@ -154,11 +334,35 @@
     <Image Include="Assets\Textures\MeshTextures\sidewall.png">
       <Filter>Assets\Textures\MeshTextures</Filter>
     </Image>
+    <Image Include="Assets\Textures\MeshTextures\t-sbark-01-bc.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\t-sbark-01-n.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\t-sbark-01-raos.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\wfzobb2ia_2K_Albedo.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\MeshTextures\wk1ncbxja_2K_Albedo.png">
+      <Filter>Assets\Textures\MeshTextures</Filter>
+    </Image>
     <Image Include="Assets\Textures\PerlinTexture.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\RPGpack_sheet_2X.png">
       <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Sky_Gradient_Textures\SunView_Gradient.png">
+      <Filter>Assets\Textures\Sky_Gradient_Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Sky_Gradient_Textures\SunZenith_Gradient.png">
+      <Filter>Assets\Textures\Sky_Gradient_Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Sky_Gradient_Textures\ViewZenith_Gradient.png">
+      <Filter>Assets\Textures\Sky_Gradient_Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\Terrain_Height_Map.png">
       <Filter>Assets\Textures</Filter>
@@ -169,14 +373,14 @@
     <Image Include="Assets\Textures\Test.png">
       <Filter>Assets\Textures</Filter>
     </Image>
+    <Image Include="Assets\Textures\ValleyMask.png">
+      <Filter>Assets\Textures</Filter>
+    </Image>
     <Image Include="Assets\Textures\grass_mask.png">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\rickshaw.png">
       <Filter>Assets\Textures</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\cs_ResetDensityMap.glsl" />
   </ItemGroup>
 </Project>
